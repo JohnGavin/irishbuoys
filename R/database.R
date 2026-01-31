@@ -274,11 +274,13 @@ log_update <- function(con, start_date, end_date, records_added, stations, notes
     notes <- ""
   }
 
+  # Generate next update_id (DuckDB doesn't auto-increment like SQLite)
   DBI::dbExecute(con, glue::glue("
     INSERT INTO update_log
-    (start_date, end_date, records_added, stations_updated, notes)
+    (update_id, start_date, end_date, records_added, stations_updated, notes)
     VALUES
-    ('{start_date}', '{end_date}', {records_added}, '{stations}', '{notes}')
+    ((SELECT COALESCE(MAX(update_id), 0) + 1 FROM update_log),
+     '{start_date}', '{end_date}', {records_added}, '{stations}', '{notes}')
   "))
 
   invisible(NULL)
