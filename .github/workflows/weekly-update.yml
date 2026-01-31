@@ -24,6 +24,7 @@ jobs:
 
       - name: Perform incremental update
         run: |
+          export NIX_PATH=nixpkgs=https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-26.tar.gz
           nix-shell default.nix -A shell --run "Rscript -e '
             devtools::load_all()
             result <- incremental_update(db_path = \"inst/extdata/irish_buoys.duckdb\", lookback_hours = 72)

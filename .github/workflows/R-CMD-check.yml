@@ -26,4 +26,5 @@ jobs:
 
       - name: Run R CMD check
         run: |
+          export NIX_PATH=nixpkgs=https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-26.tar.gz
           nix-shell default.nix -A shell --run "Rscript -e 'devtools::document(); devtools::check(error_on = \"error\")'"
