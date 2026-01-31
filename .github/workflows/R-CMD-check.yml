@@ -24,9 +24,6 @@ jobs:
           name: rstats-on-nix
           extraPullNames: johngavin
 
-      - name: Build Nix environment
-        run: nix-build default.nix -A shell --out-link nix-shell-ci
-
       - name: Run R CMD check
         run: |
-          nix-shell --run "Rscript -e 'devtools::document(); devtools::check(error_on = \"error\")'"
+          nix-shell default.nix -A shell --run "Rscript -e 'devtools::document(); devtools::check(error_on = \"error\")'"

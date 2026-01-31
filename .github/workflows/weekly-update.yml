@@ -22,12 +22,9 @@ jobs:
           name: rstats-on-nix
           extraPullNames: johngavin
 
-      - name: Build Nix environment
-        run: nix-build default.nix -A shell --out-link nix-shell-ci
-
       - name: Perform incremental update
         run: |
-          nix-shell --run "Rscript -e '
+          nix-shell default.nix -A shell --run "Rscript -e '
             devtools::load_all()
             result <- incremental_update(db_path = \"inst/extdata/irish_buoys.duckdb\", lookback_hours = 72)
             saveRDS(result, file = paste0(\"update_log_\", Sys.Date(), \".rds\"))
