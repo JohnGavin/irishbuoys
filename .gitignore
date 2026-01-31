@@ -1,0 +1,29 @@
+# R and RStudio
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+
+# Nix
+nix-shell-root
+
+# targets
+_targets/
+
+# Data
+*.duckdb
+*.parquet
+*.arrow
+*.csv
+*.json
+inst/extdata/*.rds
+inst/extdata/*.duckdb
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Documentation
+docs/
+pkgdown/

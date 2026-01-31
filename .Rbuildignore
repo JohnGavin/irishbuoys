@@ -1,0 +1,13 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^nix-shell-root$
+^default\.R$
+^default\.nix$
+^default\.sh$
+^default-ci\.nix$
+^data-raw$
+^_targets\.R$
+^_targets$
+^\.github$
+^vignettes/articles$
+^tests/testthat/_snaps$

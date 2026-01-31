@@ -1,0 +1,214 @@
+---
+format: gfm
+execute:
+  echo: true
+  eval: false
+---
+
+# irishbuoys
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+The `irishbuoys` package provides tools to download, process, and analyze data from the Irish Weather Buoy Network. It includes functions for accessing real-time and historical data via the Marine Institute's ERDDAP server, storing data in DuckDB for efficient querying, and building predictive models for wave height and weather conditions.
+
+## Installation
+
+### Standard R Installation
+
+You can install the development version of irishbuoys from GitHub:
+
+```r
+# install.packages("remotes")
+remotes::install_github("johngavin/irishbuoys")
+```
+
+### Nix Environment Installation (Recommended)
+
+For a reproducible development environment using Nix:
+
+```bash
+# Clone the repository
+git clone https://github.com/johngavin/irishbuoys.git
+cd irishbuoys
+
+# Generate Nix configuration from DESCRIPTION
+Rscript default.R
+
+# Enter Nix shell (first time may take a while)
+./default.sh
+
+# Subsequent entries are fast (seconds)
+./default.sh
+```
+
+### Using with rix
+
+To integrate this package into your own Nix environment:
+
+```r
+library(rix)
+
+rix(
+  r_ver = "4.5.0",
+  r_pkgs = c("duckdb", "DBI", "httr2", "dplyr"),
+  git_pkgs = list(
+    list(
+      package_name = "irishbuoys",
+      repo_url = "https://github.com/johngavin/irishbuoys",
+      commit = "main"  # Use specific SHA for reproducibility
+    )
+  ),
+  ide = "other",
+  project_path = "."
+)
+```
+
+## Quick Start
+
+### Download Recent Data
+
+```r
+library(irishbuoys)
+
+# Download last 7 days of data
+data <- download_buoy_data(
+  start_date = Sys.Date() - 7,
+  end_date = Sys.Date()
+)
+
+# Get data for specific station
+m3_data <- download_buoy_data(
+  stations = "M3",
+  start_date = "2024-01-01"
+)
+
+# Get only wave measurements
+waves <- download_buoy_data(
+  variables = c("time", "station_id", "WaveHeight", "WavePeriod", "Hmax")
+)
+```
+
+### Initialize and Query Database
+
+```r
+# Initialize database with historical data
+initialize_database(
+  start_date = "2023-01-01",
+  end_date = Sys.Date()
+)
+
+# Connect to database
+con <- connect_duckdb()
+
+# Query wave data
+wave_data <- query_buoy_data(
+  con,
+  stations = c("M3", "M4"),
+  variables = c("time", "station_id", "wave_height", "wave_period"),
+  start_date = "2024-01-01",
+  qc_filter = TRUE  # Only good quality data
+)
+
+# Custom SQL query
+extreme_waves <- query_buoy_data(
+  con,
+  sql_query = "
+    SELECT station_id, time, wave_height, hmax
+    FROM buoy_data
+    WHERE hmax > 2 * wave_height
+      AND wave_height > 0
+      AND qc_flag = 1
+    ORDER BY time DESC
+    LIMIT 100
+  "
+)
+
+# Don't forget to disconnect
+DBI::dbDisconnect(con)
+```
+
+### Incremental Updates
+
+```r
+# Perform incremental update (for scheduled jobs)
+result <- incremental_update()
+print(result$summary)
+
+# Check database statistics
+stats <- get_database_stats()
+```
+
+### Data Dictionary
+
+```r
+# Get complete data dictionary
+dict <- get_data_dictionary()
+View(dict)
+
+# Get detailed documentation for specific variable
+wave_docs <- get_variable_docs("WaveHeight")
+print(wave_docs)
+```
+
+## Data Source
+
+Data is sourced from the [Marine Institute's ERDDAP server](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html), which provides real-time and historical measurements from the Irish Weather Buoy Network.
+
+### Available Stations
+
+- **M2**: Southwest of Ireland
+- **M3**: Southwest of Ireland
+- **M4**: Southeast of Ireland
+- **M5**: West of Ireland
+- **M6**: Northwest of Ireland
+- **M1**: Historical data (decommissioned)
+- **FS1**: Historical data
+
+### Measured Parameters
+
+- **Meteorological**: Air temperature, pressure, humidity, wind speed/direction
+- **Oceanographic**: Wave height/period/direction, sea temperature, salinity
+- **Quality**: QC flags for data validation
+
+## Project Structure
+
+```{r}
+#| echo: false
+#| eval: true
+fs::dir_tree()
+```
+
+## Key Features
+
+1. **Efficient Data Storage**: Uses DuckDB for fast querying of large datasets
+2. **Incremental Updates**: Smart updating to only download new data
+3. **Quality Control**: Built-in filtering for data quality
+4. **Rogue Wave Detection**: Identify extreme wave events (Hmax > 2 × Hs)
+5. **Comprehensive Documentation**: Full data dictionary with scientific definitions
+
+## Use Cases
+
+- Marine safety and operations planning
+- Climate and oceanographic research
+- Extreme event analysis
+- Wave energy resource assessment
+- Weather forecast validation
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This package is licensed under the MIT License. See LICENSE file for details.
+
+## Acknowledgments
+
+Data provided by the Marine Institute Ireland in collaboration with Met Éireann and the UK Met Office.
+
+## Sources
+
+- [Marine Institute ERDDAP Server](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html)
+- [Irish Weather Buoy Network on data.gov.ie](https://data.gov.ie/dataset/weather-buoy-network)

@@ -1,0 +1,37 @@
+Package: irishbuoys
+Title: Analyze Irish Weather Buoy Network Data
+Version: 0.0.91
+Authors@R:
+    person("John", "Gavin", , "john.b.gavin@gmail.com", role = c("aut", "cre"))
+Description: Provides tools to download, process, and analyze data from the Irish
+    Weather Buoy Network. Includes functions for accessing real-time and historical
+    data via the Marine Institute's ERDDAP server, storing data in DuckDB for
+    efficient querying, and building predictive models for wave height and weather
+    conditions.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports:
+    arrow,
+    cli,
+    DBI,
+    dplyr,
+    duckdb,
+    glue,
+    httr2,
+    jsonlite,
+    lubridate,
+    rlang,
+    tidyr
+Suggests:
+    blastula,
+    crew,
+    ggplot2,
+    plotly,
+    quarto,
+    ranger,
+    tarchetypes,
+    targets,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

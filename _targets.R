@@ -1,0 +1,35 @@
+# _targets.R file for Irish Buoys Package
+# This file orchestrates modular pipeline components from R/tar_plans/
+
+# Load required packages
+library(targets)
+library(tarchetypes)
+library(crew)
+
+# Set target options
+tar_option_set(
+  packages = c("irishbuoys", "duckdb", "DBI", "dplyr", "ggplot2", "cli"),
+  format = "rds",
+  memory = "transient",
+  garbage_collection = TRUE,
+  controller = crew::crew_controller_local(workers = 2)
+)
+
+# Source all R functions (excluding R/dev/ and R/tar_plans/)
+for (file in list.files("R", pattern = "\\.R$", full.names = TRUE)) {
+  if (!grepl("R/(dev|tar_plans)/", file)) {
+    source(file)
+  }
+}
+
+# Source and load all pipeline plans
+plan_files <- list.files("R/tar_plans", pattern = "^plan_.*\\.R$", full.names = TRUE)
+for (plan_file in plan_files) {
+  source(plan_file)
+}
+
+# Combine all plans into single pipeline
+list(
+  plan_data_acquisition,
+  plan_quality_control
+)
