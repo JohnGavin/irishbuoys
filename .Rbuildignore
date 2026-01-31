@@ -12,3 +12,8 @@
 ^vignettes/articles$
 ^tests/testthat/_snaps$
 ^README\.qmd$
+^_extensions$
+^vignettes/data$
+^vignettes/.*_files$
+^vignettes/.*\.html$
+^shinylive-sw\.js$

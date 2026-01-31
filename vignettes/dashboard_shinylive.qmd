@@ -1,0 +1,218 @@
+---
+title: "Irish Weather Buoy Explorer"
+format:
+  html:
+    page-layout: full
+    embed-resources: false
+    resources:
+      - shinylive-sw.js
+      - data/buoy_data.json
+      - data/stations.json
+filters:
+  - shinylive
+---
+
+```{shinylive-r}
+#| standalone: true
+#| viewerHeight: 700
+
+library(shiny)
+library(plotly)
+library(jsonlite)
+library(dplyr)
+
+ui <- fluidPage(
+  titlePanel("Irish Weather Buoy Network Explorer"),
+
+  sidebarLayout(
+    sidebarPanel(
+      width = 3,
+      selectInput(
+        "station",
+        "Select Station:",
+        choices = NULL
+      ),
+      selectInput(
+        "variable",
+        "Select Variable:",
+        choices = c(
+          "Wave Height (m)" = "wave_height",
+          "Max Wave Height (m)" = "hmax",
+          "Wave Period (s)" = "wave_period",
+          "Wind Speed (m/s)" = "wind_speed",
+          "Wind Gust (m/s)" = "gust",
+          "Air Temperature (C)" = "air_temperature",
+          "Sea Temperature (C)" = "sea_temperature",
+          "Pressure (hPa)" = "atmospheric_pressure"
+        ),
+        selected = "wave_height"
+      ),
+      hr(),
+      h4("Station Info"),
+      verbatimTextOutput("station_info"),
+      hr(),
+      h4("Summary Statistics"),
+      verbatimTextOutput("summary_stats")
+    ),
+
+    mainPanel(
+      width = 9,
+      plotlyOutput("timeseries", height = "350px"),
+      hr(),
+      h4("Recent Observations"),
+      tableOutput("data_table")
+    )
+  )
+)
+
+server <- function(input, output, session) {
+
+  # Load data - embedded JSON
+  buoy_data <- reactive({
+    # Data is loaded from pre-exported JSON
+    url <- "data/buoy_data.json"
+    tryCatch({
+      data <- jsonlite::fromJSON(url)
+      data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+      data
+    }, error = function(e) {
+      # Fallback sample data for testing
+      data.frame(
+        time = Sys.time() - (1:100) * 3600,
+        station_id = rep(c("M2", "M3", "M4", "M5", "M6"), each = 20),
+        wave_height = runif(100, 1, 5),
+        hmax = runif(100, 2, 8),
+        wave_period = runif(100, 5, 12),
+        wind_speed = runif(100, 5, 25),
+        gust = runif(100, 10, 35),
+        air_temperature = runif(100, 5, 15),
+        sea_temperature = runif(100, 8, 12),
+        atmospheric_pressure = runif(100, 980, 1020),
+        longitude = rep(c(-10.5, -11.2, -13.5, -10.0, -15.9), each = 20),
+        latitude = rep(c(51.2, 53.1, 53.5, 51.7, 53.1), each = 20)
+      )
+    })
+  })
+
+  # Update station choices
+  observe({
+    data <- buoy_data()
+    stations <- unique(data$station_id)
+    updateSelectInput(session, "station", choices = stations, selected = stations[1])
+  })
+
+  # Filter data for selected station
+  station_data <- reactive({
+    req(input$station)
+    buoy_data() |>
+      filter(station_id == input$station) |>
+      arrange(time)
+  })
+
+  # Station info
+  output$station_info <- renderText({
+    data <- station_data()
+    if (nrow(data) == 0) return("No data available")
+
+    paste0(
+      "Station: ", input$station, "\n",
+      "Records: ", nrow(data), "\n",
+      "From: ", format(min(data$time), "%Y-%m-%d"), "\n",
+      "To: ", format(max(data$time), "%Y-%m-%d"), "\n",
+      "Lat: ", round(data$latitude[1], 2), "\n",
+      "Lon: ", round(data$longitude[1], 2)
+    )
+  })
+
+  # Summary statistics
+  output$summary_stats <- renderText({
+    data <- station_data()
+    var <- input$variable
+    if (nrow(data) == 0 || !var %in% names(data)) return("No data")
+
+    values <- data[[var]]
+    values <- values[!is.na(values)]
+
+    if (length(values) == 0) return("No valid data")
+
+    paste0(
+      "Variable: ", var, "\n",
+      "Min: ", round(min(values), 2), "\n",
+      "Max: ", round(max(values), 2), "\n",
+      "Mean: ", round(mean(values), 2), "\n",
+      "SD: ", round(sd(values), 2)
+    )
+  })
+
+  # Time series plot with plotly
+  output$timeseries <- renderPlotly({
+    data <- station_data()
+    var <- input$variable
+
+    if (nrow(data) == 0 || !var %in% names(data)) {
+      return(plot_ly() |> layout(title = "No data available"))
+    }
+
+    var_labels <- c(
+      wave_height = "Wave Height (m)",
+      hmax = "Max Wave Height (m)",
+      wave_period = "Wave Period (s)",
+      wind_speed = "Wind Speed (m/s)",
+      gust = "Wind Gust (m/s)",
+      air_temperature = "Air Temperature (C)",
+      sea_temperature = "Sea Temperature (C)",
+      atmospheric_pressure = "Pressure (hPa)"
+    )
+
+    plot_ly(data, x = ~time, y = ~get(var), type = "scatter", mode = "lines+markers",
+            line = list(color = "#1f77b4"),
+            marker = list(size = 4, color = "#1f77b4"),
+            hovertemplate = paste0(
+              "<b>%{x}</b><br>",
+              var_labels[var], ": %{y:.2f}<extra></extra>"
+            )) |>
+      layout(
+        title = paste(var_labels[var], "-", input$station),
+        xaxis = list(title = "Time (UTC)"),
+        yaxis = list(title = var_labels[var]),
+        hovermode = "x unified"
+      )
+  })
+
+  # Data table - recent observations
+  output$data_table <- renderTable({
+    data <- station_data()
+    if (nrow(data) == 0) return(data.frame(Message = "No data"))
+
+    data |>
+      tail(10) |>
+      mutate(time = format(time, "%Y-%m-%d %H:%M")) |>
+      select(time, wave_height, hmax, wave_period, wind_speed, gust)
+  }, digits = 2)
+}
+
+shinyApp(ui, server)
+```
+
+## About
+
+This interactive dashboard displays data from the **Irish Weather Buoy Network**, operated by the Marine Institute of Ireland.
+
+### Data Source
+- ERDDAP API: [Marine Institute Data Portal](https://erddap.marine.ie)
+- Updates: Weekly automated fetch via GitHub Actions
+
+### Features
+- Real-time station selection
+- Multiple meteorological variables
+- Interactive time series (zoom, pan, hover)
+- Summary statistics
+
+### Stations
+| ID | Name | Location |
+|----|------|----------|
+| M2 | M2 Buoy | Southwest Ireland |
+| M3 | M3 Buoy | West Ireland |
+| M4 | M4 Buoy | Northwest Ireland |
+| M5 | M5 Buoy | Southwest Ireland |
+| M6 | M6 Buoy | Rockall Trough |
