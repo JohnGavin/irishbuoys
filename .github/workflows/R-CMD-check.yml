@@ -11,25 +11,21 @@ jobs:
   R-CMD-check:
     runs-on: ubuntu-latest
 
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      R_KEEP_PKG_SOURCE: yes
-
     steps:
       - uses: actions/checkout@v4
 
-      - uses: r-lib/actions/setup-r@v2
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
         with:
-          r-version: 'release'
-          use-public-rspm: true
+          nix_path: nixpkgs=channel:nixos-unstable
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          extra-packages: any::rcmdcheck
-          needs: check
+      - name: Build Nix environment
+        run: |
+          nix-build default.nix -A shell --out-link nix-shell-ci
 
-      - uses: r-lib/actions/check-r-package@v2
-        with:
-          args: 'c("--no-manual", "--as-cran")'
-          error-on: '"error"'
-          check-dir: '"check"'
+      - name: Run R CMD check
+        run: |
+          nix-shell --run "Rscript -e '
+            devtools::document()
+            devtools::check(error_on = \"error\")
+          '"
