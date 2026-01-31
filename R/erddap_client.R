@@ -80,9 +80,13 @@ download_buoy_data <- function(
 
   # Parse response based on format
   if (format == "csv") {
-    data <- response |>
-      httr2::resp_body_string() |>
-      utils::read.csv(text = _, skip = 1, stringsAsFactors = FALSE)
+    # ERDDAP CSV has 2 header rows: column names (row 1) and units (row 2)
+    # We read row 1 as header and skip row 2 (units)
+    csv_text <- httr2::resp_body_string(response)
+    csv_lines <- strsplit(csv_text, "\n")[[1]]
+    # Remove the units row (row 2, index 2)
+    csv_lines <- csv_lines[-2]
+    data <- utils::read.csv(text = paste(csv_lines, collapse = "\n"), stringsAsFactors = FALSE)
 
     # Convert time column to POSIXct if present
     if ("time" %in% names(data)) {
