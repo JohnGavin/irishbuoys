@@ -11,3 +11,4 @@
 ^\.github$
 ^vignettes/articles$
 ^tests/testthat/_snaps$
+^README\.qmd$

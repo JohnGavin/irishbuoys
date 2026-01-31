@@ -87,11 +87,8 @@ save_to_parquet <- function(
     data$month <- lubridate::month(data$time)
   }
 
-  # Set compression options for maximum space savings
-  write_options <- arrow::ParquetWriteOptions$create(
-    compression = compression,
-    compression_level = if(compression == "zstd") 9 else NULL  # Max compression
-  )
+  # Set compression level
+  compression_level <- if(compression == "zstd") 9L else NULL
 
   if (partition_by == "year_month") {
     # Partition by year and month
@@ -100,8 +97,7 @@ save_to_parquet <- function(
       path = file.path(data_path, "by_year_month"),
       format = "parquet",
       partitioning = c("year", "month"),
-      existing_data_behavior = "overwrite",
-      parquet_options = write_options
+      existing_data_behavior = "overwrite"
     )
 
   } else if (partition_by == "station") {
@@ -111,8 +107,7 @@ save_to_parquet <- function(
       path = file.path(data_path, "by_station"),
       format = "parquet",
       partitioning = "station_id",
-      existing_data_behavior = "overwrite",
-      parquet_options = write_options
+      existing_data_behavior = "overwrite"
     )
 
   } else if (partition_by == "both") {
@@ -122,8 +117,7 @@ save_to_parquet <- function(
       path = file.path(data_path, "by_year_month_station"),
       format = "parquet",
       partitioning = c("year", "month", "station_id"),
-      existing_data_behavior = "overwrite",
-      parquet_options = write_options
+      existing_data_behavior = "overwrite"
     )
   }
 
@@ -155,11 +149,13 @@ save_to_parquet <- function(
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' # Query recent data
 #' df <- query_parquet(
 #'   "SELECT * FROM buoy_data WHERE wave_height > 5",
 #'   date_range = c(Sys.Date() - 30, Sys.Date())
 #' )
+#' }
 query_parquet <- function(
     query = NULL,
     data_path = "inst/extdata/parquet/by_year_month",

@@ -22,8 +22,7 @@ Imports:
     httr2,
     jsonlite,
     lubridate,
-    rlang,
-    tidyr
+    utils
 Suggests:
     blastula,
     crew,

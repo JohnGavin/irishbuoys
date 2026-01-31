@@ -153,7 +153,7 @@ initialize_database <- function(
 
   # Create date chunks
   date_seq <- seq(start_date, end_date, by = chunk_days)
-  if (tail(date_seq, 1) < end_date) {
+  if (utils::tail(date_seq, 1) < end_date) {
     date_seq <- c(date_seq, end_date)
   }
 

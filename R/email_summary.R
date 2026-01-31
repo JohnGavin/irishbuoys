@@ -156,7 +156,7 @@ create_email_summary <- function(summary) {
   # Format extreme events table
   extreme_text <- if (nrow(summary$extreme_events) > 0) {
     paste0(
-      "<h3>⚠️ Extreme Events This Week</h3>",
+      "<h3>[!] Extreme Events This Week</h3>",
       "<table border='1' style='border-collapse: collapse;'>",
       "<tr><th>Station</th><th>Time</th><th>Event</th><th>Value</th></tr>",
       paste(apply(summary$extreme_events, 1, function(row) {
@@ -176,8 +176,8 @@ create_email_summary <- function(summary) {
       "<li>Average Wave Height: ", round(as.numeric(row["avg_wave_height"]), 2), " m</li>",
       "<li>Maximum Wave Height: ", round(as.numeric(row["max_wave_height"]), 2), " m</li>",
       "<li>Average Wind Speed: ", round(as.numeric(row["avg_wind_speed"]), 1), " knots</li>",
-      "<li>Air Temperature: ", round(as.numeric(row["avg_air_temp"]), 1), "°C</li>",
-      "<li>Sea Temperature: ", round(as.numeric(row["avg_sea_temp"]), 1), "°C</li>",
+      "<li>Air Temperature: ", round(as.numeric(row["avg_air_temp"]), 1), " C</li>",
+      "<li>Sea Temperature: ", round(as.numeric(row["avg_sea_temp"]), 1), " C</li>",
       "<li>Observations: ", row["n_observations"], "</li>",
       "</ul>"
     )
@@ -185,16 +185,16 @@ create_email_summary <- function(summary) {
 
   # Create email body
   email_body <- paste0(
-    "<h1>📊 Irish Weather Buoy Network - Weekly Summary</h1>",
+    "<h1>Irish Weather Buoy Network - Weekly Summary</h1>",
     "<p><strong>Report Period:</strong> ",
     summary$period$start, " to ", summary$period$end, "</p>",
 
-    "<h2>📈 This Week's Statistics</h2>",
+    "<h2>This Week's Statistics</h2>",
     station_stats,
 
     extreme_text,
 
-    "<h2>📊 Week-over-Week Changes</h2>",
+    "<h2>Week-over-Week Changes</h2>",
     if (!is.null(summary$week_over_week)) {
       paste0(
         "<table border='1' style='border-collapse: collapse;'>",
