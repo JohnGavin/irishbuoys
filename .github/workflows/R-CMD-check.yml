@@ -10,22 +10,23 @@ on:
 jobs:
   R-CMD-check:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Nix
         uses: cachix/install-nix-action@v27
+
+      - name: Setup Cachix (rstats-on-nix)
+        uses: cachix/cachix-action@v15
         with:
-          nix_path: nixpkgs=channel:nixos-unstable
+          name: rstats-on-nix
+          extraPullNames: johngavin
 
       - name: Build Nix environment
-        run: |
-          nix-build default.nix -A shell --out-link nix-shell-ci
+        run: nix-build default.nix -A shell --out-link nix-shell-ci
 
       - name: Run R CMD check
         run: |
-          nix-shell --run "Rscript -e '
-            devtools::document()
-            devtools::check(error_on = \"error\")
-          '"
+          nix-shell --run "Rscript -e 'devtools::document(); devtools::check(error_on = \"error\")'"
