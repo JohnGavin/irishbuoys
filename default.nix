@@ -53,7 +53,7 @@ let
     LC_PAPER = "en_US.UTF-8";
     LC_MEASUREMENT = "en_US.UTF-8";
     
-    buildInputs = [ rpkgs system_packages ];
+    buildInputs = [ pkgs.R rpkgs system_packages ];
     
   }; 
 in
