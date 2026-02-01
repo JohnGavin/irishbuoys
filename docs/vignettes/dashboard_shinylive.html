@@ -40,6 +40,21 @@ ul.task-list li input[type="checkbox"] {
 <script src="dashboard_shinylive_files/libs/quarto-contrib/shinylive-0.9.1/shinylive/run-python-blocks.js" type="module"></script>
 <link href="dashboard_shinylive_files/libs/quarto-contrib/shinylive-0.9.1/shinylive/shinylive.css" rel="stylesheet">
 <link href="dashboard_shinylive_files/libs/quarto-contrib/shinylive-quarto-css/shinylive-quarto.css" rel="stylesheet">
+<script>
+// Fix serviceworker_dir meta tag BEFORE Shinylive loads
+// See: https://github.com/JohnGavin/llm/wiki for details
+(function() {
+  var meta = document.querySelector('meta[name="shinylive:serviceworker_dir"]');
+  if (meta) {
+    meta.setAttribute('content', '.');
+  } else {
+    meta = document.createElement('meta');
+    meta.name = 'shinylive:serviceworker_dir';
+    meta.content = '.';
+    document.head.appendChild(meta);
+  }
+})();
+</script>
 
 
 </head>

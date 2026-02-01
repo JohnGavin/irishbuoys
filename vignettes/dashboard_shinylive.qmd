@@ -4,6 +4,23 @@ format:
   html:
     page-layout: full
     embed-resources: false
+    include-in-header:
+      - text: |
+          <script>
+          // Fix serviceworker_dir meta tag BEFORE Shinylive loads
+          // See: https://github.com/JohnGavin/llm/wiki for details
+          (function() {
+            var meta = document.querySelector('meta[name="shinylive:serviceworker_dir"]');
+            if (meta) {
+              meta.setAttribute('content', '.');
+            } else {
+              meta = document.createElement('meta');
+              meta.name = 'shinylive:serviceworker_dir';
+              meta.content = '.';
+              document.head.appendChild(meta);
+            }
+          })();
+          </script>
     resources:
       - shinylive-sw.js
       - data/buoy_data.json
