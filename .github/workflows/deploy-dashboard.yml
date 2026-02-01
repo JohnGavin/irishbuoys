@@ -29,7 +29,8 @@ jobs:
 
       - name: Install R packages
         run: |
-          install.packages(c("shinylive", "jsonlite"), repos = "https://cloud.r-project.org")
+          install.packages("pak", repos = "https://cloud.r-project.org")
+          pak::pak(c("posit-dev/r-shinylive", "jsonlite"))
         shell: Rscript {0}
 
       - uses: quarto-dev/quarto-actions/setup@v2
