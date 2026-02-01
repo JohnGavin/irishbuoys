@@ -31,14 +31,13 @@ filters:
 
 ```{shinylive-r}
 #| standalone: true
-#| viewerHeight: 700
+#| viewerHeight: 800
 
-# Core packages (always available in WebR)
+# Core packages
 library(shiny)
 library(jsonlite)
 
-# Install ggplot2 dependencies first to avoid munsell error
-# See: https://github.com/JohnGavin/llm/wiki - Shinylive Lessons Learned
+# Install ggplot2 dependencies for plotly
 tryCatch({
   if (!requireNamespace("munsell", quietly = TRUE)) {
     webr::install("munsell", repos = "https://repo.r-wasm.org")
@@ -48,128 +47,245 @@ tryCatch({
   }
   library(plotly)
   library(dplyr)
-  USE_PLOTLY <- TRUE
 }, error = function(e) {
-  message("Plotly not available, using base graphics")
-  USE_PLOTLY <<- FALSE
+  message("Package loading error: ", e$message)
 })
 
-ui <- fluidPage(
-  titlePanel("Irish Weather Buoy Network Explorer"),
+# Variable choices for dropdowns
+VAR_CHOICES <- c(
+ "Wave Height (m)" = "wave_height",
+  "Max Wave Height (m)" = "hmax",
+  "Wave Period (s)" = "wave_period",
+  "Wind Speed (m/s)" = "wind_speed",
+  "Wind Gust (m/s)" = "gust",
+  "Air Temperature (C)" = "air_temperature",
+  "Sea Temperature (C)" = "sea_temperature",
+  "Pressure (hPa)" = "atmospheric_pressure"
+)
 
-  sidebarLayout(
-    sidebarPanel(
-      width = 3,
-      selectInput(
-        "station",
-        "Select Station:",
-        choices = NULL
-      ),
-      selectInput(
-        "variable",
-        "Select Variable:",
-        choices = c(
-          "Wave Height (m)" = "wave_height",
-          "Max Wave Height (m)" = "hmax",
-          "Wave Period (s)" = "wave_period",
-          "Wind Speed (m/s)" = "wind_speed",
-          "Wind Gust (m/s)" = "gust",
-          "Air Temperature (C)" = "air_temperature",
-          "Sea Temperature (C)" = "sea_temperature",
-          "Pressure (hPa)" = "atmospheric_pressure"
+ui <- navbarPage(
+  "Irish Weather Buoy Network",
+  id = "main_nav",
+
+  # === TAB 1: Time Series Explorer ===
+  tabPanel(
+    "Time Series",
+    icon = icon("chart-line"),
+    sidebarLayout(
+      sidebarPanel(
+        width = 3,
+        selectInput(
+          "stations",
+          "Select Station(s):",
+          choices = NULL,
+          multiple = TRUE
         ),
-        selected = "wave_height"
+        selectInput(
+          "variable",
+          "Select Variable:",
+          choices = VAR_CHOICES,
+          selected = "wave_height"
+        ),
+        sliderInput(
+          "days",
+          "Last N Days:",
+          min = 1, max = 30, value = 5, step = 1
+        ),
+        hr(),
+        h4("Station Info"),
+        verbatimTextOutput("station_info"),
+        hr(),
+        h4("Summary Statistics"),
+        verbatimTextOutput("summary_stats")
       ),
-      hr(),
-      h4("Station Info"),
-      verbatimTextOutput("station_info"),
-      hr(),
-      h4("Summary Statistics"),
-      verbatimTextOutput("summary_stats")
-    ),
+      mainPanel(
+        width = 9,
+        plotlyOutput("timeseries", height = "350px"),
+        hr(),
+        fluidRow(
+          column(6, h4("Recent Observations")),
+          column(6, align = "right",
+            selectInput("n_rows", "Show rows:",
+                        choices = c(10, 25, 50), selected = 10, width = "100px")
+          )
+        ),
+        tableOutput("data_table")
+      )
+    )
+  ),
 
-    mainPanel(
-      width = 9,
-      plotlyOutput("timeseries", height = "350px"),
+  # === TAB 2: Scatter Plot Comparison ===
+  tabPanel(
+    "Scatter Plot",
+    icon = icon("chart-scatter"),
+    sidebarLayout(
+      sidebarPanel(
+        width = 3,
+        selectInput(
+          "scatter_stations",
+          "Select Station(s):",
+          choices = NULL,
+          multiple = TRUE
+        ),
+        selectInput(
+          "var_x",
+          "X-Axis Variable:",
+          choices = VAR_CHOICES,
+          selected = "wind_speed"
+        ),
+        selectInput(
+          "var_y",
+          "Y-Axis Variable:",
+          choices = VAR_CHOICES,
+          selected = "wave_height"
+        ),
+        sliderInput(
+          "scatter_days",
+          "Last N Days:",
+          min = 1, max = 30, value = 5, step = 1
+        ),
+        hr(),
+        h4("Correlation"),
+        verbatimTextOutput("correlation")
+      ),
+      mainPanel(
+        width = 9,
+        plotlyOutput("scatter_plot", height = "500px")
+      )
+    )
+  ),
+
+  # === TAB 3: Notes & References ===
+  tabPanel(
+    "Notes",
+    icon = icon("info-circle"),
+    fluidPage(
+      h2("Data Sources"),
+      p("Data sourced from the ",
+        tags$a(href = "https://erddap.marine.ie/erddap/index.html",
+               "Marine Institute ERDDAP Server", target = "_blank")),
+      p("The Irish Weather Buoy Network is operated by the Marine Institute of Ireland."),
+
       hr(),
-      h4("Recent Observations"),
-      tableOutput("data_table")
+      h2("Last Updated"),
+      verbatimTextOutput("last_updated"),
+
+      hr(),
+      h2("Most Recent Observations (Top 6)"),
+      tableOutput("recent_obs"),
+
+      hr(),
+      h2("Data Quality"),
+      p("Quality control flags:"),
+      tags$ul(
+        tags$li("0 = Unverified data"),
+        tags$li("1 = Good quality data"),
+        tags$li("9 = Missing data")
+      ),
+      p("Current dataset uses QC flag != 9 (excludes missing data only)."),
+
+      hr(),
+      h2("Station Information"),
+      tableOutput("station_table"),
+
+      hr(),
+      h2("References"),
+      tags$ul(
+        tags$li(tags$a(href = "https://www.marine.ie/", "Marine Institute Ireland")),
+        tags$li(tags$a(href = "https://erddap.marine.ie/", "ERDDAP Data Portal")),
+        tags$li(tags$a(href = "https://github.com/JohnGavin/irishbuoys", "irishbuoys R Package"))
+      ),
+
+      hr(),
+      h2("Technical Notes"),
+      p("This dashboard runs entirely in your browser using WebR (R compiled to WebAssembly)."),
+      p("Built with: Shiny, Plotly, Shinylive, Quarto")
     )
   )
 )
 
 server <- function(input, output, session) {
 
-  # Load data - embedded JSON
+  # Load data
   buoy_data <- reactive({
-    # Data is loaded from pre-exported JSON
     url <- "data/buoy_data.json"
     tryCatch({
       data <- jsonlite::fromJSON(url)
       data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
       data
     }, error = function(e) {
-      # Fallback sample data for testing
+      # Fallback sample data
       data.frame(
-        time = Sys.time() - (1:100) * 3600,
-        station_id = rep(c("M2", "M3", "M4", "M5", "M6"), each = 20),
-        wave_height = runif(100, 1, 5),
-        hmax = runif(100, 2, 8),
-        wave_period = runif(100, 5, 12),
-        wind_speed = runif(100, 5, 25),
-        gust = runif(100, 10, 35),
-        air_temperature = runif(100, 5, 15),
-        sea_temperature = runif(100, 8, 12),
-        atmospheric_pressure = runif(100, 980, 1020),
-        longitude = rep(c(-10.5, -11.2, -13.5, -10.0, -15.9), each = 20),
-        latitude = rep(c(51.2, 53.1, 53.5, 51.7, 53.1), each = 20)
+        time = Sys.time() - (1:200) * 3600,
+        station_id = rep(c("M2", "M3", "M4", "M5", "M6"), each = 40),
+        wave_height = runif(200, 1, 5),
+        hmax = runif(200, 2, 8),
+        wave_period = runif(200, 5, 12),
+        wind_speed = runif(200, 5, 25),
+        gust = runif(200, 10, 35),
+        air_temperature = runif(200, 5, 15),
+        sea_temperature = runif(200, 8, 12),
+        atmospheric_pressure = runif(200, 980, 1020),
+        longitude = rep(c(-10.5, -11.2, -13.5, -10.0, -15.9), each = 40),
+        latitude = rep(c(51.2, 53.1, 53.5, 51.7, 53.1), each = 40)
       )
     })
   })
 
-  # Update station choices
+  # Initialize station choices
   observe({
     data <- buoy_data()
-    stations <- unique(data$station_id)
-    updateSelectInput(session, "station", choices = stations, selected = stations[1])
+    stations <- sort(unique(data$station_id))
+    updateSelectInput(session, "stations", choices = stations, selected = stations)
+    updateSelectInput(session, "scatter_stations", choices = stations, selected = stations)
   })
 
-  # Filter data for selected station
-  station_data <- reactive({
-    req(input$station)
-    buoy_data() |>
-      filter(station_id == input$station) |>
-      arrange(time)
+  # Filter data for time series tab
+  filtered_data <- reactive({
+    req(input$stations, input$days)
+    data <- buoy_data()
+    cutoff <- Sys.time() - (input$days * 24 * 3600)
+    data |>
+      filter(station_id %in% input$stations, time >= cutoff) |>
+      arrange(desc(time))
+  })
+
+  # Filter data for scatter tab
+  scatter_data <- reactive({
+    req(input$scatter_stations, input$scatter_days)
+    data <- buoy_data()
+    cutoff <- Sys.time() - (input$scatter_days * 24 * 3600)
+    data |>
+      filter(station_id %in% input$scatter_stations, time >= cutoff) |>
+      arrange(desc(time))
   })
 
   # Station info
   output$station_info <- renderText({
-    data <- station_data()
+    data <- filtered_data()
     if (nrow(data) == 0) return("No data available")
 
     paste0(
-      "Station: ", input$station, "\n",
+      "Stations: ", paste(unique(data$station_id), collapse = ", "), "\n",
       "Records: ", nrow(data), "\n",
-      "From: ", format(min(data$time), "%Y-%m-%d"), "\n",
-      "To: ", format(max(data$time), "%Y-%m-%d"), "\n",
-      "Lat: ", round(data$latitude[1], 2), "\n",
-      "Lon: ", round(data$longitude[1], 2)
+      "From: ", format(min(data$time), "%Y-%m-%d %H:%M"), "\n",
+      "To: ", format(max(data$time), "%Y-%m-%d %H:%M")
     )
   })
 
   # Summary statistics
   output$summary_stats <- renderText({
-    data <- station_data()
+    data <- filtered_data()
     var <- input$variable
     if (nrow(data) == 0 || !var %in% names(data)) return("No data")
 
     values <- data[[var]]
     values <- values[!is.na(values)]
-
     if (length(values) == 0) return("No valid data")
 
+    var_label <- names(VAR_CHOICES)[VAR_CHOICES == var]
     paste0(
-      "Variable: ", var, "\n",
+      "Variable: ", var_label, "\n",
       "Min: ", round(min(values), 2), "\n",
       "Max: ", round(max(values), 2), "\n",
       "Mean: ", round(mean(values), 2), "\n",
@@ -177,75 +293,146 @@ server <- function(input, output, session) {
     )
   })
 
-  # Time series plot with plotly
+  # Time series plot
   output$timeseries <- renderPlotly({
-    data <- station_data()
+    data <- filtered_data()
     var <- input$variable
 
     if (nrow(data) == 0 || !var %in% names(data)) {
       return(plot_ly() |> layout(title = "No data available"))
     }
 
-    var_labels <- c(
-      wave_height = "Wave Height (m)",
-      hmax = "Max Wave Height (m)",
-      wave_period = "Wave Period (s)",
-      wind_speed = "Wind Speed (m/s)",
-      gust = "Wind Gust (m/s)",
-      air_temperature = "Air Temperature (C)",
-      sea_temperature = "Sea Temperature (C)",
-      atmospheric_pressure = "Pressure (hPa)"
-    )
+    var_label <- names(VAR_CHOICES)[VAR_CHOICES == var]
 
-    plot_ly(data, x = ~time, y = ~get(var), type = "scatter", mode = "lines+markers",
-            line = list(color = "#1f77b4"),
-            marker = list(size = 4, color = "#1f77b4"),
+    p <- plot_ly()
+    for (stn in unique(data$station_id)) {
+      stn_data <- data[data$station_id == stn, ]
+      p <- p |> add_trace(
+        data = stn_data,
+        x = ~time, y = ~get(var),
+        type = "scatter", mode = "lines+markers",
+        name = stn,
+        marker = list(size = 4),
+        hovertemplate = paste0("<b>", stn, "</b><br>%{x}<br>", var_label, ": %{y:.2f}<extra></extra>")
+      )
+    }
+
+    p |> layout(
+      title = paste(var_label, "- Last", input$days, "Days"),
+      xaxis = list(title = "Time (UTC)"),
+      yaxis = list(title = var_label),
+      hovermode = "x unified",
+      legend = list(orientation = "h", y = -0.2)
+    )
+  })
+
+  # Data table
+  output$data_table <- renderTable({
+    data <- filtered_data()
+    if (nrow(data) == 0) return(data.frame(Message = "No data"))
+
+    n <- as.integer(input$n_rows)
+    data |>
+      head(n) |>
+      mutate(time = format(time, "%Y-%m-%d %H:%M")) |>
+      select(time, station_id, wave_height, hmax, wave_period, wind_speed, gust)
+  }, digits = 2)
+
+  # Scatter plot
+  output$scatter_plot <- renderPlotly({
+    data <- scatter_data()
+    var_x <- input$var_x
+    var_y <- input$var_y
+
+    if (nrow(data) == 0) {
+      return(plot_ly() |> layout(title = "No data available"))
+    }
+
+    x_label <- names(VAR_CHOICES)[VAR_CHOICES == var_x]
+    y_label <- names(VAR_CHOICES)[VAR_CHOICES == var_y]
+
+    plot_ly(data, x = ~get(var_x), y = ~get(var_y),
+            color = ~station_id,
+            type = "scatter", mode = "markers",
+            marker = list(size = 8, opacity = 0.7),
             hovertemplate = paste0(
-              "<b>%{x}</b><br>",
-              var_labels[var], ": %{y:.2f}<extra></extra>"
+              "<b>%{data.name}</b><br>",
+              x_label, ": %{x:.2f}<br>",
+              y_label, ": %{y:.2f}<extra></extra>"
             )) |>
       layout(
-        title = paste(var_labels[var], "-", input$station),
-        xaxis = list(title = "Time (UTC)"),
-        yaxis = list(title = var_labels[var]),
-        hovermode = "x unified"
+        title = paste(y_label, "vs", x_label, "- Last", input$scatter_days, "Days"),
+        xaxis = list(title = x_label),
+        yaxis = list(title = y_label),
+        legend = list(orientation = "h", y = -0.15)
       )
   })
 
-  # Data table - recent observations
-  output$data_table <- renderTable({
-    data <- station_data()
-    if (nrow(data) == 0) return(data.frame(Message = "No data"))
+  # Correlation
+  output$correlation <- renderText({
+    data <- scatter_data()
+    var_x <- input$var_x
+    var_y <- input$var_y
 
+    if (nrow(data) < 3) return("Insufficient data")
+
+    x_vals <- data[[var_x]]
+    y_vals <- data[[var_y]]
+    valid <- !is.na(x_vals) & !is.na(y_vals)
+
+    if (sum(valid) < 3) return("Insufficient valid data")
+
+    cor_val <- cor(x_vals[valid], y_vals[valid])
+    paste0("Pearson r = ", round(cor_val, 3), "\n",
+           "n = ", sum(valid), " observations")
+  })
+
+  # Notes tab outputs
+  output$last_updated <- renderText({
+    data <- buoy_data()
+    paste0(
+      "Data range: ", format(min(data$time), "%Y-%m-%d %H:%M"), " to ",
+      format(max(data$time), "%Y-%m-%d %H:%M"), " UTC\n",
+      "Total records: ", nrow(data), "\n",
+      "Stations: ", paste(sort(unique(data$station_id)), collapse = ", ")
+    )
+  })
+
+  output$recent_obs <- renderTable({
+    data <- buoy_data()
     data |>
-      tail(10) |>
+      arrange(desc(time)) |>
+      head(6) |>
       mutate(time = format(time, "%Y-%m-%d %H:%M")) |>
-      select(time, wave_height, hmax, wave_period, wind_speed, gust)
+      select(time, station_id, wave_height, wind_speed, air_temperature)
   }, digits = 2)
+
+  output$station_table <- renderTable({
+    data <- buoy_data()
+    data |>
+      group_by(station_id) |>
+      summarise(
+        n_records = n(),
+        lat = round(first(latitude), 2),
+        lon = round(first(longitude), 2),
+        .groups = "drop"
+      )
+  })
 }
 
 shinyApp(ui, server)
 ```
 
-## About
+## About This Dashboard
 
 This interactive dashboard displays data from the **Irish Weather Buoy Network**, operated by the Marine Institute of Ireland.
 
-### Data Source
-- ERDDAP API: [Marine Institute Data Portal](https://erddap.marine.ie)
-- Updates: Weekly automated fetch via GitHub Actions
-
 ### Features
-- Real-time station selection
-- Multiple meteorological variables
-- Interactive time series (zoom, pan, hover)
-- Summary statistics
+- **Time Series Tab**: View any variable over time for one or more stations
+- **Scatter Plot Tab**: Compare two variables to explore correlations
+- **Notes Tab**: Data sources, quality information, and references
 
-### Stations
-| ID | Name | Location |
-|----|------|----------|
-| M2 | M2 Buoy | Southwest Ireland |
-| M3 | M3 Buoy | West Ireland |
-| M4 | M4 Buoy | Northwest Ireland |
-| M5 | M5 Buoy | Southwest Ireland |
-| M6 | M6 Buoy | Rockall Trough |
+### Data
+- Source: Marine Institute ERDDAP API
+- Updates: Weekly via GitHub Actions
+- Quality: Excludes missing data (QC flag = 9)
