@@ -16,17 +16,23 @@ _targets/
 *.parquet
 *.arrow
 *.csv
-*.json
 inst/extdata/*.rds
 inst/extdata/*.duckdb
+# JSON ignored except in docs/ and vignettes/data/
+*.json
+!docs/**/*.json
+!vignettes/data/*.json
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# Documentation
-docs/
+# Documentation (docs/ NOT ignored - contains pre-built dashboard for GitHub Pages)
 pkgdown/
 /.quarto/
 **/*.quarto_ipynb
 _output/
+
+# Except allow dashboard data files
+!docs/
+!docs/**
