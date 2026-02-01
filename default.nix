@@ -24,11 +24,13 @@ let
       devtools
       dplyr
       duckdb
+      gh
       glue
       httr2
       jsonlite
       lubridate
       pkgload
+      ranger
       rix
       rlang
       tidyr
@@ -36,12 +38,12 @@ let
   };
       
   system_packages = builtins.attrValues {
-    inherit (pkgs)
+    inherit (pkgs) 
       git
       glibcLocales
       nix
-      pandoc;
-    # R removed - comes through rPackages dependencies to avoid derivation mismatch
+      pandoc
+      R;
   };
   
   shell = pkgs.mkShell {
@@ -53,7 +55,7 @@ let
     LC_PAPER = "en_US.UTF-8";
     LC_MEASUREMENT = "en_US.UTF-8";
     
-    buildInputs = [ pkgs.R rpkgs system_packages ];
+    buildInputs = [ rpkgs system_packages ];
     
   }; 
 in

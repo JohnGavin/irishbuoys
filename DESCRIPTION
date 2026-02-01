@@ -30,6 +30,8 @@ Suggests:
     plotly,
     quarto,
     ranger,
+    shiny,
+    shinylive,
     tarchetypes,
     targets,
     testthat (>= 3.0.0)
