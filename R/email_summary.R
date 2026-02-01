@@ -6,20 +6,30 @@
 #'
 #' @param db_path Path to DuckDB database
 #' @param lookback_days Number of days to analyze (default: 7)
+#' @param qc_filter QC flag filter: 1 = good only, 0 = include unverified, NULL = no filter
 #'
 #' @return List containing summary statistics and comparisons
 #'
 #' @export
 generate_weekly_summary <- function(
     db_path = "inst/extdata/irish_buoys.duckdb",
-    lookback_days = 7
+    lookback_days = 7,
+    qc_filter = NULL
 ) {
 
   con <- connect_duckdb(db_path = db_path)
+
   on.exit(DBI::dbDisconnect(con))
 
   current_date <- Sys.Date()
   start_date <- current_date - lookback_days
+
+  # Build QC filter clause
+  qc_clause <- if (!is.null(qc_filter)) {
+    glue::glue("AND qc_flag = {qc_filter}")
+  } else {
+    "AND qc_flag != 9"
+  }
 
   # Current week statistics
   current_week <- DBI::dbGetQuery(con, glue::glue("
@@ -35,7 +45,7 @@ generate_weekly_summary <- function(
     FROM buoy_data
     WHERE time >= '{start_date}'
       AND time < '{current_date}'
-      AND qc_flag = 1
+      {qc_clause}
     GROUP BY station_id
   "))
 
@@ -51,7 +61,7 @@ generate_weekly_summary <- function(
     FROM buoy_data
     WHERE time >= '{start_date - 7}'
       AND time < '{start_date}'
-      AND qc_flag = 1
+      {qc_clause}
     GROUP BY station_id
   "))
 
@@ -68,7 +78,7 @@ generate_weekly_summary <- function(
     FROM buoy_data
     WHERE EXTRACT(WEEK FROM time) = EXTRACT(WEEK FROM TIMESTAMP '{current_date}')
       AND time < '{start_date}'
-      AND qc_flag = 1
+      {qc_clause}
     GROUP BY station_id
   "))
 
@@ -82,7 +92,7 @@ generate_weekly_summary <- function(
     FROM buoy_data
     WHERE time >= '{start_date}'
       AND wave_height > 8
-      AND qc_flag = 1
+      {qc_clause}
 
     UNION ALL
 
@@ -94,7 +104,7 @@ generate_weekly_summary <- function(
     FROM buoy_data
     WHERE time >= '{start_date}'
       AND wind_speed > 48
-      AND qc_flag = 1
+      {qc_clause}
 
     UNION ALL
 
@@ -107,7 +117,7 @@ generate_weekly_summary <- function(
     WHERE time >= '{start_date}'
       AND hmax > 2 * wave_height
       AND wave_height > 2
-      AND qc_flag = 1
+      {qc_clause}
 
     ORDER BY time DESC
   "))

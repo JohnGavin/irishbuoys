@@ -25,9 +25,11 @@ DuckDB can query Parquet files directly without importing.
 This provides excellent performance with minimal memory usage.
 }
 \examples{
+\dontrun{
 # Query recent data
 df <- query_parquet(
   "SELECT * FROM buoy_data WHERE wave_height > 5",
   date_range = c(Sys.Date() - 30, Sys.Date())
 )
+}
 }

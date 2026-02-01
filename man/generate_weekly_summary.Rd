@@ -6,13 +6,16 @@
 \usage{
 generate_weekly_summary(
   db_path = "inst/extdata/irish_buoys.duckdb",
-  lookback_days = 7
+  lookback_days = 7,
+  qc_filter = NULL
 )
 }
 \arguments{
 \item{db_path}{Path to DuckDB database}
 
 \item{lookback_days}{Number of days to analyze (default: 7)}
+
+\item{qc_filter}{QC flag filter: 1 = good only, 0 = include unverified, NULL = no filter}
 }
 \value{
 List containing summary statistics and comparisons

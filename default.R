@@ -14,7 +14,9 @@ core_pkgs <- c(
   "httr2",          # HTTP requests
   "cli",            # CLI formatting
   "glue",           # String interpolation
-  "rlang"           # R language utilities
+  "rlang",          # R language utilities
+  "ranger",         # Random forest for wave prediction
+  "gh"              # GitHub API
 )
 
 # Development tools
