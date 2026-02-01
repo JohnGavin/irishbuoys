@@ -88,7 +88,7 @@ ul.task-list li input[type="checkbox"] {
 #|   shinylive does not work in self-contained HTML documents.
 #|   Please set `embed-resources: false` in your metadata.
 #| standalone: true
-#| viewerHeight: 800
+#| viewerHeight: 850
 
 # Core packages
 library(shiny)
@@ -110,7 +110,7 @@ tryCatch({
 
 # Variable choices for dropdowns
 VAR_CHOICES &lt;- c(
- "Wave Height (m)" = "wave_height",
+  "Wave Height (m)" = "wave_height",
   "Max Wave Height (m)" = "hmax",
   "Wave Period (s)" = "wave_period",
   "Wind Speed (m/s)" = "wind_speed",
@@ -118,6 +118,17 @@ VAR_CHOICES &lt;- c(
   "Air Temperature (C)" = "air_temperature",
   "Sea Temperature (C)" = "sea_temperature",
   "Pressure (hPa)" = "atmospheric_pressure"
+)
+
+# Sort column choices for table
+SORT_CHOICES &lt;- c(
+  "Time (newest)" = "time_desc",
+  "Time (oldest)" = "time_asc",
+  "Wave Height (high)" = "wave_height_desc",
+  "Wave Height (low)" = "wave_height_asc",
+  "Wind Speed (high)" = "wind_speed_desc",
+  "Wind Speed (low)" = "wind_speed_asc",
+  "Station" = "station_id_asc"
 )
 
 ui &lt;- navbarPage(
@@ -146,7 +157,7 @@ ui &lt;- navbarPage(
         sliderInput(
           "days",
           "Last N Days:",
-          min = 1, max = 30, value = 5, step = 1
+          min = 1, max = 90, value = 7, step = 1
         ),
         hr(),
         h4("Station Info"),
@@ -160,10 +171,14 @@ ui &lt;- navbarPage(
         plotlyOutput("timeseries", height = "350px"),
         hr(),
         fluidRow(
-          column(6, h4("Recent Observations")),
-          column(6, align = "right",
+          column(4, h4("Recent Observations")),
+          column(4,
+            selectInput("sort_by", "Sort by:",
+                        choices = SORT_CHOICES, selected = "time_desc", width = "100%")
+          ),
+          column(4, align = "right",
             selectInput("n_rows", "Show rows:",
-                        choices = c(10, 25, 50), selected = 10, width = "100px")
+                        choices = c(10, 25, 50, 100), selected = 25, width = "100px")
           )
         ),
         tableOutput("data_table")
@@ -199,7 +214,7 @@ ui &lt;- navbarPage(
         sliderInput(
           "scatter_days",
           "Last N Days:",
-          min = 1, max = 30, value = 5, step = 1
+          min = 1, max = 90, value = 7, step = 1
         ),
         hr(),
         h4("Correlation"),
@@ -217,46 +232,72 @@ ui &lt;- navbarPage(
     "Notes",
     icon = icon("info-circle"),
     fluidPage(
-      h2("Data Sources"),
-      p("Data sourced from the ",
-        tags$a(href = "https://erddap.marine.ie/erddap/index.html",
-               "Marine Institute ERDDAP Server", target = "_blank")),
-      p("The Irish Weather Buoy Network is operated by the Marine Institute of Ireland."),
-
-      hr(),
-      h2("Last Updated"),
-      verbatimTextOutput("last_updated"),
-
-      hr(),
-      h2("Most Recent Observations (Top 6)"),
-      tableOutput("recent_obs"),
+      fluidRow(
+        column(6,
+          h2("About This Dashboard"),
+          p("This interactive dashboard displays data from the ",
+            tags$b("Irish Weather Buoy Network"),
+            ", operated by the Marine Institute of Ireland."),
+          h4("Features"),
+          tags$ul(
+            tags$li(tags$b("Time Series Tab:"), " View any variable over time for one or more stations"),
+            tags$li(tags$b("Scatter Plot Tab:"), " Compare two variables to explore correlations"),
+            tags$li(tags$b("Notes Tab:"), " Data sources, quality information, and references")
+          ),
+          hr(),
+          h2("Data Sources"),
+          p("Data sourced from the ",
+            tags$a(href = "https://erddap.marine.ie/erddap/index.html",
+                   "Marine Institute ERDDAP Server", target = "_blank")),
+          p("The Irish Weather Buoy Network is operated by the Marine Institute of Ireland."),
+          p("Historical data available from 2001 to present.")
+        ),
+        column(6,
+          h2("Data Summary"),
+          verbatimTextOutput("last_updated"),
+          hr(),
+          h2("Station Information"),
+          tableOutput("station_table")
+        )
+      ),
 
       hr(),
       h2("Data Quality"),
-      p("Quality control flags:"),
-      tags$ul(
-        tags$li("0 = Unverified data"),
-        tags$li("1 = Good quality data"),
-        tags$li("9 = Missing data")
+      fluidRow(
+        column(6,
+          h4("Quality Control Flags"),
+          tags$ul(
+            tags$li(tags$b("0"), " = Unverified data (raw sensor readings)"),
+            tags$li(tags$b("1"), " = Good quality data (passed QC checks)"),
+            tags$li(tags$b("9"), " = Missing data (sensor offline or invalid)")
+          ),
+          p("Current dataset excludes missing data (QC flag = 9).")
+        ),
+        column(6,
+          h4("QC Flag Distribution"),
+          tableOutput("qc_summary"),
+          h4("QC by Station"),
+          tableOutput("qc_by_station")
+        )
       ),
-      p("Current dataset uses QC flag != 9 (excludes missing data only)."),
 
       hr(),
-      h2("Station Information"),
-      tableOutput("station_table"),
+      h2("Most Recent Observations"),
+      tableOutput("recent_obs"),
 
       hr(),
       h2("References"),
       tags$ul(
-        tags$li(tags$a(href = "https://www.marine.ie/", "Marine Institute Ireland")),
-        tags$li(tags$a(href = "https://erddap.marine.ie/", "ERDDAP Data Portal")),
-        tags$li(tags$a(href = "https://github.com/JohnGavin/irishbuoys", "irishbuoys R Package"))
+        tags$li(tags$a(href = "https://www.marine.ie/", "Marine Institute Ireland", target = "_blank")),
+        tags$li(tags$a(href = "https://erddap.marine.ie/", "ERDDAP Data Portal", target = "_blank")),
+        tags$li(tags$a(href = "https://github.com/JohnGavin/irishbuoys", "irishbuoys R Package", target = "_blank"))
       ),
 
       hr(),
       h2("Technical Notes"),
       p("This dashboard runs entirely in your browser using WebR (R compiled to WebAssembly)."),
-      p("Built with: Shiny, Plotly, Shinylive, Quarto")
+      p("Built with: Shiny, Plotly, Shinylive, Quarto"),
+      p("Data updates: Weekly via GitHub Actions")
     )
   )
 )
@@ -284,7 +325,8 @@ server &lt;- function(input, output, session) {
         sea_temperature = runif(200, 8, 12),
         atmospheric_pressure = runif(200, 980, 1020),
         longitude = rep(c(-10.5, -11.2, -13.5, -10.0, -15.9), each = 40),
-        latitude = rep(c(51.2, 53.1, 53.5, 51.7, 53.1), each = 40)
+        latitude = rep(c(51.2, 53.1, 53.5, 51.7, 53.1), each = 40),
+        qc_flag = rep(0, 200)
       )
     })
   })
@@ -303,8 +345,31 @@ server &lt;- function(input, output, session) {
     data &lt;- buoy_data()
     cutoff &lt;- Sys.time() - (input$days * 24 * 3600)
     data |&gt;
-      filter(station_id %in% input$stations, time &gt;= cutoff) |&gt;
-      arrange(desc(time))
+      filter(station_id %in% input$stations, time &gt;= cutoff)
+  })
+
+  # Sorted filtered data
+  sorted_data &lt;- reactive({
+    data &lt;- filtered_data()
+    if (nrow(data) == 0) return(data)
+
+    sort_col &lt;- input$sort_by
+    if (sort_col == "time_desc") {
+      data &lt;- data[order(data$time, decreasing = TRUE), ]
+    } else if (sort_col == "time_asc") {
+      data &lt;- data[order(data$time, decreasing = FALSE), ]
+    } else if (sort_col == "wave_height_desc") {
+      data &lt;- data[order(data$wave_height, decreasing = TRUE, na.last = TRUE), ]
+    } else if (sort_col == "wave_height_asc") {
+      data &lt;- data[order(data$wave_height, decreasing = FALSE, na.last = TRUE), ]
+    } else if (sort_col == "wind_speed_desc") {
+      data &lt;- data[order(data$wind_speed, decreasing = TRUE, na.last = TRUE), ]
+    } else if (sort_col == "wind_speed_asc") {
+      data &lt;- data[order(data$wind_speed, decreasing = FALSE, na.last = TRUE), ]
+    } else if (sort_col == "station_id_asc") {
+      data &lt;- data[order(data$station_id, data$time, decreasing = c(FALSE, TRUE)), ]
+    }
+    data
   })
 
   # Filter data for scatter tab
@@ -364,6 +429,7 @@ server &lt;- function(input, output, session) {
     p &lt;- plot_ly()
     for (stn in unique(data$station_id)) {
       stn_data &lt;- data[data$station_id == stn, ]
+      stn_data &lt;- stn_data[order(stn_data$time), ]
       p &lt;- p |&gt; add_trace(
         data = stn_data,
         x = ~time, y = ~get(var),
@@ -383,9 +449,9 @@ server &lt;- function(input, output, session) {
     )
   })
 
-  # Data table
+  # Data table with sorting
   output$data_table &lt;- renderTable({
-    data &lt;- filtered_data()
+    data &lt;- sorted_data()
     if (nrow(data) == 0) return(data.frame(Message = "No data"))
 
     n &lt;- as.integer(input$n_rows)
@@ -447,10 +513,12 @@ server &lt;- function(input, output, session) {
   # Notes tab outputs
   output$last_updated &lt;- renderText({
     data &lt;- buoy_data()
+    days_span &lt;- as.numeric(difftime(max(data$time), min(data$time), units = "days"))
     paste0(
-      "Data range: ", format(min(data$time), "%Y-%m-%d %H:%M"), " to ",
+      "Date range: ", format(min(data$time), "%Y-%m-%d %H:%M"), " to ",
       format(max(data$time), "%Y-%m-%d %H:%M"), " UTC\n",
-      "Total records: ", nrow(data), "\n",
+      "Time span: ", round(days_span, 1), " days\n",
+      "Total records: ", format(nrow(data), big.mark = ","), "\n",
       "Stations: ", paste(sort(unique(data$station_id)), collapse = ", ")
     )
   })
@@ -459,9 +527,9 @@ server &lt;- function(input, output, session) {
     data &lt;- buoy_data()
     data |&gt;
       arrange(desc(time)) |&gt;
-      head(6) |&gt;
+      head(10) |&gt;
       mutate(time = format(time, "%Y-%m-%d %H:%M")) |&gt;
-      select(time, station_id, wave_height, wind_speed, air_temperature)
+      select(time, station_id, wave_height, hmax, wind_speed, gust, air_temperature)
   }, digits = 2)
 
   output$station_table &lt;- renderTable({
@@ -469,35 +537,42 @@ server &lt;- function(input, output, session) {
     data |&gt;
       group_by(station_id) |&gt;
       summarise(
-        n_records = n(),
-        lat = round(first(latitude), 2),
-        lon = round(first(longitude), 2),
+        Records = format(n(), big.mark = ","),
+        Lat = round(first(latitude), 2),
+        Lon = round(first(longitude), 2),
         .groups = "drop"
       )
+  })
+
+  # QC Flag tables
+  output$qc_summary &lt;- renderTable({
+    data &lt;- buoy_data()
+    if (!"qc_flag" %in% names(data)) {
+      return(data.frame(Note = "QC flag data not available"))
+    }
+    qc_counts &lt;- as.data.frame(table(data$qc_flag, useNA = "ifany"))
+    names(qc_counts) &lt;- c("QC_Flag", "Count")
+    qc_counts$Percentage &lt;- paste0(round(100 * qc_counts$Count / sum(qc_counts$Count), 1), "%")
+    qc_counts$Description &lt;- ifelse(qc_counts$QC_Flag == 0, "Unverified",
+                             ifelse(qc_counts$QC_Flag == 1, "Good quality",
+                             ifelse(qc_counts$QC_Flag == 9, "Missing", "Other")))
+    qc_counts[, c("QC_Flag", "Description", "Count", "Percentage")]
+  })
+
+  output$qc_by_station &lt;- renderTable({
+    data &lt;- buoy_data()
+    if (!"qc_flag" %in% names(data)) {
+      return(data.frame(Note = "QC flag data not available"))
+    }
+    data |&gt;
+      group_by(station_id, qc_flag) |&gt;
+      summarise(Count = n(), .groups = "drop") |&gt;
+      tidyr::pivot_wider(names_from = qc_flag, values_from = Count, values_fill = 0) |&gt;
+      rename(Station = station_id)
   })
 }
 
 shinyApp(ui, server)</code></pre>
-<section id="about-this-dashboard" class="level2">
-<h2 class="anchored" data-anchor-id="about-this-dashboard">About This Dashboard</h2>
-<p>This interactive dashboard displays data from the <strong>Irish Weather Buoy Network</strong>, operated by the Marine Institute of Ireland.</p>
-<section id="features" class="level3">
-<h3 class="anchored" data-anchor-id="features">Features</h3>
-<ul>
-<li><strong>Time Series Tab</strong>: View any variable over time for one or more stations</li>
-<li><strong>Scatter Plot Tab</strong>: Compare two variables to explore correlations</li>
-<li><strong>Notes Tab</strong>: Data sources, quality information, and references</li>
-</ul>
-</section>
-<section id="data" class="level3">
-<h3 class="anchored" data-anchor-id="data">Data</h3>
-<ul>
-<li>Source: Marine Institute ERDDAP API</li>
-<li>Updates: Weekly via GitHub Actions</li>
-<li>Quality: Excludes missing data (QC flag = 9)</li>
-</ul>
-</section>
-</section>
 
 </main>
 <!-- /main column -->

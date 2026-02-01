@@ -2,7 +2,8 @@
 "_PACKAGE"
 
 ## usethis namespace: start
-#' @importFrom utils tail
+#' @importFrom stats complete.cases
+#' @importFrom utils capture.output head tail
 ## usethis namespace: end
 NULL
 
