@@ -27,3 +27,6 @@ Thumbs.db
 # Documentation
 docs/
 pkgdown/
+/.quarto/
+**/*.quarto_ipynb
+_output/
