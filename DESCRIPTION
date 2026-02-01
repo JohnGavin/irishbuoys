@@ -26,13 +26,23 @@ Imports:
 Suggests:
     blastula,
     crew,
+    evd,
+    extRemes,
+    forecast,
+    gert,
     ggplot2,
+    mgcv,
+    mirai,
     plotly,
+    quantreg,
     quarto,
     ranger,
+    scales,
     shiny,
     shinylive,
     tarchetypes,
     targets,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    xts,
+    zoo
 Config/testthat/edition: 3
