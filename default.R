@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
-# Generate minimal default.nix for irishbuoys
-# Focus on core data packages, avoiding macOS gfortran issues
+# Generate default.nix for irishbuoys with analysis vignette packages
+# Includes targets, crew, mirai for parallel processing and oceanographic packages
 
-# Minimal core R packages for data work
+# Core R packages for data work
 core_pkgs <- c(
   "arrow",          # Apache Arrow for data
   "duckdb",         # DuckDB for data queries
@@ -19,20 +19,49 @@ core_pkgs <- c(
   "gh"              # GitHub API
 )
 
+# Pipeline and parallel processing packages
+pipeline_pkgs <- c(
+  "targets",        # Pipeline framework
+  "tarchetypes",    # Targets archetypes
+  "crew",           # Worker pools
+  "mirai"           # Async parallel
+)
+
+# Analysis and modeling packages for oceanographic data
+analysis_pkgs <- c(
+  "mgcv",           # GAM models
+  "forecast",       # Time series forecasting
+  "extRemes",       # Extreme value analysis
+  "evd",            # Extreme value distributions
+  "quantreg",       # Quantile regression
+  "zoo",            # Time series infrastructure
+  "xts"             # Extensible time series
+)
+
+# Visualization packages
+viz_pkgs <- c(
+  "ggplot2",        # Grammar of graphics
+  "plotly",         # Interactive plots
+  "scales"          # Scale functions
+)
+
 # Development tools
 dev_tools <- c(
   "rix",
-  "desc", 
+  "desc",
   "devtools",
   "usethis",
-  "pkgload"
+  "pkgload",
+  "testthat",
+  "gert",           # Git operations
+  "quarto"          # Documentation
 )
 
 # All packages
-all_r_pkgs <- c(core_pkgs, dev_tools)
+all_r_pkgs <- c(core_pkgs, pipeline_pkgs, analysis_pkgs, viz_pkgs, dev_tools)
 
 # System packages
-system_pkgs <- c("git", "pandoc")
+system_pkgs <- c("git", "pandoc", "quarto")
 
 # Generate default.nix
 rix::rix(
@@ -46,8 +75,9 @@ rix::rix(
   print = FALSE
 )
 
-cat("✅ Minimal default.nix generated\n")
-cat("📦 Core packages: arrow, duckdb, dplyr, tidyr, lubridate, jsonlite\n")
-cat("🔧 Dev tools: rix, desc, devtools, usethis, pkgload\n")
-cat("ℹ️  Excluded problematic packages (plotly, ggplot2, targets, crew, etc.)\n")
-cat("   These can be added back once macOS gfortran igraph issue is fixed\n")
+cat("default.nix generated with analysis vignette packages\n")
+cat("Core: arrow, duckdb, dplyr, tidyr, lubridate, jsonlite, httr2\n")
+cat("Pipeline: targets, tarchetypes, crew, mirai\n")
+cat("Analysis: mgcv, forecast, extRemes, evd, quantreg, zoo, xts\n")
+cat("Viz: ggplot2, plotly, scales\n")
+cat("Dev: rix, desc, devtools, usethis, testthat, gert, quarto\n")
