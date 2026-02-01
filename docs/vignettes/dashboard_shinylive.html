@@ -90,10 +90,26 @@ ul.task-list li input[type="checkbox"] {
 #| standalone: true
 #| viewerHeight: 700
 
+# Core packages (always available in WebR)
 library(shiny)
-library(plotly)
 library(jsonlite)
-library(dplyr)
+
+# Install ggplot2 dependencies first to avoid munsell error
+# See: https://github.com/JohnGavin/llm/wiki - Shinylive Lessons Learned
+tryCatch({
+  if (!requireNamespace("munsell", quietly = TRUE)) {
+    webr::install("munsell", repos = "https://repo.r-wasm.org")
+  }
+  if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    webr::install("ggplot2", repos = "https://repo.r-wasm.org")
+  }
+  library(plotly)
+  library(dplyr)
+  USE_PLOTLY &lt;- TRUE
+}, error = function(e) {
+  message("Plotly not available, using base graphics")
+  USE_PLOTLY &lt;&lt;- FALSE
+})
 
 ui &lt;- fluidPage(
   titlePanel("Irish Weather Buoy Network Explorer"),
