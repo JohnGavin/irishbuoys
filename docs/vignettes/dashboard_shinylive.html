@@ -93,7 +93,33 @@ fetch('data/buoy_data.json')
 document.addEventListener('shiny:connected', function() {
   console.log('Shiny connected, sending data...');
   sendDataToShiny();
+
+  // Register custom message handler when Shiny is ready
+  if (window.Shiny && window.Shiny.addCustomMessageHandler) {
+    window.Shiny.addCustomMessageHandler('requestData', function(message) {
+      console.log('R requested data, attempt ' + message.attempt);
+      sendDataToShiny();
+    });
+  }
 });
+
+// Keep trying to send data periodically until it's loaded
+var dataRetryInterval = setInterval(function() {
+  if (window.DATA_LOADED) {
+    clearInterval(dataRetryInterval);
+    console.log('Data successfully loaded, stopping retries');
+  } else {
+    sendDataToShiny();
+  }
+}, 3000);
+
+// Stop retrying after 60 seconds
+setTimeout(function() {
+  clearInterval(dataRetryInterval);
+  if (!window.DATA_LOADED) {
+    console.error('Failed to send data to Shiny after 60 seconds');
+  }
+}, 60000);
 
 // TableSorter functionality for sortable tables
 document.addEventListener('DOMContentLoaded', function() {
@@ -385,6 +411,101 @@ ui &lt;- navbarPage(
       ),
 
       hr(),
+      h2("Variable Definitions"),
+      p("Variables from the Marine Institute ERDDAP server. ",
+        tags$a(href = "https://erddap.marine.ie/erddap/info/IWBNetwork/index.html",
+               "Full metadata", target = "_blank")),
+
+      h4("Wave Measurements"),
+      tags$table(
+        class = "table table-striped",
+        tags$thead(
+          tags$tr(tags$th("Variable"), tags$th("Units"), tags$th("Description"))
+        ),
+        tags$tbody(
+          tags$tr(
+            tags$td(tags$b("wave_height")),
+            tags$td("meters"),
+            tags$td("Significant wave height (Hs). Calculated as 4x RMS of wave motion over a 17.5 minute measurement period, then averaged hourly. This is the standard oceanographic measure representing the average height of the highest third of waves.")
+          ),
+          tags$tr(
+            tags$td(tags$b("hmax")),
+            tags$td("meters"),
+            tags$td("Maximum individual wave height recorded during the 17.5 minute measurement window. Typically 1.5-2x the significant wave height. Values &gt;20m indicate extreme storm conditions.")
+          ),
+          tags$tr(
+            tags$td(tags$b("wave_period")),
+            tags$td("seconds"),
+            tags$td("Average wave period based on zero-crossing analysis over 17.5 minutes. Counts upward crossings through mean water level.")
+          ),
+          tags$tr(
+            tags$td(tags$b("mean_wave_direction")),
+            tags$td("degrees true"),
+            tags$td("Direction from which waves originate (0-360). 0/360 = North, 90 = East, 180 = South, 270 = West.")
+          )
+        )
+      ),
+
+      h4("Wind Measurements"),
+      tags$table(
+        class = "table table-striped",
+        tags$thead(
+          tags$tr(tags$th("Variable"), tags$th("Units"), tags$th("Description"))
+        ),
+        tags$tbody(
+          tags$tr(
+            tags$td(tags$b("wind_speed")),
+            tags$td("knots"),
+            tags$td("Average wind speed over 10-minute period, reported hourly. 1 knot = 0.514 m/s. Values &gt;34 knots = gale force, &gt;48 = storm, &gt;64 = hurricane force.")
+          ),
+          tags$tr(
+            tags$td(tags$b("gust")),
+            tags$td("knots"),
+            tags$td("Maximum wind speed measured over any 3-second window during the hour. Typically 1.3-1.5x the mean wind speed.")
+          ),
+          tags$tr(
+            tags$td(tags$b("wind_direction")),
+            tags$td("degrees true"),
+            tags$td("Direction from which wind blows (10-min average). 0/360 = North wind (from north).")
+          )
+        )
+      ),
+
+      h4("Atmospheric &amp; Oceanic"),
+      tags$table(
+        class = "table table-striped",
+        tags$thead(
+          tags$tr(tags$th("Variable"), tags$th("Units"), tags$th("Description"))
+        ),
+        tags$tbody(
+          tags$tr(
+            tags$td(tags$b("atmospheric_pressure")),
+            tags$td("hPa (mbar)"),
+            tags$td("Barometric pressure. Normal range 970-1030 hPa. Low pressure (&lt;1000) often associated with storms.")
+          ),
+          tags$tr(
+            tags$td(tags$b("air_temperature")),
+            tags$td("degrees C"),
+            tags$td("Air temperature at buoy height (~3m above sea level).")
+          ),
+          tags$tr(
+            tags$td(tags$b("sea_temperature")),
+            tags$td("degrees C"),
+            tags$td("Sea surface temperature. Irish Atlantic waters typically 7-17C seasonally.")
+          )
+        )
+      ),
+
+      h4("Expected Correlations (Real Data Validation)"),
+      tags$ul(
+        tags$li(tags$b("Wind-Wave:"), " Positive correlation (r ~ 0.3-0.5). Higher winds generate larger waves."),
+        tags$li(tags$b("Wave Height-Hmax:"), " Strong positive (r &gt; 0.9). Hmax is derived from same wave record."),
+        tags$li(tags$b("Pressure-Wind:"), " Negative correlation. Low pressure systems bring high winds."),
+        tags$li(tags$b("Gust-Wind:"), " Strong positive (r &gt; 0.9). Gusts are peak values from same period.")
+      ),
+      p(tags$em("If correlations appear near zero, the dashboard may be showing fallback sample data instead of real ERDDAP data. Check browser console (F12) for data loading messages.")),
+
+      hr(),
       h2("Most Recent Observations"),
       p(tags$small("Click column headers to sort")),
       uiOutput("recent_obs_ui"),
@@ -410,8 +531,9 @@ server &lt;- function(input, output, session) {
 
   # Reactive value to store loaded data
   loaded_data &lt;- reactiveVal(NULL)
+  data_check_count &lt;- reactiveVal(0)
 
-  # Receive data from JavaScript
+  # Receive data from JavaScript via input
   observeEvent(input$js_buoy_data, {
     tryCatch({
       json_str &lt;- input$js_buoy_data
@@ -419,12 +541,24 @@ server &lt;- function(input, output, session) {
         data &lt;- jsonlite::fromJSON(json_str)
         data$time &lt;- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
         loaded_data(data)
-        message("Received ", nrow(data), " records from JavaScript")
+        message("Received ", nrow(data), " records from JavaScript input")
       }
     }, error = function(e) {
       message("Error parsing JS data: ", e$message)
     })
   }, ignoreNULL = TRUE, ignoreInit = TRUE)
+
+  # Poll for JavaScript data using session$sendCustomMessage callback
+  observe({
+    # Only poll if we don't have data yet
+    if (is.null(loaded_data()) &amp;&amp; data_check_count() &lt; 30) {
+      invalidateLater(2000, session)  # Check every 2 seconds
+      data_check_count(data_check_count() + 1)
+
+      # Request data from JavaScript
+      session$sendCustomMessage("requestData", list(attempt = data_check_count()))
+    }
+  })
 
   # Main data reactive - use JS data or fallback
   buoy_data &lt;- reactive({
@@ -436,7 +570,8 @@ server &lt;- function(input, output, session) {
     }
 
     # Fallback to sample data while waiting for JS
-    message("Using fallback sample data")
+    # NOTE: If you see this data, the real data failed to load
+    message("Using fallback sample data - check browser console for errors")
     n_days &lt;- 90
     n_per_day &lt;- 24
     n_stations &lt;- 5
@@ -505,7 +640,8 @@ server &lt;- function(input, output, session) {
     } else if (sort_col == "wind_speed_asc") {
       data &lt;- data[order(data$wind_speed, decreasing = FALSE, na.last = TRUE), ]
     } else if (sort_col == "station_id_asc") {
-      data &lt;- data[order(data$station_id, data$time, decreasing = c(FALSE, TRUE)), ]
+      # Sort by station ascending, then by time descending within each station
+      data &lt;- data |&gt; arrange(station_id, desc(time))
     }
     data
   })
@@ -685,13 +821,34 @@ server &lt;- function(input, output, session) {
     real_data &lt;- loaded_data()
     is_real &lt;- !is.null(real_data) &amp;&amp; nrow(real_data) &gt; 100
     days_span &lt;- as.numeric(difftime(max(data$time), min(data$time), units = "days"))
+
+    # Calculate correlations for data validation
+    valid_ww &lt;- complete.cases(data$wind_speed, data$wave_height)
+    valid_wh &lt;- complete.cases(data$wave_height, data$hmax)
+    cor_wind_wave &lt;- if(sum(valid_ww) &gt; 10) round(cor(data$wind_speed[valid_ww], data$wave_height[valid_ww]), 3) else NA
+    cor_wave_hmax &lt;- if(sum(valid_wh) &gt; 10) round(cor(data$wave_height[valid_wh], data$hmax[valid_wh]), 3) else NA
+
+    # Data validation check
+    data_status &lt;- if (is_real) {
+      "ERDDAP JSON (real data)"
+    } else if (!is.null(cor_wind_wave) &amp;&amp; cor_wind_wave &gt; 0.2) {
+      "Real data (correlations valid)"
+    } else {
+      "Sample data (loading... or failed)"
+    }
+
     paste0(
-      "Data source: ", ifelse(is_real, "ERDDAP JSON (real data)", "Sample data (loading...)"), "\n",
+      "Data source: ", data_status, "\n",
       "Date range: ", format(min(data$time), "%Y-%m-%d %H:%M"), " to ",
       format(max(data$time), "%Y-%m-%d %H:%M"), " UTC\n",
       "Time span: ", round(days_span, 1), " days\n",
       "Total records: ", format(nrow(data), big.mark = ","), "\n",
-      "Stations: ", paste(sort(unique(data$station_id)), collapse = ", ")
+      "Stations: ", paste(sort(unique(data$station_id)), collapse = ", "), "\n",
+      "\n--- Data Validation ---\n",
+      "Wind-Wave corr: ", ifelse(is.na(cor_wind_wave), "N/A", cor_wind_wave), " (expect ~0.3 for real data)\n",
+      "Wave-Hmax corr: ", ifelse(is.na(cor_wave_hmax), "N/A", cor_wave_hmax), " (expect &gt;0.9 for real data)\n",
+      "Max wave_height: ", round(max(data$wave_height, na.rm = TRUE), 1), "m (expect &gt;10m in storms)\n",
+      "Max wind_speed: ", round(max(data$wind_speed, na.rm = TRUE), 1), " knots (expect &gt;40 in storms)"
     )
   })
 
