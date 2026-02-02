@@ -22,6 +22,9 @@ inst/extdata/*.duckdb
 *.json
 !docs/**/*.json
 !vignettes/data/*.json
+# Parquet allowed in docs/ and vignettes/data/ for dashboard
+!docs/**/*.parquet
+!vignettes/data/*.parquet
 
 # OS files
 .DS_Store

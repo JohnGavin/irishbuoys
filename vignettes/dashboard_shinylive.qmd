@@ -78,6 +78,7 @@ format:
           </style>
     resources:
       - shinylive-sw.js
+      - data/buoy_data.parquet
       - data/buoy_data.json
       - data/stations.json
 filters:
@@ -90,7 +91,18 @@ filters:
 
 # Core packages
 library(shiny)
-library(jsonlite)
+library(jsonlite)  # For JSON fallback
+
+# Install nanoparquet for efficient Parquet data loading (WebR-compatible, 167KB vs 3.2MB)
+tryCatch({
+  if (!requireNamespace("nanoparquet", quietly = TRUE)) {
+    webr::install("nanoparquet", repos = "https://repo.r-wasm.org")
+  }
+  library(nanoparquet)
+  message("nanoparquet loaded successfully")
+}, error = function(e) {
+  message("nanoparquet install error: ", e$message)
+})
 
 # Install ggplot2 dependencies for plotly
 tryCatch({
@@ -399,69 +411,87 @@ ui <- navbarPage(
 
 server <- function(input, output, session) {
 
-  # Load data directly from JSON file at startup
+  # Load data from Parquet file (167KB compressed vs 3.2MB JSON)
   # In Shinylive, the file is bundled via resources: in YAML
   buoy_data <- reactive({
     data <- NULL
 
-    # Try multiple paths - Shinylive bundles resources at document root
-    paths_to_try <- c(
-      "data/buoy_data.json",
-      "./data/buoy_data.json",
-      "/data/buoy_data.json"
+    # Try Parquet first (compressed, efficient)
+    parquet_paths <- c(
+      "data/buoy_data.parquet",
+      "./data/buoy_data.parquet"
     )
 
-    for (path in paths_to_try) {
+    for (path in parquet_paths) {
       tryCatch({
-        if (file.exists(path)) {
-          data <- jsonlite::fromJSON(path)
+        if (file.exists(path) && requireNamespace("nanoparquet", quietly = TRUE)) {
+          data <- nanoparquet::read_parquet(path)
           data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
-          message("Loaded ", nrow(data), " records from ", path)
+          message("Loaded ", nrow(data), " records from Parquet: ", path)
           break
         }
       }, error = function(e) {
-        message("Failed to load from ", path, ": ", e$message)
+        message("Parquet load failed from ", path, ": ", e$message)
       })
     }
 
-    # If direct file access fails, try URL fetch (for WebR)
+    # Fallback to JSON if Parquet fails
     if (is.null(data) || nrow(data) < 100) {
-      tryCatch({
-        # In WebR/Shinylive, we can use download.file + fromJSON
-        tmp <- tempfile(fileext = ".json")
-        download.file("data/buoy_data.json", tmp, quiet = TRUE)
-        data <- jsonlite::fromJSON(tmp)
-        data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
-        message("Loaded ", nrow(data), " records via download")
-        unlink(tmp)
-      }, error = function(e) {
-        message("Download failed: ", e$message)
-      })
+      json_paths <- c(
+        "data/buoy_data.json",
+        "./data/buoy_data.json"
+      )
+
+      for (path in json_paths) {
+        tryCatch({
+          if (file.exists(path)) {
+            data <- jsonlite::fromJSON(path)
+            data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+            message("Loaded ", nrow(data), " records from JSON: ", path)
+            break
+          }
+        }, error = function(e) {
+          message("JSON load failed from ", path, ": ", e$message)
+        })
+      }
     }
 
-    # Fallback to sample data if all else fails
+    # Final fallback - generate sample data with REALISTIC correlations
+    # This should never happen if Parquet is bundled correctly
     if (is.null(data) || nrow(data) < 100) {
       message("WARNING: Using fallback sample data - real data failed to load")
+      message("Check browser console (F12) for data loading errors")
       n_days <- 90
       n_per_day <- 24
       n_stations <- 5
       n_total <- n_days * n_per_day * n_stations
 
+      # Generate correlated data (not random!)
+      set.seed(42)
+      base_wind <- rnorm(n_total, 15, 8)
+      base_wind <- pmax(2, pmin(50, base_wind))
+
       data <- data.frame(
         time = rep(Sys.time() - (1:(n_days * n_per_day)) * 3600, n_stations),
         station_id = rep(c("M2", "M3", "M4", "M5", "M6"), each = n_days * n_per_day),
-        wave_height = runif(n_total, 0.5, 8),
-        hmax = runif(n_total, 1, 12),
-        wave_period = runif(n_total, 4, 14),
-        wind_speed = runif(n_total, 2, 30),
-        gust = runif(n_total, 5, 40),
-        air_temperature = runif(n_total, 3, 18),
-        sea_temperature = runif(n_total, 7, 14),
-        atmospheric_pressure = runif(n_total, 970, 1030),
+        wave_height = 0.5 + 0.15 * base_wind + rnorm(n_total, 0, 1),
+        wind_speed = base_wind,
+        gust = base_wind * 1.3 + rnorm(n_total, 0, 2),
+        air_temperature = rnorm(n_total, 10, 3),
+        sea_temperature = rnorm(n_total, 11, 2),
+        atmospheric_pressure = rnorm(n_total, 1013, 15),
         longitude = rep(c(-5.43, -10.55, -10.15, -9.99, -15.88), each = n_days * n_per_day),
         latitude = rep(c(53.48, 51.22, 53.07, 55.00, 53.06), each = n_days * n_per_day),
         qc_flag = rep(0, n_total)
       )
+      # hmax correlated with wave_height
+      data$hmax <- data$wave_height * 1.6 + rnorm(n_total, 0, 0.5)
+      data$wave_period <- 4 + 0.3 * data$wave_height + rnorm(n_total, 0, 1)
+
+      # Ensure positive values
+      data$wave_height <- pmax(0.3, data$wave_height)
+      data$hmax <- pmax(0.5, data$hmax)
+      data$wave_period <- pmax(3, data$wave_period)
     }
 
     data
