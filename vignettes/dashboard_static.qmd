@@ -1,0 +1,372 @@
+---
+title: "Irish Weather Buoy Explorer"
+subtitle: "Static Dashboard with Dynamic Tabsets"
+format:
+  html:
+    page-layout: full
+    toc: true
+    toc-location: left
+    code-fold: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(dplyr)
+library(ggplot2)
+library(jsonlite)
+library(knitr)
+
+# Load the buoy data
+data_path <- "data/buoy_data.json"
+buoy_data <- fromJSON(data_path)
+buoy_data$time <- as.POSIXct(buoy_data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+
+# Get unique stations and add "All Buoys" option
+stations <- sort(unique(buoy_data$station_id))
+station_tabs <- c("All Buoys", stations)
+
+# Variable definitions
+VAR_CHOICES <- c(
+
+  "Wave Height (m)" = "wave_height",
+  "Max Wave Height (m)" = "hmax",
+  "Wave Period (s)" = "wave_period",
+  "Wind Speed (knots)" = "wind_speed",
+  "Wind Gust (knots)" = "gust",
+  "Air Temperature (C)" = "air_temperature",
+  "Sea Temperature (C)" = "sea_temperature",
+  "Pressure (hPa)" = "atmospheric_pressure"
+)
+
+# Helper function to create station-specific data
+get_station_data <- function(data, station, days = 30) {
+  cutoff <- max(data$time) - (days * 24 * 3600)
+  if (station == "All Buoys") {
+    data |> filter(time >= cutoff)
+  } else {
+    data |> filter(station_id == station, time >= cutoff)
+  }
+}
+
+# Helper function to create a plot
+create_time_series_plot <- function(data, variable = "wave_height", title_suffix = "") {
+  var_label <- names(VAR_CHOICES)[VAR_CHOICES == variable]
+
+  ggplot(data, aes(x = time, y = .data[[variable]], color = station_id)) +
+    geom_line(alpha = 0.7) +
+    geom_point(size = 0.5, alpha = 0.5) +
+    labs(
+      title = paste(var_label, title_suffix),
+      x = "Time (UTC)",
+      y = var_label,
+      color = "Station"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "bottom")
+}
+
+# Helper function to create summary table
+create_summary_table <- function(data) {
+  data |>
+    group_by(station_id) |>
+    summarise(
+      Records = n(),
+      `Wave Ht (m)` = paste0(round(mean(wave_height, na.rm = TRUE), 1), " (", round(max(wave_height, na.rm = TRUE), 1), ")"),
+      `Hmax (m)` = paste0(round(mean(hmax, na.rm = TRUE), 1), " (", round(max(hmax, na.rm = TRUE), 1), ")"),
+      `Wind (kn)` = paste0(round(mean(wind_speed, na.rm = TRUE), 1), " (", round(max(wind_speed, na.rm = TRUE), 1), ")"),
+      .groups = "drop"
+    ) |>
+    kable(caption = "Summary: Mean (Max)")
+}
+
+# Helper function to output tabset content
+output_tabset <- function(stations, data, days = 30) {
+  cat("::: {.panel-tabset}\n\n")
+
+  for (station in stations) {
+    cat("### ", station, "\n\n", sep = "")
+
+    stn_data <- get_station_data(data, station, days)
+
+    # Summary stats
+    cat("**Records:** ", format(nrow(stn_data), big.mark = ","), " | ")
+    cat("**Date range:** ", format(min(stn_data$time), "%Y-%m-%d"), " to ", format(max(stn_data$time), "%Y-%m-%d"), "\n\n")
+
+    cat("```{r}\n")
+    cat("#| fig-height: 4\n")
+    cat("stn_data <- get_station_data(buoy_data, '", station, "', 30)\n", sep = "")
+    cat("create_time_series_plot(stn_data, 'wave_height', ' - ", station, "')\n", sep = "")
+    cat("```\n\n")
+
+    cat("```{r}\n")
+    cat("create_summary_table(stn_data)\n")
+    cat("```\n\n")
+  }
+
+  cat(":::\n")
+}
+```
+
+## Data Overview
+
+This dashboard displays data from the **Irish Weather Buoy Network**, operated by the Marine Institute of Ireland. Data sourced from the [Marine Institute ERDDAP Server](https://erddap.marine.ie/erddap/index.html).
+
+```{r data-summary}
+# Calculate data validation metrics
+valid_ww <- complete.cases(buoy_data$wind_speed, buoy_data$wave_height)
+valid_wh <- complete.cases(buoy_data$wave_height, buoy_data$hmax)
+cor_wind_wave <- round(cor(buoy_data$wind_speed[valid_ww], buoy_data$wave_height[valid_ww]), 3)
+cor_wave_hmax <- round(cor(buoy_data$wave_height[valid_wh], buoy_data$hmax[valid_wh]), 3)
+
+days_span <- as.numeric(difftime(max(buoy_data$time), min(buoy_data$time), units = "days"))
+```
+
+| Metric | Value |
+|--------|-------|
+| Total Records | `r format(nrow(buoy_data), big.mark = ",")` |
+| Date Range | `r format(min(buoy_data$time), "%Y-%m-%d")` to `r format(max(buoy_data$time), "%Y-%m-%d")` |
+| Time Span | `r round(days_span, 1)` days |
+| Stations | `r paste(stations, collapse = ", ")` |
+| Wind-Wave Correlation | `r cor_wind_wave` (expect ~0.3 for real data) |
+| Wave-Hmax Correlation | `r cor_wave_hmax` (expect >0.9 for real data) |
+
+## Wave Height by Station {#wave-height}
+
+::: {.panel-tabset}
+
+### All Buoys
+
+```{r}
+#| fig-height: 5
+stn_data <- get_station_data(buoy_data, "All Buoys", 30)
+create_time_series_plot(stn_data, "wave_height", " - Last 30 Days")
+```
+
+```{r}
+create_summary_table(stn_data)
+```
+
+### M2
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M2", 30)
+create_time_series_plot(stn_data, "wave_height", " - M2")
+```
+
+### M3
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M3", 30)
+create_time_series_plot(stn_data, "wave_height", " - M3")
+```
+
+### M4
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M4", 30)
+create_time_series_plot(stn_data, "wave_height", " - M4")
+```
+
+### M5
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M5", 30)
+create_time_series_plot(stn_data, "wave_height", " - M5")
+```
+
+### M6
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M6", 30)
+create_time_series_plot(stn_data, "wave_height", " - M6")
+```
+
+:::
+
+## Wind Speed by Station {#wind-speed}
+
+::: {.panel-tabset}
+
+### All Buoys
+
+```{r}
+#| fig-height: 5
+stn_data <- get_station_data(buoy_data, "All Buoys", 30)
+create_time_series_plot(stn_data, "wind_speed", " - Last 30 Days")
+```
+
+### M2
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M2", 30)
+create_time_series_plot(stn_data, "wind_speed", " - M2")
+```
+
+### M3
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M3", 30)
+create_time_series_plot(stn_data, "wind_speed", " - M3")
+```
+
+### M4
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M4", 30)
+create_time_series_plot(stn_data, "wind_speed", " - M4")
+```
+
+### M5
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M5", 30)
+create_time_series_plot(stn_data, "wind_speed", " - M5")
+```
+
+### M6
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M6", 30)
+create_time_series_plot(stn_data, "wind_speed", " - M6")
+```
+
+:::
+
+## Wind vs Wave Scatter {#scatter}
+
+::: {.panel-tabset}
+
+### All Buoys
+
+```{r}
+#| fig-height: 5
+stn_data <- get_station_data(buoy_data, "All Buoys", 30)
+ggplot(stn_data, aes(x = wind_speed, y = wave_height, color = station_id)) +
+  geom_point(alpha = 0.4, size = 1) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 0.5) +
+  labs(
+    title = "Wind Speed vs Wave Height - All Stations",
+    x = "Wind Speed (knots)",
+    y = "Wave Height (m)",
+    color = "Station"
+  ) +
+  theme_minimal()
+```
+
+### M2
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M2", 30)
+ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Wind vs Wave - M2", x = "Wind Speed (knots)", y = "Wave Height (m)") +
+  theme_minimal()
+```
+
+### M3
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M3", 30)
+ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Wind vs Wave - M3", x = "Wind Speed (knots)", y = "Wave Height (m)") +
+  theme_minimal()
+```
+
+### M4
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M4", 30)
+ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Wind vs Wave - M4", x = "Wind Speed (knots)", y = "Wave Height (m)") +
+  theme_minimal()
+```
+
+### M5
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M5", 30)
+ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Wind vs Wave - M5", x = "Wind Speed (knots)", y = "Wave Height (m)") +
+  theme_minimal()
+```
+
+### M6
+
+```{r}
+#| fig-height: 4
+stn_data <- get_station_data(buoy_data, "M6", 30)
+ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
+  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_smooth(method = "lm", se = TRUE, color = "red") +
+  labs(title = "Wind vs Wave - M6", x = "Wind Speed (knots)", y = "Wave Height (m)") +
+  theme_minimal()
+```
+
+:::
+
+## Recent Observations
+
+```{r recent-obs}
+buoy_data |>
+  arrange(desc(time)) |>
+  head(20) |>
+  mutate(
+    time = format(time, "%Y-%m-%d %H:%M"),
+    wave_height = round(wave_height, 2),
+    hmax = round(hmax, 2),
+    wind_speed = round(wind_speed, 1),
+    gust = round(gust, 1)
+  ) |>
+  select(time, station_id, wave_height, hmax, wind_speed, gust, air_temperature) |>
+  kable(
+    col.names = c("Time (UTC)", "Station", "Wave Ht (m)", "Hmax (m)", "Wind (kn)", "Gust (kn)", "Air Temp (C)"),
+    caption = "Most recent observations across all stations"
+  )
+```
+
+## Variable Definitions
+
+| Variable | Units | Description |
+|----------|-------|-------------|
+| wave_height | meters | Significant wave height (Hs). 4x RMS of wave motion over 17.5 min |
+| hmax | meters | Maximum individual wave height in measurement period |
+| wave_period | seconds | Average wave period (zero-crossing analysis) |
+| wind_speed | knots | 10-minute average wind speed. 1 knot = 0.514 m/s |
+| gust | knots | Maximum 3-second wind speed during the hour |
+| atmospheric_pressure | hPa | Barometric pressure (970-1030 typical) |
+| air_temperature | degrees C | Air temperature at buoy (~3m above sea) |
+| sea_temperature | degrees C | Sea surface temperature |
+
+## Data Sources
+
+- [Marine Institute Ireland](https://www.marine.ie/)
+- [ERDDAP Data Portal](https://erddap.marine.ie/)
+- [irishbuoys R Package](https://github.com/JohnGavin/irishbuoys)
+
+---
+
+*Dashboard generated `r Sys.time()` UTC*
