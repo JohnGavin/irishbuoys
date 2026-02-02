@@ -411,56 +411,57 @@ ui <- navbarPage(
 
 server <- function(input, output, session) {
 
-  # Load data from Parquet file (167KB compressed vs 3.2MB JSON)
-  # In Shinylive, the file is bundled via resources: in YAML
+  # Load data via HTTP fetch (WebR cannot access bundled files via file.exists)
+  # Data is served from GitHub Pages at the same origin as the dashboard
   buoy_data <- reactive({
     data <- NULL
+    base_url <- "https://johngavin.github.io/irishbuoys/vignettes"
 
-    # Try Parquet first (compressed, efficient)
-    parquet_paths <- c(
-      "data/buoy_data.parquet",
-      "./data/buoy_data.parquet"
-    )
-
-    for (path in parquet_paths) {
+    # Method 1: Try Parquet via HTTP (167KB compressed)
+    if (is.null(data) && requireNamespace("nanoparquet", quietly = TRUE)) {
       tryCatch({
-        if (file.exists(path) && requireNamespace("nanoparquet", quietly = TRUE)) {
-          data <- nanoparquet::read_parquet(path)
-          data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
-          message("Loaded ", nrow(data), " records from Parquet: ", path)
-          break
-        }
+        message("Attempting to fetch Parquet from GitHub Pages...")
+        tmp_parquet <- tempfile(fileext = ".parquet")
+        download.file(
+          paste0(base_url, "/data/buoy_data.parquet"),
+          tmp_parquet,
+          mode = "wb",
+          quiet = FALSE
+        )
+        data <- nanoparquet::read_parquet(tmp_parquet)
+        data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+        message("SUCCESS: Loaded ", nrow(data), " records from Parquet via HTTP")
+        unlink(tmp_parquet)
       }, error = function(e) {
-        message("Parquet load failed from ", path, ": ", e$message)
+        message("Parquet HTTP fetch failed: ", e$message)
       })
     }
 
-    # Fallback to JSON if Parquet fails
+    # Method 2: Try JSON via HTTP (3.2MB uncompressed - slower but more compatible)
     if (is.null(data) || nrow(data) < 100) {
-      json_paths <- c(
-        "data/buoy_data.json",
-        "./data/buoy_data.json"
-      )
-
-      for (path in json_paths) {
-        tryCatch({
-          if (file.exists(path)) {
-            data <- jsonlite::fromJSON(path)
-            data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
-            message("Loaded ", nrow(data), " records from JSON: ", path)
-            break
-          }
-        }, error = function(e) {
-          message("JSON load failed from ", path, ": ", e$message)
-        })
-      }
+      tryCatch({
+        message("Attempting to fetch JSON from GitHub Pages...")
+        tmp_json <- tempfile(fileext = ".json")
+        download.file(
+          paste0(base_url, "/data/buoy_data.json"),
+          tmp_json,
+          mode = "w",
+          quiet = FALSE
+        )
+        data <- jsonlite::fromJSON(tmp_json)
+        data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+        message("SUCCESS: Loaded ", nrow(data), " records from JSON via HTTP")
+        unlink(tmp_json)
+      }, error = function(e) {
+        message("JSON HTTP fetch failed: ", e$message)
+      })
     }
 
     # NO FALLBACK - If data fails to load, stop with error
     if (is.null(data) || nrow(data) < 100) {
-      stop("FATAL: Failed to load buoy data from Parquet or JSON. ",
-           "Check browser console (F12) for errors. ",
-           "Data files must be bundled with the dashboard.")
+      stop("FATAL: Failed to load buoy data. ",
+           "Parquet and JSON HTTP fetches both failed. ",
+           "Check browser console (F12) for network/CORS errors.")
     }
 
     data
