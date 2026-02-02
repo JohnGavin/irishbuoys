@@ -54,76 +54,8 @@ ul.task-list li input[type="checkbox"] {
   }
 })();
 
-// Fetch buoy data and pass to Shiny
-window.BUOY_DATA = null;
-window.DATA_LOADED = false;
-
-function sendDataToShiny() {
-  if (window.BUOY_DATA && window.Shiny && window.Shiny.setInputValue) {
-    // Send the data as JSON string to R
-    window.Shiny.setInputValue('js_buoy_data', JSON.stringify(window.BUOY_DATA), {priority: 'event'});
-    window.Shiny.setInputValue('data_loaded', true, {priority: 'event'});
-    console.log('Data sent to Shiny: ' + window.BUOY_DATA.time.length + ' records');
-    window.DATA_LOADED = true;
-  }
-}
-
-fetch('data/buoy_data.json')
-  .then(response => {
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    return response.json();
-  })
-  .then(data => {
-    window.BUOY_DATA = data;
-    console.log('Loaded ' + data.time.length + ' buoy records from JSON');
-    sendDataToShiny();
-    // Retry sending if Shiny not ready yet
-    if (!window.DATA_LOADED) {
-      setTimeout(sendDataToShiny, 1000);
-      setTimeout(sendDataToShiny, 3000);
-      setTimeout(sendDataToShiny, 5000);
-    }
-  })
-  .catch(err => {
-    console.error('Failed to load buoy data:', err);
-    window.BUOY_DATA = null;
-  });
-
-// Also try when Shiny connects
-document.addEventListener('shiny:connected', function() {
-  console.log('Shiny connected, sending data...');
-  sendDataToShiny();
-
-  // Register custom message handler when Shiny is ready
-  if (window.Shiny && window.Shiny.addCustomMessageHandler) {
-    window.Shiny.addCustomMessageHandler('requestData', function(message) {
-      console.log('R requested data, attempt ' + message.attempt);
-      sendDataToShiny();
-    });
-  }
-});
-
-// Keep trying to send data periodically until it's loaded
-var dataRetryInterval = setInterval(function() {
-  if (window.DATA_LOADED) {
-    clearInterval(dataRetryInterval);
-    console.log('Data successfully loaded, stopping retries');
-  } else {
-    sendDataToShiny();
-  }
-}, 3000);
-
-// Stop retrying after 60 seconds
-setTimeout(function() {
-  clearInterval(dataRetryInterval);
-  if (!window.DATA_LOADED) {
-    console.error('Failed to send data to Shiny after 60 seconds');
-  }
-}, 60000);
-
 // TableSorter functionality for sortable tables
 document.addEventListener('DOMContentLoaded', function() {
-  // Add click handlers to table headers for sorting
   document.addEventListener('click', function(e) {
     if (e.target.tagName === 'TH' && e.target.closest('table.sortable')) {
       var th = e.target;
@@ -133,26 +65,21 @@ document.addEventListener('DOMContentLoaded', function() {
       var colIndex = Array.from(th.parentNode.children).indexOf(th);
       var isAsc = th.classList.contains('asc');
 
-      // Sort rows
       rows.sort(function(a, b) {
         var aVal = a.children[colIndex].textContent.trim();
         var bVal = b.children[colIndex].textContent.trim();
         var aNum = parseFloat(aVal);
         var bNum = parseFloat(bVal);
-
         if (!isNaN(aNum) && !isNaN(bNum)) {
           return isAsc ? bNum - aNum : aNum - bNum;
         }
         return isAsc ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
       });
 
-      // Update classes
       th.parentNode.querySelectorAll('th').forEach(function(t) {
         t.classList.remove('asc', 'desc');
       });
       th.classList.add(isAsc ? 'desc' : 'asc');
-
-      // Reorder rows
       rows.forEach(function(row) { tbody.appendChild(row); });
     }
   });
@@ -529,88 +456,81 @@ ui &lt;- navbarPage(
 
 server &lt;- function(input, output, session) {
 
-  # Reactive value to store loaded data
-  loaded_data &lt;- reactiveVal(NULL)
-  data_check_count &lt;- reactiveVal(0)
-
-  # Receive data from JavaScript via input
-  observeEvent(input$js_buoy_data, {
-    tryCatch({
-      json_str &lt;- input$js_buoy_data
-      if (!is.null(json_str) &amp;&amp; nchar(json_str) &gt; 100) {
-        data &lt;- jsonlite::fromJSON(json_str)
-        data$time &lt;- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
-        loaded_data(data)
-        message("Received ", nrow(data), " records from JavaScript input")
-      }
-    }, error = function(e) {
-      message("Error parsing JS data: ", e$message)
-    })
-  }, ignoreNULL = TRUE, ignoreInit = TRUE)
-
-  # Poll for JavaScript data using session$sendCustomMessage callback
-  observe({
-    # Only poll if we don't have data yet
-    if (is.null(loaded_data()) &amp;&amp; data_check_count() &lt; 30) {
-      invalidateLater(2000, session)  # Check every 2 seconds
-      data_check_count(data_check_count() + 1)
-
-      # Request data from JavaScript
-      session$sendCustomMessage("requestData", list(attempt = data_check_count()))
-    }
-  })
-
-  # Main data reactive - use JS data or fallback
+  # Load data directly from JSON file at startup
+  # In Shinylive, the file is bundled via resources: in YAML
   buoy_data &lt;- reactive({
-    # Check if we have data from JavaScript
-    data &lt;- loaded_data()
+    data &lt;- NULL
 
-    if (!is.null(data) &amp;&amp; nrow(data) &gt; 100) {
-      return(data)
+    # Try multiple paths - Shinylive bundles resources at document root
+    paths_to_try &lt;- c(
+      "data/buoy_data.json",
+      "./data/buoy_data.json",
+      "/data/buoy_data.json"
+    )
+
+    for (path in paths_to_try) {
+      tryCatch({
+        if (file.exists(path)) {
+          data &lt;- jsonlite::fromJSON(path)
+          data$time &lt;- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+          message("Loaded ", nrow(data), " records from ", path)
+          break
+        }
+      }, error = function(e) {
+        message("Failed to load from ", path, ": ", e$message)
+      })
     }
 
-    # Fallback to sample data while waiting for JS
-    # NOTE: If you see this data, the real data failed to load
-    message("Using fallback sample data - check browser console for errors")
-    n_days &lt;- 90
-    n_per_day &lt;- 24
-    n_stations &lt;- 5
-    n_total &lt;- n_days * n_per_day * n_stations
+    # If direct file access fails, try URL fetch (for WebR)
+    if (is.null(data) || nrow(data) &lt; 100) {
+      tryCatch({
+        # In WebR/Shinylive, we can use download.file + fromJSON
+        tmp &lt;- tempfile(fileext = ".json")
+        download.file("data/buoy_data.json", tmp, quiet = TRUE)
+        data &lt;- jsonlite::fromJSON(tmp)
+        data$time &lt;- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+        message("Loaded ", nrow(data), " records via download")
+        unlink(tmp)
+      }, error = function(e) {
+        message("Download failed: ", e$message)
+      })
+    }
 
-    data.frame(
-      time = rep(Sys.time() - (1:(n_days * n_per_day)) * 3600, n_stations),
-      station_id = rep(c("M2", "M3", "M4", "M5", "M6"), each = n_days * n_per_day),
-      wave_height = runif(n_total, 0.5, 8),
-      hmax = runif(n_total, 1, 12),
-      wave_period = runif(n_total, 4, 14),
-      wind_speed = runif(n_total, 2, 30),
-      gust = runif(n_total, 5, 40),
-      air_temperature = runif(n_total, 3, 18),
-      sea_temperature = runif(n_total, 7, 14),
-      atmospheric_pressure = runif(n_total, 970, 1030),
-      longitude = rep(c(-5.43, -10.55, -10.15, -9.99, -15.88), each = n_days * n_per_day),
-      latitude = rep(c(53.48, 51.22, 53.07, 55.00, 53.06), each = n_days * n_per_day),
-      qc_flag = rep(0, n_total)
-    )
+    # Fallback to sample data if all else fails
+    if (is.null(data) || nrow(data) &lt; 100) {
+      message("WARNING: Using fallback sample data - real data failed to load")
+      n_days &lt;- 90
+      n_per_day &lt;- 24
+      n_stations &lt;- 5
+      n_total &lt;- n_days * n_per_day * n_stations
+
+      data &lt;- data.frame(
+        time = rep(Sys.time() - (1:(n_days * n_per_day)) * 3600, n_stations),
+        station_id = rep(c("M2", "M3", "M4", "M5", "M6"), each = n_days * n_per_day),
+        wave_height = runif(n_total, 0.5, 8),
+        hmax = runif(n_total, 1, 12),
+        wave_period = runif(n_total, 4, 14),
+        wind_speed = runif(n_total, 2, 30),
+        gust = runif(n_total, 5, 40),
+        air_temperature = runif(n_total, 3, 18),
+        sea_temperature = runif(n_total, 7, 14),
+        atmospheric_pressure = runif(n_total, 970, 1030),
+        longitude = rep(c(-5.43, -10.55, -10.15, -9.99, -15.88), each = n_days * n_per_day),
+        latitude = rep(c(53.48, 51.22, 53.07, 55.00, 53.06), each = n_days * n_per_day),
+        qc_flag = rep(0, n_total)
+      )
+    }
+
+    data
   })
 
-  # Initialize station choices - update when data changes
+  # Initialize station choices when data loads
   observe({
     data &lt;- buoy_data()
     stations &lt;- sort(unique(data$station_id))
     updateSelectInput(session, "stations", choices = stations, selected = stations)
     updateSelectInput(session, "scatter_stations", choices = stations, selected = stations)
   })
-
-  # Re-trigger station update when real data loads
-  observeEvent(loaded_data(), {
-    data &lt;- loaded_data()
-    if (!is.null(data)) {
-      stations &lt;- sort(unique(data$station_id))
-      updateSelectInput(session, "stations", choices = stations, selected = stations)
-      updateSelectInput(session, "scatter_stations", choices = stations, selected = stations)
-    }
-  }, ignoreNULL = TRUE)
 
   # Filter data for time series tab
   filtered_data &lt;- reactive({
@@ -818,8 +738,6 @@ server &lt;- function(input, output, session) {
   # Notes tab outputs
   output$last_updated &lt;- renderText({
     data &lt;- buoy_data()
-    real_data &lt;- loaded_data()
-    is_real &lt;- !is.null(real_data) &amp;&amp; nrow(real_data) &gt; 100
     days_span &lt;- as.numeric(difftime(max(data$time), min(data$time), units = "days"))
 
     # Calculate correlations for data validation
@@ -828,13 +746,15 @@ server &lt;- function(input, output, session) {
     cor_wind_wave &lt;- if(sum(valid_ww) &gt; 10) round(cor(data$wind_speed[valid_ww], data$wave_height[valid_ww]), 3) else NA
     cor_wave_hmax &lt;- if(sum(valid_wh) &gt; 10) round(cor(data$wave_height[valid_wh], data$hmax[valid_wh]), 3) else NA
 
-    # Data validation check
-    data_status &lt;- if (is_real) {
-      "ERDDAP JSON (real data)"
-    } else if (!is.null(cor_wind_wave) &amp;&amp; cor_wind_wave &gt; 0.2) {
-      "Real data (correlations valid)"
+    # Data validation: real ERDDAP data has Wind-Wave corr ~0.3, Wave-Hmax ~0.97
+    # Fallback sample data has correlations ~0
+    is_real_data &lt;- !is.na(cor_wind_wave) &amp;&amp; cor_wind_wave &gt; 0.15 &amp;&amp;
+                    !is.na(cor_wave_hmax) &amp;&amp; cor_wave_hmax &gt; 0.8
+
+    data_status &lt;- if (is_real_data) {
+      "ERDDAP JSON (real data loaded)"
     } else {
-      "Sample data (loading... or failed)"
+      "FALLBACK SAMPLE DATA (real data failed to load)"
     }
 
     paste0(
