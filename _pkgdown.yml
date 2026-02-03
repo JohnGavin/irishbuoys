@@ -16,16 +16,12 @@ navbar:
       aria-label: GitHub
 
 articles:
-  - title: Interactive
-    navbar: ~
-    contents:
-      - dashboard_shinylive
-      - dashboard_static
-
   - title: Analysis
     navbar: Analysis
     contents:
       - wave_analysis
+  # Note: dashboard_shinylive requires separate Quarto rendering with shinylive extension
+  # Build with: quarto render vignettes/dashboard_shinylive.qmd
 
 reference:
   - title: "Data Access"
