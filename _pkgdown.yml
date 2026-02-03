@@ -16,6 +16,10 @@ navbar:
       aria-label: GitHub
 
 articles:
+  - title: Dashboards
+    navbar: Dashboards
+    contents:
+      - dashboard_static
   - title: Analysis
     navbar: Analysis
     contents:
