@@ -33,11 +33,16 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
 
-# Load pre-computed analysis data (or create placeholder if not available)
+# Load pre-computed analysis data
 load_data <- function(file) {
+  # Try installed package location first
   path <- system.file("extdata", file, package = "irishbuoys")
+  # Fall back to development location (when rendering from vignettes/)
   if (path == "" || !file.exists(path)) {
-    # Return placeholder data for development
+    path <- file.path("..", "inst", "extdata", file)
+  }
+  if (!file.exists(path)) {
+    warning("Data file not found: ", file)
     return(NULL)
   }
   readRDS(path)
