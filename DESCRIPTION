@@ -31,18 +31,23 @@ Suggests:
     forecast,
     gert,
     ggplot2,
+    knitr,
     mgcv,
     mirai,
+    nanoparquet,
     plotly,
     quantreg,
     quarto,
     ranger,
+    rmarkdown,
     scales,
     shiny,
     shinylive,
     tarchetypes,
     targets,
     testthat (>= 3.0.0),
+    tidyr,
     xts,
     zoo
+VignetteBuilder: knitr, quarto
 Config/testthat/edition: 3

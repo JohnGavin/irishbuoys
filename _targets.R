@@ -8,7 +8,10 @@ library(crew)
 
 # Set target options
 tar_option_set(
-  packages = c("irishbuoys", "duckdb", "DBI", "dplyr", "ggplot2", "cli"),
+  packages = c(
+    "irishbuoys", "duckdb", "DBI", "dplyr", "ggplot2", "cli",
+    "extRemes"  # For extreme value analysis
+  ),
   format = "rds",
   memory = "transient",
   garbage_collection = TRUE,
@@ -29,7 +32,10 @@ for (plan_file in plan_files) {
 }
 
 # Combine all plans into single pipeline
+# Note: Plans are loaded dynamically from R/tar_plans/, but we list them
+# explicitly here to ensure correct execution order and visibility
 list(
   plan_data_acquisition,
-  plan_quality_control
+  plan_quality_control,
+  plan_wave_analysis
 )
