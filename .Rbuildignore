@@ -17,3 +17,10 @@
 ^vignettes/.*_files$
 ^vignettes/.*\.html$
 ^shinylive-sw\.js$
+^_output$
+^_quarto\.yml$
+^docs$
+^\.quarto$
+^LICENSE\.md$
+^pkgdown$
+^plans$

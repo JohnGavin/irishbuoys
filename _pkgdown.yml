@@ -1,0 +1,113 @@
+url: https://johngavin.github.io/irishbuoys/
+
+template:
+  bootstrap: 5
+  bslib:
+    preset: "shiny"
+
+navbar:
+  structure:
+    left: [intro, articles, reference]
+    right: [github]
+  components:
+    github:
+      icon: fab fa-github
+      href: https://github.com/JohnGavin/irishbuoys
+      aria-label: GitHub
+
+articles:
+  - title: Interactive
+    navbar: ~
+    contents:
+      - dashboard_shinylive
+      - dashboard_static
+
+  - title: Analysis
+    navbar: Analysis
+    contents:
+      - wave_analysis
+
+reference:
+  - title: "Data Access"
+    desc: "Functions for downloading and accessing buoy data"
+    contents:
+      - download_buoy_data
+      - get_latest_timestamp
+      - get_stations
+
+  - title: "Database Management"
+    desc: "Functions for DuckDB and Parquet storage"
+    contents:
+      - connect_duckdb
+      - create_buoy_schema
+      - load_to_duckdb
+      - query_buoy_data
+      - get_database_stats
+      - init_parquet_storage
+      - save_to_parquet
+      - query_parquet
+      - analyze_parquet_storage
+      - incremental_update
+      - incremental_update_parquet
+      - initialize_database
+      - convert_duckdb_to_parquet
+
+  - title: "Wave Analysis"
+    desc: "Functions for wave science and rogue wave detection"
+    contents:
+      - wave_glossary
+      - explain_hs_formula
+      - explain_wave_height_measurement
+      - explain_measurement_period
+      - explain_hourly_averaging
+      - wave_science_documentation
+      - calculate_hs_from_elevation
+      - calculate_rms_wave_height
+      - hs_from_rms
+      - detect_rogue_waves
+      - analyze_rogue_statistics
+      - calculate_wave_steepness
+      - add_wave_metrics
+      - rogue_wave_report
+
+  - title: "Extreme Value Analysis"
+    desc: "Functions for fitting extreme value models"
+    contents:
+      - fit_gev_annual_maxima
+      - fit_gpd_threshold
+      - calculate_return_levels
+      - create_return_level_plot_data
+      - analyze_gust_factor
+      - compare_rogue_wave_gust
+
+  - title: "Trend Analysis"
+    desc: "Seasonal decomposition and trend detection"
+    contents:
+      - decompose_stl
+      - calculate_seasonal_means
+      - calculate_annual_trends
+      - detect_anomalies
+      - trend_summary_report
+
+  - title: "Wave Modeling"
+    desc: "Machine learning models for wave prediction"
+    contents:
+      - wave_model
+      - prepare_wave_features
+      - train_wave_model
+      - evaluate_wave_model
+      - predict_wave_height
+      - wave_model_report
+
+  - title: "Email Reporting"
+    desc: "Functions for generating and sending email summaries"
+    contents:
+      - generate_weekly_summary
+      - create_email_summary
+      - generate_and_send_summary
+
+  - title: "Documentation"
+    desc: "Data dictionary and variable documentation"
+    contents:
+      - get_data_dictionary
+      - get_variable_docs

@@ -52,4 +52,26 @@ fi
 echo -e "${GREEN}🚀 Entering Nix shell for irishbuoys...${NC}"
 echo -e "${YELLOW}💡 Tip: To rebuild, run: rm nix-shell-root && ./default.sh${NC}"
 
-exec nix-shell --pure
+# CRITICAL: Pure mode enforcement for reproducibility and security
+echo ""
+echo -e "${GREEN}🔒 SECURITY: Running in --pure mode${NC}"
+echo -e "${GREEN}   ✓ Only Nix-provided tools available in PATH${NC}"
+echo -e "${GREEN}   ✓ System tools blocked (reproducibility guaranteed)${NC}"
+echo -e "${GREEN}   ✓ Verify with: echo \$IN_NIX_SHELL  # Should show 'pure'${NC}"
+echo ""
+
+# Pass required environment variables explicitly through pure mode
+# HOME: Required for R library paths and config files
+# USER: Required for git commits
+# GITHUB_TOKEN/GH_TOKEN: Required for gh CLI authentication
+# CACHIX_AUTH_TOKEN: Required for Nix binary cache
+# LANG/LC_ALL: Required for proper locale handling
+exec nix-shell --pure \
+  --keep HOME \
+  --keep USER \
+  --keep GITHUB_TOKEN \
+  --keep GH_TOKEN \
+  --keep CACHIX_AUTH_TOKEN \
+  --keep LANG \
+  --keep LC_ALL \
+  default.nix

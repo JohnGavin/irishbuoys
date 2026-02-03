@@ -43,6 +43,50 @@ Rscript default.R
 ./default.sh
 ```
 
+### Pure Mode Enforcement (Security & Reproducibility)
+
+This project enforces Nix `--pure` mode to guarantee:
+
+- **Reproducibility**: Only Nix-provided tools are available
+- **Security**: No accidental use of system tools with different versions
+- **Consistency**: Same environment locally and in CI
+
+**Entering the environment:**
+
+```bash
+# Recommended: Use default.sh (pure mode enforced automatically)
+./default.sh
+# Output shows: 🔒 SECURITY: Running in --pure mode
+
+# Or manually with pure flag:
+nix-shell --pure default.nix
+```
+
+**Verifying pure mode:**
+
+```bash
+# Check IN_NIX_SHELL (should be "pure", not "impure")
+echo $IN_NIX_SHELL
+# Expected: pure
+
+# Check tools are from Nix store
+which R
+# Expected: /nix/store/...
+
+which git
+# Expected: /nix/store/...
+
+# Verify R version
+R --version
+```
+
+**Passing additional environment variables:**
+
+```bash
+# If you need to pass secrets/tokens through pure mode:
+nix-shell --pure --keep GITHUB_TOKEN --keep MY_API_KEY default.nix
+```
+
 ### Using with rix
 
 To integrate this package into your own Nix environment:
