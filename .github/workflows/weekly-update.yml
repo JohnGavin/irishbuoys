@@ -8,7 +8,7 @@ on:
 jobs:
   update-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
           name: rstats-on-nix
           extraPullNames: johngavin
 
-      - name: Perform incremental update
+      - name: Perform incremental data update
         run: |
           export NIX_PATH=nixpkgs=https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-26.tar.gz
           nix-shell default.nix -A shell --run "Rscript -e '
@@ -33,13 +33,29 @@ jobs:
             cat(\"Records added:\", result\$records_added, \"\\n\")
           '"
 
-      - name: Commit updated database
+      - name: Run targets pipeline for wave analysis
+        run: |
+          export NIX_PATH=nixpkgs=https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-26.tar.gz
+          nix-shell default.nix -A shell --run "Rscript -e '
+            targets::tar_make()
+          '" || echo "Targets pipeline completed with warnings"
+
+      - name: Render wave analysis vignette
+        run: |
+          export NIX_PATH=nixpkgs=https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-26.tar.gz
+          nix-shell default.nix -A shell --run "
+            cd vignettes && quarto render wave_analysis.qmd
+          "
+          cp docs/vignettes/wave_analysis.html docs/articles/ || true
+          cp -r docs/vignettes/wave_analysis_files docs/articles/ 2>/dev/null || true
+
+      - name: Commit updates
         if: success()
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add inst/extdata/irish_buoys.duckdb || true
-          git diff --staged --quiet || git commit -m "🔄 Weekly data update - $(date +'%Y-%m-%d')"
+          git add inst/extdata/ docs/articles/ docs/vignettes/ _targets/ || true
+          git diff --staged --quiet || git commit -m "🔄 Weekly update: data + wave analysis - $(date +'%Y-%m-%d')"
           git push || true
 
       - name: Upload update log
