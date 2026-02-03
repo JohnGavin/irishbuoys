@@ -1,0 +1,1645 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="irishbuoys package">
+<meta name="dcterms.date" content="2026-02-03">
+
+<title>Comprehensive Wave Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="wave_analysis_files/libs/clipboard/clipboard.min.js"></script>
+<script src="wave_analysis_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="wave_analysis_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="wave_analysis_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="wave_analysis_files/libs/quarto-html/popper.min.js"></script>
+<script src="wave_analysis_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="wave_analysis_files/libs/quarto-html/anchor.min.js"></script>
+<link href="wave_analysis_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="wave_analysis_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="wave_analysis_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="wave_analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="wave_analysis_files/libs/bootstrap/bootstrap-d5fa03fb90ac27921a6d47853be462c0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-full toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#wave-science" id="toc-wave-science" class="nav-link" data-scroll-target="#wave-science">Wave Measurement Science</a>
+  <ul class="collapse">
+  <li><a href="#glossary-of-terms" id="toc-glossary-of-terms" class="nav-link" data-scroll-target="#glossary-of-terms">Glossary of Terms</a></li>
+  <li><a href="#hs-formula" id="toc-hs-formula" class="nav-link" data-scroll-target="#hs-formula">Why Significant Wave Height (Hs) = 4 x Standard Deviation</a></li>
+  <li><a href="#relationship-between-hs-and-rms-wave-height" id="toc-relationship-between-hs-and-rms-wave-height" class="nav-link" data-scroll-target="#relationship-between-hs-and-rms-wave-height">Relationship Between Hs and RMS Wave Height</a></li>
+  <li><a href="#measurement-period" id="toc-measurement-period" class="nav-link" data-scroll-target="#measurement-period">Why 17.5-Minute Measurement Period?</a></li>
+  <li><a href="#how-hourly-data-is-produced" id="toc-how-hourly-data-is-produced" class="nav-link" data-scroll-target="#how-hourly-data-is-produced">How Hourly Data is Produced</a></li>
+  </ul></li>
+  <li><a href="#rogue-waves" id="toc-rogue-waves" class="nav-link" data-scroll-target="#rogue-waves">Rogue Wave Analysis</a>
+  <ul class="collapse">
+  <li><a href="#definition" id="toc-definition" class="nav-link" data-scroll-target="#definition">Definition</a></li>
+  <li><a href="#rogue-wave-events" id="toc-rogue-wave-events" class="nav-link" data-scroll-target="#rogue-wave-events">Rogue Wave Events</a></li>
+  <li><a href="#rogue-waves-by-station" id="toc-rogue-waves-by-station" class="nav-link" data-scroll-target="#rogue-waves-by-station">Rogue Waves by Station</a></li>
+  <li><a href="#rogue-waves-by-weather-conditions" id="toc-rogue-waves-by-weather-conditions" class="nav-link" data-scroll-target="#rogue-waves-by-weather-conditions">Rogue Waves by Weather Conditions</a></li>
+  </ul></li>
+  <li><a href="#trends" id="toc-trends" class="nav-link" data-scroll-target="#trends">Trend Decomposition</a>
+  <ul class="collapse">
+  <li><a href="#seasonal-patterns" id="toc-seasonal-patterns" class="nav-link" data-scroll-target="#seasonal-patterns">Seasonal Patterns</a></li>
+  <li><a href="#long-term-trends" id="toc-long-term-trends" class="nav-link" data-scroll-target="#long-term-trends">Long-term Trends</a></li>
+  </ul></li>
+  <li><a href="#eva" id="toc-eva" class="nav-link" data-scroll-target="#eva">Extreme Value Analysis</a>
+  <ul class="collapse">
+  <li><a href="#methodology" id="toc-methodology" class="nav-link" data-scroll-target="#methodology">Methodology</a></li>
+  <li><a href="#return-levels" id="toc-return-levels" class="nav-link" data-scroll-target="#return-levels">Return Levels</a></li>
+  <li><a href="#summary-of-extreme-event-estimates" id="toc-summary-of-extreme-event-estimates" class="nav-link" data-scroll-target="#summary-of-extreme-event-estimates">Summary of Extreme Event Estimates</a></li>
+  </ul></li>
+  <li><a href="#rogue-wind" id="toc-rogue-wind" class="nav-link" data-scroll-target="#rogue-wind">Gust Factor Analysis: Is There a “Rogue Wind”?</a>
+  <ul class="collapse">
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a></li>
+  <li><a href="#analysis-results" id="toc-analysis-results" class="nav-link" data-scroll-target="#analysis-results">Analysis Results</a></li>
+  <li><a href="#is-there-a-rogue-gust-equivalent" id="toc-is-there-a-rogue-gust-equivalent" class="nav-link" data-scroll-target="#is-there-a-rogue-gust-equivalent">Is There a “Rogue Gust” Equivalent?</a></li>
+  <li><a href="#gust-factor-by-wind-speed-category" id="toc-gust-factor-by-wind-speed-category" class="nav-link" data-scroll-target="#gust-factor-by-wind-speed-category">Gust Factor by Wind Speed Category</a></li>
+  </ul></li>
+  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Technical Appendix</a>
+  <ul class="collapse">
+  <li><a href="#pipeline-architecture" id="toc-pipeline-architecture" class="nav-link" data-scroll-target="#pipeline-architecture">Pipeline Architecture</a></li>
+  <li><a href="#environment-information" id="toc-environment-information" class="nav-link" data-scroll-target="#environment-information">Environment Information</a></li>
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+</div>
+<main class="content column-page-right" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Comprehensive Wave Analysis</h1>
+<p class="subtitle lead">Irish Weather Buoy Network Data Analysis</p>
+</div>
+
+
+
+<div class="quarto-title-meta column-page-right">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>irishbuoys package </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">February 3, 2026</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>This vignette provides a comprehensive analysis of wave and wind data from the Irish Weather Buoy Network. The analysis uses data from the <a href="https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html">Marine Institute’s ERDDAP server</a>.</p>
+<p><strong>Data Summary:</strong></p>
+<ul>
+<li><strong>Total Observations:</strong> 50,000</li>
+<li><strong>Stations:</strong> M2, M3, M4, M5, M6</li>
+<li><strong>Date Range:</strong> 2020-01-01 to 2024-12-31</li>
+</ul>
+<hr>
+</section>
+<section id="wave-science" class="level2">
+<h2 class="anchored" data-anchor-id="wave-science">Wave Measurement Science</h2>
+<p>Understanding how wave parameters are measured and calculated is essential for proper interpretation of the data.</p>
+<section id="glossary-of-terms" class="level3">
+<h3 class="anchored" data-anchor-id="glossary-of-terms">Glossary of Terms</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>glossary <span class="ot">&lt;-</span> <span class="fu">wave_glossary</span>()</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(glossary, <span class="at">caption =</span> <span class="st">"Wave Measurement Terminology"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Wave Measurement Terminology</caption>
+<colgroup>
+<col style="width: 4%">
+<col style="width: 28%">
+<col style="width: 60%">
+<col style="width: 6%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">acronym</th>
+<th style="text-align: left;">term</th>
+<th style="text-align: left;">definition</th>
+<th style="text-align: left;">unit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Hs</td>
+<td style="text-align: left;">Significant Wave Height</td>
+<td style="text-align: left;">Average height of the highest one-third of waves; equals 4 times the standard deviation of surface elevation</td>
+<td style="text-align: left;">meters (m)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H_1/3</td>
+<td style="text-align: left;">Mean of Highest Third</td>
+<td style="text-align: left;">Traditional definition of significant wave height: mean of the highest 33% of waves</td>
+<td style="text-align: left;">meters (m)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">RMS</td>
+<td style="text-align: left;">Root Mean Square</td>
+<td style="text-align: left;">Square root of the mean of squared values; for waves, related to energy content</td>
+<td style="text-align: left;">meters (m)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hmax</td>
+<td style="text-align: left;">Maximum Wave Height</td>
+<td style="text-align: left;">Maximum individual wave height observed in a measurement period</td>
+<td style="text-align: left;">meters (m)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tp</td>
+<td style="text-align: left;">Peak Wave Period</td>
+<td style="text-align: left;">Wave period corresponding to the peak of the energy spectrum</td>
+<td style="text-align: left;">seconds (s)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Tz</td>
+<td style="text-align: left;">Zero-Crossing Period</td>
+<td style="text-align: left;">Average period between successive zero up-crossings of the water surface</td>
+<td style="text-align: left;">seconds (s)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">m0</td>
+<td style="text-align: left;">Zeroth Spectral Moment</td>
+<td style="text-align: left;">Variance of the sea surface elevation; integral of wave spectrum</td>
+<td style="text-align: left;">m^2</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">GEV</td>
+<td style="text-align: left;">Generalized Extreme Value</td>
+<td style="text-align: left;">Family of distributions for modeling block maxima (e.g., annual maximum waves)</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">GPD</td>
+<td style="text-align: left;">Generalized Pareto Distribution</td>
+<td style="text-align: left;">Distribution for modeling exceedances over a high threshold</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">EVA</td>
+<td style="text-align: left;">Extreme Value Analysis</td>
+<td style="text-align: left;">Statistical methods for estimating extreme events and return levels</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">STL</td>
+<td style="text-align: left;">Seasonal-Trend using Loess</td>
+<td style="text-align: left;">Decomposition method separating seasonal, trend, and remainder components</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">QC</td>
+<td style="text-align: left;">Quality Control</td>
+<td style="text-align: left;">Quality control flags indicating data validity</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ERDDAP</td>
+<td style="text-align: left;">Environmental Research Division Data Access Program</td>
+<td style="text-align: left;">Server protocol for accessing scientific datasets</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">WMO</td>
+<td style="text-align: left;">World Meteorological Organization</td>
+<td style="text-align: left;">United Nations agency for weather, climate, and water</td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">IMO</td>
+<td style="text-align: left;">International Maritime Organization</td>
+<td style="text-align: left;">United Nations agency for shipping safety</td>
+<td style="text-align: left;">-</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="hs-formula" class="level3">
+<h3 class="anchored" data-anchor-id="hs-formula">Why Significant Wave Height (Hs) = 4 x Standard Deviation</h3>
+<p>The relationship <strong>Hs = 4σ</strong> comes from wave spectrum theory (Longuet-Higgins, 1952).</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Step-by-Step Calculation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><strong>Measure</strong> sea surface elevation η(t) over 17.5 minutes (raw data in meters)</li>
+<li><strong>De-trend</strong> by subtracting the mean: η’(t) = η(t) - mean(η)
+<ul>
+<li>This removes tidal/ambient sea level</li>
+<li>Now we have pure wave-induced fluctuations</li>
+</ul></li>
+<li><strong>Calculate σ</strong> = standard deviation of the de-meaned elevations (units: meters)</li>
+<li><strong>Hs = 4 × σ</strong> (units: meters)</li>
+</ol>
+<p><strong>Note:</strong> We subtract the mean from the <em>raw data</em> (step 2), then calculate σ of the result (step 3). We do NOT subtract anything from σ itself.</p>
+</div>
+</div>
+<p><strong>Why multiply by 4?</strong></p>
+<p>This is a <strong>mathematical constant</strong> from the Rayleigh distribution, not an arbitrary choice:</p>
+<ul>
+<li>For a narrow-banded Gaussian random sea, individual wave heights follow a <strong>Rayleigh distribution</strong></li>
+<li>The theoretical average of the highest 1/3 of waves (H₁/₃) is derived by integrating the Rayleigh PDF:</li>
+</ul>
+<p><span class="math display">\[H_{1/3} = \int_{H_{67\%}}^{\infty} H \cdot f(H) \, dH = 4.004\sigma \approx 4\sigma\]</span></p>
+<p><strong>Physical meaning:</strong> Hs approximates what trained observers visually estimate—they naturally focus on the larger, memorable waves, unconsciously averaging the highest third.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Key References
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><p><strong>Longuet-Higgins, M.S. (1952)</strong>. On the statistical distribution of the heights of sea waves. <em>J. Marine Research</em>, 11(3), 245-266. [Original derivation]</p></li>
+<li><p><strong>Holthuijsen, L.H. (2007)</strong>. <em>Waves in Oceanic and Coastal Waters</em>. Cambridge University Press. Chapter 4. [Modern textbook]</p></li>
+<li><p><strong>WMO (2018)</strong>. Guide to Wave Analysis and Forecasting. WMO-No.&nbsp;702. [Operational standards]</p></li>
+</ol>
+</div>
+</div>
+</section>
+<section id="relationship-between-hs-and-rms-wave-height" class="level3">
+<h3 class="anchored" data-anchor-id="relationship-between-hs-and-rms-wave-height">Relationship Between Hs and RMS Wave Height</h3>
+<p>The <strong>Root Mean Square (RMS)</strong> wave height is related to energy content:</p>
+<p><span class="math display">\[H_{rms} = \sqrt{\frac{1}{n}\sum_{i=1}^{n} H_i^2}\]</span></p>
+<p>For a Rayleigh distribution:</p>
+<p><span class="math display">\[H_{rms} = \frac{H_s}{\sqrt{8}} \approx 0.707 \times H_s\]</span></p>
+<p>Or equivalently: <strong>Hs ≈ 1.42 × H_rms</strong></p>
+</section>
+<section id="measurement-period" class="level3">
+<h3 class="anchored" data-anchor-id="measurement-period">Why 17.5-Minute Measurement Period?</h3>
+<p>The Marine Institute buoys use <strong>17.5-minute measurement periods</strong>. Here’s the rationale:</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Statistical Requirement
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The significant wave height (H₁/₃) requires a sufficient sample size for reliability. You need approximately <strong>100-200 waves</strong> for valid statistics.</p>
+</div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Wave Type</th>
+<th>Typical Period</th>
+<th>Waves in 17.5 min</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Wind waves</td>
+<td>3-10 s</td>
+<td>105-350</td>
+</tr>
+<tr class="even">
+<td>Swell</td>
+<td>10-25 s</td>
+<td>42-105</td>
+</tr>
+<tr class="odd">
+<td>Average ocean</td>
+<td>~8 s</td>
+<td>~130</td>
+</tr>
+</tbody>
+</table>
+<p><strong>WMO Recommendations:</strong></p>
+<ul>
+<li>Standard period: <strong>20-30 minutes</strong></li>
+<li>Minimum acceptable: <strong>17 minutes</strong></li>
+<li>Marine Institute uses: <strong>17.5 minutes</strong> (lower bound)</li>
+</ul>
+<p><strong>Trade-offs:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Longer Period</th>
+<th>Shorter Period</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>✓ Better statistics</td>
+<td>✓ Better temporal resolution</td>
+</tr>
+<tr class="even">
+<td>✓ More stable Hs estimates</td>
+<td>✓ Captures rapid changes</td>
+</tr>
+<tr class="odd">
+<td>✗ Less temporal resolution</td>
+<td>✗ Higher uncertainty in Hs</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="how-hourly-data-is-produced" class="level3">
+<h3 class="anchored" data-anchor-id="how-hourly-data-is-produced">How Hourly Data is Produced</h3>
+<p>The ERDDAP data provides <strong>one value per hour</strong>. Here’s the process:</p>
+<ol type="1">
+<li><strong>Burst Sampling:</strong> 17.5-minute measurement period</li>
+<li><strong>Spectral Processing:</strong> FFT applied to heave signal → wave spectrum</li>
+<li><strong>Parameter Calculation:</strong>
+<ul>
+<li>Hs = 4√m₀</li>
+<li>Hmax from zero-crossing analysis</li>
+<li>Tp from spectral peak</li>
+</ul></li>
+<li><strong>Hourly Reporting:</strong> Most recent burst analysis reported</li>
+</ol>
+<hr>
+</section>
+</section>
+<section id="rogue-waves" class="level2">
+<h2 class="anchored" data-anchor-id="rogue-waves">Rogue Wave Analysis</h2>
+<section id="definition" class="level3">
+<h3 class="anchored" data-anchor-id="definition">Definition</h3>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Rogue Wave Definition
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A <strong>rogue wave</strong> (also called freak wave or abnormal wave) is defined as a wave where:</p>
+<p><span class="math display">\[\frac{H_{max}}{H_s} &gt; 2.0\]</span></p>
+<p>Some standards use a stricter threshold of 2.2.</p>
+</div>
+</div>
+<p>Rogue waves are NOT:</p>
+<ul>
+<li>Tsunamis (which are seismic waves)</li>
+<li>Storm surges (which are meteorologically forced)</li>
+<li>Tidal waves</li>
+</ul>
+<p>They are <strong>extreme individual waves</strong> within a given sea state that significantly exceed the expected statistical distribution.</p>
+<p><strong>Physical Mechanisms:</strong></p>
+<ol type="1">
+<li><strong>Wave-current interaction:</strong> Waves steepening against opposing currents</li>
+<li><strong>Modulational instability:</strong> Benjamin-Feir instability in nonlinear wave groups</li>
+<li><strong>Superposition:</strong> Constructive interference of wave components</li>
+<li><strong>Focusing:</strong> Wave refraction by bathymetry or currents</li>
+</ol>
+</section>
+<section id="rogue-wave-events" class="level3">
+<h3 class="anchored" data-anchor-id="rogue-wave-events">Rogue Wave Events</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>stats <span class="ot">&lt;-</span> analysis_summary<span class="sc">$</span>rogue_waves<span class="sc">$</span>statistics</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(stats<span class="sc">$</span>overall, <span class="at">caption =</span> <span class="st">"Overall Rogue Wave Statistics"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div id="tbl-rogue-summary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-rogue-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Rogue Wave Detection Summary
+</figcaption>
+<div aria-describedby="tbl-rogue-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell-output-display">
+<p>Table: Overall Rogue Wave Statistics</p>
+</div>
+</div>
+</figure>
+</div>
+</div>
+<p><strong>Events Detected:</strong> 0 rogue wave events (Hmax/Hs &gt; 2.0)</p>
+</section>
+<section id="rogue-waves-by-station" class="level3">
+<h3 class="anchored" data-anchor-id="rogue-waves-by-station">Rogue Waves by Station</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">All Stations</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">M2</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">M3</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false" href="">M4</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false" href="">M5</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false" href="">M6</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(rogue_events) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(rogue_events, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> rogue_ratio, <span class="at">color =</span> station_id)) <span class="sc">+</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.7</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">2.0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">2.2</span>, <span class="at">linetype =</span> <span class="st">"dotted"</span>, <span class="at">color =</span> <span class="st">"darkred"</span>) <span class="sc">+</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Time"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Hmax / Hs Ratio"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">color =</span> <span class="st">"Station"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Rogue Wave Events (Ratio &gt; 2.0)"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fu">min</span>(rogue_events<span class="sc">$</span>time), <span class="at">y =</span> <span class="fl">2.05</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">label =</span> <span class="st">"Standard threshold (2.0)"</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="fu">min</span>(rogue_events<span class="sc">$</span>time), <span class="at">y =</span> <span class="fl">2.25</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>             <span class="at">label =</span> <span class="st">"Strict threshold (2.2)"</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"darkred"</span>) <span class="sc">+</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"bottom"</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>m2_rogues <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M2"</span>, ]</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(m2_rogues) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(m2_rogues, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> hmax)) <span class="sc">+</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> rogue_ratio), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_viridis_c</span>(<span class="at">name =</span> <span class="st">"Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Maximum Wave Height (m)"</span>, <span class="at">title =</span> <span class="st">"M2 Rogue Wave Events"</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No rogue waves detected at M2"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>No rogue waves detected at M2</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>m3_rogues <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M3"</span>, ]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(m3_rogues) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(m3_rogues, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> hmax)) <span class="sc">+</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> rogue_ratio), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_viridis_c</span>(<span class="at">name =</span> <span class="st">"Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Maximum Wave Height (m)"</span>, <span class="at">title =</span> <span class="st">"M3 Rogue Wave Events"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No rogue waves detected at M3"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>No rogue waves detected at M3</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>m4_rogues <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M4"</span>, ]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(m4_rogues) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(m4_rogues, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> hmax)) <span class="sc">+</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> rogue_ratio), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_viridis_c</span>(<span class="at">name =</span> <span class="st">"Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Maximum Wave Height (m)"</span>, <span class="at">title =</span> <span class="st">"M4 Rogue Wave Events"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No rogue waves detected at M4"</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>No rogue waves detected at M4</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>m5_rogues <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M5"</span>, ]</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(m5_rogues) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(m5_rogues, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> hmax)) <span class="sc">+</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> rogue_ratio), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_viridis_c</span>(<span class="at">name =</span> <span class="st">"Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Maximum Wave Height (m)"</span>, <span class="at">title =</span> <span class="st">"M5 Rogue Wave Events"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No rogue waves detected at M5"</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>No rogue waves detected at M5</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>m6_rogues <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M6"</span>, ]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(m6_rogues) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(m6_rogues, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> hmax)) <span class="sc">+</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">color =</span> rogue_ratio), <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_color_viridis_c</span>(<span class="at">name =</span> <span class="st">"Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Maximum Wave Height (m)"</span>, <span class="at">title =</span> <span class="st">"M6 Rogue Wave Events"</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No rogue waves detected at M6"</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>No rogue waves detected at M6</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="rogue-waves-by-weather-conditions" class="level3">
+<h3 class="anchored" data-anchor-id="rogue-waves-by-weather-conditions">Rogue Waves by Weather Conditions</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Wind Speed</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Water Depth</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">Time of Day</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">Season</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(rogue_events) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="st">"wind_category"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_events)) {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  wind_summary <span class="ot">&lt;-</span> rogue_events <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(wind_category) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_ratio =</span> <span class="fu">mean</span>(rogue_ratio, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">max_hmax =</span> <span class="fu">max</span>(hmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(wind_summary, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(wind_category, n), <span class="at">y =</span> n, <span class="at">fill =</span> mean_ratio)) <span class="sc">+</span></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_flip</span>() <span class="sc">+</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Mean</span><span class="sc">\n</span><span class="st">Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Wind Condition"</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Number of Rogue Wave Events"</span>,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Rogue Waves by Wind Speed Category"</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(rogue_events) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="st">"depth_category"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_events)) {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  depth_summary <span class="ot">&lt;-</span> rogue_events <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(depth_category) <span class="sc">%&gt;%</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_ratio =</span> <span class="fu">mean</span>(rogue_ratio, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">max_hmax =</span> <span class="fu">max</span>(hmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(depth_summary, <span class="fu">aes</span>(<span class="at">x =</span> depth_category, <span class="at">y =</span> n, <span class="at">fill =</span> mean_ratio)) <span class="sc">+</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Mean</span><span class="sc">\n</span><span class="st">Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Water Depth Category"</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Number of Rogue Wave Events"</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Rogue Waves: Deep Water vs Shelf Edge"</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(rogue_events) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="st">"time_of_day"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_events)) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  time_summary <span class="ot">&lt;-</span> rogue_events <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(time_of_day) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(time_summary, <span class="fu">aes</span>(<span class="at">x =</span> time_of_day, <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Time of Day"</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Number of Rogue Wave Events"</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Rogue Wave Distribution by Time of Day"</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(rogue_events) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">&amp;&amp;</span> <span class="st">"season"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_events)) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  season_summary <span class="ot">&lt;-</span> rogue_events <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(season) <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">mean_hmax =</span> <span class="fu">mean</span>(hmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Order seasons</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  season_summary<span class="sc">$</span>season <span class="ot">&lt;-</span> <span class="fu">factor</span>(season_summary<span class="sc">$</span>season,</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Winter"</span>, <span class="st">"Spring"</span>, <span class="st">"Summer"</span>, <span class="st">"Autumn"</span>))</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(season_summary, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> n, <span class="at">fill =</span> mean_hmax)) <span class="sc">+</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Mean Hmax"</span>) <span class="sc">+</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Season"</span>,</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Number of Rogue Wave Events"</span>,</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Seasonal Distribution of Rogue Waves"</span></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="trends" class="level2">
+<h2 class="anchored" data-anchor-id="trends">Trend Decomposition</h2>
+<section id="seasonal-patterns" class="level3">
+<h3 class="anchored" data-anchor-id="seasonal-patterns">Seasonal Patterns</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">Wave Height</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">Wind Speed</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false" href="">STL Decomposition</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_data<span class="sc">$</span>wave<span class="sc">$</span>monthly)) {</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  monthly_wave <span class="ot">&lt;-</span> seasonal_data<span class="sc">$</span>wave<span class="sc">$</span>monthly</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  monthly_wave<span class="sc">$</span>month_name <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly_wave<span class="sc">$</span>month_name, <span class="at">levels =</span> month.abb)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(monthly_wave, <span class="fu">aes</span>(<span class="at">x =</span> month_name, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Mean Significant Wave Height (m)"</span>,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Monthly Wave Height Pattern"</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_data<span class="sc">$</span>wave<span class="sc">$</span>seasonal)) {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(seasonal_data<span class="sc">$</span>wave<span class="sc">$</span>seasonal, <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Seasonal Wave Height Statistics"</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_data<span class="sc">$</span>wind<span class="sc">$</span>monthly)) {</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  monthly_wind <span class="ot">&lt;-</span> seasonal_data<span class="sc">$</span>wind<span class="sc">$</span>monthly</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  monthly_wind<span class="sc">$</span>month_name <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly_wind<span class="sc">$</span>month_name, <span class="at">levels =</span> month.abb)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(monthly_wind, <span class="fu">aes</span>(<span class="at">x =</span> month_name, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Mean Wind Speed (m/s)"</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Monthly Wind Speed Pattern"</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_data<span class="sc">$</span>wind<span class="sc">$</span>seasonal)) {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(seasonal_data<span class="sc">$</span>wind<span class="sc">$</span>seasonal, <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Seasonal Wind Speed Statistics"</span>)</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_data<span class="sc">$</span>stl) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.null</span>(seasonal_data<span class="sc">$</span>stl<span class="sc">$</span>components)) {</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  stl_df <span class="ot">&lt;-</span> seasonal_data<span class="sc">$</span>stl<span class="sc">$</span>components</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Reshape for faceted plot</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  stl_long <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    stl_df,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(original, seasonal, trend, remainder),</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"component"</span>,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  stl_long<span class="sc">$</span>component <span class="ot">&lt;-</span> <span class="fu">factor</span>(stl_long<span class="sc">$</span>component,</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"original"</span>, <span class="st">"trend"</span>, <span class="st">"seasonal"</span>, <span class="st">"remainder"</span>))</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(stl_long, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>component, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Wave Height (m)"</span>,</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">"STL Decomposition of Wave Height"</span>) <span class="sc">+</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>))</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="long-term-trends" class="level3">
+<h3 class="anchored" data-anchor-id="long-term-trends">Long-term Trends</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(analysis_summary<span class="sc">$</span>trends<span class="sc">$</span>annual_wave<span class="sc">$</span>annual_stats)) {</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  annual_wave <span class="ot">&lt;-</span> analysis_summary<span class="sc">$</span>trends<span class="sc">$</span>annual_wave<span class="sc">$</span>annual_stats</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(annual_wave, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add trend line if available</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(analysis_summary<span class="sc">$</span>trends<span class="sc">$</span>annual_wave<span class="sc">$</span>trend_model)) {</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    p <span class="ot">&lt;-</span> p <span class="sc">+</span> <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>)</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  p <span class="sc">+</span> <span class="fu">labs</span>(</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Year"</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Mean Significant Wave Height (m)"</span>,</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Annual Wave Height Trend"</span>,</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="fu">sprintf</span>(<span class="st">"Trend: %+.3f m/decade (p = %.3f)"</span>,</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>                      analysis_summary<span class="sc">$</span>trends<span class="sc">$</span>annual_wave<span class="sc">$</span>trend_per_decade,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>                      analysis_summary<span class="sc">$</span>trends<span class="sc">$</span>annual_wave<span class="sc">$</span>p_value)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+</section>
+</section>
+<section id="eva" class="level2">
+<h2 class="anchored" data-anchor-id="eva">Extreme Value Analysis</h2>
+<p>Extreme Value Analysis (EVA) is used to estimate the probability of rare, extreme events based on historical data.</p>
+<section id="methodology" class="level3">
+<h3 class="anchored" data-anchor-id="methodology">Methodology</h3>
+<p>Two main approaches:</p>
+<ol type="1">
+<li><strong>Block Maxima (GEV):</strong> Fit Generalized Extreme Value distribution to annual maximum values</li>
+<li><strong>Peaks Over Threshold (GPD):</strong> Fit Generalized Pareto Distribution to exceedances over a high threshold</li>
+</ol>
+<p>We use the <strong>Block Maxima</strong> approach with annual maximum values.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>GEV Distribution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The GEV distribution has three parameters:</p>
+<ul>
+<li><strong>Location (μ):</strong> Central tendency of extremes</li>
+<li><strong>Scale (σ):</strong> Spread of extremes</li>
+<li><strong>Shape (ξ):</strong> Tail behavior
+<ul>
+<li>ξ &gt; 0: Fréchet (heavy tail)</li>
+<li>ξ = 0: Gumbel (exponential tail)</li>
+<li>ξ &lt; 0: Weibull (bounded tail)</li>
+</ul></li>
+</ul>
+</div>
+</div>
+</section>
+<section id="return-levels" class="level3">
+<h3 class="anchored" data-anchor-id="return-levels">Return Levels</h3>
+<p>A <strong>return level</strong> is the value expected to be exceeded on average once every T years. For example:</p>
+<ul>
+<li><strong>10-year return level:</strong> Expected to be exceeded 10% of years</li>
+<li><strong>100-year return level:</strong> Expected to be exceeded 1% of years</li>
+</ul>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href="">Wave Height</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href="">Maximum Wave (Hmax)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false" href="">Wind Speed</a></li></ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>wave)) {</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  rl_wave <span class="ot">&lt;-</span> return_levels<span class="sc">$</span>wave</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(rl_wave, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Return Period (years)"</span>,</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Significant Wave Height (m)"</span>,</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Wave Height Return Levels"</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>wave)) {</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(return_levels<span class="sc">$</span>wave, <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Wave Height Return Levels (Hs)"</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Return Period (years)"</span>, <span class="st">"Return Level (m)"</span>, <span class="st">"Lower 95% CI"</span>, <span class="st">"Upper 95% CI"</span>, <span class="st">"Variable"</span>))</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>hmax)) {</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  rl_hmax <span class="ot">&lt;-</span> return_levels<span class="sc">$</span>hmax</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(rl_hmax, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"darkred"</span>) <span class="sc">+</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Return Period (years)"</span>,</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Maximum Wave Height (m)"</span>,</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Maximum Wave Height (Hmax) Return Levels"</span></span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>hmax)) {</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(return_levels<span class="sc">$</span>hmax, <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Maximum Wave Height Return Levels (Hmax)"</span>)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>wind)) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  rl_wind <span class="ot">&lt;-</span> return_levels<span class="sc">$</span>wind</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(rl_wind, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Return Period (years)"</span>,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Wind Speed (m/s)"</span>,</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Wind Speed Return Levels"</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>wind)) {</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(return_levels<span class="sc">$</span>wind, <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Wind Speed Return Levels"</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="summary-of-extreme-event-estimates" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-extreme-event-estimates">Summary of Extreme Event Estimates</h3>
+<div class="cell" data-tbl-cap="Summary of Extreme Event Return Levels">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>extremes_df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Variable =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"Wave Height (Hs)"</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">"Max Wave (Hmax)"</span>, <span class="dv">3</span>), <span class="fu">rep</span>(<span class="st">"Wind Speed"</span>, <span class="dv">3</span>)),</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">Return_Period =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>), <span class="dv">3</span>),</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>wave) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>hmax) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.null</span>(return_levels<span class="sc">$</span>wind)) {</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  extremes_df<span class="sc">$</span>Return_Level <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>wave<span class="sc">$</span>return_level,</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>hmax<span class="sc">$</span>return_level,</span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>wind<span class="sc">$</span>return_level</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>  extremes_df<span class="sc">$</span>Unit <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">"m"</span>, <span class="dv">6</span>), <span class="fu">rep</span>(<span class="st">"m/s"</span>, <span class="dv">3</span>))</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>  extremes_df<span class="sc">$</span>Lower_CI <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>wave<span class="sc">$</span>lower,</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>hmax<span class="sc">$</span>lower,</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>wind<span class="sc">$</span>lower</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>  extremes_df<span class="sc">$</span>Upper_CI <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>wave<span class="sc">$</span>upper,</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>hmax<span class="sc">$</span>upper,</span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>    return_levels<span class="sc">$</span>wind<span class="sc">$</span>upper</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-25"><a href="#cb30-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(extremes_df, <span class="at">digits =</span> <span class="dv">1</span>)</span>
+<span id="cb30-26"><a href="#cb30-26" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+</section>
+</section>
+<section id="rogue-wind" class="level2">
+<h2 class="anchored" data-anchor-id="rogue-wind">Gust Factor Analysis: Is There a “Rogue Wind”?</h2>
+<section id="background" class="level3">
+<h3 class="anchored" data-anchor-id="background">Background</h3>
+<p>For waves, we define a “rogue wave” as one where <strong>Hmax/Hs &gt; 2.0</strong>. Is there an equivalent concept for wind?</p>
+<p>The <strong>gust factor</strong> is the ratio of peak gust to sustained wind speed:</p>
+<p><span class="math display">\[\text{Gust Factor} = \frac{\text{Peak Gust}}{\text{Sustained Wind}}\]</span></p>
+<p>Typical gust factors are around <strong>1.3</strong> (30% increase from sustained to gust).</p>
+</section>
+<section id="analysis-results" class="level3">
+<h3 class="anchored" data-anchor-id="analysis-results">Analysis Results</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(analysis_summary<span class="sc">$</span>gust_analysis<span class="sc">$</span>summary)) {</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(analysis_summary<span class="sc">$</span>gust_analysis<span class="sc">$</span>summary, <span class="at">digits =</span> <span class="dv">2</span>,</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Gust Factor Statistics"</span>)</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="is-there-a-rogue-gust-equivalent" class="level3">
+<h3 class="anchored" data-anchor-id="is-there-a-rogue-gust-equivalent">Is There a “Rogue Gust” Equivalent?</h3>
+<p>If we apply the same logic as rogue waves (ratio &gt; 2× typical), we would define a “rogue gust” as:</p>
+<p><span class="math display">\[\text{Gust Factor} &gt; 2 \times 1.3 = 2.6\]</span></p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(analysis_summary<span class="sc">$</span>rogue_comparison)) {</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(analysis_summary<span class="sc">$</span>rogue_comparison, <span class="at">digits =</span> <span class="dv">3</span>,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">caption =</span> <span class="st">"Comparison: Rogue Waves vs 'Rogue Gusts'"</span>)</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Conclusion: No Standard “Rogue Wind” Definition
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Unlike rogue waves, there is <strong>no established “rogue wind” or “rogue gust” definition</strong> in meteorology. This is because:</p>
+<ol type="1">
+<li><strong>Different physics:</strong> Wind gusts are turbulent fluctuations, not individual wave-like phenomena</li>
+<li><strong>Different statistics:</strong> Wind follows different distributions than ocean waves</li>
+<li><strong>Different time scales:</strong> Gusts occur on seconds, wave measurements on minutes</li>
+</ol>
+<p>The gust factor is already the standard metric for extreme wind variability, and values &gt; 1.5 are considered “gusty” conditions.</p>
+</div>
+</div>
+</section>
+<section id="gust-factor-by-wind-speed-category" class="level3">
+<h3 class="anchored" data-anchor-id="gust-factor-by-wind-speed-category">Gust Factor by Wind Speed Category</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(analysis_summary<span class="sc">$</span>gust_analysis<span class="sc">$</span>by_category)) {</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  gust_cat <span class="ot">&lt;-</span> analysis_summary<span class="sc">$</span>gust_analysis<span class="sc">$</span>by_category</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(gust_cat, <span class="fu">aes</span>(<span class="at">x =</span> wind_category, <span class="at">y =</span> mean_gf)) <span class="sc">+</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean_gf <span class="sc">-</span> <span class="fl">0.1</span>, <span class="at">ymax =</span> p95_gf), <span class="at">width =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">1.3</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="dv">1</span>, <span class="at">y =</span> <span class="fl">1.35</span>, <span class="at">label =</span> <span class="st">"Typical GF = 1.3"</span>, <span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Sustained Wind Speed (m/s)"</span>,</span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Gust Factor"</span>,</span>
+<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">title =</span> <span class="st">"Gust Factor by Wind Speed Category"</span>,</span>
+<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">subtitle =</span> <span class="st">"Bars show mean, error bars extend to 95th percentile"</span></span>
+<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+</section>
+</section>
+<section id="appendix" class="level2">
+<h2 class="anchored" data-anchor-id="appendix">Technical Appendix</h2>
+<section id="pipeline-architecture" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline-architecture">Pipeline Architecture</h3>
+<p>This analysis uses a <code>{targets}</code> pipeline for reproducibility. The pipeline:</p>
+<ol type="1">
+<li>Loads data from DuckDB</li>
+<li>Detects rogue waves</li>
+<li>Performs trend decomposition</li>
+<li>Fits extreme value models</li>
+<li>Saves results for vignette rendering</li>
+</ol>
+<p>To reproduce the analysis:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># In the package directory</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>targets<span class="sc">::</span><span class="fu">tar_make</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="environment-information" class="level3">
+<h3 class="anchored" data-anchor-id="environment-information">Environment Information</h3>
+<p>This vignette was generated in a <strong>Nix pure mode</strong> environment for reproducibility.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: aarch64-apple-darwin24.6.0
+Running under: macOS Tahoe 26.2
+
+Matrix products: default
+BLAS:   /nix/store/gf17x1bj3m732n39jznn6kz69szbr5rb-blas-3/lib/libblas.dylib 
+LAPACK: /nix/store/5kg4z5bffhr8nry8bl8l5wlxvpy54dm2-openblas-0.3.30/lib/libopenblasp-r0.3.30.dylib;  LAPACK version 3.12.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: UTC
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] knitr_1.51        ggplot2_4.0.1     dplyr_1.1.4       irishbuoys_0.0.91
+[5] testthat_3.3.2   
+
+loaded via a namespace (and not attached):
+ [1] bit_4.6.0          gtable_0.3.6       jsonlite_2.0.0     compiler_4.5.2    
+ [5] brio_1.1.5         tidyselect_1.2.1   assertthat_0.2.1   scales_1.4.0      
+ [9] arrow_22.0.0       yaml_2.3.12        fastmap_1.2.0      R6_2.6.1          
+[13] generics_0.1.4     httr2_1.2.2        htmlwidgets_1.6.4  tibble_3.3.1      
+[17] desc_1.4.3         rprojroot_2.1.1    lubridate_1.9.4    DBI_1.2.3         
+[21] RColorBrewer_1.1-3 pillar_1.11.1      rlang_1.1.7        xfun_0.55         
+[25] S7_0.2.1           bit64_4.6.0-1      pkgload_1.4.1      otel_0.2.0        
+[29] timechange_0.3.0   cli_3.6.5          withr_3.0.2        magrittr_2.0.4    
+[33] grid_4.5.2         digest_0.6.39      rappdirs_0.3.3     lifecycle_1.0.5   
+[37] vctrs_0.6.5        evaluate_1.0.5     glue_1.8.0         farver_2.1.2      
+[41] duckdb_1.4.3       pkgbuild_1.4.8     rmarkdown_2.30     purrr_1.2.1       
+[45] tools_4.5.2        pkgconfig_2.0.3    htmltools_0.5.9   </code></pre>
+</div>
+</div>
+</section>
+<section id="data-sources" class="level3">
+<h3 class="anchored" data-anchor-id="data-sources">Data Sources</h3>
+<ul>
+<li><a href="https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html">Marine Institute ERDDAP Server</a></li>
+<li><a href="https://data.gov.ie/dataset/weather-buoy-network">Irish Weather Buoy Network</a></li>
+</ul>
+</section>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<ol type="1">
+<li><p><strong>Significant Wave Height:</strong> Longuet-Higgins, M.S. (1952). On the statistical distribution of the heights of sea waves. <em>J. Marine Research</em>, 11, 245-266.</p></li>
+<li><p><strong>Rogue Waves:</strong> Dysthe, K., Krogstad, H.E., &amp; Müller, P. (2008). Oceanic rogue waves. <em>Annual Review of Fluid Mechanics</em>, 40, 287-310.</p></li>
+<li><p><strong>Extreme Value Analysis:</strong> Coles, S. (2001). <em>An Introduction to Statistical Modeling of Extreme Values</em>. Springer.</p></li>
+<li><p><strong>WMO Wave Measurement:</strong> WMO-No.&nbsp;702 (2019). <em>Manual on Codes: International Codes</em>.</p></li>
+</ol>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
