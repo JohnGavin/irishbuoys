@@ -69,7 +69,15 @@ fit_gev_annual_maxima <- function(
   annual_max <- annual_max[is.finite(annual_max$max_value), ]
 
   if (nrow(annual_max) < min_years) {
-    cli::cli_abort("Insufficient data: only {nrow(annual_max)} years available, need at least {min_years}")
+    cli::cli_alert_warning("Insufficient data: only {nrow(annual_max)} years available, need at least {min_years}")
+    return(list(
+      fit = NULL,
+      annual_maxima = annual_max,
+      parameters = c(location = NA, scale = NA, shape = NA),
+      n_years = nrow(annual_max),
+      variable = variable,
+      error = "Insufficient data for GEV fitting"
+    ))
   }
 
   cli::cli_alert_info("Fitting GEV to {nrow(annual_max)} annual maxima ({min(annual_max$year)}-{max(annual_max$year)})")
@@ -242,6 +250,19 @@ calculate_return_levels <- function(
     conf_level = 0.95
 ) {
 
+  # Handle case where GEV fitting failed
+  if (is.null(fit$fit)) {
+    cli::cli_alert_warning("Return levels not calculated: GEV fit not available")
+    return(data.frame(
+      return_period = return_periods,
+      return_level = NA_real_,
+      lower = NA_real_,
+      upper = NA_real_,
+      variable = fit$variable,
+      error = fit$error
+    ))
+  }
+
   cli::cli_progress_step("Calculating return levels...")
 
   # Get return levels with confidence intervals
@@ -295,6 +316,18 @@ create_return_level_plot_data <- function(
     max_return_period = 200,
     n_points = 100
 ) {
+
+  # Handle case where GEV fitting failed
+  if (is.null(fit$fit)) {
+    cli::cli_alert_warning("Return level plot data not calculated: GEV fit not available")
+    return(data.frame(
+      return_period = numeric(0),
+      return_level = numeric(0),
+      lower = numeric(0),
+      upper = numeric(0),
+      variable = character(0)
+    ))
+  }
 
   return_periods <- exp(seq(log(1.1), log(max_return_period), length.out = n_points))
 
