@@ -6,10 +6,14 @@ library(targets)
 library(tarchetypes)
 library(crew)
 
+# Load package functions (not installed, so use load_all)
+pkgload::load_all(quiet = TRUE)
+
 # Set target options
+# Note: Don't include "irishbuoys" in packages - we load_all() above instead
 tar_option_set(
   packages = c(
-    "irishbuoys", "duckdb", "DBI", "dplyr", "ggplot2", "cli",
+    "duckdb", "DBI", "dplyr", "ggplot2", "cli",
     "extRemes"  # For extreme value analysis
   ),
   format = "rds",
