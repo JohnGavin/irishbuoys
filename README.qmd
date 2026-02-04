@@ -109,6 +109,57 @@ rix(
 )
 ```
 
+### Cachix Binary Cache (Faster Builds)
+::: {.panel-tabset}
+
+#### For Other Machines
+
+Use the pre-built R packages from `rstats-on-nix` Cachix cache for much faster builds:
+
+```bash
+# Install cachix (one-time setup)
+nix-shell -p cachix --run "cachix use rstats-on-nix"
+
+# Now nix-shell will download pre-built packages instead of compiling
+cd irishbuoys
+./default.sh  # Much faster with cache!
+```
+
+#### Two-Tier Caching Strategy
+
+This project uses a two-tier Cachix strategy:
+
+| Priority | Cache | Contains |
+|----------|-------|----------|
+| 1st | `rstats-on-nix` | All standard R packages (public, pre-built) |
+| 2nd | `johngavin` | Project-specific custom packages only |
+
+**Important**: Standard R packages (dplyr, targets, etc.) are ALL available from `rstats-on-nix`. The `johngavin` cache is only for custom packages not in rstats-on-nix.
+
+For irishbuoys:
+- All dependencies come from `rstats-on-nix`
+- The irishbuoys package itself is loaded via `pkgload::load_all()` (development mode)
+- Nothing needs to be pushed to `johngavin` cache
+
+#### GitHub Actions CI
+
+CI workflows automatically use both caches:
+
+```yaml
+# In .github/workflows/r-cmd-check.yaml
+- uses: cachix/cachix-action@v15
+  with:
+    name: rstats-on-nix  # Public cache FIRST
+
+- uses: cachix/cachix-action@v15
+  with:
+    name: johngavin      # Project cache SECOND
+    authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
+    skipPush: true       # Don't push during checks
+```
+
+:::
+
 ## Quick Start
 
 ### Download Recent Data
