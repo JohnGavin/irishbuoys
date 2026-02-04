@@ -109,9 +109,12 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
     dyLegend(show = "always", width = 400)
 }
 
-# Helper function for DT tables
+# Helper function for DT tables with optimized timestamp display
 create_dt <- function(data, caption = "") {
-  datatable(
+  # Find timestamp columns
+  time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp", "datetime"))
+
+  dt <- datatable(
     data,
     caption = caption,
     filter = 'top',
@@ -121,10 +124,25 @@ create_dt <- function(data, caption = "") {
       dom = 'Bfrtip',
       buttons = c('copy', 'csv', 'excel'),
       order = list(list(0, 'desc')),
-      scrollX = TRUE
+      scrollX = TRUE,
+      columnDefs = if (length(time_cols) > 0) {
+        list(list(width = '150px', targets = time_cols - 1))
+      } else NULL
     ),
     class = 'cell-border stripe hover compact'
   )
+
+  # Style timestamp columns with smaller, non-wrapping text
+  if (length(time_cols) > 0) {
+    dt <- dt %>%
+      DT::formatStyle(
+        columns = names(data)[time_cols],
+        fontSize = '11px',
+        whiteSpace = 'nowrap'
+      )
+  }
+
+  dt
 }
 
 # Calculate summary stats

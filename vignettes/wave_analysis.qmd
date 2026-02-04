@@ -50,19 +50,41 @@ tar_read_safe <- function(name) {
   }
 }
 
-# Helper for DT tables
+# Helper for DT tables with optimized timestamp display
 create_dt <- function(data, caption = "") {
-  datatable(
+  # Find timestamp columns (typically named 'time')
+  time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp", "datetime"))
+
+  dt <- datatable(
     data,
     caption = caption,
     filter = 'top',
+    extensions = 'Buttons',
     options = list(
       pageLength = 15,
       order = list(list(0, 'desc')),
-      scrollX = TRUE
+      scrollX = TRUE,
+      dom = 'Bfrtip',
+      buttons = c('copy', 'csv', 'excel'),
+      # Set column widths - wider for timestamps
+      columnDefs = if (length(time_cols) > 0) {
+        list(list(width = '150px', targets = time_cols - 1))  # 0-indexed
+      } else NULL
     ),
-    class = 'cell-border stripe hover'
+    class = 'cell-border stripe hover compact'
   )
+
+  # Style timestamp columns with smaller, non-wrapping text
+  if (length(time_cols) > 0) {
+    dt <- dt %>%
+      DT::formatStyle(
+        columns = names(data)[time_cols],
+        fontSize = '11px',
+        whiteSpace = 'nowrap'
+      )
+  }
+
+  dt
 }
 
 # Load targets data
@@ -81,11 +103,47 @@ wave_stl <- tar_read_safe(wave_height_seasonal)
 # Fallback to inst/extdata if targets not available
 if (is.null(rogue_events)) {
   load_rds <- function(f) {
+    # Try relative path (during vignette rendering)
     p <- file.path("..", "inst", "extdata", f)
-    if (file.exists(p)) readRDS(p) else NULL
+    if (file.exists(p)) return(readRDS(p))
+    # Fallback to installed package
+    p <- system.file("extdata", f, package = "irishbuoys")
+    if (p != "" && file.exists(p)) return(readRDS(p))
+    NULL
   }
+
+  # Load rogue wave events (contains weather condition fields)
   rogue_events <- load_rds("rogue_wave_events.rds")
+  rogue_conditions <- rogue_events  # Same data with wind_category, season, etc.
+
+  # Load analysis summary
   analysis_summary <- load_rds("wave_analysis_summary.rds")
+
+  # Load seasonal analysis
+  seasonal_data <- load_rds("seasonal_analysis.rds")
+  if (!is.null(seasonal_data)) {
+    seasonal_means_wave <- seasonal_data$wave
+    seasonal_means_wind <- seasonal_data$wind
+    wave_stl <- seasonal_data$stl
+  }
+
+  # Load return levels
+  return_data <- load_rds("return_levels.rds")
+  if (!is.null(return_data)) {
+    return_levels_wave <- return_data$wave
+    return_levels_wind <- return_data$wind
+    return_levels_hmax <- return_data$hmax
+  }
+
+  # Extract gust analysis from summary if available
+  if (!is.null(analysis_summary) && "gust_analysis" %in% names(analysis_summary)) {
+    gust_analysis <- analysis_summary$gust_analysis
+  }
+
+  # Extract annual trends from summary
+  if (!is.null(analysis_summary) && "trends" %in% names(analysis_summary)) {
+    annual_trends_wave <- analysis_summary$trends$annual_wave
+  }
 }
 
 has_targets <- !is.null(rogue_events) && nrow(rogue_events) > 0
@@ -187,10 +245,10 @@ if (has_targets && nrow(rogue_events) > 0) {
 if (has_targets && nrow(rogue_events) > 0) {
   rogue_events %>%
     arrange(desc(rogue_ratio)) %>%
-    select(time, station_id, hs, hmax, rogue_ratio) %>%
+    select(time, station_id, wave_height, hmax, rogue_ratio) %>%
     mutate(
       time = format(time, "%Y-%m-%d %H:%M"),
-      hs = round(hs, 2),
+      wave_height = round(wave_height, 2),
       hmax = round(hmax, 2),
       rogue_ratio = round(rogue_ratio, 3)
     ) %>%
@@ -220,10 +278,10 @@ if (has_targets) {
   m2 <- rogue_events[rogue_events$station_id == "M2", ]
   if (nrow(m2) > 0) {
     m2 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, hs, hmax, rogue_ratio) %>%
+      select(time, wave_height, hmax, rogue_ratio) %>%
       mutate(
         time = format(time, "%Y-%m-%d %H:%M"),
-        across(c(hs, hmax), ~round(., 2)),
+        across(c(wave_height, hmax), ~round(., 2)),
         rogue_ratio = round(rogue_ratio, 3)
       ) %>%
       create_dt("M2 Rogue Waves")
@@ -251,8 +309,8 @@ if (has_targets) {
   m3 <- rogue_events[rogue_events$station_id == "M3", ]
   if (nrow(m3) > 0) {
     m3 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, hs, hmax, rogue_ratio) %>%
-      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(hs, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
+      select(time, wave_height, hmax, rogue_ratio) %>%
+      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
       create_dt("M3 Rogue Waves")
   }
 }
@@ -278,8 +336,8 @@ if (has_targets) {
   m4 <- rogue_events[rogue_events$station_id == "M4", ]
   if (nrow(m4) > 0) {
     m4 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, hs, hmax, rogue_ratio) %>%
-      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(hs, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
+      select(time, wave_height, hmax, rogue_ratio) %>%
+      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
       create_dt("M4 Rogue Waves")
   }
 }
@@ -305,8 +363,8 @@ if (has_targets) {
   m5 <- rogue_events[rogue_events$station_id == "M5", ]
   if (nrow(m5) > 0) {
     m5 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, hs, hmax, rogue_ratio) %>%
-      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(hs, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
+      select(time, wave_height, hmax, rogue_ratio) %>%
+      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
       create_dt("M5 Rogue Waves")
   }
 }
@@ -332,8 +390,8 @@ if (has_targets) {
   m6 <- rogue_events[rogue_events$station_id == "M6", ]
   if (nrow(m6) > 0) {
     m6 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, hs, hmax, rogue_ratio) %>%
-      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(hs, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
+      select(time, wave_height, hmax, rogue_ratio) %>%
+      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
       create_dt("M6 Rogue Waves")
   }
 }
