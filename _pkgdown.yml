@@ -4,6 +4,14 @@ template:
   bootstrap: 5
   bslib:
     preset: "shiny"
+  includes:
+    in_header: |
+      <style>
+      /* Fix content hidden behind fixed navbar */
+      .page-header { padding-top: 1rem; }
+      main { padding-top: 1rem; }
+      .template-home main > .row:first-child { padding-top: 0.5rem; }
+      </style>
 
 navbar:
   structure:
