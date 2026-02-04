@@ -1,0 +1,22 @@
+/* Fix for content being hidden behind fixed navbar */
+.page-header {
+  padding-top: 1rem;
+}
+
+/* Add spacing below navbar for main content */
+main {
+  padding-top: 1rem;
+}
+
+/* Ensure the package description is visible */
+.section.level1:first-of-type,
+#irishbuoys + p,
+.contents > p:first-of-type {
+  margin-top: 1rem;
+}
+
+/* Fix for homepage content */
+.template-home main > .row:first-child,
+.template-home .contents > *:first-child {
+  padding-top: 0.5rem;
+}

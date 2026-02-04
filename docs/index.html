@@ -9,9 +9,16 @@
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Analyze Irish Weather Buoy Network Data">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
+<meta property="og:title" content="Analyze Irish Weather Buoy Network Data">
 <meta name="description" content="Provides tools to download, process, and analyze data from the Irish Weather Buoy Network. Includes functions for accessing real-time and historical data via the Marine Institute's ERDDAP server, storing data in DuckDB for efficient querying, and building predictive models for wave height and weather conditions.">
 <meta property="og:description" content="Provides tools to download, process, and analyze data from the Irish Weather Buoy Network. Includes functions for accessing real-time and historical data via the Marine Institute's ERDDAP server, storing data in DuckDB for efficient querying, and building predictive models for wave height and weather conditions.">
+<style>
+/* Fix content hidden behind fixed navbar */
+.page-header { padding-top: 1rem; }
+main { padding-top: 1rem; }
+.template-home main > .row:first-child { padding-top: 0.5rem; }
+</style>
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -21,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">irishbuoys</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.91</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,10 +40,14 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/dashboard_static.html">Irish Weather Buoy Explorer</a></li>
+<li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Dashboards</h6></li>
+    <li><a class="dropdown-item" href="articles/dashboard_static.html">Irish Weather Buoy Explorer</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Analysis</h6></li>
     <li><a class="dropdown-item" href="articles/wave_analysis.html">Comprehensive Wave Analysis</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="articles/index.html">More articles...</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
@@ -50,8 +61,1388 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9">
-Provides tools to download, process, and analyze data from the Irish Weather Buoy Network. Includes functions for accessing real-time and historical data via the Marine Institute's ERDDAP server, storing data in DuckDB for efficient querying, and building predictive models for wave height and weather conditions.
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header"><h1 id="irishbuoys">irishbuoys<a class="anchor" aria-label="anchor" href="#irishbuoys"></a>
+</h1></div>
+<!-- badges: start -->
+
+<p>The <code>irishbuoys</code> package provides tools to download, process, and analyze data from the Irish Weather Buoy Network. It includes functions for accessing real-time and historical data via the Marine Institute’s ERDDAP server, storing data in DuckDB for efficient querying, and building predictive models for wave height and weather conditions.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<div class="section level3">
+<h3 id="standard-r-installation">Standard R Installation<a class="anchor" aria-label="anchor" href="#standard-r-installation"></a>
+</h3>
+<p>You can install the development version of irishbuoys from GitHub:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"johngavin/irishbuoys"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="nix-environment-installation-recommended">Nix Environment Installation (Recommended)<a class="anchor" aria-label="anchor" href="#nix-environment-installation-recommended"></a>
+</h3>
+<p>For a reproducible development environment using Nix:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Clone the repository</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/johngavin/irishbuoys.git</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="bu">cd</span> irishbuoys</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Generate Nix configuration from DESCRIPTION</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="ex">Rscript</span> default.R</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Enter Nix shell (first time may take a while)</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="ex">./default.sh</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co"># Subsequent entries are fast (seconds)</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="ex">./default.sh</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="pure-mode-enforcement-security--reproducibility">Pure Mode Enforcement (Security &amp; Reproducibility)<a class="anchor" aria-label="anchor" href="#pure-mode-enforcement-security--reproducibility"></a>
+</h3>
+<p>This project enforces Nix <code>--pure</code> mode to guarantee:</p>
+<ul>
+<li>
+<strong>Reproducibility</strong>: Only Nix-provided tools are available</li>
+<li>
+<strong>Security</strong>: No accidental use of system tools with different versions</li>
+<li>
+<strong>Consistency</strong>: Same environment locally and in CI</li>
+</ul>
+<p><strong>Entering the environment:</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Recommended: Use default.sh (pure mode enforced automatically)</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="ex">./default.sh</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># Output shows: 🔒 </span><span class="al">SECURITY</span><span class="co">: Running in --pure mode</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># Or manually with pure flag:</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="ex">nix-shell</span> <span class="at">--pure</span> default.nix</span></code></pre></div>
+<p><strong>Verifying pure mode:</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Check IN_NIX_SHELL (should be "pure", not "impure")</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$IN_NIX_SHELL</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co"># Expected: pure</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co"># Check tools are from Nix store</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">which</span> R</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Expected: /nix/store/...</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="fu">which</span> git</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co"># Expected: /nix/store/...</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co"># Verify R version</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="ex">R</span> <span class="at">--version</span></span></code></pre></div>
+<p><strong>Passing additional environment variables:</strong></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># If you need to pass secrets/tokens through pure mode:</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="ex">nix-shell</span> <span class="at">--pure</span> <span class="at">--keep</span> GITHUB_TOKEN <span class="at">--keep</span> MY_API_KEY default.nix</span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="using-with-rix">Using with rix<a class="anchor" aria-label="anchor" href="#using-with-rix"></a>
+</h3>
+<p>To integrate this package into your own Nix environment:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rix/" class="external-link">rix</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://docs.ropensci.org/rix/reference/rix.html" class="external-link">rix</a></span><span class="op">(</span></span>
+<span>  r_ver <span class="op">=</span> <span class="st">"4.5.0"</span>,</span>
+<span>  r_pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"duckdb"</span>, <span class="st">"DBI"</span>, <span class="st">"httr2"</span>, <span class="st">"dplyr"</span><span class="op">)</span>,</span>
+<span>  git_pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>      package_name <span class="op">=</span> <span class="st">"irishbuoys"</span>,</span>
+<span>      repo_url <span class="op">=</span> <span class="st">"https://github.com/johngavin/irishbuoys"</span>,</span>
+<span>      commit <span class="op">=</span> <span class="st">"main"</span>  <span class="co"># Use specific SHA for reproducibility</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  ide <span class="op">=</span> <span class="st">"other"</span>,</span>
+<span>  project_path <span class="op">=</span> <span class="st">"."</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="cachix-binary-cache-faster-builds">Cachix Binary Cache (Faster Builds)<a class="anchor" aria-label="anchor" href="#cachix-binary-cache-faster-builds"></a>
+</h3>
+<div class="panel-tabset">
+
+
+
+<ul class="nav nav-tabs" id="NA" role="tablist">
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#for-other-machines" id="for-other-machines-tab" type="button" role="tab" aria-controls="for-other-machines" aria-selected="true" class="active nav-link">For Other Machines</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#two-tier-caching-strategy" id="two-tier-caching-strategy-tab" type="button" role="tab" aria-controls="two-tier-caching-strategy" aria-selected="false" class="nav-link">Two-Tier Caching Strategy</button></li>
+<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#github-actions-ci" id="github-actions-ci-tab" type="button" role="tab" aria-controls="github-actions-ci" aria-selected="false" class="nav-link">GitHub Actions CI</button></li>
+</ul>
+<div class="tab-content">
+<div class="active  tab-pane" id="for-other-machines" role="tabpanel" aria-labelledby="for-other-machines-tab">
+
+<p>Use the pre-built R packages from <code>rstats-on-nix</code> Cachix cache for much faster builds:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Install cachix (one-time setup)</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="ex">nix-shell</span> <span class="at">-p</span> cachix <span class="at">--run</span> <span class="st">"cachix use rstats-on-nix"</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co"># Now nix-shell will download pre-built packages instead of compiling</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="bu">cd</span> irishbuoys</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="ex">./default.sh</span>  <span class="co"># Much faster with cache!</span></span></code></pre></div>
+</div>
+<div class="tab-pane" id="two-tier-caching-strategy" role="tabpanel" aria-labelledby="two-tier-caching-strategy-tab">
+
+<p>This project uses a two-tier Cachix strategy:</p>
+<table class="table">
+<colgroup>
+<col width="13%">
+<col width="23%">
+<col width="62%">
+</colgroup>
+<thead><tr>
+<th>Priority</th>
+<th>Cache</th>
+<th>Contains</th>
+</tr></thead>
+<tbody>
+<tr>
+<td>1st</td>
+<td><code>rstats-on-nix</code></td>
+<td>All standard R packages (public, pre-built)</td>
+</tr>
+<tr>
+<td>2nd</td>
+<td><code>johngavin</code></td>
+<td>Project-specific custom packages only</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Important</strong>: Standard R packages (dplyr, targets, etc.) are ALL available from <code>rstats-on-nix</code>. The <code>johngavin</code> cache is only for custom packages not in rstats-on-nix.</p>
+<p>For irishbuoys: - All dependencies come from <code>rstats-on-nix</code> - The irishbuoys package itself is loaded via <code><a href="https://pkgload.r-lib.org/reference/load_all.html" class="external-link">pkgload::load_all()</a></code> (development mode) - Nothing needs to be pushed to <code>johngavin</code> cache</p>
+</div>
+<div class="tab-pane" id="github-actions-ci" role="tabpanel" aria-labelledby="github-actions-ci-tab">
+
+<p>CI workflows automatically use both caches:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># In .github/workflows/r-cmd-check.yaml</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> cachix/cachix-action@v15</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="at">    </span><span class="fu">name</span><span class="kw">:</span><span class="at"> rstats-on-nix</span><span class="co">  # Public cache FIRST</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> cachix/cachix-action@v15</span></span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="at">    </span><span class="fu">name</span><span class="kw">:</span><span class="at"> johngavin</span><span class="co">      # Project cache SECOND</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="at">    </span><span class="fu">authToken</span><span class="kw">:</span><span class="at"> </span><span class="st">'${{ secrets.CACHIX_AUTH_TOKEN }}'</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="at">    </span><span class="fu">skipPush</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">       # Don't push during checks</span></span></code></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick Start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<div class="section level3">
+<h3 id="download-recent-data">Download Recent Data<a class="anchor" aria-label="anchor" href="#download-recent-data"></a>
+</h3>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">irishbuoys</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Download last 7 days of data</span></span>
+<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/download_buoy_data.html">download_buoy_data</a></span><span class="op">(</span></span>
+<span>  start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">7</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get data for specific station</span></span>
+<span><span class="va">m3_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/download_buoy_data.html">download_buoy_data</a></span><span class="op">(</span></span>
+<span>  stations <span class="op">=</span> <span class="st">"M3"</span>,</span>
+<span>  start_date <span class="op">=</span> <span class="st">"2024-01-01"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get only wave measurements</span></span>
+<span><span class="va">waves</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/download_buoy_data.html">download_buoy_data</a></span><span class="op">(</span></span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"WaveHeight"</span>, <span class="st">"WavePeriod"</span>, <span class="st">"Hmax"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="initialize-and-query-database">Initialize and Query Database<a class="anchor" aria-label="anchor" href="#initialize-and-query-database"></a>
+</h3>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Initialize database with historical data</span></span>
+<span><span class="fu"><a href="reference/initialize_database.html">initialize_database</a></span><span class="op">(</span></span>
+<span>  start_date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
+<span>  end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Connect to database</span></span>
+<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/connect_duckdb.html">connect_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Query wave data</span></span>
+<span><span class="va">wave_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/query_buoy_data.html">query_buoy_data</a></span><span class="op">(</span></span>
+<span>  <span class="va">con</span>,</span>
+<span>  stations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M3"</span>, <span class="st">"M4"</span><span class="op">)</span>,</span>
+<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"wave_height"</span>, <span class="st">"wave_period"</span><span class="op">)</span>,</span>
+<span>  start_date <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
+<span>  qc_filter <span class="op">=</span> <span class="cn">TRUE</span>  <span class="co"># Only good quality data</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Custom SQL query</span></span>
+<span><span class="va">extreme_waves</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/query_buoy_data.html">query_buoy_data</a></span><span class="op">(</span></span>
+<span>  <span class="va">con</span>,</span>
+<span>  sql_query <span class="op">=</span> <span class="st">"</span></span>
+<span><span class="st">    SELECT station_id, time, wave_height, hmax</span></span>
+<span><span class="st">    FROM buoy_data</span></span>
+<span><span class="st">    WHERE hmax &gt; 2 * wave_height</span></span>
+<span><span class="st">      AND wave_height &gt; 0</span></span>
+<span><span class="st">      AND qc_flag = 1</span></span>
+<span><span class="st">    ORDER BY time DESC</span></span>
+<span><span class="st">    LIMIT 100</span></span>
+<span><span class="st">  "</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Don't forget to disconnect</span></span>
+<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="incremental-updates">Incremental Updates<a class="anchor" aria-label="anchor" href="#incremental-updates"></a>
+</h3>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Perform incremental update (for scheduled jobs)</span></span>
+<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/incremental_update.html">incremental_update</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check database statistics</span></span>
+<span><span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_database_stats.html">get_database_stats</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="data-dictionary">Data Dictionary<a class="anchor" aria-label="anchor" href="#data-dictionary"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Get complete data dictionary</span></span>
+<span><span class="va">dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_data_dictionary.html">get_data_dictionary</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="va">dict</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Get detailed documentation for specific variable</span></span>
+<span><span class="va">wave_docs</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_variable_docs.html">get_variable_docs</a></span><span class="op">(</span><span class="st">"WaveHeight"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wave_docs</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="data-source">Data Source<a class="anchor" aria-label="anchor" href="#data-source"></a>
+</h2>
+<p>Data is sourced from the <a href="https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html" class="external-link">Marine Institute’s ERDDAP server</a>, which provides real-time and historical measurements from the Irish Weather Buoy Network.</p>
+<div class="section level3">
+<h3 id="available-stations">Available Stations<a class="anchor" aria-label="anchor" href="#available-stations"></a>
+</h3>
+<ul>
+<li>
+<strong>M2</strong>: Southwest of Ireland</li>
+<li>
+<strong>M3</strong>: Southwest of Ireland</li>
+<li>
+<strong>M4</strong>: Southeast of Ireland</li>
+<li>
+<strong>M5</strong>: West of Ireland</li>
+<li>
+<strong>M6</strong>: Northwest of Ireland</li>
+<li>
+<strong>M1</strong>: Historical data (decommissioned)</li>
+<li>
+<strong>FS1</strong>: Historical data</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="measured-parameters">Measured Parameters<a class="anchor" aria-label="anchor" href="#measured-parameters"></a>
+</h3>
+<ul>
+<li>
+<strong>Meteorological</strong>: Air temperature, pressure, humidity, wind speed/direction</li>
+<li>
+<strong>Oceanographic</strong>: Wave height/period/direction, sea temperature, salinity</li>
+<li>
+<strong>Quality</strong>: QC flags for data validation</li>
+</ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="project-structure">Project Structure<a class="anchor" aria-label="anchor" href="#project-structure"></a>
+</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>.</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>├── DESCRIPTION</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>├── LICENSE</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>├── LICENSE.md</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>├── NAMESPACE</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>├── R</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a>│   ├── data_dictionary.R</span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a>│   ├── database.R</span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a>│   ├── database_parquet.R</span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a>│   ├── dev</span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a>│   │   ├── generate_dashboard_data.R</span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a>│   │   └── issues</span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a>│   ├── email_summary.R</span>
+<span id="cb13-14"><a href="#cb13-14" tabindex="-1"></a>│   ├── erddap_client.R</span>
+<span id="cb13-15"><a href="#cb13-15" tabindex="-1"></a>│   ├── extreme_values.R</span>
+<span id="cb13-16"><a href="#cb13-16" tabindex="-1"></a>│   ├── irishbuoys<span class="sc">-</span>package.R</span>
+<span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a>│   ├── rogue_waves.R</span>
+<span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a>│   ├── tar_plans</span>
+<span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a>│   │   ├── plan_data_acquisition.R</span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a>│   │   ├── plan_quality_control.R</span>
+<span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a>│   │   └── plan_wave_analysis.R</span>
+<span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a>│   ├── trend_analysis.R</span>
+<span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a>│   ├── update.R</span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a>│   ├── wave_model.R</span>
+<span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a>│   └── wave_science.R</span>
+<span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a>├── README.qmd</span>
+<span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a>├── README.rmarkdown</span>
+<span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a>├── _extensions</span>
+<span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a>│   └── quarto<span class="sc">-</span>ext</span>
+<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a>│       └── shinylive</span>
+<span id="cb13-31"><a href="#cb13-31" tabindex="-1"></a>│           ├── README.md</span>
+<span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a>│           ├── _extension.yml</span>
+<span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a>│           ├── resources</span>
+<span id="cb13-34"><a href="#cb13-34" tabindex="-1"></a>│           │   └── css</span>
+<span id="cb13-35"><a href="#cb13-35" tabindex="-1"></a>│           │       └── shinylive<span class="sc">-</span>quarto.css</span>
+<span id="cb13-36"><a href="#cb13-36" tabindex="-1"></a>│           └── shinylive.lua</span>
+<span id="cb13-37"><a href="#cb13-37" tabindex="-1"></a>├── _output</span>
+<span id="cb13-38"><a href="#cb13-38" tabindex="-1"></a>│   ├── shinylive<span class="sc">-</span>sw.js</span>
+<span id="cb13-39"><a href="#cb13-39" tabindex="-1"></a>│   └── vignettes</span>
+<span id="cb13-40"><a href="#cb13-40" tabindex="-1"></a>│       ├── dashboard_shinylive.html</span>
+<span id="cb13-41"><a href="#cb13-41" tabindex="-1"></a>│       ├── dashboard_shinylive_files</span>
+<span id="cb13-42"><a href="#cb13-42" tabindex="-1"></a>│       │   └── libs</span>
+<span id="cb13-43"><a href="#cb13-43" tabindex="-1"></a>│       │       ├── bootstrap</span>
+<span id="cb13-44"><a href="#cb13-44" tabindex="-1"></a>│       │       │   ├── bootstrap<span class="sc">-</span>d5fa03fb90ac27921a6d47853be462c0.min.css</span>
+<span id="cb13-45"><a href="#cb13-45" tabindex="-1"></a>│       │       │   ├── bootstrap<span class="sc">-</span>icons.css</span>
+<span id="cb13-46"><a href="#cb13-46" tabindex="-1"></a>│       │       │   ├── bootstrap<span class="sc">-</span>icons.woff</span>
+<span id="cb13-47"><a href="#cb13-47" tabindex="-1"></a>│       │       │   └── bootstrap.min.js</span>
+<span id="cb13-48"><a href="#cb13-48" tabindex="-1"></a>│       │       ├── clipboard</span>
+<span id="cb13-49"><a href="#cb13-49" tabindex="-1"></a>│       │       │   └── clipboard.min.js</span>
+<span id="cb13-50"><a href="#cb13-50" tabindex="-1"></a>│       │       ├── quarto<span class="sc">-</span>contrib</span>
+<span id="cb13-51"><a href="#cb13-51" tabindex="-1"></a>│       │       │   ├── shinylive<span class="dv">-0</span>.<span class="fl">9.1</span></span>
+<span id="cb13-52"><a href="#cb13-52" tabindex="-1"></a>│       │       │   │   ├── shinylive</span>
+<span id="cb13-53"><a href="#cb13-53" tabindex="-1"></a>│       │       │   │   │   ├── Editor.css</span>
+<span id="cb13-54"><a href="#cb13-54" tabindex="-1"></a>│       │       │   │   │   ├── Editor.js</span>
+<span id="cb13-55"><a href="#cb13-55" tabindex="-1"></a>│       │       │   │   │   ├── SourceSansPro<span class="sc">-</span>Regular.otf<span class="sc">-</span>PVQ5ZP77.woff2</span>
+<span id="cb13-56"><a href="#cb13-56" tabindex="-1"></a>│       │       │   │   │   ├── browser<span class="sc">-</span>OYYBATHK.js</span>
+<span id="cb13-57"><a href="#cb13-57" tabindex="-1"></a>│       │       │   │   │   ├── browser<span class="sc">-</span>YJT5PK6V.js</span>
+<span id="cb13-58"><a href="#cb13-58" tabindex="-1"></a>│       │       │   │   │   ├── chunk<span class="sc">-</span>O5P2LFOG.js</span>
+<span id="cb13-59"><a href="#cb13-59" tabindex="-1"></a>│       │       │   │   │   ├── chunk<span class="sc">-</span>PHWSSKUM.js</span>
+<span id="cb13-60"><a href="#cb13-60" tabindex="-1"></a>│       │       │   │   │   ├── load<span class="sc">-</span>shinylive<span class="sc">-</span>sw.js</span>
+<span id="cb13-61"><a href="#cb13-61" tabindex="-1"></a>│       │       │   │   │   ├── lzstring<span class="sc">-</span>worker.js</span>
+<span id="cb13-62"><a href="#cb13-62" tabindex="-1"></a>│       │       │   │   │   ├── pyodide<span class="sc">-</span>worker.js</span>
+<span id="cb13-63"><a href="#cb13-63" tabindex="-1"></a>│       │       │   │   │   ├── run<span class="sc">-</span>python<span class="sc">-</span>blocks.js</span>
+<span id="cb13-64"><a href="#cb13-64" tabindex="-1"></a>│       │       │   │   │   ├── shinylive.css</span>
+<span id="cb13-65"><a href="#cb13-65" tabindex="-1"></a>│       │       │   │   │   ├── shinylive.js</span>
+<span id="cb13-66"><a href="#cb13-66" tabindex="-1"></a>│       │       │   │   │   ├── style<span class="sc">-</span>resets.css</span>
+<span id="cb13-67"><a href="#cb13-67" tabindex="-1"></a>│       │       │   │   │   └── webr</span>
+<span id="cb13-68"><a href="#cb13-68" tabindex="-1"></a>│       │       │   │   │       ├── R.bin.js</span>
+<span id="cb13-69"><a href="#cb13-69" tabindex="-1"></a>│       │       │   │   │       ├── R.bin.js.bak</span>
+<span id="cb13-70"><a href="#cb13-70" tabindex="-1"></a>│       │       │   │   │       ├── R.bin.wasm</span>
+<span id="cb13-71"><a href="#cb13-71" tabindex="-1"></a>│       │       │   │   │       ├── esbuild.d.ts</span>
+<span id="cb13-72"><a href="#cb13-72" tabindex="-1"></a>│       │       │   │   │       ├── libRblas.so</span>
+<span id="cb13-73"><a href="#cb13-73" tabindex="-1"></a>│       │       │   │   │       ├── libRlapack.so</span>
+<span id="cb13-74"><a href="#cb13-74" tabindex="-1"></a>│       │       │   │   │       ├── library.data.gz</span>
+<span id="cb13-75"><a href="#cb13-75" tabindex="-1"></a>│       │       │   │   │       ├── library.js.metadata</span>
+<span id="cb13-76"><a href="#cb13-76" tabindex="-1"></a>│       │       │   │   │       ├── packages</span>
+<span id="cb13-77"><a href="#cb13-77" tabindex="-1"></a>│       │       │   │   │       │   ├── RColorBrewer</span>
+<span id="cb13-78"><a href="#cb13-78" tabindex="-1"></a>│       │       │   │   │       │   │   └── RColorBrewer_1<span class="fl">.1-3.</span>tgz</span>
+<span id="cb13-79"><a href="#cb13-79" tabindex="-1"></a>│       │       │   │   │       │   ├── S7</span>
+<span id="cb13-80"><a href="#cb13-80" tabindex="-1"></a>│       │       │   │   │       │   │   └── S7_0.<span class="dv">2</span>.<span class="fl">0.</span>tgz</span>
+<span id="cb13-81"><a href="#cb13-81" tabindex="-1"></a>│       │       │   │   │       │   ├── askpass</span>
+<span id="cb13-82"><a href="#cb13-82" tabindex="-1"></a>│       │       │   │   │       │   │   └── askpass_1.<span class="dv">2</span>.<span class="fl">1.</span>tgz</span>
+<span id="cb13-83"><a href="#cb13-83" tabindex="-1"></a>│       │       │   │   │       │   ├── crosstalk</span>
+<span id="cb13-84"><a href="#cb13-84" tabindex="-1"></a>│       │       │   │   │       │   │   └── crosstalk_1.<span class="dv">2</span>.<span class="fl">1.</span>tgz</span>
+<span id="cb13-85"><a href="#cb13-85" tabindex="-1"></a>│       │       │   │   │       │   ├── data.table</span>
+<span id="cb13-86"><a href="#cb13-86" tabindex="-1"></a>│       │       │   │   │       │   │   └── data.table_1.<span class="dv">17</span>.<span class="fl">0.</span>tgz</span>
+<span id="cb13-87"><a href="#cb13-87" tabindex="-1"></a>│       │       │   │   │       │   ├── dplyr</span>
+<span id="cb13-88"><a href="#cb13-88" tabindex="-1"></a>│       │       │   │   │       │   │   └── dplyr_1.<span class="dv">1</span>.<span class="fl">4.</span>tgz</span>
+<span id="cb13-89"><a href="#cb13-89" tabindex="-1"></a>│       │       │   │   │       │   ├── evaluate</span>
+<span id="cb13-90"><a href="#cb13-90" tabindex="-1"></a>│       │       │   │   │       │   │   └── evaluate_1.<span class="dv">0</span>.<span class="fl">3.</span>tgz</span>
+<span id="cb13-91"><a href="#cb13-91" tabindex="-1"></a>│       │       │   │   │       │   ├── farver</span>
+<span id="cb13-92"><a href="#cb13-92" tabindex="-1"></a>│       │       │   │   │       │   │   └── farver_2.<span class="dv">1</span>.<span class="fl">2.</span>tgz</span>
+<span id="cb13-93"><a href="#cb13-93" tabindex="-1"></a>│       │       │   │   │       │   ├── generics</span>
+<span id="cb13-94"><a href="#cb13-94" tabindex="-1"></a>│       │       │   │   │       │   │   └── generics_0.<span class="dv">1</span>.<span class="fl">3.</span>tgz</span>
+<span id="cb13-95"><a href="#cb13-95" tabindex="-1"></a>│       │       │   │   │       │   ├── ggplot2</span>
+<span id="cb13-96"><a href="#cb13-96" tabindex="-1"></a>│       │       │   │   │       │   │   └── ggplot2_3.<span class="dv">5</span>.<span class="fl">2.</span>tgz</span>
+<span id="cb13-97"><a href="#cb13-97" tabindex="-1"></a>│       │       │   │   │       │   ├── gtable</span>
+<span id="cb13-98"><a href="#cb13-98" tabindex="-1"></a>│       │       │   │   │       │   │   └── gtable_0.<span class="dv">3</span>.<span class="fl">6.</span>tgz</span>
+<span id="cb13-99"><a href="#cb13-99" tabindex="-1"></a>│       │       │   │   │       │   ├── highr</span>
+<span id="cb13-100"><a href="#cb13-100" tabindex="-1"></a>│       │       │   │   │       │   │   └── highr_0.<span class="fl">11.</span>tgz</span>
+<span id="cb13-101"><a href="#cb13-101" tabindex="-1"></a>│       │       │   │   │       │   ├── htmlwidgets</span>
+<span id="cb13-102"><a href="#cb13-102" tabindex="-1"></a>│       │       │   │   │       │   │   └── htmlwidgets_1.<span class="dv">6</span>.<span class="fl">4.</span>tgz</span>
+<span id="cb13-103"><a href="#cb13-103" tabindex="-1"></a>│       │       │   │   │       │   ├── httr</span>
+<span id="cb13-104"><a href="#cb13-104" tabindex="-1"></a>│       │       │   │   │       │   │   └── httr_1.<span class="dv">4</span>.<span class="fl">7.</span>tgz</span>
+<span id="cb13-105"><a href="#cb13-105" tabindex="-1"></a>│       │       │   │   │       │   ├── isoband</span>
+<span id="cb13-106"><a href="#cb13-106" tabindex="-1"></a>│       │       │   │   │       │   │   └── isoband_0.<span class="dv">2</span>.<span class="fl">7.</span>tgz</span>
+<span id="cb13-107"><a href="#cb13-107" tabindex="-1"></a>│       │       │   │   │       │   ├── knitr</span>
+<span id="cb13-108"><a href="#cb13-108" tabindex="-1"></a>│       │       │   │   │       │   │   └── knitr_1.<span class="fl">50.</span>tgz</span>
+<span id="cb13-109"><a href="#cb13-109" tabindex="-1"></a>│       │       │   │   │       │   ├── labeling</span>
+<span id="cb13-110"><a href="#cb13-110" tabindex="-1"></a>│       │       │   │   │       │   │   └── labeling_0.<span class="dv">4</span>.<span class="fl">3.</span>tgz</span>
+<span id="cb13-111"><a href="#cb13-111" tabindex="-1"></a>│       │       │   │   │       │   ├── lazyeval</span>
+<span id="cb13-112"><a href="#cb13-112" tabindex="-1"></a>│       │       │   │   │       │   │   └── lazyeval_0.<span class="dv">2</span>.<span class="fl">2.</span>tgz</span>
+<span id="cb13-113"><a href="#cb13-113" tabindex="-1"></a>│       │       │   │   │       │   ├── metadata.rds</span>
+<span id="cb13-114"><a href="#cb13-114" tabindex="-1"></a>│       │       │   │   │       │   ├── openssl</span>
+<span id="cb13-115"><a href="#cb13-115" tabindex="-1"></a>│       │       │   │   │       │   │   └── openssl_2.<span class="dv">3</span>.<span class="fl">2.</span>tgz</span>
+<span id="cb13-116"><a href="#cb13-116" tabindex="-1"></a>│       │       │   │   │       │   ├── pillar</span>
+<span id="cb13-117"><a href="#cb13-117" tabindex="-1"></a>│       │       │   │   │       │   │   └── pillar_1.<span class="dv">10</span>.<span class="fl">2.</span>tgz</span>
+<span id="cb13-118"><a href="#cb13-118" tabindex="-1"></a>│       │       │   │   │       │   ├── pkgconfig</span>
+<span id="cb13-119"><a href="#cb13-119" tabindex="-1"></a>│       │       │   │   │       │   │   └── pkgconfig_2.<span class="dv">0</span>.<span class="fl">3.</span>tgz</span>
+<span id="cb13-120"><a href="#cb13-120" tabindex="-1"></a>│       │       │   │   │       │   ├── plotly</span>
+<span id="cb13-121"><a href="#cb13-121" tabindex="-1"></a>│       │       │   │   │       │   │   └── plotly_4.<span class="dv">10</span>.<span class="fl">4.</span>tgz</span>
+<span id="cb13-122"><a href="#cb13-122" tabindex="-1"></a>│       │       │   │   │       │   ├── purrr</span>
+<span id="cb13-123"><a href="#cb13-123" tabindex="-1"></a>│       │       │   │   │       │   │   └── purrr_1.<span class="dv">0</span>.<span class="fl">4.</span>tgz</span>
+<span id="cb13-124"><a href="#cb13-124" tabindex="-1"></a>│       │       │   │   │       │   ├── rmarkdown</span>
+<span id="cb13-125"><a href="#cb13-125" tabindex="-1"></a>│       │       │   │   │       │   │   └── rmarkdown_2.<span class="fl">29.</span>tgz</span>
+<span id="cb13-126"><a href="#cb13-126" tabindex="-1"></a>│       │       │   │   │       │   ├── scales</span>
+<span id="cb13-127"><a href="#cb13-127" tabindex="-1"></a>│       │       │   │   │       │   │   └── scales_1.<span class="dv">3</span>.<span class="fl">0.</span>tgz</span>
+<span id="cb13-128"><a href="#cb13-128" tabindex="-1"></a>│       │       │   │   │       │   ├── stringi</span>
+<span id="cb13-129"><a href="#cb13-129" tabindex="-1"></a>│       │       │   │   │       │   │   └── stringi_1.<span class="dv">8</span>.<span class="fl">7.</span>tgz</span>
+<span id="cb13-130"><a href="#cb13-130" tabindex="-1"></a>│       │       │   │   │       │   ├── stringr</span>
+<span id="cb13-131"><a href="#cb13-131" tabindex="-1"></a>│       │       │   │   │       │   │   └── stringr_1.<span class="dv">5</span>.<span class="fl">1.</span>tgz</span>
+<span id="cb13-132"><a href="#cb13-132" tabindex="-1"></a>│       │       │   │   │       │   ├── sys</span>
+<span id="cb13-133"><a href="#cb13-133" tabindex="-1"></a>│       │       │   │   │       │   │   └── sys_3.<span class="dv">4</span>.<span class="fl">3.</span>tgz</span>
+<span id="cb13-134"><a href="#cb13-134" tabindex="-1"></a>│       │       │   │   │       │   ├── tibble</span>
+<span id="cb13-135"><a href="#cb13-135" tabindex="-1"></a>│       │       │   │   │       │   │   └── tibble_3.<span class="dv">2</span>.<span class="fl">1.</span>tgz</span>
+<span id="cb13-136"><a href="#cb13-136" tabindex="-1"></a>│       │       │   │   │       │   ├── tidyr</span>
+<span id="cb13-137"><a href="#cb13-137" tabindex="-1"></a>│       │       │   │   │       │   │   └── tidyr_1.<span class="dv">3</span>.<span class="fl">1.</span>tgz</span>
+<span id="cb13-138"><a href="#cb13-138" tabindex="-1"></a>│       │       │   │   │       │   ├── tidyselect</span>
+<span id="cb13-139"><a href="#cb13-139" tabindex="-1"></a>│       │       │   │   │       │   │   └── tidyselect_1.<span class="dv">2</span>.<span class="fl">1.</span>tgz</span>
+<span id="cb13-140"><a href="#cb13-140" tabindex="-1"></a>│       │       │   │   │       │   ├── tinytex</span>
+<span id="cb13-141"><a href="#cb13-141" tabindex="-1"></a>│       │       │   │   │       │   │   └── tinytex_0.<span class="fl">57.</span>tgz</span>
+<span id="cb13-142"><a href="#cb13-142" tabindex="-1"></a>│       │       │   │   │       │   ├── utf8</span>
+<span id="cb13-143"><a href="#cb13-143" tabindex="-1"></a>│       │       │   │   │       │   │   └── utf8_1.<span class="dv">2</span>.<span class="fl">4.</span>tgz</span>
+<span id="cb13-144"><a href="#cb13-144" tabindex="-1"></a>│       │       │   │   │       │   ├── vctrs</span>
+<span id="cb13-145"><a href="#cb13-145" tabindex="-1"></a>│       │       │   │   │       │   │   └── vctrs_0.<span class="dv">6</span>.<span class="fl">5.</span>tgz</span>
+<span id="cb13-146"><a href="#cb13-146" tabindex="-1"></a>│       │       │   │   │       │   ├── viridisLite</span>
+<span id="cb13-147"><a href="#cb13-147" tabindex="-1"></a>│       │       │   │   │       │   │   └── viridisLite_0.<span class="dv">4</span>.<span class="fl">2.</span>tgz</span>
+<span id="cb13-148"><a href="#cb13-148" tabindex="-1"></a>│       │       │   │   │       │   ├── xfun</span>
+<span id="cb13-149"><a href="#cb13-149" tabindex="-1"></a>│       │       │   │   │       │   │   └── xfun_0.<span class="fl">52.</span>tgz</span>
+<span id="cb13-150"><a href="#cb13-150" tabindex="-1"></a>│       │       │   │   │       │   └── yaml</span>
+<span id="cb13-151"><a href="#cb13-151" tabindex="-1"></a>│       │       │   │   │       │       └── yaml_2.<span class="dv">3</span>.<span class="fl">10.</span>tgz</span>
+<span id="cb13-152"><a href="#cb13-152" tabindex="-1"></a>│       │       │   │   │       ├── repl</span>
+<span id="cb13-153"><a href="#cb13-153" tabindex="-1"></a>│       │       │   │   │       │   ├── App.d.ts</span>
+<span id="cb13-154"><a href="#cb13-154" tabindex="-1"></a>│       │       │   │   │       │   └── components</span>
+<span id="cb13-155"><a href="#cb13-155" tabindex="-1"></a>│       │       │   │   │       │       ├── Editor.d.ts</span>
+<span id="cb13-156"><a href="#cb13-156" tabindex="-1"></a>│       │       │   │   │       │       ├── Files.d.ts</span>
+<span id="cb13-157"><a href="#cb13-157" tabindex="-1"></a>│       │       │   │   │       │       ├── Plot.d.ts</span>
+<span id="cb13-158"><a href="#cb13-158" tabindex="-1"></a>│       │       │   │   │       │       ├── Terminal.d.ts</span>
+<span id="cb13-159"><a href="#cb13-159" tabindex="-1"></a>│       │       │   │   │       │       └── utils.d.ts</span>
+<span id="cb13-160"><a href="#cb13-160" tabindex="-1"></a>│       │       │   │   │       ├── tests</span>
+<span id="cb13-161"><a href="#cb13-161" tabindex="-1"></a>│       │       │   │   │       │   ├── packages</span>
+<span id="cb13-162"><a href="#cb13-162" tabindex="-1"></a>│       │       │   │   │       │   │   └── webr.test.d.ts</span>
+<span id="cb13-163"><a href="#cb13-163" tabindex="-1"></a>│       │       │   │   │       │   └── webR</span>
+<span id="cb13-164"><a href="#cb13-164" tabindex="-1"></a>│       │       │   │   │       │       ├── chan</span>
+<span id="cb13-165"><a href="#cb13-165" tabindex="-1"></a>│       │       │   │   │       │       │   └── channel<span class="sc">-</span>postmessage.test.d.ts</span>
+<span id="cb13-166"><a href="#cb13-166" tabindex="-1"></a>│       │       │   │   │       │       ├── console.test.d.ts</span>
+<span id="cb13-167"><a href="#cb13-167" tabindex="-1"></a>│       │       │   │   │       │       ├── error.test.d.ts</span>
+<span id="cb13-168"><a href="#cb13-168" tabindex="-1"></a>│       │       │   │   │       │       ├── mount.test.d.ts</span>
+<span id="cb13-169"><a href="#cb13-169" tabindex="-1"></a>│       │       │   │   │       │       ├── proxy.test.d.ts</span>
+<span id="cb13-170"><a href="#cb13-170" tabindex="-1"></a>│       │       │   │   │       │       ├── robj.test.d.ts</span>
+<span id="cb13-171"><a href="#cb13-171" tabindex="-1"></a>│       │       │   │   │       │       ├── utils.test.d.ts</span>
+<span id="cb13-172"><a href="#cb13-172" tabindex="-1"></a>│       │       │   │   │       │       ├── webr<span class="sc">-</span>main.test.d.ts</span>
+<span id="cb13-173"><a href="#cb13-173" tabindex="-1"></a>│       │       │   │   │       │       ├── webr<span class="sc">-</span>r.test.d.ts</span>
+<span id="cb13-174"><a href="#cb13-174" tabindex="-1"></a>│       │       │   │   │       │       └── webr<span class="sc">-</span>worker.test.d.ts</span>
+<span id="cb13-175"><a href="#cb13-175" tabindex="-1"></a>│       │       │   │   │       ├── vfs</span>
+<span id="cb13-176"><a href="#cb13-176" tabindex="-1"></a>│       │       │   │   │       │   ├── etc</span>
+<span id="cb13-177"><a href="#cb13-177" tabindex="-1"></a>│       │       │   │   │       │   │   └── fonts</span>
+<span id="cb13-178"><a href="#cb13-178" tabindex="-1"></a>│       │       │   │   │       │   │       └── fonts.conf</span>
+<span id="cb13-179"><a href="#cb13-179" tabindex="-1"></a>│       │       │   │   │       │   ├── usr</span>
+<span id="cb13-180"><a href="#cb13-180" tabindex="-1"></a>│       │       │   │   │       │   │   ├── lib</span>
+<span id="cb13-181"><a href="#cb13-181" tabindex="-1"></a>│       │       │   │   │       │   │   │   └── R</span>
+<span id="cb13-182"><a href="#cb13-182" tabindex="-1"></a>│       │       │   │   │       │   │   │       ├── doc.data.gz</span>
+<span id="cb13-183"><a href="#cb13-183" tabindex="-1"></a>│       │       │   │   │       │   │   │       ├── doc.js.metadata</span>
+<span id="cb13-184"><a href="#cb13-184" tabindex="-1"></a>│       │       │   │   │       │   │   │       ├── library</span>
+<span id="cb13-185"><a href="#cb13-185" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── base</span>
+<span id="cb13-186"><a href="#cb13-186" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── demo.data.gz</span>
+<span id="cb13-187"><a href="#cb13-187" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── demo.js.metadata</span>
+<span id="cb13-188"><a href="#cb13-188" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-189"><a href="#cb13-189" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-190"><a href="#cb13-190" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-191"><a href="#cb13-191" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── html.js.metadata</span>
+<span id="cb13-192"><a href="#cb13-192" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── compiler</span>
+<span id="cb13-193"><a href="#cb13-193" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-194"><a href="#cb13-194" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-195"><a href="#cb13-195" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-196"><a href="#cb13-196" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-197"><a href="#cb13-197" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-198"><a href="#cb13-198" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-199"><a href="#cb13-199" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── datasets</span>
+<span id="cb13-200"><a href="#cb13-200" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-201"><a href="#cb13-201" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-202"><a href="#cb13-202" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-203"><a href="#cb13-203" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── html.js.metadata</span>
+<span id="cb13-204"><a href="#cb13-204" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── grDevices</span>
+<span id="cb13-205"><a href="#cb13-205" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── afm.data.gz</span>
+<span id="cb13-206"><a href="#cb13-206" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── afm.js.metadata</span>
+<span id="cb13-207"><a href="#cb13-207" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── demo.data.gz</span>
+<span id="cb13-208"><a href="#cb13-208" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── demo.js.metadata</span>
+<span id="cb13-209"><a href="#cb13-209" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── enc.data.gz</span>
+<span id="cb13-210"><a href="#cb13-210" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── enc.js.metadata</span>
+<span id="cb13-211"><a href="#cb13-211" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── fonts.data.gz</span>
+<span id="cb13-212"><a href="#cb13-212" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── fonts.js.metadata</span>
+<span id="cb13-213"><a href="#cb13-213" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-214"><a href="#cb13-214" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-215"><a href="#cb13-215" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-216"><a href="#cb13-216" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-217"><a href="#cb13-217" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── libs.data.gz</span>
+<span id="cb13-218"><a href="#cb13-218" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── libs.js.metadata</span>
+<span id="cb13-219"><a href="#cb13-219" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-220"><a href="#cb13-220" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-221"><a href="#cb13-221" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── graphics</span>
+<span id="cb13-222"><a href="#cb13-222" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── demo.data.gz</span>
+<span id="cb13-223"><a href="#cb13-223" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── demo.js.metadata</span>
+<span id="cb13-224"><a href="#cb13-224" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-225"><a href="#cb13-225" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-226"><a href="#cb13-226" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-227"><a href="#cb13-227" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── html.js.metadata</span>
+<span id="cb13-228"><a href="#cb13-228" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── grid</span>
+<span id="cb13-229"><a href="#cb13-229" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── doc.data.gz</span>
+<span id="cb13-230"><a href="#cb13-230" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── doc.js.metadata</span>
+<span id="cb13-231"><a href="#cb13-231" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-232"><a href="#cb13-232" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-233"><a href="#cb13-233" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-234"><a href="#cb13-234" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-235"><a href="#cb13-235" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-236"><a href="#cb13-236" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-237"><a href="#cb13-237" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── methods</span>
+<span id="cb13-238"><a href="#cb13-238" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-239"><a href="#cb13-239" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-240"><a href="#cb13-240" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-241"><a href="#cb13-241" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-242"><a href="#cb13-242" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-243"><a href="#cb13-243" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-244"><a href="#cb13-244" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── parallel.data.gz</span>
+<span id="cb13-245"><a href="#cb13-245" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── parallel.js.metadata</span>
+<span id="cb13-246"><a href="#cb13-246" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── splines</span>
+<span id="cb13-247"><a href="#cb13-247" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-248"><a href="#cb13-248" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-249"><a href="#cb13-249" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-250"><a href="#cb13-250" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-251"><a href="#cb13-251" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-252"><a href="#cb13-252" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-253"><a href="#cb13-253" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── stats</span>
+<span id="cb13-254"><a href="#cb13-254" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── demo.data.gz</span>
+<span id="cb13-255"><a href="#cb13-255" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── demo.js.metadata</span>
+<span id="cb13-256"><a href="#cb13-256" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-257"><a href="#cb13-257" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-258"><a href="#cb13-258" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-259"><a href="#cb13-259" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-260"><a href="#cb13-260" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-261"><a href="#cb13-261" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-262"><a href="#cb13-262" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── stats4</span>
+<span id="cb13-263"><a href="#cb13-263" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-264"><a href="#cb13-264" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-265"><a href="#cb13-265" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-266"><a href="#cb13-266" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-267"><a href="#cb13-267" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-268"><a href="#cb13-268" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-269"><a href="#cb13-269" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── tcltk.data.gz</span>
+<span id="cb13-270"><a href="#cb13-270" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── tcltk.js.metadata</span>
+<span id="cb13-271"><a href="#cb13-271" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── tools</span>
+<span id="cb13-272"><a href="#cb13-272" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-273"><a href="#cb13-273" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-274"><a href="#cb13-274" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-275"><a href="#cb13-275" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-276"><a href="#cb13-276" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-277"><a href="#cb13-277" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-278"><a href="#cb13-278" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── translations</span>
+<span id="cb13-279"><a href="#cb13-279" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── DESCRIPTION</span>
+<span id="cb13-280"><a href="#cb13-280" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── translations.data.gz</span>
+<span id="cb13-281"><a href="#cb13-281" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── translations.js.metadata</span>
+<span id="cb13-282"><a href="#cb13-282" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   ├── utils</span>
+<span id="cb13-283"><a href="#cb13-283" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── doc.data.gz</span>
+<span id="cb13-284"><a href="#cb13-284" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── doc.js.metadata</span>
+<span id="cb13-285"><a href="#cb13-285" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.data.gz</span>
+<span id="cb13-286"><a href="#cb13-286" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── help.js.metadata</span>
+<span id="cb13-287"><a href="#cb13-287" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.data.gz</span>
+<span id="cb13-288"><a href="#cb13-288" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── html.js.metadata</span>
+<span id="cb13-289"><a href="#cb13-289" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── misc.data.gz</span>
+<span id="cb13-290"><a href="#cb13-290" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── misc.js.metadata</span>
+<span id="cb13-291"><a href="#cb13-291" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   ├── tests.data.gz</span>
+<span id="cb13-292"><a href="#cb13-292" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   │   └── tests.js.metadata</span>
+<span id="cb13-293"><a href="#cb13-293" tabindex="-1"></a>│       │       │   │   │       │   │   │       │   └── webr</span>
+<span id="cb13-294"><a href="#cb13-294" tabindex="-1"></a>│       │       │   │   │       │   │   │       │       ├── help.data.gz</span>
+<span id="cb13-295"><a href="#cb13-295" tabindex="-1"></a>│       │       │   │   │       │   │   │       │       ├── help.js.metadata</span>
+<span id="cb13-296"><a href="#cb13-296" tabindex="-1"></a>│       │       │   │   │       │   │   │       │       ├── html.data.gz</span>
+<span id="cb13-297"><a href="#cb13-297" tabindex="-1"></a>│       │       │   │   │       │   │   │       │       └── html.js.metadata</span>
+<span id="cb13-298"><a href="#cb13-298" tabindex="-1"></a>│       │       │   │   │       │   │   │       ├── share.data.gz</span>
+<span id="cb13-299"><a href="#cb13-299" tabindex="-1"></a>│       │       │   │   │       │   │   │       ├── share.js.metadata</span>
+<span id="cb13-300"><a href="#cb13-300" tabindex="-1"></a>│       │       │   │   │       │   │   │       ├── tests.data.gz</span>
+<span id="cb13-301"><a href="#cb13-301" tabindex="-1"></a>│       │       │   │   │       │   │   │       └── tests.js.metadata</span>
+<span id="cb13-302"><a href="#cb13-302" tabindex="-1"></a>│       │       │   │   │       │   │   └── share</span>
+<span id="cb13-303"><a href="#cb13-303" tabindex="-1"></a>│       │       │   │   │       │   │       ├── fonts</span>
+<span id="cb13-304"><a href="#cb13-304" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSans<span class="sc">-</span>Bold.ttf</span>
+<span id="cb13-305"><a href="#cb13-305" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSans<span class="sc">-</span>BoldItalic.ttf</span>
+<span id="cb13-306"><a href="#cb13-306" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSans<span class="sc">-</span>Italic.ttf</span>
+<span id="cb13-307"><a href="#cb13-307" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSans<span class="sc">-</span>Regular.ttf</span>
+<span id="cb13-308"><a href="#cb13-308" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSansMono<span class="sc">-</span>Bold.ttf</span>
+<span id="cb13-309"><a href="#cb13-309" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSansMono<span class="sc">-</span>Regular.ttf</span>
+<span id="cb13-310"><a href="#cb13-310" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSerif<span class="sc">-</span>Bold.ttf</span>
+<span id="cb13-311"><a href="#cb13-311" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSerif<span class="sc">-</span>BoldItalic.ttf</span>
+<span id="cb13-312"><a href="#cb13-312" tabindex="-1"></a>│       │       │   │   │       │   │       │   ├── NotoSerif<span class="sc">-</span>Italic.ttf</span>
+<span id="cb13-313"><a href="#cb13-313" tabindex="-1"></a>│       │       │   │   │       │   │       │   └── NotoSerif<span class="sc">-</span>Regular.ttf</span>
+<span id="cb13-314"><a href="#cb13-314" tabindex="-1"></a>│       │       │   │   │       │   │       ├── gdal.data.gz</span>
+<span id="cb13-315"><a href="#cb13-315" tabindex="-1"></a>│       │       │   │   │       │   │       ├── gdal.js.metadata</span>
+<span id="cb13-316"><a href="#cb13-316" tabindex="-1"></a>│       │       │   │   │       │   │       ├── proj.data.gz</span>
+<span id="cb13-317"><a href="#cb13-317" tabindex="-1"></a>│       │       │   │   │       │   │       ├── proj.js.metadata</span>
+<span id="cb13-318"><a href="#cb13-318" tabindex="-1"></a>│       │       │   │   │       │   │       ├── udunits.data.gz</span>
+<span id="cb13-319"><a href="#cb13-319" tabindex="-1"></a>│       │       │   │   │       │   │       └── udunits.js.metadata</span>
+<span id="cb13-320"><a href="#cb13-320" tabindex="-1"></a>│       │       │   │   │       │   └── var</span>
+<span id="cb13-321"><a href="#cb13-321" tabindex="-1"></a>│       │       │   │   │       │       └── cache</span>
+<span id="cb13-322"><a href="#cb13-322" tabindex="-1"></a>│       │       │   │   │       │           └── fontconfig</span>
+<span id="cb13-323"><a href="#cb13-323" tabindex="-1"></a>│       │       │   │   │       │               ├── <span class="dv">3830</span>d5c3ddfd5cd38a049b759396e72e<span class="sc">-</span>le32d8.cache<span class="dv">-7</span></span>
+<span id="cb13-324"><a href="#cb13-324" tabindex="-1"></a>│       │       │   │   │       │               └── CACHEDIR.TAG</span>
+<span id="cb13-325"><a href="#cb13-325" tabindex="-1"></a>│       │       │   │   │       ├── webR</span>
+<span id="cb13-326"><a href="#cb13-326" tabindex="-1"></a>│       │       │   │   │       │   ├── chan</span>
+<span id="cb13-327"><a href="#cb13-327" tabindex="-1"></a>│       │       │   │   │       │   │   ├── channel<span class="sc">-</span>common.d.ts</span>
+<span id="cb13-328"><a href="#cb13-328" tabindex="-1"></a>│       │       │   │   │       │   │   ├── channel<span class="sc">-</span>postmessage.d.ts</span>
+<span id="cb13-329"><a href="#cb13-329" tabindex="-1"></a>│       │       │   │   │       │   │   ├── channel<span class="sc">-</span>service.d.ts</span>
+<span id="cb13-330"><a href="#cb13-330" tabindex="-1"></a>│       │       │   │   │       │   │   ├── channel<span class="sc">-</span>shared.d.ts</span>
+<span id="cb13-331"><a href="#cb13-331" tabindex="-1"></a>│       │       │   │   │       │   │   ├── channel.d.ts</span>
+<span id="cb13-332"><a href="#cb13-332" tabindex="-1"></a>│       │       │   │   │       │   │   ├── message.d.ts</span>
+<span id="cb13-333"><a href="#cb13-333" tabindex="-1"></a>│       │       │   │   │       │   │   ├── queue.d.ts</span>
+<span id="cb13-334"><a href="#cb13-334" tabindex="-1"></a>│       │       │   │   │       │   │   ├── serviceworker.d.ts</span>
+<span id="cb13-335"><a href="#cb13-335" tabindex="-1"></a>│       │       │   │   │       │   │   ├── task<span class="sc">-</span>common.d.ts</span>
+<span id="cb13-336"><a href="#cb13-336" tabindex="-1"></a>│       │       │   │   │       │   │   ├── task<span class="sc">-</span>main.d.ts</span>
+<span id="cb13-337"><a href="#cb13-337" tabindex="-1"></a>│       │       │   │   │       │   │   └── task<span class="sc">-</span>worker.d.ts</span>
+<span id="cb13-338"><a href="#cb13-338" tabindex="-1"></a>│       │       │   │   │       │   ├── compat.d.ts</span>
+<span id="cb13-339"><a href="#cb13-339" tabindex="-1"></a>│       │       │   │   │       │   ├── config.d.ts</span>
+<span id="cb13-340"><a href="#cb13-340" tabindex="-1"></a>│       │       │   │   │       │   ├── console.d.ts</span>
+<span id="cb13-341"><a href="#cb13-341" tabindex="-1"></a>│       │       │   │   │       │   ├── emscripten.d.ts</span>
+<span id="cb13-342"><a href="#cb13-342" tabindex="-1"></a>│       │       │   │   │       │   ├── error.d.ts</span>
+<span id="cb13-343"><a href="#cb13-343" tabindex="-1"></a>│       │       │   │   │       │   ├── mount.d.ts</span>
+<span id="cb13-344"><a href="#cb13-344" tabindex="-1"></a>│       │       │   │   │       │   ├── payload.d.ts</span>
+<span id="cb13-345"><a href="#cb13-345" tabindex="-1"></a>│       │       │   │   │       │   ├── proxy.d.ts</span>
+<span id="cb13-346"><a href="#cb13-346" tabindex="-1"></a>│       │       │   │   │       │   ├── robj<span class="sc">-</span>main.d.ts</span>
+<span id="cb13-347"><a href="#cb13-347" tabindex="-1"></a>│       │       │   │   │       │   ├── robj<span class="sc">-</span>worker.d.ts</span>
+<span id="cb13-348"><a href="#cb13-348" tabindex="-1"></a>│       │       │   │   │       │   ├── robj.d.ts</span>
+<span id="cb13-349"><a href="#cb13-349" tabindex="-1"></a>│       │       │   │   │       │   ├── utils<span class="sc">-</span>r.d.ts</span>
+<span id="cb13-350"><a href="#cb13-350" tabindex="-1"></a>│       │       │   │   │       │   ├── utils.d.ts</span>
+<span id="cb13-351"><a href="#cb13-351" tabindex="-1"></a>│       │       │   │   │       │   ├── webr<span class="sc">-</span>chan.d.ts</span>
+<span id="cb13-352"><a href="#cb13-352" tabindex="-1"></a>│       │       │   │   │       │   ├── webr<span class="sc">-</span>main.d.ts</span>
+<span id="cb13-353"><a href="#cb13-353" tabindex="-1"></a>│       │       │   │   │       │   └── webr<span class="sc">-</span>worker.d.ts</span>
+<span id="cb13-354"><a href="#cb13-354" tabindex="-1"></a>│       │       │   │   │       ├── webr<span class="sc">-</span>serviceworker.js</span>
+<span id="cb13-355"><a href="#cb13-355" tabindex="-1"></a>│       │       │   │   │       ├── webr<span class="sc">-</span>serviceworker.js.map</span>
+<span id="cb13-356"><a href="#cb13-356" tabindex="-1"></a>│       │       │   │   │       ├── webr<span class="sc">-</span>serviceworker.mjs</span>
+<span id="cb13-357"><a href="#cb13-357" tabindex="-1"></a>│       │       │   │   │       ├── webr<span class="sc">-</span>serviceworker.mjs.map</span>
+<span id="cb13-358"><a href="#cb13-358" tabindex="-1"></a>│       │       │   │   │       ├── webr<span class="sc">-</span>worker.js</span>
+<span id="cb13-359"><a href="#cb13-359" tabindex="-1"></a>│       │       │   │   │       ├── webr<span class="sc">-</span>worker.js.map</span>
+<span id="cb13-360"><a href="#cb13-360" tabindex="-1"></a>│       │       │   │   │       ├── webr.cjs</span>
+<span id="cb13-361"><a href="#cb13-361" tabindex="-1"></a>│       │       │   │   │       ├── webr.cjs.map</span>
+<span id="cb13-362"><a href="#cb13-362" tabindex="-1"></a>│       │       │   │   │       ├── webr.mjs</span>
+<span id="cb13-363"><a href="#cb13-363" tabindex="-1"></a>│       │       │   │   │       └── webr.mjs.map</span>
+<span id="cb13-364"><a href="#cb13-364" tabindex="-1"></a>│       │       │   │   └── shinylive<span class="sc">-</span>sw.js</span>
+<span id="cb13-365"><a href="#cb13-365" tabindex="-1"></a>│       │       │   └── shinylive<span class="sc">-</span>quarto<span class="sc">-</span>css</span>
+<span id="cb13-366"><a href="#cb13-366" tabindex="-1"></a>│       │       │       └── shinylive<span class="sc">-</span>quarto.css</span>
+<span id="cb13-367"><a href="#cb13-367" tabindex="-1"></a>│       │       └── quarto<span class="sc">-</span>html</span>
+<span id="cb13-368"><a href="#cb13-368" tabindex="-1"></a>│       │           ├── anchor.min.js</span>
+<span id="cb13-369"><a href="#cb13-369" tabindex="-1"></a>│       │           ├── axe</span>
+<span id="cb13-370"><a href="#cb13-370" tabindex="-1"></a>│       │           │   └── axe<span class="sc">-</span>check.js</span>
+<span id="cb13-371"><a href="#cb13-371" tabindex="-1"></a>│       │           ├── popper.min.js</span>
+<span id="cb13-372"><a href="#cb13-372" tabindex="-1"></a>│       │           ├── quarto<span class="sc">-</span>syntax<span class="sc">-</span>highlighting<span class="dv">-587</span>c61ba64f3a5504c4d52d930310e48.css</span>
+<span id="cb13-373"><a href="#cb13-373" tabindex="-1"></a>│       │           ├── quarto.js</span>
+<span id="cb13-374"><a href="#cb13-374" tabindex="-1"></a>│       │           ├── tabsets</span>
+<span id="cb13-375"><a href="#cb13-375" tabindex="-1"></a>│       │           │   └── tabsets.js</span>
+<span id="cb13-376"><a href="#cb13-376" tabindex="-1"></a>│       │           ├── tippy.css</span>
+<span id="cb13-377"><a href="#cb13-377" tabindex="-1"></a>│       │           └── tippy.umd.min.js</span>
+<span id="cb13-378"><a href="#cb13-378" tabindex="-1"></a>│       └── data</span>
+<span id="cb13-379"><a href="#cb13-379" tabindex="-1"></a>│           ├── buoy_data.json</span>
+<span id="cb13-380"><a href="#cb13-380" tabindex="-1"></a>│           └── stations.json</span>
+<span id="cb13-381"><a href="#cb13-381" tabindex="-1"></a>├── _pkgdown.yml</span>
+<span id="cb13-382"><a href="#cb13-382" tabindex="-1"></a>├── _quarto.yml</span>
+<span id="cb13-383"><a href="#cb13-383" tabindex="-1"></a>├── _targets</span>
+<span id="cb13-384"><a href="#cb13-384" tabindex="-1"></a>│   ├── meta</span>
+<span id="cb13-385"><a href="#cb13-385" tabindex="-1"></a>│   │   ├── crew</span>
+<span id="cb13-386"><a href="#cb13-386" tabindex="-1"></a>│   │   ├── meta</span>
+<span id="cb13-387"><a href="#cb13-387" tabindex="-1"></a>│   │   ├── process</span>
+<span id="cb13-388"><a href="#cb13-388" tabindex="-1"></a>│   │   └── progress</span>
+<span id="cb13-389"><a href="#cb13-389" tabindex="-1"></a>│   ├── objects</span>
+<span id="cb13-390"><a href="#cb13-390" tabindex="-1"></a>│   │   ├── analysis_data</span>
+<span id="cb13-391"><a href="#cb13-391" tabindex="-1"></a>│   │   ├── analysis_summary</span>
+<span id="cb13-392"><a href="#cb13-392" tabindex="-1"></a>│   │   ├── annual_trends_wave</span>
+<span id="cb13-393"><a href="#cb13-393" tabindex="-1"></a>│   │   ├── annual_trends_wind</span>
+<span id="cb13-394"><a href="#cb13-394" tabindex="-1"></a>│   │   ├── current_db_stats</span>
+<span id="cb13-395"><a href="#cb13-395" tabindex="-1"></a>│   │   ├── data_completeness</span>
+<span id="cb13-396"><a href="#cb13-396" tabindex="-1"></a>│   │   ├── data_update</span>
+<span id="cb13-397"><a href="#cb13-397" tabindex="-1"></a>│   │   ├── gev_hmax</span>
+<span id="cb13-398"><a href="#cb13-398" tabindex="-1"></a>│   │   ├── gev_wave_height</span>
+<span id="cb13-399"><a href="#cb13-399" tabindex="-1"></a>│   │   ├── gev_wind_speed</span>
+<span id="cb13-400"><a href="#cb13-400" tabindex="-1"></a>│   │   ├── gust_factor_analysis</span>
+<span id="cb13-401"><a href="#cb13-401" tabindex="-1"></a>│   │   ├── latest_erddap_timestamp</span>
+<span id="cb13-402"><a href="#cb13-402" tabindex="-1"></a>│   │   ├── outlier_check</span>
+<span id="cb13-403"><a href="#cb13-403" tabindex="-1"></a>│   │   ├── quality_report</span>
+<span id="cb13-404"><a href="#cb13-404" tabindex="-1"></a>│   │   ├── recent_data</span>
+<span id="cb13-405"><a href="#cb13-405" tabindex="-1"></a>│   │   ├── return_level_curves_wave</span>
+<span id="cb13-406"><a href="#cb13-406" tabindex="-1"></a>│   │   ├── return_level_curves_wind</span>
+<span id="cb13-407"><a href="#cb13-407" tabindex="-1"></a>│   │   ├── return_levels_hmax</span>
+<span id="cb13-408"><a href="#cb13-408" tabindex="-1"></a>│   │   ├── return_levels_wave</span>
+<span id="cb13-409"><a href="#cb13-409" tabindex="-1"></a>│   │   ├── return_levels_wind</span>
+<span id="cb13-410"><a href="#cb13-410" tabindex="-1"></a>│   │   ├── rogue_comparison</span>
+<span id="cb13-411"><a href="#cb13-411" tabindex="-1"></a>│   │   ├── rogue_wave_conditions</span>
+<span id="cb13-412"><a href="#cb13-412" tabindex="-1"></a>│   │   ├── rogue_wave_events</span>
+<span id="cb13-413"><a href="#cb13-413" tabindex="-1"></a>│   │   ├── rogue_wave_statistics</span>
+<span id="cb13-414"><a href="#cb13-414" tabindex="-1"></a>│   │   ├── rogue_waves</span>
+<span id="cb13-415"><a href="#cb13-415" tabindex="-1"></a>│   │   ├── save_vignette_data</span>
+<span id="cb13-416"><a href="#cb13-416" tabindex="-1"></a>│   │   ├── seasonal_means_wave</span>
+<span id="cb13-417"><a href="#cb13-417" tabindex="-1"></a>│   │   ├── seasonal_means_wind</span>
+<span id="cb13-418"><a href="#cb13-418" tabindex="-1"></a>│   │   ├── stations</span>
+<span id="cb13-419"><a href="#cb13-419" tabindex="-1"></a>│   │   ├── wave_anomalies</span>
+<span id="cb13-420"><a href="#cb13-420" tabindex="-1"></a>│   │   └── wave_height_seasonal</span>
+<span id="cb13-421"><a href="#cb13-421" tabindex="-1"></a>│   ├── user</span>
+<span id="cb13-422"><a href="#cb13-422" tabindex="-1"></a>│   └── workspaces</span>
+<span id="cb13-423"><a href="#cb13-423" tabindex="-1"></a>│       ├── analysis_data</span>
+<span id="cb13-424"><a href="#cb13-424" tabindex="-1"></a>│       ├── data_completeness</span>
+<span id="cb13-425"><a href="#cb13-425" tabindex="-1"></a>│       ├── gev_wind_speed</span>
+<span id="cb13-426"><a href="#cb13-426" tabindex="-1"></a>│       ├── return_level_curves_wind</span>
+<span id="cb13-427"><a href="#cb13-427" tabindex="-1"></a>│       ├── seasonal_means_wave</span>
+<span id="cb13-428"><a href="#cb13-428" tabindex="-1"></a>│       └── stations</span>
+<span id="cb13-429"><a href="#cb13-429" tabindex="-1"></a>├── _targets.R</span>
+<span id="cb13-430"><a href="#cb13-430" tabindex="-1"></a>├── data<span class="sc">-</span>raw</span>
+<span id="cb13-431"><a href="#cb13-431" tabindex="-1"></a>├── default.R</span>
+<span id="cb13-432"><a href="#cb13-432" tabindex="-1"></a>├── default.nix</span>
+<span id="cb13-433"><a href="#cb13-433" tabindex="-1"></a>├── default.sh</span>
+<span id="cb13-434"><a href="#cb13-434" tabindex="-1"></a>├── docs</span>
+<span id="cb13-435"><a href="#cb13-435" tabindex="-1"></a>│   ├── <span class="fl">404.</span>html</span>
+<span id="cb13-436"><a href="#cb13-436" tabindex="-1"></a>│   ├── LICENSE<span class="sc">-</span>text.html</span>
+<span id="cb13-437"><a href="#cb13-437" tabindex="-1"></a>│   ├── LICENSE.html</span>
+<span id="cb13-438"><a href="#cb13-438" tabindex="-1"></a>│   ├── articles</span>
+<span id="cb13-439"><a href="#cb13-439" tabindex="-1"></a>│   │   ├── dashboard_static.html</span>
+<span id="cb13-440"><a href="#cb13-440" tabindex="-1"></a>│   │   ├── dashboard_static_files</span>
+<span id="cb13-441"><a href="#cb13-441" tabindex="-1"></a>│   │   │   ├── figure<span class="sc">-</span>html</span>
+<span id="cb13-442"><a href="#cb13-442" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-1</span><span class="fl">-1.</span>png</span>
+<span id="cb13-443"><a href="#cb13-443" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-10</span><span class="fl">-1.</span>png</span>
+<span id="cb13-444"><a href="#cb13-444" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-11</span><span class="fl">-1.</span>png</span>
+<span id="cb13-445"><a href="#cb13-445" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-12</span><span class="fl">-1.</span>png</span>
+<span id="cb13-446"><a href="#cb13-446" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-13</span><span class="fl">-1.</span>png</span>
+<span id="cb13-447"><a href="#cb13-447" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-14</span><span class="fl">-1.</span>png</span>
+<span id="cb13-448"><a href="#cb13-448" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-15</span><span class="fl">-1.</span>png</span>
+<span id="cb13-449"><a href="#cb13-449" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-16</span><span class="fl">-1.</span>png</span>
+<span id="cb13-450"><a href="#cb13-450" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-17</span><span class="fl">-1.</span>png</span>
+<span id="cb13-451"><a href="#cb13-451" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-18</span><span class="fl">-1.</span>png</span>
+<span id="cb13-452"><a href="#cb13-452" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-19</span><span class="fl">-1.</span>png</span>
+<span id="cb13-453"><a href="#cb13-453" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-21</span><span class="fl">-1.</span>png</span>
+<span id="cb13-454"><a href="#cb13-454" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-23</span><span class="fl">-1.</span>png</span>
+<span id="cb13-455"><a href="#cb13-455" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-25</span><span class="fl">-1.</span>png</span>
+<span id="cb13-456"><a href="#cb13-456" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-27</span><span class="fl">-1.</span>png</span>
+<span id="cb13-457"><a href="#cb13-457" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-28</span><span class="fl">-1.</span>png</span>
+<span id="cb13-458"><a href="#cb13-458" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-29</span><span class="fl">-1.</span>png</span>
+<span id="cb13-459"><a href="#cb13-459" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-3</span><span class="fl">-1.</span>png</span>
+<span id="cb13-460"><a href="#cb13-460" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-30</span><span class="fl">-1.</span>png</span>
+<span id="cb13-461"><a href="#cb13-461" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-31</span><span class="fl">-1.</span>png</span>
+<span id="cb13-462"><a href="#cb13-462" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-4</span><span class="fl">-1.</span>png</span>
+<span id="cb13-463"><a href="#cb13-463" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-5</span><span class="fl">-1.</span>png</span>
+<span id="cb13-464"><a href="#cb13-464" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-6</span><span class="fl">-1.</span>png</span>
+<span id="cb13-465"><a href="#cb13-465" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-7</span><span class="fl">-1.</span>png</span>
+<span id="cb13-466"><a href="#cb13-466" tabindex="-1"></a>│   │   │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-8</span><span class="fl">-1.</span>png</span>
+<span id="cb13-467"><a href="#cb13-467" tabindex="-1"></a>│   │   │   │   └── unnamed<span class="sc">-</span>chunk<span class="dv">-9</span><span class="fl">-1.</span>png</span>
+<span id="cb13-468"><a href="#cb13-468" tabindex="-1"></a>│   │   │   └── libs</span>
+<span id="cb13-469"><a href="#cb13-469" tabindex="-1"></a>│   │   │       ├── bootstrap</span>
+<span id="cb13-470"><a href="#cb13-470" tabindex="-1"></a>│   │   │       │   ├── bootstrap<span class="sc">-</span>d5fa03fb90ac27921a6d47853be462c0.min.css</span>
+<span id="cb13-471"><a href="#cb13-471" tabindex="-1"></a>│   │   │       │   ├── bootstrap<span class="sc">-</span>icons.css</span>
+<span id="cb13-472"><a href="#cb13-472" tabindex="-1"></a>│   │   │       │   ├── bootstrap<span class="sc">-</span>icons.woff</span>
+<span id="cb13-473"><a href="#cb13-473" tabindex="-1"></a>│   │   │       │   └── bootstrap.min.js</span>
+<span id="cb13-474"><a href="#cb13-474" tabindex="-1"></a>│   │   │       ├── clipboard</span>
+<span id="cb13-475"><a href="#cb13-475" tabindex="-1"></a>│   │   │       │   └── clipboard.min.js</span>
+<span id="cb13-476"><a href="#cb13-476" tabindex="-1"></a>│   │   │       ├── crosstalk<span class="dv">-1</span>.<span class="fl">2.2</span></span>
+<span id="cb13-477"><a href="#cb13-477" tabindex="-1"></a>│   │   │       │   ├── css</span>
+<span id="cb13-478"><a href="#cb13-478" tabindex="-1"></a>│   │   │       │   │   └── crosstalk.min.css</span>
+<span id="cb13-479"><a href="#cb13-479" tabindex="-1"></a>│   │   │       │   ├── js</span>
+<span id="cb13-480"><a href="#cb13-480" tabindex="-1"></a>│   │   │       │   │   ├── crosstalk.js</span>
+<span id="cb13-481"><a href="#cb13-481" tabindex="-1"></a>│   │   │       │   │   ├── crosstalk.js.map</span>
+<span id="cb13-482"><a href="#cb13-482" tabindex="-1"></a>│   │   │       │   │   ├── crosstalk.min.js</span>
+<span id="cb13-483"><a href="#cb13-483" tabindex="-1"></a>│   │   │       │   │   └── crosstalk.min.js.map</span>
+<span id="cb13-484"><a href="#cb13-484" tabindex="-1"></a>│   │   │       │   └── scss</span>
+<span id="cb13-485"><a href="#cb13-485" tabindex="-1"></a>│   │   │       │       └── crosstalk.scss</span>
+<span id="cb13-486"><a href="#cb13-486" tabindex="-1"></a>│   │   │       ├── datatables<span class="sc">-</span>binding<span class="dv">-0</span>.<span class="fl">34.0</span></span>
+<span id="cb13-487"><a href="#cb13-487" tabindex="-1"></a>│   │   │       │   └── datatables.js</span>
+<span id="cb13-488"><a href="#cb13-488" tabindex="-1"></a>│   │   │       ├── datatables<span class="sc">-</span>css<span class="dv">-0</span>.<span class="fl">0.0</span></span>
+<span id="cb13-489"><a href="#cb13-489" tabindex="-1"></a>│   │   │       │   └── datatables<span class="sc">-</span>crosstalk.css</span>
+<span id="cb13-490"><a href="#cb13-490" tabindex="-1"></a>│   │   │       ├── dt<span class="sc">-</span>core<span class="dv">-1</span>.<span class="fl">13.6</span></span>
+<span id="cb13-491"><a href="#cb13-491" tabindex="-1"></a>│   │   │       │   ├── css</span>
+<span id="cb13-492"><a href="#cb13-492" tabindex="-1"></a>│   │   │       │   │   ├── jquery.dataTables.extra.css</span>
+<span id="cb13-493"><a href="#cb13-493" tabindex="-1"></a>│   │   │       │   │   └── jquery.dataTables.min.css</span>
+<span id="cb13-494"><a href="#cb13-494" tabindex="-1"></a>│   │   │       │   └── js</span>
+<span id="cb13-495"><a href="#cb13-495" tabindex="-1"></a>│   │   │       │       └── jquery.dataTables.min.js</span>
+<span id="cb13-496"><a href="#cb13-496" tabindex="-1"></a>│   │   │       ├── htmltools<span class="sc">-</span>fill<span class="dv">-0</span>.<span class="fl">5.9</span></span>
+<span id="cb13-497"><a href="#cb13-497" tabindex="-1"></a>│   │   │       │   └── fill.css</span>
+<span id="cb13-498"><a href="#cb13-498" tabindex="-1"></a>│   │   │       ├── htmlwidgets<span class="dv">-1</span>.<span class="fl">6.4</span></span>
+<span id="cb13-499"><a href="#cb13-499" tabindex="-1"></a>│   │   │       │   └── htmlwidgets.js</span>
+<span id="cb13-500"><a href="#cb13-500" tabindex="-1"></a>│   │   │       ├── jquery<span class="dv">-3</span>.<span class="fl">6.0</span></span>
+<span id="cb13-501"><a href="#cb13-501" tabindex="-1"></a>│   │   │       │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>js</span>
+<span id="cb13-502"><a href="#cb13-502" tabindex="-1"></a>│   │   │       │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.js</span>
+<span id="cb13-503"><a href="#cb13-503" tabindex="-1"></a>│   │   │       │   └── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.map</span>
+<span id="cb13-504"><a href="#cb13-504" tabindex="-1"></a>│   │   │       ├── nouislider<span class="dv">-7</span>.<span class="fl">0.10</span></span>
+<span id="cb13-505"><a href="#cb13-505" tabindex="-1"></a>│   │   │       │   ├── jquery.nouislider.min.css</span>
+<span id="cb13-506"><a href="#cb13-506" tabindex="-1"></a>│   │   │       │   └── jquery.nouislider.min.js</span>
+<span id="cb13-507"><a href="#cb13-507" tabindex="-1"></a>│   │   │       ├── quarto<span class="sc">-</span>html</span>
+<span id="cb13-508"><a href="#cb13-508" tabindex="-1"></a>│   │   │       │   ├── anchor.min.js</span>
+<span id="cb13-509"><a href="#cb13-509" tabindex="-1"></a>│   │   │       │   ├── axe</span>
+<span id="cb13-510"><a href="#cb13-510" tabindex="-1"></a>│   │   │       │   │   └── axe<span class="sc">-</span>check.js</span>
+<span id="cb13-511"><a href="#cb13-511" tabindex="-1"></a>│   │   │       │   ├── popper.min.js</span>
+<span id="cb13-512"><a href="#cb13-512" tabindex="-1"></a>│   │   │       │   ├── quarto<span class="sc">-</span>syntax<span class="sc">-</span>highlighting<span class="dv">-587</span>c61ba64f3a5504c4d52d930310e48.css</span>
+<span id="cb13-513"><a href="#cb13-513" tabindex="-1"></a>│   │   │       │   ├── quarto.js</span>
+<span id="cb13-514"><a href="#cb13-514" tabindex="-1"></a>│   │   │       │   ├── tabsets</span>
+<span id="cb13-515"><a href="#cb13-515" tabindex="-1"></a>│   │   │       │   │   └── tabsets.js</span>
+<span id="cb13-516"><a href="#cb13-516" tabindex="-1"></a>│   │   │       │   ├── tippy.css</span>
+<span id="cb13-517"><a href="#cb13-517" tabindex="-1"></a>│   │   │       │   └── tippy.umd.min.js</span>
+<span id="cb13-518"><a href="#cb13-518" tabindex="-1"></a>│   │   │       └── selectize<span class="dv">-0</span>.<span class="fl">12.0</span></span>
+<span id="cb13-519"><a href="#cb13-519" tabindex="-1"></a>│   │   │           ├── selectize.bootstrap3.css</span>
+<span id="cb13-520"><a href="#cb13-520" tabindex="-1"></a>│   │   │           └── selectize.min.js</span>
+<span id="cb13-521"><a href="#cb13-521" tabindex="-1"></a>│   │   ├── index.html</span>
+<span id="cb13-522"><a href="#cb13-522" tabindex="-1"></a>│   │   ├── wave_analysis.html</span>
+<span id="cb13-523"><a href="#cb13-523" tabindex="-1"></a>│   │   └── wave_analysis_files</span>
+<span id="cb13-524"><a href="#cb13-524" tabindex="-1"></a>│   │       ├── figure<span class="sc">-</span>html</span>
+<span id="cb13-525"><a href="#cb13-525" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>all<span class="fl">-1.</span>png</span>
+<span id="cb13-526"><a href="#cb13-526" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>all<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-527"><a href="#cb13-527" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m2<span class="fl">-1.</span>png</span>
+<span id="cb13-528"><a href="#cb13-528" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m2<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-529"><a href="#cb13-529" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m3<span class="fl">-1.</span>png</span>
+<span id="cb13-530"><a href="#cb13-530" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m3<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-531"><a href="#cb13-531" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m4<span class="fl">-1.</span>png</span>
+<span id="cb13-532"><a href="#cb13-532" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m4<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-533"><a href="#cb13-533" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m5<span class="fl">-1.</span>png</span>
+<span id="cb13-534"><a href="#cb13-534" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m5<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-535"><a href="#cb13-535" tabindex="-1"></a>│   │       │   ├── rogue<span class="sc">-</span>m6<span class="fl">-1.</span>png</span>
+<span id="cb13-536"><a href="#cb13-536" tabindex="-1"></a>│   │       │   └── rogue<span class="sc">-</span>m6<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-537"><a href="#cb13-537" tabindex="-1"></a>│   │       └── libs</span>
+<span id="cb13-538"><a href="#cb13-538" tabindex="-1"></a>│   │           ├── bootstrap</span>
+<span id="cb13-539"><a href="#cb13-539" tabindex="-1"></a>│   │           │   ├── bootstrap<span class="sc">-</span>d5fa03fb90ac27921a6d47853be462c0.min.css</span>
+<span id="cb13-540"><a href="#cb13-540" tabindex="-1"></a>│   │           │   ├── bootstrap<span class="sc">-</span>icons.css</span>
+<span id="cb13-541"><a href="#cb13-541" tabindex="-1"></a>│   │           │   ├── bootstrap<span class="sc">-</span>icons.woff</span>
+<span id="cb13-542"><a href="#cb13-542" tabindex="-1"></a>│   │           │   └── bootstrap.min.js</span>
+<span id="cb13-543"><a href="#cb13-543" tabindex="-1"></a>│   │           ├── clipboard</span>
+<span id="cb13-544"><a href="#cb13-544" tabindex="-1"></a>│   │           │   └── clipboard.min.js</span>
+<span id="cb13-545"><a href="#cb13-545" tabindex="-1"></a>│   │           ├── crosstalk<span class="dv">-1</span>.<span class="fl">2.2</span></span>
+<span id="cb13-546"><a href="#cb13-546" tabindex="-1"></a>│   │           │   ├── css</span>
+<span id="cb13-547"><a href="#cb13-547" tabindex="-1"></a>│   │           │   │   └── crosstalk.min.css</span>
+<span id="cb13-548"><a href="#cb13-548" tabindex="-1"></a>│   │           │   ├── js</span>
+<span id="cb13-549"><a href="#cb13-549" tabindex="-1"></a>│   │           │   │   ├── crosstalk.js</span>
+<span id="cb13-550"><a href="#cb13-550" tabindex="-1"></a>│   │           │   │   ├── crosstalk.js.map</span>
+<span id="cb13-551"><a href="#cb13-551" tabindex="-1"></a>│   │           │   │   ├── crosstalk.min.js</span>
+<span id="cb13-552"><a href="#cb13-552" tabindex="-1"></a>│   │           │   │   └── crosstalk.min.js.map</span>
+<span id="cb13-553"><a href="#cb13-553" tabindex="-1"></a>│   │           │   └── scss</span>
+<span id="cb13-554"><a href="#cb13-554" tabindex="-1"></a>│   │           │       └── crosstalk.scss</span>
+<span id="cb13-555"><a href="#cb13-555" tabindex="-1"></a>│   │           ├── datatables<span class="sc">-</span>binding<span class="dv">-0</span>.<span class="fl">34.0</span></span>
+<span id="cb13-556"><a href="#cb13-556" tabindex="-1"></a>│   │           │   └── datatables.js</span>
+<span id="cb13-557"><a href="#cb13-557" tabindex="-1"></a>│   │           ├── datatables<span class="sc">-</span>css<span class="dv">-0</span>.<span class="fl">0.0</span></span>
+<span id="cb13-558"><a href="#cb13-558" tabindex="-1"></a>│   │           │   └── datatables<span class="sc">-</span>crosstalk.css</span>
+<span id="cb13-559"><a href="#cb13-559" tabindex="-1"></a>│   │           ├── dt<span class="sc">-</span>core<span class="dv">-1</span>.<span class="fl">13.6</span></span>
+<span id="cb13-560"><a href="#cb13-560" tabindex="-1"></a>│   │           │   ├── css</span>
+<span id="cb13-561"><a href="#cb13-561" tabindex="-1"></a>│   │           │   │   ├── jquery.dataTables.extra.css</span>
+<span id="cb13-562"><a href="#cb13-562" tabindex="-1"></a>│   │           │   │   └── jquery.dataTables.min.css</span>
+<span id="cb13-563"><a href="#cb13-563" tabindex="-1"></a>│   │           │   └── js</span>
+<span id="cb13-564"><a href="#cb13-564" tabindex="-1"></a>│   │           │       └── jquery.dataTables.min.js</span>
+<span id="cb13-565"><a href="#cb13-565" tabindex="-1"></a>│   │           ├── htmltools<span class="sc">-</span>fill<span class="dv">-0</span>.<span class="fl">5.9</span></span>
+<span id="cb13-566"><a href="#cb13-566" tabindex="-1"></a>│   │           │   └── fill.css</span>
+<span id="cb13-567"><a href="#cb13-567" tabindex="-1"></a>│   │           ├── htmlwidgets<span class="dv">-1</span>.<span class="fl">6.4</span></span>
+<span id="cb13-568"><a href="#cb13-568" tabindex="-1"></a>│   │           │   └── htmlwidgets.js</span>
+<span id="cb13-569"><a href="#cb13-569" tabindex="-1"></a>│   │           ├── jquery<span class="dv">-3</span>.<span class="fl">6.0</span></span>
+<span id="cb13-570"><a href="#cb13-570" tabindex="-1"></a>│   │           │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>js</span>
+<span id="cb13-571"><a href="#cb13-571" tabindex="-1"></a>│   │           │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.js</span>
+<span id="cb13-572"><a href="#cb13-572" tabindex="-1"></a>│   │           │   └── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.map</span>
+<span id="cb13-573"><a href="#cb13-573" tabindex="-1"></a>│   │           ├── nouislider<span class="dv">-7</span>.<span class="fl">0.10</span></span>
+<span id="cb13-574"><a href="#cb13-574" tabindex="-1"></a>│   │           │   ├── jquery.nouislider.min.css</span>
+<span id="cb13-575"><a href="#cb13-575" tabindex="-1"></a>│   │           │   └── jquery.nouislider.min.js</span>
+<span id="cb13-576"><a href="#cb13-576" tabindex="-1"></a>│   │           ├── quarto<span class="sc">-</span>html</span>
+<span id="cb13-577"><a href="#cb13-577" tabindex="-1"></a>│   │           │   ├── anchor.min.js</span>
+<span id="cb13-578"><a href="#cb13-578" tabindex="-1"></a>│   │           │   ├── axe</span>
+<span id="cb13-579"><a href="#cb13-579" tabindex="-1"></a>│   │           │   │   └── axe<span class="sc">-</span>check.js</span>
+<span id="cb13-580"><a href="#cb13-580" tabindex="-1"></a>│   │           │   ├── popper.min.js</span>
+<span id="cb13-581"><a href="#cb13-581" tabindex="-1"></a>│   │           │   ├── quarto<span class="sc">-</span>syntax<span class="sc">-</span>highlighting<span class="dv">-587</span>c61ba64f3a5504c4d52d930310e48.css</span>
+<span id="cb13-582"><a href="#cb13-582" tabindex="-1"></a>│   │           │   ├── quarto.js</span>
+<span id="cb13-583"><a href="#cb13-583" tabindex="-1"></a>│   │           │   ├── tabsets</span>
+<span id="cb13-584"><a href="#cb13-584" tabindex="-1"></a>│   │           │   │   └── tabsets.js</span>
+<span id="cb13-585"><a href="#cb13-585" tabindex="-1"></a>│   │           │   ├── tippy.css</span>
+<span id="cb13-586"><a href="#cb13-586" tabindex="-1"></a>│   │           │   └── tippy.umd.min.js</span>
+<span id="cb13-587"><a href="#cb13-587" tabindex="-1"></a>│   │           └── selectize<span class="dv">-0</span>.<span class="fl">12.0</span></span>
+<span id="cb13-588"><a href="#cb13-588" tabindex="-1"></a>│   │               ├── selectize.bootstrap3.css</span>
+<span id="cb13-589"><a href="#cb13-589" tabindex="-1"></a>│   │               └── selectize.min.js</span>
+<span id="cb13-590"><a href="#cb13-590" tabindex="-1"></a>│   ├── authors.html</span>
+<span id="cb13-591"><a href="#cb13-591" tabindex="-1"></a>│   ├── deps</span>
+<span id="cb13-592"><a href="#cb13-592" tabindex="-1"></a>│   │   ├── bootstrap<span class="dv">-5</span>.<span class="fl">3.1</span></span>
+<span id="cb13-593"><a href="#cb13-593" tabindex="-1"></a>│   │   │   ├── bootstrap.bundle.min.js</span>
+<span id="cb13-594"><a href="#cb13-594" tabindex="-1"></a>│   │   │   ├── bootstrap.bundle.min.js.map</span>
+<span id="cb13-595"><a href="#cb13-595" tabindex="-1"></a>│   │   │   ├── bootstrap.min.css</span>
+<span id="cb13-596"><a href="#cb13-596" tabindex="-1"></a>│   │   │   ├── font.css</span>
+<span id="cb13-597"><a href="#cb13-597" tabindex="-1"></a>│   │   │   └── fonts</span>
+<span id="cb13-598"><a href="#cb13-598" tabindex="-1"></a>│   │   │       ├── <span class="dv">07</span>d40e985ad7c747025dabb9f22142c4.woff2</span>
+<span id="cb13-599"><a href="#cb13-599" tabindex="-1"></a>│   │   │       ├── <span class="dv">1</span>Ptug8zYS_SKggPNyC0ITw.woff2</span>
+<span id="cb13-600"><a href="#cb13-600" tabindex="-1"></a>│   │   │       ├── <span class="dv">1</span>Ptug8zYS_SKggPNyCAIT5lu.woff2</span>
+<span id="cb13-601"><a href="#cb13-601" tabindex="-1"></a>│   │   │       ├── <span class="dv">1</span>Ptug8zYS_SKggPNyCIIT5lu.woff2</span>
+<span id="cb13-602"><a href="#cb13-602" tabindex="-1"></a>│   │   │       ├── <span class="dv">1</span>Ptug8zYS_SKggPNyCMIT5lu.woff2</span>
+<span id="cb13-603"><a href="#cb13-603" tabindex="-1"></a>│   │   │       ├── <span class="dv">1</span>Ptug8zYS_SKggPNyCkIT5lu.woff2</span>
+<span id="cb13-604"><a href="#cb13-604" tabindex="-1"></a>│   │   │       ├── <span class="dv">1</span>f5e011d6aae0d98fc0518e1a303e99a.woff2</span>
+<span id="cb13-605"><a href="#cb13-605" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cs6KVjbNBYlgoKcQ72j00.woff2</span>
+<span id="cb13-606"><a href="#cb13-606" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cs6KVjbNBYlgoKcg72j00.woff2</span>
+<span id="cb13-607"><a href="#cb13-607" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cs6KVjbNBYlgoKcw72j00.woff2</span>
+<span id="cb13-608"><a href="#cb13-608" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cs6KVjbNBYlgoKew72j00.woff2</span>
+<span id="cb13-609"><a href="#cb13-609" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cs6KVjbNBYlgoKfA72j00.woff2</span>
+<span id="cb13-610"><a href="#cb13-610" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cs6KVjbNBYlgoKfw72.woff2</span>
+<span id="cb13-611"><a href="#cb13-611" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cv6KVjbNBYlgoCxCvjs2yNL4U.woff2</span>
+<span id="cb13-612"><a href="#cb13-612" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cv6KVjbNBYlgoCxCvjsGyN.woff2</span>
+<span id="cb13-613"><a href="#cb13-613" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cv6KVjbNBYlgoCxCvjtGyNL4U.woff2</span>
+<span id="cb13-614"><a href="#cb13-614" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cv6KVjbNBYlgoCxCvjvGyNL4U.woff2</span>
+<span id="cb13-615"><a href="#cb13-615" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cv6KVjbNBYlgoCxCvjvWyNL4U.woff2</span>
+<span id="cb13-616"><a href="#cb13-616" tabindex="-1"></a>│   │   │       ├── <span class="dv">4</span><span class="dt">i</span>Cv6KVjbNBYlgoCxCvjvmyNL4U.woff2</span>
+<span id="cb13-617"><a href="#cb13-617" tabindex="-1"></a>│   │   │       ├── <span class="fl">626330658504e338</span>ee86aec8e957426b.woff2</span>
+<span id="cb13-618"><a href="#cb13-618" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK1dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qPZ7jsDJT9g.woff2</span>
+<span id="cb13-619"><a href="#cb13-619" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK1dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qPZ7ksDJT9g.woff2</span>
+<span id="cb13-620"><a href="#cb13-620" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK1dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qPZ7nsDI.woff2</span>
+<span id="cb13-621"><a href="#cb13-621" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK1dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qPZ7osDJT9g.woff2</span>
+<span id="cb13-622"><a href="#cb13-622" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK1dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qPZ7psDJT9g.woff2</span>
+<span id="cb13-623"><a href="#cb13-623" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK1dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qPZ7qsDJT9g.woff2</span>
+<span id="cb13-624"><a href="#cb13-624" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK1dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qPZ7rsDJT9g.woff2</span>
+<span id="cb13-625"><a href="#cb13-625" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK3dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qN67lqDY.woff2</span>
+<span id="cb13-626"><a href="#cb13-626" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK3dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qNK7lqDY.woff2</span>
+<span id="cb13-627"><a href="#cb13-627" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK3dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qNa7lqDY.woff2</span>
+<span id="cb13-628"><a href="#cb13-628" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK3dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qNq7lqDY.woff2</span>
+<span id="cb13-629"><a href="#cb13-629" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK3dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qO67lqDY.woff2</span>
+<span id="cb13-630"><a href="#cb13-630" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK3dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qOK7l.woff2</span>
+<span id="cb13-631"><a href="#cb13-631" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xK3dSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3qPK7lqDY.woff2</span>
+<span id="cb13-632"><a href="#cb13-632" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3i54rwkxduz8A.woff2</span>
+<span id="cb13-633"><a href="#cb13-633" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3i54rwlBduz8A.woff2</span>
+<span id="cb13-634"><a href="#cb13-634" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3i54rwlxdu.woff2</span>
+<span id="cb13-635"><a href="#cb13-635" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3i54rwmBduz8A.woff2</span>
+<span id="cb13-636"><a href="#cb13-636" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3i54rwmRduz8A.woff2</span>
+<span id="cb13-637"><a href="#cb13-637" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3i54rwmhduz8A.woff2</span>
+<span id="cb13-638"><a href="#cb13-638" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3i54rwmxduz8A.woff2</span>
+<span id="cb13-639"><a href="#cb13-639" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ig4vwkxduz8A.woff2</span>
+<span id="cb13-640"><a href="#cb13-640" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ig4vwlBduz8A.woff2</span>
+<span id="cb13-641"><a href="#cb13-641" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ig4vwlxdu.woff2</span>
+<span id="cb13-642"><a href="#cb13-642" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ig4vwmBduz8A.woff2</span>
+<span id="cb13-643"><a href="#cb13-643" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ig4vwmRduz8A.woff2</span>
+<span id="cb13-644"><a href="#cb13-644" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ig4vwmhduz8A.woff2</span>
+<span id="cb13-645"><a href="#cb13-645" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ig4vwmxduz8A.woff2</span>
+<span id="cb13-646"><a href="#cb13-646" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ik4zwkxduz8A.woff2</span>
+<span id="cb13-647"><a href="#cb13-647" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ik4zwlBduz8A.woff2</span>
+<span id="cb13-648"><a href="#cb13-648" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ik4zwlxdu.woff2</span>
+<span id="cb13-649"><a href="#cb13-649" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ik4zwmBduz8A.woff2</span>
+<span id="cb13-650"><a href="#cb13-650" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ik4zwmRduz8A.woff2</span>
+<span id="cb13-651"><a href="#cb13-651" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ik4zwmhduz8A.woff2</span>
+<span id="cb13-652"><a href="#cb13-652" tabindex="-1"></a>│   │   │       ├── <span class="dv">6</span>xKydSBYKcSV<span class="sc">-</span>LCoeQqfX1RYOo3ik4zwmxduz8A.woff2</span>
+<span id="cb13-653"><a href="#cb13-653" tabindex="-1"></a>│   │   │       ├── CSR54z1Qlv<span class="sc">-</span>GDxkbKVQ_dFsvWNReuQ.woff2</span>
+<span id="cb13-654"><a href="#cb13-654" tabindex="-1"></a>│   │   │       ├── CSR54z1Qlv<span class="sc">-</span>GDxkbKVQ_dFsvWNpeudwk.woff2</span>
+<span id="cb13-655"><a href="#cb13-655" tabindex="-1"></a>│   │   │       ├── CSR64z1Qlv<span class="sc">-</span>GDxkbKVQ_fO4KTet_.woff2</span>
+<span id="cb13-656"><a href="#cb13-656" tabindex="-1"></a>│   │   │       ├── CSR64z1Qlv<span class="sc">-</span>GDxkbKVQ_fOAKTQ.woff2</span>
+<span id="cb13-657"><a href="#cb13-657" tabindex="-1"></a>│   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvQlMIXxw.woff2</span>
+<span id="cb13-658"><a href="#cb13-658" tabindex="-1"></a>│   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvUlMI.woff2</span>
+<span id="cb13-659"><a href="#cb13-659" tabindex="-1"></a>│   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvXlMIXxw.woff2</span>
+<span id="cb13-660"><a href="#cb13-660" tabindex="-1"></a>│   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvYlMIXxw.woff2</span>
+<span id="cb13-661"><a href="#cb13-661" tabindex="-1"></a>│   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvZlMIXxw.woff2</span>
+<span id="cb13-662"><a href="#cb13-662" tabindex="-1"></a>│   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvalMIXxw.woff2</span>
+<span id="cb13-663"><a href="#cb13-663" tabindex="-1"></a>│   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvblMIXxw.woff2</span>
+<span id="cb13-664"><a href="#cb13-664" tabindex="-1"></a>│   │   │       ├── HI_SiYsKILxRpg3hIP6sJ7fM7PqlM<span class="sc">-</span>vWjMY.woff2</span>
+<span id="cb13-665"><a href="#cb13-665" tabindex="-1"></a>│   │   │       ├── HI_SiYsKILxRpg3hIP6sJ7fM7PqlMOvWjMY.woff2</span>
+<span id="cb13-666"><a href="#cb13-666" tabindex="-1"></a>│   │   │       ├── HI_SiYsKILxRpg3hIP6sJ7fM7PqlMevWjMY.woff2</span>
+<span id="cb13-667"><a href="#cb13-667" tabindex="-1"></a>│   │   │       ├── HI_SiYsKILxRpg3hIP6sJ7fM7PqlMuvWjMY.woff2</span>
+<span id="cb13-668"><a href="#cb13-668" tabindex="-1"></a>│   │   │       ├── HI_SiYsKILxRpg3hIP6sJ7fM7PqlOevWjMY.woff2</span>
+<span id="cb13-669"><a href="#cb13-669" tabindex="-1"></a>│   │   │       ├── HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2</span>
+<span id="cb13-670"><a href="#cb13-670" tabindex="-1"></a>│   │   │       ├── HI_SiYsKILxRpg3hIP6sJ7fM7PqlPuvWjMY.woff2</span>
+<span id="cb13-671"><a href="#cb13-671" tabindex="-1"></a>│   │   │       ├── JTUSjIg1_i6t8kCHKm459W1hyzbi.woff2</span>
+<span id="cb13-672"><a href="#cb13-672" tabindex="-1"></a>│   │   │       ├── JTUSjIg1_i6t8kCHKm459WRhyzbi.woff2</span>
+<span id="cb13-673"><a href="#cb13-673" tabindex="-1"></a>│   │   │       ├── JTUSjIg1_i6t8kCHKm459WZhyzbi.woff2</span>
+<span id="cb13-674"><a href="#cb13-674" tabindex="-1"></a>│   │   │       ├── JTUSjIg1_i6t8kCHKm459Wdhyzbi.woff2</span>
+<span id="cb13-675"><a href="#cb13-675" tabindex="-1"></a>│   │   │       ├── JTUSjIg1_i6t8kCHKm459Wlhyw.woff2</span>
+<span id="cb13-676"><a href="#cb13-676" tabindex="-1"></a>│   │   │       ├── QGYpz_kZZAGCONcK2A4bGOj8mNhN.woff2</span>
+<span id="cb13-677"><a href="#cb13-677" tabindex="-1"></a>│   │   │       ├── S6u8w4BMUTPHjxsAUi<span class="sc">-</span>qJCY.woff2</span>
+<span id="cb13-678"><a href="#cb13-678" tabindex="-1"></a>│   │   │       ├── S6u8w4BMUTPHjxsAXC<span class="sc">-</span>q.woff2</span>
+<span id="cb13-679"><a href="#cb13-679" tabindex="-1"></a>│   │   │       ├── S6u9w4BMUTPHh6UVSwaPGR_p.woff2</span>
+<span id="cb13-680"><a href="#cb13-680" tabindex="-1"></a>│   │   │       ├── S6u9w4BMUTPHh6UVSwiPGQ.woff2</span>
+<span id="cb13-681"><a href="#cb13-681" tabindex="-1"></a>│   │   │       ├── S6u9w4BMUTPHh7USSwaPGR_p.woff2</span>
+<span id="cb13-682"><a href="#cb13-682" tabindex="-1"></a>│   │   │       ├── S6u9w4BMUTPHh7USSwiPGQ.woff2</span>
+<span id="cb13-683"><a href="#cb13-683" tabindex="-1"></a>│   │   │       ├── S6uyw4BMUTPHjx4wXg.woff2</span>
+<span id="cb13-684"><a href="#cb13-684" tabindex="-1"></a>│   │   │       ├── S6uyw4BMUTPHjxAwXjeu.woff2</span>
+<span id="cb13-685"><a href="#cb13-685" tabindex="-1"></a>│   │   │       ├── XRXV3I6Li01BKofIMeaBXso.woff2</span>
+<span id="cb13-686"><a href="#cb13-686" tabindex="-1"></a>│   │   │       ├── XRXV3I6Li01BKofINeaB.woff2</span>
+<span id="cb13-687"><a href="#cb13-687" tabindex="-1"></a>│   │   │       ├── XRXV3I6Li01BKofIO<span class="sc">-</span>aBXso.woff2</span>
+<span id="cb13-688"><a href="#cb13-688" tabindex="-1"></a>│   │   │       ├── XRXV3I6Li01BKofIOOaBXso.woff2</span>
+<span id="cb13-689"><a href="#cb13-689" tabindex="-1"></a>│   │   │       ├── XRXV3I6Li01BKofIOuaBXso.woff2</span>
+<span id="cb13-690"><a href="#cb13-690" tabindex="-1"></a>│   │   │       ├── c2f002b3a87d3f9bfeebb23d32cfd9f8.woff2</span>
+<span id="cb13-691"><a href="#cb13-691" tabindex="-1"></a>│   │   │       ├── ee91700cdbf7ce16c054c2bb8946c736.woff2</span>
+<span id="cb13-692"><a href="#cb13-692" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqW106F15M.woff2</span>
+<span id="cb13-693"><a href="#cb13-693" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWt06F15M.woff2</span>
+<span id="cb13-694"><a href="#cb13-694" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWtE6F15M.woff2</span>
+<span id="cb13-695"><a href="#cb13-695" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWtU6F15M.woff2</span>
+<span id="cb13-696"><a href="#cb13-696" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWtk6F15M.woff2</span>
+<span id="cb13-697"><a href="#cb13-697" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWu06F15M.woff2</span>
+<span id="cb13-698"><a href="#cb13-698" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWuU6F.woff2</span>
+<span id="cb13-699"><a href="#cb13-699" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWuk6F15M.woff2</span>
+<span id="cb13-700"><a href="#cb13-700" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWvU6F15M.woff2</span>
+<span id="cb13-701"><a href="#cb13-701" tabindex="-1"></a>│   │   │       ├── memtYaGs126MiZpBA<span class="sc">-</span>UFUIcVXSCEkx2cmqvXlWqWxU6F15M.woff2</span>
+<span id="cb13-702"><a href="#cb13-702" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTS<span class="sc">-</span>muw.woff2</span>
+<span id="cb13-703"><a href="#cb13-703" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTS2mu1aB.woff2</span>
+<span id="cb13-704"><a href="#cb13-704" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTSCmu1aB.woff2</span>
+<span id="cb13-705"><a href="#cb13-705" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTSGmu1aB.woff2</span>
+<span id="cb13-706"><a href="#cb13-706" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTSKmu1aB.woff2</span>
+<span id="cb13-707"><a href="#cb13-707" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTSOmu1aB.woff2</span>
+<span id="cb13-708"><a href="#cb13-708" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTSumu1aB.woff2</span>
+<span id="cb13-709"><a href="#cb13-709" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTSymu1aB.woff2</span>
+<span id="cb13-710"><a href="#cb13-710" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTUGmu1aB.woff2</span>
+<span id="cb13-711"><a href="#cb13-711" tabindex="-1"></a>│   │   │       ├── memvYaGs126MiZpBA<span class="sc">-</span>UvWbX2vVnXBbObj2OVTVOmu1aB.woff2</span>
+<span id="cb13-712"><a href="#cb13-712" tabindex="-1"></a>│   │   │       ├── q5uGsou0JOdh94bfuQltOxU.woff2</span>
+<span id="cb13-713"><a href="#cb13-713" tabindex="-1"></a>│   │   │       └── q5uGsou0JOdh94bfvQlt.woff2</span>
+<span id="cb13-714"><a href="#cb13-714" tabindex="-1"></a>│   │   ├── bootstrap<span class="sc">-</span>toc<span class="dv">-1</span>.<span class="fl">0.1</span></span>
+<span id="cb13-715"><a href="#cb13-715" tabindex="-1"></a>│   │   │   └── bootstrap<span class="sc">-</span>toc.min.js</span>
+<span id="cb13-716"><a href="#cb13-716" tabindex="-1"></a>│   │   ├── clipboard.js<span class="dv">-2</span>.<span class="fl">0.11</span></span>
+<span id="cb13-717"><a href="#cb13-717" tabindex="-1"></a>│   │   │   └── clipboard.min.js</span>
+<span id="cb13-718"><a href="#cb13-718" tabindex="-1"></a>│   │   ├── data<span class="sc">-</span>deps.txt</span>
+<span id="cb13-719"><a href="#cb13-719" tabindex="-1"></a>│   │   ├── font<span class="sc">-</span>awesome<span class="dv">-6</span>.<span class="fl">5.2</span></span>
+<span id="cb13-720"><a href="#cb13-720" tabindex="-1"></a>│   │   │   ├── css</span>
+<span id="cb13-721"><a href="#cb13-721" tabindex="-1"></a>│   │   │   │   ├── all.css</span>
+<span id="cb13-722"><a href="#cb13-722" tabindex="-1"></a>│   │   │   │   ├── all.min.css</span>
+<span id="cb13-723"><a href="#cb13-723" tabindex="-1"></a>│   │   │   │   ├── v4<span class="sc">-</span>shims.css</span>
+<span id="cb13-724"><a href="#cb13-724" tabindex="-1"></a>│   │   │   │   └── v4<span class="sc">-</span>shims.min.css</span>
+<span id="cb13-725"><a href="#cb13-725" tabindex="-1"></a>│   │   │   └── webfonts</span>
+<span id="cb13-726"><a href="#cb13-726" tabindex="-1"></a>│   │   │       ├── fa<span class="sc">-</span>brands<span class="fl">-400.</span>ttf</span>
+<span id="cb13-727"><a href="#cb13-727" tabindex="-1"></a>│   │   │       ├── fa<span class="sc">-</span>brands<span class="fl">-400.</span>woff2</span>
+<span id="cb13-728"><a href="#cb13-728" tabindex="-1"></a>│   │   │       ├── fa<span class="sc">-</span>regular<span class="fl">-400.</span>ttf</span>
+<span id="cb13-729"><a href="#cb13-729" tabindex="-1"></a>│   │   │       ├── fa<span class="sc">-</span>regular<span class="fl">-400.</span>woff2</span>
+<span id="cb13-730"><a href="#cb13-730" tabindex="-1"></a>│   │   │       ├── fa<span class="sc">-</span>solid<span class="fl">-900.</span>ttf</span>
+<span id="cb13-731"><a href="#cb13-731" tabindex="-1"></a>│   │   │       ├── fa<span class="sc">-</span>solid<span class="fl">-900.</span>woff2</span>
+<span id="cb13-732"><a href="#cb13-732" tabindex="-1"></a>│   │   │       ├── fa<span class="sc">-</span>v4compatibility.ttf</span>
+<span id="cb13-733"><a href="#cb13-733" tabindex="-1"></a>│   │   │       └── fa<span class="sc">-</span>v4compatibility.woff2</span>
+<span id="cb13-734"><a href="#cb13-734" tabindex="-1"></a>│   │   ├── headroom<span class="dv">-0</span>.<span class="fl">11.0</span></span>
+<span id="cb13-735"><a href="#cb13-735" tabindex="-1"></a>│   │   │   ├── headroom.min.js</span>
+<span id="cb13-736"><a href="#cb13-736" tabindex="-1"></a>│   │   │   └── jQuery.headroom.min.js</span>
+<span id="cb13-737"><a href="#cb13-737" tabindex="-1"></a>│   │   ├── jquery<span class="dv">-3</span>.<span class="fl">6.0</span></span>
+<span id="cb13-738"><a href="#cb13-738" tabindex="-1"></a>│   │   │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>js</span>
+<span id="cb13-739"><a href="#cb13-739" tabindex="-1"></a>│   │   │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.js</span>
+<span id="cb13-740"><a href="#cb13-740" tabindex="-1"></a>│   │   │   └── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.map</span>
+<span id="cb13-741"><a href="#cb13-741" tabindex="-1"></a>│   │   └── search<span class="dv">-1</span>.<span class="fl">0.0</span></span>
+<span id="cb13-742"><a href="#cb13-742" tabindex="-1"></a>│   │       ├── autocomplete.jquery.min.js</span>
+<span id="cb13-743"><a href="#cb13-743" tabindex="-1"></a>│   │       ├── fuse.min.js</span>
+<span id="cb13-744"><a href="#cb13-744" tabindex="-1"></a>│   │       └── mark.min.js</span>
+<span id="cb13-745"><a href="#cb13-745" tabindex="-1"></a>│   ├── index.html</span>
+<span id="cb13-746"><a href="#cb13-746" tabindex="-1"></a>│   ├── katex<span class="sc">-</span>auto.js</span>
+<span id="cb13-747"><a href="#cb13-747" tabindex="-1"></a>│   ├── lightswitch.js</span>
+<span id="cb13-748"><a href="#cb13-748" tabindex="-1"></a>│   ├── link.svg</span>
+<span id="cb13-749"><a href="#cb13-749" tabindex="-1"></a>│   ├── pkgdown.js</span>
+<span id="cb13-750"><a href="#cb13-750" tabindex="-1"></a>│   ├── pkgdown.yml</span>
+<span id="cb13-751"><a href="#cb13-751" tabindex="-1"></a>│   ├── reference</span>
+<span id="cb13-752"><a href="#cb13-752" tabindex="-1"></a>│   │   ├── add_wave_metrics.html</span>
+<span id="cb13-753"><a href="#cb13-753" tabindex="-1"></a>│   │   ├── analyze_gust_factor.html</span>
+<span id="cb13-754"><a href="#cb13-754" tabindex="-1"></a>│   │   ├── analyze_parquet_storage.html</span>
+<span id="cb13-755"><a href="#cb13-755" tabindex="-1"></a>│   │   ├── analyze_rogue_statistics.html</span>
+<span id="cb13-756"><a href="#cb13-756" tabindex="-1"></a>│   │   ├── calculate_annual_trends.html</span>
+<span id="cb13-757"><a href="#cb13-757" tabindex="-1"></a>│   │   ├── calculate_hs_from_elevation.html</span>
+<span id="cb13-758"><a href="#cb13-758" tabindex="-1"></a>│   │   ├── calculate_return_levels.html</span>
+<span id="cb13-759"><a href="#cb13-759" tabindex="-1"></a>│   │   ├── calculate_rms_wave_height.html</span>
+<span id="cb13-760"><a href="#cb13-760" tabindex="-1"></a>│   │   ├── calculate_seasonal_means.html</span>
+<span id="cb13-761"><a href="#cb13-761" tabindex="-1"></a>│   │   ├── calculate_wave_steepness.html</span>
+<span id="cb13-762"><a href="#cb13-762" tabindex="-1"></a>│   │   ├── compare_rogue_wave_gust.html</span>
+<span id="cb13-763"><a href="#cb13-763" tabindex="-1"></a>│   │   ├── connect_duckdb.html</span>
+<span id="cb13-764"><a href="#cb13-764" tabindex="-1"></a>│   │   ├── convert_duckdb_to_parquet.html</span>
+<span id="cb13-765"><a href="#cb13-765" tabindex="-1"></a>│   │   ├── create_buoy_schema.html</span>
+<span id="cb13-766"><a href="#cb13-766" tabindex="-1"></a>│   │   ├── create_email_summary.html</span>
+<span id="cb13-767"><a href="#cb13-767" tabindex="-1"></a>│   │   ├── create_return_level_plot_data.html</span>
+<span id="cb13-768"><a href="#cb13-768" tabindex="-1"></a>│   │   ├── decompose_stl.html</span>
+<span id="cb13-769"><a href="#cb13-769" tabindex="-1"></a>│   │   ├── detect_anomalies.html</span>
+<span id="cb13-770"><a href="#cb13-770" tabindex="-1"></a>│   │   ├── detect_rogue_waves.html</span>
+<span id="cb13-771"><a href="#cb13-771" tabindex="-1"></a>│   │   ├── download_buoy_data.html</span>
+<span id="cb13-772"><a href="#cb13-772" tabindex="-1"></a>│   │   ├── evaluate_wave_model.html</span>
+<span id="cb13-773"><a href="#cb13-773" tabindex="-1"></a>│   │   ├── explain_hourly_averaging.html</span>
+<span id="cb13-774"><a href="#cb13-774" tabindex="-1"></a>│   │   ├── explain_hs_formula.html</span>
+<span id="cb13-775"><a href="#cb13-775" tabindex="-1"></a>│   │   ├── explain_measurement_period.html</span>
+<span id="cb13-776"><a href="#cb13-776" tabindex="-1"></a>│   │   ├── explain_wave_height_measurement.html</span>
+<span id="cb13-777"><a href="#cb13-777" tabindex="-1"></a>│   │   ├── extreme_values.html</span>
+<span id="cb13-778"><a href="#cb13-778" tabindex="-1"></a>│   │   ├── fit_gev_annual_maxima.html</span>
+<span id="cb13-779"><a href="#cb13-779" tabindex="-1"></a>│   │   ├── fit_gpd_threshold.html</span>
+<span id="cb13-780"><a href="#cb13-780" tabindex="-1"></a>│   │   ├── generate_and_send_summary.html</span>
+<span id="cb13-781"><a href="#cb13-781" tabindex="-1"></a>│   │   ├── generate_weekly_summary.html</span>
+<span id="cb13-782"><a href="#cb13-782" tabindex="-1"></a>│   │   ├── get_data_dictionary.html</span>
+<span id="cb13-783"><a href="#cb13-783" tabindex="-1"></a>│   │   ├── get_database_stats.html</span>
+<span id="cb13-784"><a href="#cb13-784" tabindex="-1"></a>│   │   ├── get_latest_timestamp.html</span>
+<span id="cb13-785"><a href="#cb13-785" tabindex="-1"></a>│   │   ├── get_stations.html</span>
+<span id="cb13-786"><a href="#cb13-786" tabindex="-1"></a>│   │   ├── get_variable_docs.html</span>
+<span id="cb13-787"><a href="#cb13-787" tabindex="-1"></a>│   │   ├── hs_from_rms.html</span>
+<span id="cb13-788"><a href="#cb13-788" tabindex="-1"></a>│   │   ├── incremental_update.html</span>
+<span id="cb13-789"><a href="#cb13-789" tabindex="-1"></a>│   │   ├── incremental_update_parquet.html</span>
+<span id="cb13-790"><a href="#cb13-790" tabindex="-1"></a>│   │   ├── index.html</span>
+<span id="cb13-791"><a href="#cb13-791" tabindex="-1"></a>│   │   ├── init_parquet_storage.html</span>
+<span id="cb13-792"><a href="#cb13-792" tabindex="-1"></a>│   │   ├── initialize_database.html</span>
+<span id="cb13-793"><a href="#cb13-793" tabindex="-1"></a>│   │   ├── inst</span>
+<span id="cb13-794"><a href="#cb13-794" tabindex="-1"></a>│   │   │   └── extdata</span>
+<span id="cb13-795"><a href="#cb13-795" tabindex="-1"></a>│   │   ├── irishbuoys<span class="sc">-</span>package.html</span>
+<span id="cb13-796"><a href="#cb13-796" tabindex="-1"></a>│   │   ├── load_to_duckdb.html</span>
+<span id="cb13-797"><a href="#cb13-797" tabindex="-1"></a>│   │   ├── log_update.html</span>
+<span id="cb13-798"><a href="#cb13-798" tabindex="-1"></a>│   │   ├── predict_wave_height.html</span>
+<span id="cb13-799"><a href="#cb13-799" tabindex="-1"></a>│   │   ├── prepare_wave_features.html</span>
+<span id="cb13-800"><a href="#cb13-800" tabindex="-1"></a>│   │   ├── query_buoy_data.html</span>
+<span id="cb13-801"><a href="#cb13-801" tabindex="-1"></a>│   │   ├── query_parquet.html</span>
+<span id="cb13-802"><a href="#cb13-802" tabindex="-1"></a>│   │   ├── rogue_wave_report.html</span>
+<span id="cb13-803"><a href="#cb13-803" tabindex="-1"></a>│   │   ├── save_to_parquet.html</span>
+<span id="cb13-804"><a href="#cb13-804" tabindex="-1"></a>│   │   ├── train_wave_model.html</span>
+<span id="cb13-805"><a href="#cb13-805" tabindex="-1"></a>│   │   ├── trend_analysis.html</span>
+<span id="cb13-806"><a href="#cb13-806" tabindex="-1"></a>│   │   ├── trend_summary_report.html</span>
+<span id="cb13-807"><a href="#cb13-807" tabindex="-1"></a>│   │   ├── update_station_metadata.html</span>
+<span id="cb13-808"><a href="#cb13-808" tabindex="-1"></a>│   │   ├── wave_glossary.html</span>
+<span id="cb13-809"><a href="#cb13-809" tabindex="-1"></a>│   │   ├── wave_model.html</span>
+<span id="cb13-810"><a href="#cb13-810" tabindex="-1"></a>│   │   ├── wave_model_report.html</span>
+<span id="cb13-811"><a href="#cb13-811" tabindex="-1"></a>│   │   ├── wave_science.html</span>
+<span id="cb13-812"><a href="#cb13-812" tabindex="-1"></a>│   │   └── wave_science_documentation.html</span>
+<span id="cb13-813"><a href="#cb13-813" tabindex="-1"></a>│   └── vignettes</span>
+<span id="cb13-814"><a href="#cb13-814" tabindex="-1"></a>│       ├── dashboard_static.html</span>
+<span id="cb13-815"><a href="#cb13-815" tabindex="-1"></a>│       ├── dashboard_static_files</span>
+<span id="cb13-816"><a href="#cb13-816" tabindex="-1"></a>│       │   ├── figure<span class="sc">-</span>html</span>
+<span id="cb13-817"><a href="#cb13-817" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-1</span><span class="fl">-1.</span>png</span>
+<span id="cb13-818"><a href="#cb13-818" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-11</span><span class="fl">-1.</span>png</span>
+<span id="cb13-819"><a href="#cb13-819" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-13</span><span class="fl">-1.</span>png</span>
+<span id="cb13-820"><a href="#cb13-820" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-15</span><span class="fl">-1.</span>png</span>
+<span id="cb13-821"><a href="#cb13-821" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-17</span><span class="fl">-1.</span>png</span>
+<span id="cb13-822"><a href="#cb13-822" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-19</span><span class="fl">-1.</span>png</span>
+<span id="cb13-823"><a href="#cb13-823" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-21</span><span class="fl">-1.</span>png</span>
+<span id="cb13-824"><a href="#cb13-824" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-23</span><span class="fl">-1.</span>png</span>
+<span id="cb13-825"><a href="#cb13-825" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-25</span><span class="fl">-1.</span>png</span>
+<span id="cb13-826"><a href="#cb13-826" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-27</span><span class="fl">-1.</span>png</span>
+<span id="cb13-827"><a href="#cb13-827" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-28</span><span class="fl">-1.</span>png</span>
+<span id="cb13-828"><a href="#cb13-828" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-29</span><span class="fl">-1.</span>png</span>
+<span id="cb13-829"><a href="#cb13-829" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-3</span><span class="fl">-1.</span>png</span>
+<span id="cb13-830"><a href="#cb13-830" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-30</span><span class="fl">-1.</span>png</span>
+<span id="cb13-831"><a href="#cb13-831" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-31</span><span class="fl">-1.</span>png</span>
+<span id="cb13-832"><a href="#cb13-832" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-5</span><span class="fl">-1.</span>png</span>
+<span id="cb13-833"><a href="#cb13-833" tabindex="-1"></a>│       │   │   ├── unnamed<span class="sc">-</span>chunk<span class="dv">-7</span><span class="fl">-1.</span>png</span>
+<span id="cb13-834"><a href="#cb13-834" tabindex="-1"></a>│       │   │   └── unnamed<span class="sc">-</span>chunk<span class="dv">-9</span><span class="fl">-1.</span>png</span>
+<span id="cb13-835"><a href="#cb13-835" tabindex="-1"></a>│       │   └── libs</span>
+<span id="cb13-836"><a href="#cb13-836" tabindex="-1"></a>│       │       ├── bootstrap</span>
+<span id="cb13-837"><a href="#cb13-837" tabindex="-1"></a>│       │       │   ├── bootstrap<span class="sc">-</span>d5fa03fb90ac27921a6d47853be462c0.min.css</span>
+<span id="cb13-838"><a href="#cb13-838" tabindex="-1"></a>│       │       │   ├── bootstrap<span class="sc">-</span>icons.css</span>
+<span id="cb13-839"><a href="#cb13-839" tabindex="-1"></a>│       │       │   ├── bootstrap<span class="sc">-</span>icons.woff</span>
+<span id="cb13-840"><a href="#cb13-840" tabindex="-1"></a>│       │       │   └── bootstrap.min.js</span>
+<span id="cb13-841"><a href="#cb13-841" tabindex="-1"></a>│       │       ├── clipboard</span>
+<span id="cb13-842"><a href="#cb13-842" tabindex="-1"></a>│       │       │   └── clipboard.min.js</span>
+<span id="cb13-843"><a href="#cb13-843" tabindex="-1"></a>│       │       ├── crosstalk<span class="dv">-1</span>.<span class="fl">2.2</span></span>
+<span id="cb13-844"><a href="#cb13-844" tabindex="-1"></a>│       │       │   ├── css</span>
+<span id="cb13-845"><a href="#cb13-845" tabindex="-1"></a>│       │       │   │   └── crosstalk.min.css</span>
+<span id="cb13-846"><a href="#cb13-846" tabindex="-1"></a>│       │       │   ├── js</span>
+<span id="cb13-847"><a href="#cb13-847" tabindex="-1"></a>│       │       │   │   ├── crosstalk.js</span>
+<span id="cb13-848"><a href="#cb13-848" tabindex="-1"></a>│       │       │   │   ├── crosstalk.js.map</span>
+<span id="cb13-849"><a href="#cb13-849" tabindex="-1"></a>│       │       │   │   ├── crosstalk.min.js</span>
+<span id="cb13-850"><a href="#cb13-850" tabindex="-1"></a>│       │       │   │   └── crosstalk.min.js.map</span>
+<span id="cb13-851"><a href="#cb13-851" tabindex="-1"></a>│       │       │   └── scss</span>
+<span id="cb13-852"><a href="#cb13-852" tabindex="-1"></a>│       │       │       └── crosstalk.scss</span>
+<span id="cb13-853"><a href="#cb13-853" tabindex="-1"></a>│       │       ├── datatables<span class="sc">-</span>binding<span class="dv">-0</span>.<span class="fl">34.0</span></span>
+<span id="cb13-854"><a href="#cb13-854" tabindex="-1"></a>│       │       │   └── datatables.js</span>
+<span id="cb13-855"><a href="#cb13-855" tabindex="-1"></a>│       │       ├── datatables<span class="sc">-</span>css<span class="dv">-0</span>.<span class="fl">0.0</span></span>
+<span id="cb13-856"><a href="#cb13-856" tabindex="-1"></a>│       │       │   └── datatables<span class="sc">-</span>crosstalk.css</span>
+<span id="cb13-857"><a href="#cb13-857" tabindex="-1"></a>│       │       ├── dt<span class="sc">-</span>core<span class="dv">-1</span>.<span class="fl">13.6</span></span>
+<span id="cb13-858"><a href="#cb13-858" tabindex="-1"></a>│       │       │   ├── css</span>
+<span id="cb13-859"><a href="#cb13-859" tabindex="-1"></a>│       │       │   │   ├── jquery.dataTables.extra.css</span>
+<span id="cb13-860"><a href="#cb13-860" tabindex="-1"></a>│       │       │   │   └── jquery.dataTables.min.css</span>
+<span id="cb13-861"><a href="#cb13-861" tabindex="-1"></a>│       │       │   └── js</span>
+<span id="cb13-862"><a href="#cb13-862" tabindex="-1"></a>│       │       │       └── jquery.dataTables.min.js</span>
+<span id="cb13-863"><a href="#cb13-863" tabindex="-1"></a>│       │       ├── htmltools<span class="sc">-</span>fill<span class="dv">-0</span>.<span class="fl">5.9</span></span>
+<span id="cb13-864"><a href="#cb13-864" tabindex="-1"></a>│       │       │   └── fill.css</span>
+<span id="cb13-865"><a href="#cb13-865" tabindex="-1"></a>│       │       ├── htmlwidgets<span class="dv">-1</span>.<span class="fl">6.4</span></span>
+<span id="cb13-866"><a href="#cb13-866" tabindex="-1"></a>│       │       │   └── htmlwidgets.js</span>
+<span id="cb13-867"><a href="#cb13-867" tabindex="-1"></a>│       │       ├── jquery<span class="dv">-3</span>.<span class="fl">6.0</span></span>
+<span id="cb13-868"><a href="#cb13-868" tabindex="-1"></a>│       │       │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>js</span>
+<span id="cb13-869"><a href="#cb13-869" tabindex="-1"></a>│       │       │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.js</span>
+<span id="cb13-870"><a href="#cb13-870" tabindex="-1"></a>│       │       │   └── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.map</span>
+<span id="cb13-871"><a href="#cb13-871" tabindex="-1"></a>│       │       ├── nouislider<span class="dv">-7</span>.<span class="fl">0.10</span></span>
+<span id="cb13-872"><a href="#cb13-872" tabindex="-1"></a>│       │       │   ├── jquery.nouislider.min.css</span>
+<span id="cb13-873"><a href="#cb13-873" tabindex="-1"></a>│       │       │   └── jquery.nouislider.min.js</span>
+<span id="cb13-874"><a href="#cb13-874" tabindex="-1"></a>│       │       ├── quarto<span class="sc">-</span>html</span>
+<span id="cb13-875"><a href="#cb13-875" tabindex="-1"></a>│       │       │   ├── anchor.min.js</span>
+<span id="cb13-876"><a href="#cb13-876" tabindex="-1"></a>│       │       │   ├── axe</span>
+<span id="cb13-877"><a href="#cb13-877" tabindex="-1"></a>│       │       │   │   └── axe<span class="sc">-</span>check.js</span>
+<span id="cb13-878"><a href="#cb13-878" tabindex="-1"></a>│       │       │   ├── popper.min.js</span>
+<span id="cb13-879"><a href="#cb13-879" tabindex="-1"></a>│       │       │   ├── quarto<span class="sc">-</span>syntax<span class="sc">-</span>highlighting<span class="dv">-587</span>c61ba64f3a5504c4d52d930310e48.css</span>
+<span id="cb13-880"><a href="#cb13-880" tabindex="-1"></a>│       │       │   ├── quarto.js</span>
+<span id="cb13-881"><a href="#cb13-881" tabindex="-1"></a>│       │       │   ├── tabsets</span>
+<span id="cb13-882"><a href="#cb13-882" tabindex="-1"></a>│       │       │   │   └── tabsets.js</span>
+<span id="cb13-883"><a href="#cb13-883" tabindex="-1"></a>│       │       │   ├── tippy.css</span>
+<span id="cb13-884"><a href="#cb13-884" tabindex="-1"></a>│       │       │   └── tippy.umd.min.js</span>
+<span id="cb13-885"><a href="#cb13-885" tabindex="-1"></a>│       │       └── selectize<span class="dv">-0</span>.<span class="fl">12.0</span></span>
+<span id="cb13-886"><a href="#cb13-886" tabindex="-1"></a>│       │           ├── selectize.bootstrap3.css</span>
+<span id="cb13-887"><a href="#cb13-887" tabindex="-1"></a>│       │           └── selectize.min.js</span>
+<span id="cb13-888"><a href="#cb13-888" tabindex="-1"></a>│       ├── wave_analysis.html</span>
+<span id="cb13-889"><a href="#cb13-889" tabindex="-1"></a>│       └── wave_analysis_files</span>
+<span id="cb13-890"><a href="#cb13-890" tabindex="-1"></a>│           ├── figure<span class="sc">-</span>html</span>
+<span id="cb13-891"><a href="#cb13-891" tabindex="-1"></a>│           │   ├── rogue<span class="sc">-</span>all<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-892"><a href="#cb13-892" tabindex="-1"></a>│           │   ├── rogue<span class="sc">-</span>m2<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-893"><a href="#cb13-893" tabindex="-1"></a>│           │   ├── rogue<span class="sc">-</span>m3<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-894"><a href="#cb13-894" tabindex="-1"></a>│           │   ├── rogue<span class="sc">-</span>m4<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-895"><a href="#cb13-895" tabindex="-1"></a>│           │   ├── rogue<span class="sc">-</span>m5<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-896"><a href="#cb13-896" tabindex="-1"></a>│           │   └── rogue<span class="sc">-</span>m6<span class="sc">-</span>plot<span class="fl">-1.</span>png</span>
+<span id="cb13-897"><a href="#cb13-897" tabindex="-1"></a>│           └── libs</span>
+<span id="cb13-898"><a href="#cb13-898" tabindex="-1"></a>│               ├── bootstrap</span>
+<span id="cb13-899"><a href="#cb13-899" tabindex="-1"></a>│               │   ├── bootstrap<span class="sc">-</span>d5fa03fb90ac27921a6d47853be462c0.min.css</span>
+<span id="cb13-900"><a href="#cb13-900" tabindex="-1"></a>│               │   ├── bootstrap<span class="sc">-</span>icons.css</span>
+<span id="cb13-901"><a href="#cb13-901" tabindex="-1"></a>│               │   ├── bootstrap<span class="sc">-</span>icons.woff</span>
+<span id="cb13-902"><a href="#cb13-902" tabindex="-1"></a>│               │   └── bootstrap.min.js</span>
+<span id="cb13-903"><a href="#cb13-903" tabindex="-1"></a>│               ├── clipboard</span>
+<span id="cb13-904"><a href="#cb13-904" tabindex="-1"></a>│               │   └── clipboard.min.js</span>
+<span id="cb13-905"><a href="#cb13-905" tabindex="-1"></a>│               ├── crosstalk<span class="dv">-1</span>.<span class="fl">2.2</span></span>
+<span id="cb13-906"><a href="#cb13-906" tabindex="-1"></a>│               │   ├── css</span>
+<span id="cb13-907"><a href="#cb13-907" tabindex="-1"></a>│               │   │   └── crosstalk.min.css</span>
+<span id="cb13-908"><a href="#cb13-908" tabindex="-1"></a>│               │   ├── js</span>
+<span id="cb13-909"><a href="#cb13-909" tabindex="-1"></a>│               │   │   ├── crosstalk.js</span>
+<span id="cb13-910"><a href="#cb13-910" tabindex="-1"></a>│               │   │   ├── crosstalk.js.map</span>
+<span id="cb13-911"><a href="#cb13-911" tabindex="-1"></a>│               │   │   ├── crosstalk.min.js</span>
+<span id="cb13-912"><a href="#cb13-912" tabindex="-1"></a>│               │   │   └── crosstalk.min.js.map</span>
+<span id="cb13-913"><a href="#cb13-913" tabindex="-1"></a>│               │   └── scss</span>
+<span id="cb13-914"><a href="#cb13-914" tabindex="-1"></a>│               │       └── crosstalk.scss</span>
+<span id="cb13-915"><a href="#cb13-915" tabindex="-1"></a>│               ├── datatables<span class="sc">-</span>binding<span class="dv">-0</span>.<span class="fl">34.0</span></span>
+<span id="cb13-916"><a href="#cb13-916" tabindex="-1"></a>│               │   └── datatables.js</span>
+<span id="cb13-917"><a href="#cb13-917" tabindex="-1"></a>│               ├── datatables<span class="sc">-</span>css<span class="dv">-0</span>.<span class="fl">0.0</span></span>
+<span id="cb13-918"><a href="#cb13-918" tabindex="-1"></a>│               │   └── datatables<span class="sc">-</span>crosstalk.css</span>
+<span id="cb13-919"><a href="#cb13-919" tabindex="-1"></a>│               ├── dt<span class="sc">-</span>core<span class="dv">-1</span>.<span class="fl">13.6</span></span>
+<span id="cb13-920"><a href="#cb13-920" tabindex="-1"></a>│               │   ├── css</span>
+<span id="cb13-921"><a href="#cb13-921" tabindex="-1"></a>│               │   │   ├── jquery.dataTables.extra.css</span>
+<span id="cb13-922"><a href="#cb13-922" tabindex="-1"></a>│               │   │   └── jquery.dataTables.min.css</span>
+<span id="cb13-923"><a href="#cb13-923" tabindex="-1"></a>│               │   └── js</span>
+<span id="cb13-924"><a href="#cb13-924" tabindex="-1"></a>│               │       └── jquery.dataTables.min.js</span>
+<span id="cb13-925"><a href="#cb13-925" tabindex="-1"></a>│               ├── htmltools<span class="sc">-</span>fill<span class="dv">-0</span>.<span class="fl">5.9</span></span>
+<span id="cb13-926"><a href="#cb13-926" tabindex="-1"></a>│               │   └── fill.css</span>
+<span id="cb13-927"><a href="#cb13-927" tabindex="-1"></a>│               ├── htmlwidgets<span class="dv">-1</span>.<span class="fl">6.4</span></span>
+<span id="cb13-928"><a href="#cb13-928" tabindex="-1"></a>│               │   └── htmlwidgets.js</span>
+<span id="cb13-929"><a href="#cb13-929" tabindex="-1"></a>│               ├── jquery<span class="dv">-3</span>.<span class="fl">6.0</span></span>
+<span id="cb13-930"><a href="#cb13-930" tabindex="-1"></a>│               │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>js</span>
+<span id="cb13-931"><a href="#cb13-931" tabindex="-1"></a>│               │   ├── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.js</span>
+<span id="cb13-932"><a href="#cb13-932" tabindex="-1"></a>│               │   └── jquery<span class="dv">-3</span>.<span class="dv">6</span>.<span class="fl">0.</span>min.map</span>
+<span id="cb13-933"><a href="#cb13-933" tabindex="-1"></a>│               ├── nouislider<span class="dv">-7</span>.<span class="fl">0.10</span></span>
+<span id="cb13-934"><a href="#cb13-934" tabindex="-1"></a>│               │   ├── jquery.nouislider.min.css</span>
+<span id="cb13-935"><a href="#cb13-935" tabindex="-1"></a>│               │   └── jquery.nouislider.min.js</span>
+<span id="cb13-936"><a href="#cb13-936" tabindex="-1"></a>│               ├── quarto<span class="sc">-</span>html</span>
+<span id="cb13-937"><a href="#cb13-937" tabindex="-1"></a>│               │   ├── anchor.min.js</span>
+<span id="cb13-938"><a href="#cb13-938" tabindex="-1"></a>│               │   ├── axe</span>
+<span id="cb13-939"><a href="#cb13-939" tabindex="-1"></a>│               │   │   └── axe<span class="sc">-</span>check.js</span>
+<span id="cb13-940"><a href="#cb13-940" tabindex="-1"></a>│               │   ├── popper.min.js</span>
+<span id="cb13-941"><a href="#cb13-941" tabindex="-1"></a>│               │   ├── quarto<span class="sc">-</span>syntax<span class="sc">-</span>highlighting<span class="dv">-587</span>c61ba64f3a5504c4d52d930310e48.css</span>
+<span id="cb13-942"><a href="#cb13-942" tabindex="-1"></a>│               │   ├── quarto.js</span>
+<span id="cb13-943"><a href="#cb13-943" tabindex="-1"></a>│               │   ├── tabsets</span>
+<span id="cb13-944"><a href="#cb13-944" tabindex="-1"></a>│               │   │   └── tabsets.js</span>
+<span id="cb13-945"><a href="#cb13-945" tabindex="-1"></a>│               │   ├── tippy.css</span>
+<span id="cb13-946"><a href="#cb13-946" tabindex="-1"></a>│               │   └── tippy.umd.min.js</span>
+<span id="cb13-947"><a href="#cb13-947" tabindex="-1"></a>│               └── selectize<span class="dv">-0</span>.<span class="fl">12.0</span></span>
+<span id="cb13-948"><a href="#cb13-948" tabindex="-1"></a>│                   ├── selectize.bootstrap3.css</span>
+<span id="cb13-949"><a href="#cb13-949" tabindex="-1"></a>│                   └── selectize.min.js</span>
+<span id="cb13-950"><a href="#cb13-950" tabindex="-1"></a>├── inst</span>
+<span id="cb13-951"><a href="#cb13-951" tabindex="-1"></a>│   ├── docs</span>
+<span id="cb13-952"><a href="#cb13-952" tabindex="-1"></a>│   │   └── parquet_storage_guide.md</span>
+<span id="cb13-953"><a href="#cb13-953" tabindex="-1"></a>│   ├── extdata</span>
+<span id="cb13-954"><a href="#cb13-954" tabindex="-1"></a>│   │   ├── analysis_questions.md</span>
+<span id="cb13-955"><a href="#cb13-955" tabindex="-1"></a>│   │   ├── irish_buoys.duckdb</span>
+<span id="cb13-956"><a href="#cb13-956" tabindex="-1"></a>│   │   ├── return_levels.rds</span>
+<span id="cb13-957"><a href="#cb13-957" tabindex="-1"></a>│   │   ├── rogue_wave_events.rds</span>
+<span id="cb13-958"><a href="#cb13-958" tabindex="-1"></a>│   │   ├── seasonal_analysis.rds</span>
+<span id="cb13-959"><a href="#cb13-959" tabindex="-1"></a>│   │   └── wave_analysis_summary.rds</span>
+<span id="cb13-960"><a href="#cb13-960" tabindex="-1"></a>│   └── scripts</span>
+<span id="cb13-961"><a href="#cb13-961" tabindex="-1"></a>│       ├── example_usage.R</span>
+<span id="cb13-962"><a href="#cb13-962" tabindex="-1"></a>│       └── storage_comparison.R</span>
+<span id="cb13-963"><a href="#cb13-963" tabindex="-1"></a>├── man</span>
+<span id="cb13-964"><a href="#cb13-964" tabindex="-1"></a>│   ├── add_wave_metrics.Rd</span>
+<span id="cb13-965"><a href="#cb13-965" tabindex="-1"></a>│   ├── analyze_gust_factor.Rd</span>
+<span id="cb13-966"><a href="#cb13-966" tabindex="-1"></a>│   ├── analyze_parquet_storage.Rd</span>
+<span id="cb13-967"><a href="#cb13-967" tabindex="-1"></a>│   ├── analyze_rogue_statistics.Rd</span>
+<span id="cb13-968"><a href="#cb13-968" tabindex="-1"></a>│   ├── calculate_annual_trends.Rd</span>
+<span id="cb13-969"><a href="#cb13-969" tabindex="-1"></a>│   ├── calculate_hs_from_elevation.Rd</span>
+<span id="cb13-970"><a href="#cb13-970" tabindex="-1"></a>│   ├── calculate_return_levels.Rd</span>
+<span id="cb13-971"><a href="#cb13-971" tabindex="-1"></a>│   ├── calculate_rms_wave_height.Rd</span>
+<span id="cb13-972"><a href="#cb13-972" tabindex="-1"></a>│   ├── calculate_seasonal_means.Rd</span>
+<span id="cb13-973"><a href="#cb13-973" tabindex="-1"></a>│   ├── calculate_wave_steepness.Rd</span>
+<span id="cb13-974"><a href="#cb13-974" tabindex="-1"></a>│   ├── compare_rogue_wave_gust.Rd</span>
+<span id="cb13-975"><a href="#cb13-975" tabindex="-1"></a>│   ├── connect_duckdb.Rd</span>
+<span id="cb13-976"><a href="#cb13-976" tabindex="-1"></a>│   ├── convert_duckdb_to_parquet.Rd</span>
+<span id="cb13-977"><a href="#cb13-977" tabindex="-1"></a>│   ├── create_buoy_schema.Rd</span>
+<span id="cb13-978"><a href="#cb13-978" tabindex="-1"></a>│   ├── create_email_summary.Rd</span>
+<span id="cb13-979"><a href="#cb13-979" tabindex="-1"></a>│   ├── create_return_level_plot_data.Rd</span>
+<span id="cb13-980"><a href="#cb13-980" tabindex="-1"></a>│   ├── decompose_stl.Rd</span>
+<span id="cb13-981"><a href="#cb13-981" tabindex="-1"></a>│   ├── detect_anomalies.Rd</span>
+<span id="cb13-982"><a href="#cb13-982" tabindex="-1"></a>│   ├── detect_rogue_waves.Rd</span>
+<span id="cb13-983"><a href="#cb13-983" tabindex="-1"></a>│   ├── download_buoy_data.Rd</span>
+<span id="cb13-984"><a href="#cb13-984" tabindex="-1"></a>│   ├── evaluate_wave_model.Rd</span>
+<span id="cb13-985"><a href="#cb13-985" tabindex="-1"></a>│   ├── explain_hourly_averaging.Rd</span>
+<span id="cb13-986"><a href="#cb13-986" tabindex="-1"></a>│   ├── explain_hs_formula.Rd</span>
+<span id="cb13-987"><a href="#cb13-987" tabindex="-1"></a>│   ├── explain_measurement_period.Rd</span>
+<span id="cb13-988"><a href="#cb13-988" tabindex="-1"></a>│   ├── explain_wave_height_measurement.Rd</span>
+<span id="cb13-989"><a href="#cb13-989" tabindex="-1"></a>│   ├── extreme_values.Rd</span>
+<span id="cb13-990"><a href="#cb13-990" tabindex="-1"></a>│   ├── fit_gev_annual_maxima.Rd</span>
+<span id="cb13-991"><a href="#cb13-991" tabindex="-1"></a>│   ├── fit_gpd_threshold.Rd</span>
+<span id="cb13-992"><a href="#cb13-992" tabindex="-1"></a>│   ├── generate_and_send_summary.Rd</span>
+<span id="cb13-993"><a href="#cb13-993" tabindex="-1"></a>│   ├── generate_weekly_summary.Rd</span>
+<span id="cb13-994"><a href="#cb13-994" tabindex="-1"></a>│   ├── get_data_dictionary.Rd</span>
+<span id="cb13-995"><a href="#cb13-995" tabindex="-1"></a>│   ├── get_database_stats.Rd</span>
+<span id="cb13-996"><a href="#cb13-996" tabindex="-1"></a>│   ├── get_latest_timestamp.Rd</span>
+<span id="cb13-997"><a href="#cb13-997" tabindex="-1"></a>│   ├── get_stations.Rd</span>
+<span id="cb13-998"><a href="#cb13-998" tabindex="-1"></a>│   ├── get_variable_docs.Rd</span>
+<span id="cb13-999"><a href="#cb13-999" tabindex="-1"></a>│   ├── hs_from_rms.Rd</span>
+<span id="cb13-1000"><a href="#cb13-1000" tabindex="-1"></a>│   ├── incremental_update.Rd</span>
+<span id="cb13-1001"><a href="#cb13-1001" tabindex="-1"></a>│   ├── incremental_update_parquet.Rd</span>
+<span id="cb13-1002"><a href="#cb13-1002" tabindex="-1"></a>│   ├── init_parquet_storage.Rd</span>
+<span id="cb13-1003"><a href="#cb13-1003" tabindex="-1"></a>│   ├── initialize_database.Rd</span>
+<span id="cb13-1004"><a href="#cb13-1004" tabindex="-1"></a>│   ├── irishbuoys<span class="sc">-</span>package.Rd</span>
+<span id="cb13-1005"><a href="#cb13-1005" tabindex="-1"></a>│   ├── load_to_duckdb.Rd</span>
+<span id="cb13-1006"><a href="#cb13-1006" tabindex="-1"></a>│   ├── log_update.Rd</span>
+<span id="cb13-1007"><a href="#cb13-1007" tabindex="-1"></a>│   ├── predict_wave_height.Rd</span>
+<span id="cb13-1008"><a href="#cb13-1008" tabindex="-1"></a>│   ├── prepare_wave_features.Rd</span>
+<span id="cb13-1009"><a href="#cb13-1009" tabindex="-1"></a>│   ├── query_buoy_data.Rd</span>
+<span id="cb13-1010"><a href="#cb13-1010" tabindex="-1"></a>│   ├── query_parquet.Rd</span>
+<span id="cb13-1011"><a href="#cb13-1011" tabindex="-1"></a>│   ├── rogue_wave_report.Rd</span>
+<span id="cb13-1012"><a href="#cb13-1012" tabindex="-1"></a>│   ├── save_to_parquet.Rd</span>
+<span id="cb13-1013"><a href="#cb13-1013" tabindex="-1"></a>│   ├── train_wave_model.Rd</span>
+<span id="cb13-1014"><a href="#cb13-1014" tabindex="-1"></a>│   ├── trend_analysis.Rd</span>
+<span id="cb13-1015"><a href="#cb13-1015" tabindex="-1"></a>│   ├── trend_summary_report.Rd</span>
+<span id="cb13-1016"><a href="#cb13-1016" tabindex="-1"></a>│   ├── update_station_metadata.Rd</span>
+<span id="cb13-1017"><a href="#cb13-1017" tabindex="-1"></a>│   ├── wave_glossary.Rd</span>
+<span id="cb13-1018"><a href="#cb13-1018" tabindex="-1"></a>│   ├── wave_model.Rd</span>
+<span id="cb13-1019"><a href="#cb13-1019" tabindex="-1"></a>│   ├── wave_model_report.Rd</span>
+<span id="cb13-1020"><a href="#cb13-1020" tabindex="-1"></a>│   ├── wave_science.Rd</span>
+<span id="cb13-1021"><a href="#cb13-1021" tabindex="-1"></a>│   └── wave_science_documentation.Rd</span>
+<span id="cb13-1022"><a href="#cb13-1022" tabindex="-1"></a>├── push_to_cachix.sh</span>
+<span id="cb13-1023"><a href="#cb13-1023" tabindex="-1"></a>├── tests</span>
+<span id="cb13-1024"><a href="#cb13-1024" tabindex="-1"></a>│   ├── testthat</span>
+<span id="cb13-1025"><a href="#cb13-1025" tabindex="-1"></a>│   │   └── test<span class="sc">-</span>data<span class="sc">-</span>consistency.R</span>
+<span id="cb13-1026"><a href="#cb13-1026" tabindex="-1"></a>│   └── testthat.R</span>
+<span id="cb13-1027"><a href="#cb13-1027" tabindex="-1"></a>└── vignettes</span>
+<span id="cb13-1028"><a href="#cb13-1028" tabindex="-1"></a>    ├── dashboard_shinylive.qmd</span>
+<span id="cb13-1029"><a href="#cb13-1029" tabindex="-1"></a>    ├── dashboard_shinylive_files</span>
+<span id="cb13-1030"><a href="#cb13-1030" tabindex="-1"></a>    │   └── mediabag</span>
+<span id="cb13-1031"><a href="#cb13-1031" tabindex="-1"></a>    ├── dashboard_static.qmd</span>
+<span id="cb13-1032"><a href="#cb13-1032" tabindex="-1"></a>    ├── data</span>
+<span id="cb13-1033"><a href="#cb13-1033" tabindex="-1"></a>    │   ├── buoy_data.json</span>
+<span id="cb13-1034"><a href="#cb13-1034" tabindex="-1"></a>    │   ├── buoy_data.parquet</span>
+<span id="cb13-1035"><a href="#cb13-1035" tabindex="-1"></a>    │   ├── buoy_data_raw.csv</span>
+<span id="cb13-1036"><a href="#cb13-1036" tabindex="-1"></a>    │   └── stations.json</span>
+<span id="cb13-1037"><a href="#cb13-1037" tabindex="-1"></a>    ├── shinylive<span class="sc">-</span>sw.js</span>
+<span id="cb13-1038"><a href="#cb13-1038" tabindex="-1"></a>    └── wave_analysis.qmd</span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="key-features">Key Features<a class="anchor" aria-label="anchor" href="#key-features"></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Efficient Data Storage</strong>: Uses DuckDB for fast querying of large datasets</li>
+<li>
+<strong>Incremental Updates</strong>: Smart updating to only download new data</li>
+<li>
+<strong>Quality Control</strong>: Built-in filtering for data quality</li>
+<li>
+<strong>Rogue Wave Detection</strong>: Identify extreme wave events (Hmax &gt; 2 × Hs)</li>
+<li>
+<strong>Comprehensive Documentation</strong>: Full data dictionary with scientific definitions</li>
+</ol>
+</div>
+<div class="section level2">
+<h2 id="use-cases">Use Cases<a class="anchor" aria-label="anchor" href="#use-cases"></a>
+</h2>
+<ul>
+<li>Marine safety and operations planning</li>
+<li>Climate and oceanographic research</li>
+<li>Extreme event analysis</li>
+<li>Wave energy resource assessment</li>
+<li>Weather forecast validation</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="contributing">Contributing<a class="anchor" aria-label="anchor" href="#contributing"></a>
+</h2>
+<p>Contributions are welcome! Please feel free to submit a Pull Request.</p>
+</div>
+<div class="section level2">
+<h2 id="license">License<a class="anchor" aria-label="anchor" href="#license"></a>
+</h2>
+<p>This package is licensed under the MIT License. See LICENSE file for details.</p>
+</div>
+<div class="section level2">
+<h2 id="acknowledgments">Acknowledgments<a class="anchor" aria-label="anchor" href="#acknowledgments"></a>
+</h2>
+<p>Data provided by the Marine Institute Ireland in collaboration with Met Éireann and the UK Met Office.</p>
+</div>
+<div class="section level2">
+<h2 id="sources">Sources<a class="anchor" aria-label="anchor" href="#sources"></a>
+</h2>
+<ul>
+<li><a href="https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html" class="external-link">Marine Institute ERDDAP Server</a></li>
+<li><a href="https://data.gov.ie/dataset/weather-buoy-network" class="external-link">Irish Weather Buoy Network on data.gov.ie</a></li>
+</ul>
+</div>
+</div>
   </main><aside class="col-md-3"><div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
@@ -75,7 +1466,12 @@ Provides tools to download, process, and analyze data from the Irish Weather Buo
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
