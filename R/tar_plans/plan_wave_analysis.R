@@ -19,7 +19,7 @@ plan_wave_analysis <- list(
   targets::tar_target(
     analysis_data,
     {
-      con <- irishbuoys::connect_duckdb()
+      con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
       data <- DBI::dbGetQuery(con, "
@@ -37,8 +37,8 @@ plan_wave_analysis <- list(
           sea_temperature,
           qc_flag
         FROM buoy_data
-        WHERE qc_flag = 1
-          AND wave_height IS NOT NULL
+        WHERE wave_height IS NOT NULL
+          AND qc_flag IS NOT NULL
         ORDER BY station_id, time
       ")
 
@@ -58,10 +58,10 @@ plan_wave_analysis <- list(
   targets::tar_target(
     rogue_wave_events,
     {
-      con <- irishbuoys::connect_duckdb()
+      con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      irishbuoys::detect_rogue_waves(con, threshold = 2.0, min_wave_height = 2.0)
+      detect_rogue_waves(con, threshold = 2.0, min_wave_height = 2.0)
     }
   ),
 
@@ -69,10 +69,10 @@ plan_wave_analysis <- list(
   targets::tar_target(
     rogue_wave_statistics,
     {
-      con <- irishbuoys::connect_duckdb()
+      con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      irishbuoys::analyze_rogue_statistics(con, threshold = 2.0, min_wave_height = 2.0)
+      analyze_rogue_statistics(con, threshold = 2.0, min_wave_height = 2.0)
     }
   ),
 
@@ -136,7 +136,7 @@ plan_wave_analysis <- list(
       m3_data <- analysis_data[analysis_data$station_id == "M3", ]
 
       if (nrow(m3_data) >= 168) {  # At least 1 week
-        irishbuoys::decompose_stl(m3_data, variable = "wave_height", frequency = "daily")
+        decompose_stl(m3_data, variable = "wave_height", frequency = "daily")
       } else {
         cli::cli_alert_warning("Insufficient M3 data for STL decomposition")
         NULL
@@ -147,29 +147,29 @@ plan_wave_analysis <- list(
   # Seasonal means by variable
   targets::tar_target(
     seasonal_means_wave,
-    irishbuoys::calculate_seasonal_means(analysis_data, variable = "wave_height")
+    calculate_seasonal_means(analysis_data, variable = "wave_height")
   ),
 
   targets::tar_target(
     seasonal_means_wind,
-    irishbuoys::calculate_seasonal_means(analysis_data, variable = "wind_speed")
+    calculate_seasonal_means(analysis_data, variable = "wind_speed")
   ),
 
   # Annual trends
   targets::tar_target(
     annual_trends_wave,
-    irishbuoys::calculate_annual_trends(analysis_data, variable = "wave_height")
+    calculate_annual_trends(analysis_data, variable = "wave_height")
   ),
 
   targets::tar_target(
     annual_trends_wind,
-    irishbuoys::calculate_annual_trends(analysis_data, variable = "wind_speed")
+    calculate_annual_trends(analysis_data, variable = "wind_speed")
   ),
 
   # Anomaly detection
   targets::tar_target(
     wave_anomalies,
-    irishbuoys::detect_anomalies(analysis_data, variable = "wave_height", threshold = 3)
+    detect_anomalies(analysis_data, variable = "wave_height", threshold = 3)
   ),
 
   # ========================================
@@ -182,14 +182,14 @@ plan_wave_analysis <- list(
     {
       # Filter for valid wave heights
       wave_data <- analysis_data[!is.na(analysis_data$wave_height), ]
-      irishbuoys::fit_gev_annual_maxima(wave_data, variable = "wave_height")
+      fit_gev_annual_maxima(wave_data, variable = "wave_height")
     }
   ),
 
   # Calculate wave height return levels
   targets::tar_target(
     return_levels_wave,
-    irishbuoys::calculate_return_levels(gev_wave_height, c(10, 50, 100))
+    calculate_return_levels(gev_wave_height, c(10, 50, 100))
   ),
 
   # Fit GEV to annual maximum wind speeds
@@ -197,14 +197,14 @@ plan_wave_analysis <- list(
     gev_wind_speed,
     {
       wind_data <- analysis_data[!is.na(analysis_data$wind_speed), ]
-      irishbuoys::fit_gev_annual_maxima(wind_data, variable = "wind_speed")
+      fit_gev_annual_maxima(wind_data, variable = "wind_speed")
     }
   ),
 
   # Calculate wind speed return levels
   targets::tar_target(
     return_levels_wind,
-    irishbuoys::calculate_return_levels(gev_wind_speed, c(10, 50, 100))
+    calculate_return_levels(gev_wind_speed, c(10, 50, 100))
   ),
 
   # Fit GEV to annual maximum Hmax
@@ -212,24 +212,24 @@ plan_wave_analysis <- list(
     gev_hmax,
     {
       hmax_data <- analysis_data[!is.na(analysis_data$hmax), ]
-      irishbuoys::fit_gev_annual_maxima(hmax_data, variable = "hmax")
+      fit_gev_annual_maxima(hmax_data, variable = "hmax")
     }
   ),
 
   targets::tar_target(
     return_levels_hmax,
-    irishbuoys::calculate_return_levels(gev_hmax, c(10, 50, 100))
+    calculate_return_levels(gev_hmax, c(10, 50, 100))
   ),
 
   # Return level plot data for visualization
   targets::tar_target(
     return_level_curves_wave,
-    irishbuoys::create_return_level_plot_data(gev_wave_height, max_return_period = 200)
+    create_return_level_plot_data(gev_wave_height, max_return_period = 200)
   ),
 
   targets::tar_target(
     return_level_curves_wind,
-    irishbuoys::create_return_level_plot_data(gev_wind_speed, max_return_period = 200)
+    create_return_level_plot_data(gev_wind_speed, max_return_period = 200)
   ),
 
   # ========================================
@@ -238,13 +238,13 @@ plan_wave_analysis <- list(
 
   targets::tar_target(
     gust_factor_analysis,
-    irishbuoys::analyze_gust_factor(analysis_data, min_wind_speed = 5)
+    analyze_gust_factor(analysis_data, min_wind_speed = 5)
   ),
 
   # Compare rogue wave vs rogue gust occurrence
   targets::tar_target(
     rogue_comparison,
-    irishbuoys::compare_rogue_wave_gust(analysis_data)
+    compare_rogue_wave_gust(analysis_data)
   ),
 
   # ========================================

@@ -7,7 +7,7 @@ plan_quality_control <- list(
   targets::tar_target(
     data_completeness,
     {
-      con <- irishbuoys::connect_duckdb()
+      con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
       DBI::dbGetQuery(con, "
@@ -29,7 +29,7 @@ plan_quality_control <- list(
   targets::tar_target(
     outlier_check,
     {
-      con <- irishbuoys::connect_duckdb()
+      con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
       # Check for extreme values
@@ -75,7 +75,7 @@ plan_quality_control <- list(
   targets::tar_target(
     rogue_waves,
     {
-      con <- irishbuoys::connect_duckdb()
+      con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
       DBI::dbGetQuery(con, "

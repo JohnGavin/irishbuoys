@@ -19,7 +19,10 @@ tar_option_set(
   format = "rds",
   memory = "transient",
   garbage_collection = TRUE,
-  controller = crew::crew_controller_local(workers = 2)
+  # Disable crew parallel workers to avoid DuckDB lock conflicts
+  # Re-enable when targets don't share database connections
+  # controller = crew::crew_controller_local(workers = 2)
+  controller = NULL
 )
 
 # Source all R functions (excluding R/dev/ and R/tar_plans/)
