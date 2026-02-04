@@ -24,6 +24,9 @@ articles:
     navbar: Analysis
     contents:
       - wave_analysis
+  - title: internal
+    contents:
+      - dashboard_shinylive
   # Note: dashboard_shinylive requires separate Quarto rendering with shinylive extension
   # Build with: quarto render vignettes/dashboard_shinylive.qmd
 

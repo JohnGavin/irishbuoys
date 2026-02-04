@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="irishbuoys package">
-<meta name="dcterms.date" content="2026-02-03">
+<meta name="dcterms.date" content="2026-02-04">
 
 <title>Comprehensive Wave Analysis</title>
 <style>
@@ -72,6 +72,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="wave_analysis_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="wave_analysis_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="wave_analysis_files/libs/bootstrap/bootstrap-d5fa03fb90ac27921a6d47853be462c0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="wave_analysis_files/libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
+<script src="wave_analysis_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="wave_analysis_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="wave_analysis_files/libs/datatables-binding-0.34.0/datatables.js"></script>
+<script src="wave_analysis_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="wave_analysis_files/libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="wave_analysis_files/libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="wave_analysis_files/libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="wave_analysis_files/libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet">
+<script src="wave_analysis_files/libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="wave_analysis_files/libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet">
+<script src="wave_analysis_files/libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="wave_analysis_files/libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
+<script src="wave_analysis_files/libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
@@ -156,7 +170,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 3, 2026</p>
+      <p class="date">February 4, 2026</p>
     </div>
   </div>
   
@@ -168,8 +182,8 @@ window.Quarto = {
 </header>
 
 
-<section id="overview" class="level2 tabset">
-<h2 class="tabset anchored" data-anchor-id="overview">Overview</h2>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>This vignette provides comprehensive wave and wind analysis from the Irish Weather Buoy Network using data from the <a href="https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html">Marine Institute’s ERDDAP server</a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -196,118 +210,11 @@ window.Quarto = {
 <details class="code-fold">
 <summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>glossary <span class="ot">&lt;-</span> <span class="fu">wave_glossary</span>()</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(glossary, <span class="at">caption =</span> <span class="st">"Wave Measurement Terminology"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">create_dt</span>(glossary, <span class="st">"Wave Measurement Terminology - Click columns to sort, use filters to search"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>Wave Measurement Terminology</caption>
-<colgroup>
-<col style="width: 4%">
-<col style="width: 28%">
-<col style="width: 60%">
-<col style="width: 6%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">acronym</th>
-<th style="text-align: left;">term</th>
-<th style="text-align: left;">definition</th>
-<th style="text-align: left;">unit</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Hs</td>
-<td style="text-align: left;">Significant Wave Height</td>
-<td style="text-align: left;">Average height of the highest one-third of waves; equals 4 times the standard deviation of surface elevation</td>
-<td style="text-align: left;">meters (m)</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">H_1/3</td>
-<td style="text-align: left;">Mean of Highest Third</td>
-<td style="text-align: left;">Traditional definition of significant wave height: mean of the highest 33% of waves</td>
-<td style="text-align: left;">meters (m)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">RMS</td>
-<td style="text-align: left;">Root Mean Square</td>
-<td style="text-align: left;">Square root of the mean of squared values; for waves, related to energy content</td>
-<td style="text-align: left;">meters (m)</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Hmax</td>
-<td style="text-align: left;">Maximum Wave Height</td>
-<td style="text-align: left;">Maximum individual wave height observed in a measurement period</td>
-<td style="text-align: left;">meters (m)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Tp</td>
-<td style="text-align: left;">Peak Wave Period</td>
-<td style="text-align: left;">Wave period corresponding to the peak of the energy spectrum</td>
-<td style="text-align: left;">seconds (s)</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Tz</td>
-<td style="text-align: left;">Zero-Crossing Period</td>
-<td style="text-align: left;">Average period between successive zero up-crossings of the water surface</td>
-<td style="text-align: left;">seconds (s)</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">m0</td>
-<td style="text-align: left;">Zeroth Spectral Moment</td>
-<td style="text-align: left;">Variance of the sea surface elevation; integral of wave spectrum</td>
-<td style="text-align: left;">m^2</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">GEV</td>
-<td style="text-align: left;">Generalized Extreme Value</td>
-<td style="text-align: left;">Family of distributions for modeling block maxima (e.g., annual maximum waves)</td>
-<td style="text-align: left;">-</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">GPD</td>
-<td style="text-align: left;">Generalized Pareto Distribution</td>
-<td style="text-align: left;">Distribution for modeling exceedances over a high threshold</td>
-<td style="text-align: left;">-</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">EVA</td>
-<td style="text-align: left;">Extreme Value Analysis</td>
-<td style="text-align: left;">Statistical methods for estimating extreme events and return levels</td>
-<td style="text-align: left;">-</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">STL</td>
-<td style="text-align: left;">Seasonal-Trend using Loess</td>
-<td style="text-align: left;">Decomposition method separating seasonal, trend, and remainder components</td>
-<td style="text-align: left;">-</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">QC</td>
-<td style="text-align: left;">Quality Control</td>
-<td style="text-align: left;">Quality control flags indicating data validity</td>
-<td style="text-align: left;">-</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">ERDDAP</td>
-<td style="text-align: left;">Environmental Research Division Data Access Program</td>
-<td style="text-align: left;">Server protocol for accessing scientific datasets</td>
-<td style="text-align: left;">-</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">WMO</td>
-<td style="text-align: left;">World Meteorological Organization</td>
-<td style="text-align: left;">United Nations agency for weather, climate, and water</td>
-<td style="text-align: left;">-</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">IMO</td>
-<td style="text-align: left;">International Maritime Organization</td>
-<td style="text-align: left;">United Nations agency for shipping safety</td>
-<td style="text-align: left;">-</td>
-</tr>
-</tbody>
-</table>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-31a2e0e934acf31b9e41" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-31a2e0e934acf31b9e41">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","caption":"<caption>Wave Measurement Terminology - Click columns to sort, use filters to search<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15"],["Hs","H_1/3","RMS","Hmax","Tp","Tz","m0","GEV","GPD","EVA","STL","QC","ERDDAP","WMO","IMO"],["Significant Wave Height","Mean of Highest Third","Root Mean Square","Maximum Wave Height","Peak Wave Period","Zero-Crossing Period","Zeroth Spectral Moment","Generalized Extreme Value","Generalized Pareto Distribution","Extreme Value Analysis","Seasonal-Trend using Loess","Quality Control","Environmental Research Division Data Access Program","World Meteorological Organization","International Maritime Organization"],["Average height of the highest one-third of waves; equals 4 times the standard deviation of surface elevation","Traditional definition of significant wave height: mean of the highest 33% of waves","Square root of the mean of squared values; for waves, related to energy content","Maximum individual wave height observed in a measurement period","Wave period corresponding to the peak of the energy spectrum","Average period between successive zero up-crossings of the water surface","Variance of the sea surface elevation; integral of wave spectrum","Family of distributions for modeling block maxima (e.g., annual maximum waves)","Distribution for modeling exceedances over a high threshold","Statistical methods for estimating extreme events and return levels","Decomposition method separating seasonal, trend, and remainder components","Quality control flags indicating data validity","Server protocol for accessing scientific datasets","United Nations agency for weather, climate, and water","United Nations agency for shipping safety"],["meters (m)","meters (m)","meters (m)","meters (m)","seconds (s)","seconds (s)","m^2","-","-","-","-","-","-","-","-"]],"container":"<table class=\"cell-border stripe hover\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>acronym<\/th>\n      <th>term<\/th>\n      <th>definition<\/th>\n      <th>unit<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"order":[[0,"desc"]],"scrollX":true,"columnDefs":[{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"acronym","targets":1},{"name":"term","targets":2},{"name":"definition","targets":3},{"name":"unit","targets":4}],"autoWidth":false,"orderClasses":false,"orderCellsTop":true,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
@@ -390,10 +297,10 @@ window.Quarto = {
 <p>Rogue wave: <strong>Hmax/Hs &gt; 2.0</strong> (or 2.2 strict threshold)</p>
 </div>
 </div>
-<section id="events-by-station" class="level3 tabset">
-<h3 class="tabset anchored" data-anchor-id="events-by-station">Events by Station</h3>
+<section id="events-by-station" class="level3">
+<h3 class="anchored" data-anchor-id="events-by-station">Events by Station</h3>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">All Stations (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">All Stations (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">M2 (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">M2 (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false" href="">M3 (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false" href="">M3 (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false" href="">M4/M5/M6</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">All Stations (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">All Stations (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">M2 (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">M2 (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false" href="">M3 (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-6" role="tab" aria-controls="tabset-2-6" aria-selected="false" href="">M3 (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-7" role="tab" aria-controls="tabset-2-7" aria-selected="false" href="">M4 (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-8" role="tab" aria-controls="tabset-2-8" aria-selected="false" href="">M4 (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-9-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-9" role="tab" aria-controls="tabset-2-9" aria-selected="false" href="">M5 (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-10-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-10" role="tab" aria-controls="tabset-2-10" aria-selected="false" href="">M5 (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-11-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-11" role="tab" aria-controls="tabset-2-11" aria-selected="false" href="">M6 (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-12-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-12" role="tab" aria-controls="tabset-2-12" aria-selected="false" href="">M6 (Data)</a></li></ul>
 <div class="tab-content">
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
@@ -430,358 +337,19 @@ window.Quarto = {
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(<span class="fu">desc</span>(rogue_ratio)) <span class="sc">%&gt;%</span></span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(time, station_id, hs, hmax, rogue_ratio) <span class="sc">%&gt;%</span></span>
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">hs =</span> <span class="fu">round</span>(hs, <span class="dv">2</span>),</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">hmax =</span> <span class="fu">round</span>(hmax, <span class="dv">2</span>),</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"All Rogue Wave Events"</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Time"</span>, <span class="st">"Station"</span>, <span class="st">"Hs (m)"</span>, <span class="st">"Hmax (m)"</span>, <span class="st">"Hmax/Hs"</span>))</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">hs =</span> <span class="fu">round</span>(hs, <span class="dv">2</span>),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">hmax =</span> <span class="fu">round</span>(hmax, <span class="dv">2</span>),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"All Rogue Wave Events - Click columns to sort"</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No rogue wave data available."</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<caption>All Rogue Wave Events</caption>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Time</th>
-<th style="text-align: left;">Station</th>
-<th style="text-align: right;">Hs (m)</th>
-<th style="text-align: right;">Hmax (m)</th>
-<th style="text-align: right;">Hmax/Hs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">2023-12-13 19:22:43</td>
-<td style="text-align: left;">M2</td>
-<td style="text-align: right;">6.97</td>
-<td style="text-align: right;">19.49</td>
-<td style="text-align: right;">2.797</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-07-05 01:47:29</td>
-<td style="text-align: left;">M5</td>
-<td style="text-align: right;">6.40</td>
-<td style="text-align: right;">17.76</td>
-<td style="text-align: right;">2.774</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-11-06 04:36:21</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">7.12</td>
-<td style="text-align: right;">19.73</td>
-<td style="text-align: right;">2.769</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-08-20 13:07:38</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">5.07</td>
-<td style="text-align: right;">13.76</td>
-<td style="text-align: right;">2.714</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-01-26 16:19:45</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">4.97</td>
-<td style="text-align: right;">13.47</td>
-<td style="text-align: right;">2.708</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-04-15 21:58:29</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">6.88</td>
-<td style="text-align: right;">18.45</td>
-<td style="text-align: right;">2.682</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-04-12 11:43:32</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">3.58</td>
-<td style="text-align: right;">9.56</td>
-<td style="text-align: right;">2.671</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-11-13 11:07:08</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">6.97</td>
-<td style="text-align: right;">18.52</td>
-<td style="text-align: right;">2.656</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2020-07-15 07:54:34</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">6.67</td>
-<td style="text-align: right;">17.52</td>
-<td style="text-align: right;">2.627</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2020-12-30 05:54:50</td>
-<td style="text-align: left;">M6</td>
-<td style="text-align: right;">4.62</td>
-<td style="text-align: right;">11.99</td>
-<td style="text-align: right;">2.595</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-01-17 02:28:02</td>
-<td style="text-align: left;">M6</td>
-<td style="text-align: right;">6.89</td>
-<td style="text-align: right;">17.82</td>
-<td style="text-align: right;">2.585</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-12-17 01:01:27</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">5.68</td>
-<td style="text-align: right;">14.30</td>
-<td style="text-align: right;">2.520</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-06-05 19:26:50</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">3.93</td>
-<td style="text-align: right;">9.67</td>
-<td style="text-align: right;">2.460</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-08-07 00:38:05</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">5.06</td>
-<td style="text-align: right;">12.33</td>
-<td style="text-align: right;">2.438</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-10-03 08:11:04</td>
-<td style="text-align: left;">M2</td>
-<td style="text-align: right;">3.68</td>
-<td style="text-align: right;">8.96</td>
-<td style="text-align: right;">2.434</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-10-14 02:05:28</td>
-<td style="text-align: left;">M2</td>
-<td style="text-align: right;">3.98</td>
-<td style="text-align: right;">9.70</td>
-<td style="text-align: right;">2.434</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2020-11-03 22:31:22</td>
-<td style="text-align: left;">M2</td>
-<td style="text-align: right;">3.75</td>
-<td style="text-align: right;">9.08</td>
-<td style="text-align: right;">2.425</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-03-01 11:32:53</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">6.39</td>
-<td style="text-align: right;">15.43</td>
-<td style="text-align: right;">2.414</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-09-18 00:21:56</td>
-<td style="text-align: left;">M6</td>
-<td style="text-align: right;">5.40</td>
-<td style="text-align: right;">12.92</td>
-<td style="text-align: right;">2.392</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-07-09 05:39:28</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">7.67</td>
-<td style="text-align: right;">18.32</td>
-<td style="text-align: right;">2.388</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-01-29 18:24:09</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">4.59</td>
-<td style="text-align: right;">10.83</td>
-<td style="text-align: right;">2.361</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-04-16 03:05:56</td>
-<td style="text-align: left;">M2</td>
-<td style="text-align: right;">3.94</td>
-<td style="text-align: right;">9.27</td>
-<td style="text-align: right;">2.354</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-05-07 19:46:48</td>
-<td style="text-align: left;">M5</td>
-<td style="text-align: right;">3.68</td>
-<td style="text-align: right;">8.66</td>
-<td style="text-align: right;">2.354</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-07-26 09:15:14</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">6.65</td>
-<td style="text-align: right;">15.18</td>
-<td style="text-align: right;">2.283</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023-06-22 05:03:32</td>
-<td style="text-align: left;">M5</td>
-<td style="text-align: right;">4.30</td>
-<td style="text-align: right;">9.80</td>
-<td style="text-align: right;">2.281</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-01-12 15:47:21</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">3.90</td>
-<td style="text-align: right;">8.84</td>
-<td style="text-align: right;">2.269</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-11-11 08:50:32</td>
-<td style="text-align: left;">M6</td>
-<td style="text-align: right;">5.96</td>
-<td style="text-align: right;">13.42</td>
-<td style="text-align: right;">2.251</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-11-24 18:16:35</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">6.85</td>
-<td style="text-align: right;">15.37</td>
-<td style="text-align: right;">2.246</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023-11-13 13:19:32</td>
-<td style="text-align: left;">M5</td>
-<td style="text-align: right;">6.74</td>
-<td style="text-align: right;">15.11</td>
-<td style="text-align: right;">2.243</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2020-02-06 22:38:56</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">5.32</td>
-<td style="text-align: right;">11.87</td>
-<td style="text-align: right;">2.230</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-09-25 20:21:42</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">6.01</td>
-<td style="text-align: right;">13.27</td>
-<td style="text-align: right;">2.208</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-08-06 09:46:31</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">5.75</td>
-<td style="text-align: right;">12.67</td>
-<td style="text-align: right;">2.202</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023-05-17 13:07:49</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">4.58</td>
-<td style="text-align: right;">10.07</td>
-<td style="text-align: right;">2.197</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2020-04-20 10:54:37</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">6.90</td>
-<td style="text-align: right;">14.87</td>
-<td style="text-align: right;">2.156</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023-02-22 15:05:07</td>
-<td style="text-align: left;">M6</td>
-<td style="text-align: right;">7.59</td>
-<td style="text-align: right;">16.31</td>
-<td style="text-align: right;">2.148</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-09-28 23:06:01</td>
-<td style="text-align: left;">M6</td>
-<td style="text-align: right;">5.14</td>
-<td style="text-align: right;">10.98</td>
-<td style="text-align: right;">2.137</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023-07-07 20:10:52</td>
-<td style="text-align: left;">M2</td>
-<td style="text-align: right;">6.71</td>
-<td style="text-align: right;">14.28</td>
-<td style="text-align: right;">2.127</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-04-19 12:05:26</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">3.15</td>
-<td style="text-align: right;">6.69</td>
-<td style="text-align: right;">2.126</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2020-01-18 21:50:22</td>
-<td style="text-align: left;">M6</td>
-<td style="text-align: right;">3.40</td>
-<td style="text-align: right;">7.17</td>
-<td style="text-align: right;">2.107</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2020-08-31 08:32:25</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">3.85</td>
-<td style="text-align: right;">8.10</td>
-<td style="text-align: right;">2.103</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2020-08-14 08:51:27</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">7.09</td>
-<td style="text-align: right;">14.90</td>
-<td style="text-align: right;">2.103</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2020-11-06 15:49:06</td>
-<td style="text-align: left;">M3</td>
-<td style="text-align: right;">6.60</td>
-<td style="text-align: right;">13.79</td>
-<td style="text-align: right;">2.090</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2020-10-10 02:38:13</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">7.72</td>
-<td style="text-align: right;">15.89</td>
-<td style="text-align: right;">2.058</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-01-26 04:06:55</td>
-<td style="text-align: left;">M5</td>
-<td style="text-align: right;">5.26</td>
-<td style="text-align: right;">10.78</td>
-<td style="text-align: right;">2.049</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2020-10-22 04:58:42</td>
-<td style="text-align: left;">M2</td>
-<td style="text-align: right;">4.47</td>
-<td style="text-align: right;">9.13</td>
-<td style="text-align: right;">2.043</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2023-03-13 22:55:30</td>
-<td style="text-align: left;">M5</td>
-<td style="text-align: right;">7.31</td>
-<td style="text-align: right;">14.91</td>
-<td style="text-align: right;">2.039</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2023-12-07 05:44:26</td>
-<td style="text-align: left;">M4</td>
-<td style="text-align: right;">7.59</td>
-<td style="text-align: right;">15.29</td>
-<td style="text-align: right;">2.014</td>
-</tr>
-</tbody>
-</table>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-7feeef99d78e43da6795" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-7feeef99d78e43da6795">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"3.15\" data-max=\"7.72\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"6.69\" data-max=\"19.73\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"2.013\" data-max=\"2.797\" data-scale=\"3\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","caption":"<caption>All Rogue Wave Events - Click columns to sort<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47"],["2023-12-13 19:22","2021-07-05 01:47","2022-11-06 04:36","2022-08-20 13:07","2021-01-26 16:19","2021-04-15 21:58","2022-04-12 11:43","2022-11-13 11:07","2020-07-15 07:54","2020-12-30 05:54","2021-01-17 02:28","2021-12-17 01:01","2022-06-05 19:26","2022-08-07 00:38","2022-10-03 08:11","2021-10-14 02:05","2020-11-03 22:31","2021-03-01 11:32","2022-09-18 00:21","2021-07-09 05:39","2022-01-29 18:24","2021-04-16 03:05","2021-05-07 19:46","2022-07-26 09:15","2023-06-22 05:03","2022-01-12 15:47","2022-11-11 08:50","2022-11-24 18:16","2023-11-13 13:19","2020-02-06 22:38","2021-09-25 20:21","2021-08-06 09:46","2023-05-17 13:07","2020-04-20 10:54","2023-02-22 15:05","2022-09-28 23:06","2023-07-07 20:10","2021-04-19 12:05","2020-01-18 21:50","2020-08-31 08:32","2020-08-14 08:51","2020-11-06 15:49","2020-10-10 02:38","2022-01-26 04:06","2020-10-22 04:58","2023-03-13 22:55","2023-12-07 05:44"],["M2","M5","M4","M3","M4","M3","M3","M4","M3","M6","M6","M3","M4","M4","M2","M2","M2","M4","M6","M3","M3","M2","M5","M4","M5","M4","M6","M4","M5","M4","M3","M3","M4","M3","M6","M6","M2","M4","M6","M4","M4","M3","M4","M5","M2","M5","M4"],[6.97,6.4,7.12,5.07,4.97,6.88,3.58,6.97,6.67,4.62,6.89,5.68,3.93,5.06,3.68,3.98,3.75,6.39,5.4,7.67,4.59,3.94,3.68,6.65,4.3,3.9,5.96,6.85,6.74,5.32,6.01,5.75,4.58,6.9,7.59,5.14,6.71,3.15,3.4,3.85,7.09,6.6,7.72,5.26,4.47,7.31,7.59],[19.49,17.76,19.73,13.76,13.47,18.45,9.56,18.52,17.52,11.99,17.82,14.3,9.67,12.33,8.960000000000001,9.699999999999999,9.08,15.43,12.92,18.32,10.83,9.27,8.66,15.18,9.800000000000001,8.84,13.42,15.37,15.11,11.87,13.27,12.67,10.07,14.87,16.31,10.98,14.28,6.69,7.17,8.1,14.9,13.79,15.89,10.78,9.130000000000001,14.91,15.29],[2.797,2.774,2.769,2.714,2.708,2.682,2.671,2.656,2.627,2.595,2.585,2.52,2.46,2.438,2.434,2.434,2.425,2.414,2.392,2.388,2.361,2.354,2.354,2.283,2.281,2.269,2.251,2.246,2.243,2.23,2.208,2.202,2.197,2.156,2.148,2.137,2.127,2.126,2.107,2.103,2.103,2.09,2.058,2.049,2.043,2.039,2.014]],"container":"<table class=\"cell-border stripe hover\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>time<\/th>\n      <th>station_id<\/th>\n      <th>hs<\/th>\n      <th>hmax<\/th>\n      <th>rogue_ratio<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"order":[[0,"desc"]],"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[3,4,5]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"time","targets":1},{"name":"station_id","targets":2},{"name":"hs","targets":3},{"name":"hmax","targets":4},{"name":"rogue_ratio","targets":5}],"autoWidth":false,"orderClasses":false,"orderCellsTop":true,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
@@ -816,66 +384,18 @@ window.Quarto = {
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(m2) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    m2 <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(rogue_ratio)) <span class="sc">%&gt;%</span></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(time, hs, hmax, rogue_ratio) <span class="sc">%&gt;%</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(hs, hmax), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>)), <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">kable</span>(<span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Time"</span>, <span class="st">"Hs (m)"</span>, <span class="st">"Hmax (m)"</span>, <span class="st">"Hmax/Hs"</span>))</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">across</span>(<span class="fu">c</span>(hs, hmax), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>)),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      ) <span class="sc">%&gt;%</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">create_dt</span>(<span class="st">"M2 Rogue Waves"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Time</th>
-<th style="text-align: right;">Hs (m)</th>
-<th style="text-align: right;">Hmax (m)</th>
-<th style="text-align: right;">Hmax/Hs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">2023-12-13 19:22:43</td>
-<td style="text-align: right;">6.97</td>
-<td style="text-align: right;">19.49</td>
-<td style="text-align: right;">2.797</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2022-10-03 08:11:04</td>
-<td style="text-align: right;">3.68</td>
-<td style="text-align: right;">8.96</td>
-<td style="text-align: right;">2.434</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-10-14 02:05:28</td>
-<td style="text-align: right;">3.98</td>
-<td style="text-align: right;">9.70</td>
-<td style="text-align: right;">2.434</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2020-11-03 22:31:22</td>
-<td style="text-align: right;">3.75</td>
-<td style="text-align: right;">9.08</td>
-<td style="text-align: right;">2.425</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-04-16 03:05:56</td>
-<td style="text-align: right;">3.94</td>
-<td style="text-align: right;">9.27</td>
-<td style="text-align: right;">2.354</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2023-07-07 20:10:52</td>
-<td style="text-align: right;">6.71</td>
-<td style="text-align: right;">14.28</td>
-<td style="text-align: right;">2.127</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2020-10-22 04:58:42</td>
-<td style="text-align: right;">4.47</td>
-<td style="text-align: right;">9.13</td>
-<td style="text-align: right;">2.043</td>
-</tr>
-</tbody>
-</table>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-dd5e13f0a4a28e3ac759" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-dd5e13f0a4a28e3ac759">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"3.68\" data-max=\"6.97\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"8.96\" data-max=\"19.49\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"2.043\" data-max=\"2.797\" data-scale=\"3\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","caption":"<caption>M2 Rogue Waves<\/caption>","data":[["1","2","3","4","5","6","7"],["2023-12-13 19:22","2022-10-03 08:11","2021-10-14 02:05","2020-11-03 22:31","2021-04-16 03:05","2023-07-07 20:10","2020-10-22 04:58"],[6.97,3.68,3.98,3.75,3.94,6.71,4.47],[19.49,8.960000000000001,9.699999999999999,9.08,9.27,14.28,9.130000000000001],[2.797,2.434,2.434,2.425,2.354,2.127,2.043]],"container":"<table class=\"cell-border stripe hover\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>time<\/th>\n      <th>hs<\/th>\n      <th>hmax<\/th>\n      <th>rogue_ratio<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"order":[[0,"desc"]],"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"time","targets":1},{"name":"hs","targets":2},{"name":"hmax","targets":3},{"name":"rogue_ratio","targets":4}],"autoWidth":false,"orderClasses":false,"orderCellsTop":true,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
@@ -910,90 +430,14 @@ window.Quarto = {
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(m3) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    m3 <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(rogue_ratio)) <span class="sc">%&gt;%</span></span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(time, hs, hmax, rogue_ratio) <span class="sc">%&gt;%</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(hs, hmax), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>)), <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">kable</span>(<span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Time"</span>, <span class="st">"Hs (m)"</span>, <span class="st">"Hmax (m)"</span>, <span class="st">"Hmax/Hs"</span>))</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>), <span class="fu">across</span>(<span class="fu">c</span>(hs, hmax), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>)), <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">create_dt</span>(<span class="st">"M3 Rogue Waves"</span>)</span>
 <span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output-display">
-<table class="caption-top table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Time</th>
-<th style="text-align: right;">Hs (m)</th>
-<th style="text-align: right;">Hmax (m)</th>
-<th style="text-align: right;">Hmax/Hs</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">2022-08-20 13:07:38</td>
-<td style="text-align: right;">5.07</td>
-<td style="text-align: right;">13.76</td>
-<td style="text-align: right;">2.714</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-04-15 21:58:29</td>
-<td style="text-align: right;">6.88</td>
-<td style="text-align: right;">18.45</td>
-<td style="text-align: right;">2.682</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-04-12 11:43:32</td>
-<td style="text-align: right;">3.58</td>
-<td style="text-align: right;">9.56</td>
-<td style="text-align: right;">2.671</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2020-07-15 07:54:34</td>
-<td style="text-align: right;">6.67</td>
-<td style="text-align: right;">17.52</td>
-<td style="text-align: right;">2.627</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-12-17 01:01:27</td>
-<td style="text-align: right;">5.68</td>
-<td style="text-align: right;">14.30</td>
-<td style="text-align: right;">2.520</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-07-09 05:39:28</td>
-<td style="text-align: right;">7.67</td>
-<td style="text-align: right;">18.32</td>
-<td style="text-align: right;">2.388</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2022-01-29 18:24:09</td>
-<td style="text-align: right;">4.59</td>
-<td style="text-align: right;">10.83</td>
-<td style="text-align: right;">2.361</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2021-09-25 20:21:42</td>
-<td style="text-align: right;">6.01</td>
-<td style="text-align: right;">13.27</td>
-<td style="text-align: right;">2.208</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2021-08-06 09:46:31</td>
-<td style="text-align: right;">5.75</td>
-<td style="text-align: right;">12.67</td>
-<td style="text-align: right;">2.202</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">2020-04-20 10:54:37</td>
-<td style="text-align: right;">6.90</td>
-<td style="text-align: right;">14.87</td>
-<td style="text-align: right;">2.156</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">2020-11-06 15:49:06</td>
-<td style="text-align: right;">6.60</td>
-<td style="text-align: right;">13.79</td>
-<td style="text-align: right;">2.090</td>
-</tr>
-</tbody>
-</table>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-38197b77955d99273085" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-38197b77955d99273085">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"3.58\" data-max=\"7.67\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"9.56\" data-max=\"18.45\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"2.09\" data-max=\"2.714\" data-scale=\"3\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","caption":"<caption>M3 Rogue Waves<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11"],["2022-08-20 13:07","2021-04-15 21:58","2022-04-12 11:43","2020-07-15 07:54","2021-12-17 01:01","2021-07-09 05:39","2022-01-29 18:24","2021-09-25 20:21","2021-08-06 09:46","2020-04-20 10:54","2020-11-06 15:49"],[5.07,6.88,3.58,6.67,5.68,7.67,4.59,6.01,5.75,6.9,6.6],[13.76,18.45,9.56,17.52,14.3,18.32,10.83,13.27,12.67,14.87,13.79],[2.714,2.682,2.671,2.627,2.52,2.388,2.361,2.208,2.202,2.156,2.09]],"container":"<table class=\"cell-border stripe hover\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>time<\/th>\n      <th>hs<\/th>\n      <th>hmax<\/th>\n      <th>rogue_ratio<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"order":[[0,"desc"]],"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"time","targets":1},{"name":"hs","targets":2},{"name":"hmax","targets":3},{"name":"rogue_ratio","targets":4}],"autoWidth":false,"orderClasses":false,"orderCellsTop":true,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
@@ -1002,78 +446,150 @@ window.Quarto = {
 <details class="code-fold">
 <summary>Show code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (has_targets) {</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (stn <span class="cf">in</span> <span class="fu">c</span>(<span class="st">"M4"</span>, <span class="st">"M5"</span>, <span class="st">"M6"</span>)) {</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    d <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> stn, ]</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">**"</span>, stn, <span class="st">":** "</span>, <span class="fu">nrow</span>(d), <span class="st">" rogue wave events</span><span class="sc">\n</span><span class="st">"</span>))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">nrow</span>(d) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">print</span>(<span class="fu">kable</span>(d <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(rogue_ratio)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">select</span>(time, hs, hmax, rogue_ratio) <span class="sc">%&gt;%</span> <span class="fu">head</span>(<span class="dv">5</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(hs, hmax), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>)), <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)),</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Time"</span>, <span class="st">"Hs (m)"</span>, <span class="st">"Hmax (m)"</span>, <span class="st">"Hmax/Hs"</span>)))</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  m4 <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M4"</span>, ]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(m4) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(m4, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> hmax, <span class="at">color =</span> rogue_ratio)) <span class="sc">+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="fu">scale_color_viridis_c</span>(<span class="at">name =</span> <span class="st">"Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Hmax (m)"</span>, <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"M4 Rogue Waves (n ="</span>, <span class="fu">nrow</span>(m4), <span class="st">")"</span>))</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="fu">cat</span>(<span class="st">"No rogue waves at M4"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-**M4:** 16 rogue wave events
-
-
-|Time                | Hs (m)| Hmax (m)| Hmax/Hs|
-|:-------------------|------:|--------:|-------:|
-|2022-11-06 04:36:21 |   7.12|    19.73|   2.769|
-|2021-01-26 16:19:45 |   4.97|    13.47|   2.708|
-|2022-11-13 11:07:08 |   6.97|    18.52|   2.656|
-|2022-06-05 19:26:50 |   3.93|     9.67|   2.460|
-|2022-08-07 00:38:05 |   5.06|    12.33|   2.438|
-
-**M5:** 6 rogue wave events
-
-
-|Time                | Hs (m)| Hmax (m)| Hmax/Hs|
-|:-------------------|------:|--------:|-------:|
-|2021-07-05 01:47:29 |   6.40|    17.76|   2.774|
-|2021-05-07 19:46:48 |   3.68|     8.66|   2.354|
-|2023-06-22 05:03:32 |   4.30|     9.80|   2.281|
-|2023-11-13 13:19:32 |   6.74|    15.11|   2.243|
-|2022-01-26 04:06:55 |   5.26|    10.78|   2.049|
-
-**M6:** 7 rogue wave events
-
-
-|Time                | Hs (m)| Hmax (m)| Hmax/Hs|
-|:-------------------|------:|--------:|-------:|
-|2020-12-30 05:54:50 |   4.62|    11.99|   2.595|
-|2021-01-17 02:28:02 |   6.89|    17.82|   2.585|
-|2022-09-18 00:21:56 |   5.40|    12.92|   2.392|
-|2022-11-11 08:50:32 |   5.96|    13.42|   2.251|
-|2023-02-22 15:05:07 |   7.59|    16.31|   2.148|</code></pre>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wave_analysis_files/figure-html/rogue-m4-plot-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-8-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (has_targets) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  m4 <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M4"</span>, ]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(m4) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    m4 <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(rogue_ratio)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(time, hs, hmax, rogue_ratio) <span class="sc">%&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>), <span class="fu">across</span>(<span class="fu">c</span>(hs, hmax), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>)), <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">create_dt</span>(<span class="st">"M4 Rogue Waves"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-9544f62508e1433db1df" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-9544f62508e1433db1df">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"3.15\" data-max=\"7.72\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"6.69\" data-max=\"19.73\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"2.013\" data-max=\"2.769\" data-scale=\"3\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","caption":"<caption>M4 Rogue Waves<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["2022-11-06 04:36","2021-01-26 16:19","2022-11-13 11:07","2022-06-05 19:26","2022-08-07 00:38","2021-03-01 11:32","2022-07-26 09:15","2022-01-12 15:47","2022-11-24 18:16","2020-02-06 22:38","2023-05-17 13:07","2021-04-19 12:05","2020-08-31 08:32","2020-08-14 08:51","2020-10-10 02:38","2023-12-07 05:44"],[7.12,4.97,6.97,3.93,5.06,6.39,6.65,3.9,6.85,5.32,4.58,3.15,3.85,7.09,7.72,7.59],[19.73,13.47,18.52,9.67,12.33,15.43,15.18,8.84,15.37,11.87,10.07,6.69,8.1,14.9,15.89,15.29],[2.769,2.708,2.656,2.46,2.438,2.414,2.283,2.269,2.246,2.23,2.197,2.126,2.103,2.103,2.058,2.014]],"container":"<table class=\"cell-border stripe hover\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>time<\/th>\n      <th>hs<\/th>\n      <th>hmax<\/th>\n      <th>rogue_ratio<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"order":[[0,"desc"]],"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"time","targets":1},{"name":"hs","targets":2},{"name":"hmax","targets":3},{"name":"rogue_ratio","targets":4}],"autoWidth":false,"orderClasses":false,"orderCellsTop":true,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-2-9" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-9-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (has_targets) {</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  m5 <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M5"</span>, ]</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(m5) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(m5, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> hmax, <span class="at">color =</span> rogue_ratio)) <span class="sc">+</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="fu">scale_color_viridis_c</span>(<span class="at">name =</span> <span class="st">"Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Hmax (m)"</span>, <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"M5 Rogue Waves (n ="</span>, <span class="fu">nrow</span>(m5), <span class="st">")"</span>))</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="fu">cat</span>(<span class="st">"No rogue waves at M5"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wave_analysis_files/figure-html/rogue-m5-plot-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-10" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-10-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (has_targets) {</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  m5 <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M5"</span>, ]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(m5) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    m5 <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(rogue_ratio)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(time, hs, hmax, rogue_ratio) <span class="sc">%&gt;%</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>), <span class="fu">across</span>(<span class="fu">c</span>(hs, hmax), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>)), <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">create_dt</span>(<span class="st">"M5 Rogue Waves"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-dfdd692064a4bd5681a1" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-dfdd692064a4bd5681a1">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"3.68\" data-max=\"7.31\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"8.66\" data-max=\"17.77\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"2.039\" data-max=\"2.774\" data-scale=\"3\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","caption":"<caption>M5 Rogue Waves<\/caption>","data":[["1","2","3","4","5","6"],["2021-07-05 01:47","2021-05-07 19:46","2023-06-22 05:03","2023-11-13 13:19","2022-01-26 04:06","2023-03-13 22:55"],[6.4,3.68,4.3,6.74,5.26,7.31],[17.76,8.66,9.800000000000001,15.11,10.78,14.91],[2.774,2.354,2.281,2.243,2.049,2.039]],"container":"<table class=\"cell-border stripe hover\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>time<\/th>\n      <th>hs<\/th>\n      <th>hmax<\/th>\n      <th>rogue_ratio<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"order":[[0,"desc"]],"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"time","targets":1},{"name":"hs","targets":2},{"name":"hmax","targets":3},{"name":"rogue_ratio","targets":4}],"autoWidth":false,"orderClasses":false,"orderCellsTop":true,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-2-11" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-11-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (has_targets) {</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  m6 <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M6"</span>, ]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(m6) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(m6, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> hmax, <span class="at">color =</span> rogue_ratio)) <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="fu">scale_color_viridis_c</span>(<span class="at">name =</span> <span class="st">"Hmax/Hs"</span>) <span class="sc">+</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Hmax (m)"</span>, <span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"M6 Rogue Waves (n ="</span>, <span class="fu">nrow</span>(m6), <span class="st">")"</span>))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> <span class="fu">cat</span>(<span class="st">"No rogue waves at M6"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="wave_analysis_files/figure-html/rogue-m6-plot-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-12" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-12-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (has_targets) {</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  m6 <span class="ot">&lt;-</span> rogue_events[rogue_events<span class="sc">$</span>station_id <span class="sc">==</span> <span class="st">"M6"</span>, ]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(m6) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    m6 <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(rogue_ratio)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(time, hs, hmax, rogue_ratio) <span class="sc">%&gt;%</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>), <span class="fu">across</span>(<span class="fu">c</span>(hs, hmax), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>)), <span class="at">rogue_ratio =</span> <span class="fu">round</span>(rogue_ratio, <span class="dv">3</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">create_dt</span>(<span class="st">"M6 Rogue Waves"</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-74245cc65b3aae46568f" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-74245cc65b3aae46568f">{"x":{"filter":"top","vertical":false,"filterHTML":"<tr>\n  <td><\/td>\n  <td data-type=\"character\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"3.4\" data-max=\"7.59\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"7.17\" data-max=\"17.82\" data-scale=\"2\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n  <td data-type=\"number\" style=\"vertical-align: top;\">\n    <div class=\"form-group has-feedback\" style=\"margin-bottom: auto;\">\n      <input type=\"search\" placeholder=\"All\" class=\"form-control\" style=\"width: 100%;\"/>\n      <span class=\"glyphicon glyphicon-remove-circle form-control-feedback\"><\/span>\n    <\/div>\n    <div style=\"display: none;position: absolute;width: 200px;opacity: 1\">\n      <div data-min=\"2.107\" data-max=\"2.595\" data-scale=\"3\"><\/div>\n      <span style=\"float: left;\"><\/span>\n      <span style=\"float: right;\"><\/span>\n    <\/div>\n  <\/td>\n<\/tr>","caption":"<caption>M6 Rogue Waves<\/caption>","data":[["1","2","3","4","5","6","7"],["2020-12-30 05:54","2021-01-17 02:28","2022-09-18 00:21","2022-11-11 08:50","2023-02-22 15:05","2022-09-28 23:06","2020-01-18 21:50"],[4.62,6.89,5.4,5.96,7.59,5.14,3.4],[11.99,17.82,12.92,13.42,16.31,10.98,7.17],[2.595,2.585,2.392,2.251,2.148,2.137,2.107]],"container":"<table class=\"cell-border stripe hover\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>time<\/th>\n      <th>hs<\/th>\n      <th>hmax<\/th>\n      <th>rogue_ratio<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"order":[[0,"desc"]],"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"time","targets":1},{"name":"hs","targets":2},{"name":"hmax","targets":3},{"name":"rogue_ratio","targets":4}],"autoWidth":false,"orderClasses":false,"orderCellsTop":true,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </div>
 </div>
 </div>
 </section>
-<section id="by-weather-conditions" class="level3 tabset">
-<h3 class="tabset anchored" data-anchor-id="by-weather-conditions">By Weather Conditions</h3>
+<section id="by-weather-conditions" class="level3">
+<h3 class="anchored" data-anchor-id="by-weather-conditions">By Weather Conditions</h3>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">Wind Speed</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">Season</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false" href="">Time of Day</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false" href="">Conditions Table</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true" href="">Wind Speed (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false" href="">Wind Speed (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-3" role="tab" aria-controls="tabset-3-3" aria-selected="false" href="">Season (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-4" role="tab" aria-controls="tabset-3-4" aria-selected="false" href="">Season (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-5" role="tab" aria-controls="tabset-3-5" aria-selected="false" href="">Time of Day (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-6" role="tab" aria-controls="tabset-3-6" aria-selected="false" href="">All Conditions (Data)</a></li></ul>
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions) <span class="sc">&amp;&amp;</span> <span class="st">"wind_category"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_conditions)) {</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  wind_sum <span class="ot">&lt;-</span> rogue_conditions <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(wind_category) <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">mean_ratio =</span> <span class="fu">mean</span>(rogue_ratio, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(wind_sum, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(wind_category, n), <span class="at">y =</span> n, <span class="at">fill =</span> mean_ratio)) <span class="sc">+</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span> <span class="fu">coord_flip</span>() <span class="sc">+</span> <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Mean Ratio"</span>) <span class="sc">+</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Wind Category"</span>, <span class="at">y =</span> <span class="st">"Count"</span>, <span class="at">title =</span> <span class="st">"Rogue Waves by Wind Speed"</span>)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Weather condition data not available. Run targets::tar_make()"</span>)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions) <span class="sc">&amp;&amp;</span> <span class="st">"wind_category"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_conditions)) {</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  wind_sum <span class="ot">&lt;-</span> rogue_conditions <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(wind_category) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">mean_ratio =</span> <span class="fu">mean</span>(rogue_ratio, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(wind_sum, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(wind_category, n), <span class="at">y =</span> n, <span class="at">fill =</span> mean_ratio)) <span class="sc">+</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span> <span class="fu">coord_flip</span>() <span class="sc">+</span> <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Mean Ratio"</span>) <span class="sc">+</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Wind Category"</span>, <span class="at">y =</span> <span class="st">"Count"</span>, <span class="at">title =</span> <span class="st">"Rogue Waves by Wind Speed"</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Weather condition data not available. Run targets::tar_make()"</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Weather condition data not available. Run targets::tar_make()</code></pre>
@@ -1084,42 +600,37 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions) <span class="sc">&amp;&amp;</span> <span class="st">"season"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_conditions)) {</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  season_sum <span class="ot">&lt;-</span> rogue_conditions <span class="sc">%&gt;%</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(season) <span class="sc">%&gt;%</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">mean_hmax =</span> <span class="fu">mean</span>(hmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">season =</span> <span class="fu">factor</span>(season, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Winter"</span>, <span class="st">"Spring"</span>, <span class="st">"Summer"</span>, <span class="st">"Autumn"</span>)))</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(season_sum, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> n, <span class="at">fill =</span> mean_hmax)) <span class="sc">+</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span> <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Mean Hmax"</span>) <span class="sc">+</span></span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Count"</span>, <span class="at">title =</span> <span class="st">"Rogue Waves by Season"</span>)</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Season data not available"</span>)</span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions) <span class="sc">&amp;&amp;</span> <span class="st">"wind_category"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_conditions)) {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  rogue_conditions <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"rogue_ratio"</span>, <span class="st">"wind_category"</span>, <span class="st">"wind_speed"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>),</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Rogue Waves by Wind Conditions"</span>)</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Season data not available</code></pre>
-</div>
 </div>
 </div>
 <div id="tabset-3-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-3-tab">
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions) <span class="sc">&amp;&amp;</span> <span class="st">"time_of_day"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_conditions)) {</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  tod_sum <span class="ot">&lt;-</span> rogue_conditions <span class="sc">%&gt;%</span></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(time_of_day) <span class="sc">%&gt;%</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(tod_sum, <span class="fu">aes</span>(<span class="at">x =</span> time_of_day, <span class="at">y =</span> n)) <span class="sc">+</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time of Day"</span>, <span class="at">y =</span> <span class="st">"Count"</span>, <span class="at">title =</span> <span class="st">"Rogue Waves by Time of Day"</span>)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Time of day data not available"</span>)</span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions) <span class="sc">&amp;&amp;</span> <span class="st">"season"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_conditions)) {</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  season_sum <span class="ot">&lt;-</span> rogue_conditions <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(season) <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">mean_hmax =</span> <span class="fu">mean</span>(hmax, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="at">.groups =</span> <span class="st">"drop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">season =</span> <span class="fu">factor</span>(season, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Winter"</span>, <span class="st">"Spring"</span>, <span class="st">"Summer"</span>, <span class="st">"Autumn"</span>)))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(season_sum, <span class="fu">aes</span>(<span class="at">x =</span> season, <span class="at">y =</span> n, <span class="at">fill =</span> mean_hmax)) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>() <span class="sc">+</span> <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="st">"Mean Hmax"</span>) <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Season"</span>, <span class="at">y =</span> <span class="st">"Count"</span>, <span class="at">title =</span> <span class="st">"Rogue Waves by Season"</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Season data not available"</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Time of day data not available</code></pre>
+<pre><code>Season data not available</code></pre>
 </div>
 </div>
 </div>
@@ -1127,12 +638,46 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions)) {</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  rogue_conditions <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span>(<span class="dv">20</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"rogue_ratio"</span>, <span class="st">"wind_category"</span>, <span class="st">"season"</span>))) <span class="sc">%&gt;%</span></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Sample of rogue wave conditions"</span>)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions) <span class="sc">&amp;&amp;</span> <span class="st">"season"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_conditions)) {</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  rogue_conditions <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"rogue_ratio"</span>, <span class="st">"season"</span>, <span class="st">"hmax"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>), <span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Rogue Waves by Season"</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-3-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-5-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions) <span class="sc">&amp;&amp;</span> <span class="st">"time_of_day"</span> <span class="sc">%in%</span> <span class="fu">names</span>(rogue_conditions)) {</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  tod_sum <span class="ot">&lt;-</span> rogue_conditions <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(time_of_day) <span class="sc">%&gt;%</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">n</span>(), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(tod_sum, <span class="fu">aes</span>(<span class="at">x =</span> time_of_day, <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time of Day"</span>, <span class="at">y =</span> <span class="st">"Count"</span>, <span class="at">title =</span> <span class="st">"Rogue Waves by Time of Day"</span>)</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Time of day data not available"</span>)</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Time of day data not available</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-3-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-6-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(rogue_conditions)) {</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  rogue_conditions <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"rogue_ratio"</span>, <span class="st">"wind_category"</span>, <span class="st">"season"</span>, <span class="st">"time_of_day"</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">time =</span> <span class="fu">format</span>(time, <span class="st">"%Y-%m-%d %H:%M"</span>), <span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"All Rogue Wave Conditions"</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </div>
@@ -1144,25 +689,25 @@ window.Quarto = {
 <section id="trends" class="level2">
 <h2 class="anchored" data-anchor-id="trends">Trend Decomposition</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href="">Monthly Wave Height</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href="">Monthly Wind Speed</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false" href="">Annual Trends</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-4" role="tab" aria-controls="tabset-4-4" aria-selected="false" href="">STL Decomposition</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true" href="">Monthly Wave Height (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false" href="">Monthly Wave Height (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false" href="">Monthly Wind Speed (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-4" role="tab" aria-controls="tabset-4-4" aria-selected="false" href="">Monthly Wind Speed (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-5" role="tab" aria-controls="tabset-4-5" aria-selected="false" href="">Annual Trends (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-6" role="tab" aria-controls="tabset-4-6" aria-selected="false" href="">Annual Trends (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-7" role="tab" aria-controls="tabset-4-7" aria-selected="false" href="">STL Decomposition</a></li></ul>
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_means_wave)) {</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="st">"monthly"</span> <span class="sc">%in%</span> <span class="fu">names</span>(seasonal_means_wave)) {</span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    monthly <span class="ot">&lt;-</span> seasonal_means_wave<span class="sc">$</span>monthly</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    monthly<span class="sc">$</span>month_name <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly<span class="sc">$</span>month_name, <span class="at">levels =</span> month.abb)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(monthly, <span class="fu">aes</span>(<span class="at">x =</span> month_name, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Month"</span>, <span class="at">y =</span> <span class="st">"Mean Hs (m)"</span>, <span class="at">title =</span> <span class="st">"Monthly Wave Height"</span>)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Seasonal data not available. Run targets::tar_make()"</span>)</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_means_wave)) {</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="st">"monthly"</span> <span class="sc">%in%</span> <span class="fu">names</span>(seasonal_means_wave)) {</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    monthly <span class="ot">&lt;-</span> seasonal_means_wave<span class="sc">$</span>monthly</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    monthly<span class="sc">$</span>month_name <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly<span class="sc">$</span>month_name, <span class="at">levels =</span> month.abb)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(monthly, <span class="fu">aes</span>(<span class="at">x =</span> month_name, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Month"</span>, <span class="at">y =</span> <span class="st">"Mean Hs (m)"</span>, <span class="at">title =</span> <span class="st">"Monthly Wave Height"</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Seasonal data not available. Run targets::tar_make()"</span>)</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Seasonal data not available. Run targets::tar_make()</code></pre>
@@ -1173,43 +718,34 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_means_wind)) {</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="st">"monthly"</span> <span class="sc">%in%</span> <span class="fu">names</span>(seasonal_means_wind)) {</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    monthly <span class="ot">&lt;-</span> seasonal_means_wind<span class="sc">$</span>monthly</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    monthly<span class="sc">$</span>month_name <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly<span class="sc">$</span>month_name, <span class="at">levels =</span> month.abb)</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(monthly, <span class="fu">aes</span>(<span class="at">x =</span> month_name, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Month"</span>, <span class="at">y =</span> <span class="st">"Mean Wind Speed (m/s)"</span>, <span class="at">title =</span> <span class="st">"Monthly Wind Speed"</span>)</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Wind seasonal data not available"</span>)</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_means_wave) <span class="sc">&amp;&amp;</span> <span class="st">"monthly"</span> <span class="sc">%in%</span> <span class="fu">names</span>(seasonal_means_wave)) {</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  seasonal_means_wave<span class="sc">$</span>monthly <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Monthly Wave Height Statistics"</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Wind seasonal data not available</code></pre>
-</div>
 </div>
 </div>
 <div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(annual_trends_wave) <span class="sc">&amp;&amp;</span> <span class="st">"annual_stats"</span> <span class="sc">%in%</span> <span class="fu">names</span>(annual_trends_wave)) {</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  annual <span class="ot">&lt;-</span> annual_trends_wave<span class="sc">$</span>annual_stats</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(annual, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Year"</span>, <span class="at">y =</span> <span class="st">"Mean Hs (m)"</span>, <span class="at">title =</span> <span class="st">"Annual Wave Height Trend"</span>)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Annual trend data not available. Run targets::tar_make()"</span>)</span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_means_wind)) {</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="st">"monthly"</span> <span class="sc">%in%</span> <span class="fu">names</span>(seasonal_means_wind)) {</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    monthly <span class="ot">&lt;-</span> seasonal_means_wind<span class="sc">$</span>monthly</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    monthly<span class="sc">$</span>month_name <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly<span class="sc">$</span>month_name, <span class="at">levels =</span> month.abb)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(monthly, <span class="fu">aes</span>(<span class="at">x =</span> month_name, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>) <span class="sc">+</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>      <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Month"</span>, <span class="at">y =</span> <span class="st">"Mean Wind Speed (m/s)"</span>, <span class="at">title =</span> <span class="st">"Monthly Wind Speed"</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Wind seasonal data not available"</span>)</span>
+<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Annual trend data not available. Run targets::tar_make()</code></pre>
+<pre><code>Wind seasonal data not available</code></pre>
 </div>
 </div>
 </div>
@@ -1217,21 +753,66 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(wave_stl) <span class="sc">&amp;&amp;</span> <span class="st">"components"</span> <span class="sc">%in%</span> <span class="fu">names</span>(wave_stl)) {</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  stl_df <span class="ot">&lt;-</span> wave_stl<span class="sc">$</span>components</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  stl_long <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(stl_df,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(original, seasonal, trend, remainder),</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"component"</span>, <span class="at">values_to =</span> <span class="st">"value"</span>)</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  stl_long<span class="sc">$</span>component <span class="ot">&lt;-</span> <span class="fu">factor</span>(stl_long<span class="sc">$</span>component,</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"original"</span>, <span class="st">"trend"</span>, <span class="st">"seasonal"</span>, <span class="st">"remainder"</span>))</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(stl_long, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> value)) <span class="sc">+</span></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>component, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Wave Height (m)"</span>, <span class="at">title =</span> <span class="st">"STL Decomposition"</span>)</span>
-<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"STL decomposition not available"</span>)</span>
-<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(seasonal_means_wind) <span class="sc">&amp;&amp;</span> <span class="st">"monthly"</span> <span class="sc">%in%</span> <span class="fu">names</span>(seasonal_means_wind)) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  seasonal_means_wind<span class="sc">$</span>monthly <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Monthly Wind Speed Statistics"</span>)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-4-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-5-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(annual_trends_wave) <span class="sc">&amp;&amp;</span> <span class="st">"annual_stats"</span> <span class="sc">%in%</span> <span class="fu">names</span>(annual_trends_wave)) {</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  annual <span class="ot">&lt;-</span> annual_trends_wave<span class="sc">$</span>annual_stats</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(annual, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> mean)) <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> mean <span class="sc">-</span> sd, <span class="at">ymax =</span> mean <span class="sc">+</span> sd), <span class="at">width =</span> <span class="fl">0.3</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">TRUE</span>, <span class="at">color =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Year"</span>, <span class="at">y =</span> <span class="st">"Mean Hs (m)"</span>, <span class="at">title =</span> <span class="st">"Annual Wave Height Trend"</span>)</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Annual trend data not available. Run targets::tar_make()"</span>)</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Annual trend data not available. Run targets::tar_make()</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-4-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-6-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(annual_trends_wave) <span class="sc">&amp;&amp;</span> <span class="st">"annual_stats"</span> <span class="sc">%in%</span> <span class="fu">names</span>(annual_trends_wave)) {</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  annual_trends_wave<span class="sc">$</span>annual_stats <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Annual Wave Height Statistics"</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-4-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-7-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(wave_stl) <span class="sc">&amp;&amp;</span> <span class="st">"components"</span> <span class="sc">%in%</span> <span class="fu">names</span>(wave_stl)) {</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  stl_df <span class="ot">&lt;-</span> wave_stl<span class="sc">$</span>components</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  stl_long <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">pivot_longer</span>(stl_df,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">c</span>(original, seasonal, trend, remainder),</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to =</span> <span class="st">"component"</span>, <span class="at">values_to =</span> <span class="st">"value"</span>)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  stl_long<span class="sc">$</span>component <span class="ot">&lt;-</span> <span class="fu">factor</span>(stl_long<span class="sc">$</span>component,</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"original"</span>, <span class="st">"trend"</span>, <span class="st">"seasonal"</span>, <span class="st">"remainder"</span>))</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(stl_long, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> value)) <span class="sc">+</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>component, <span class="at">scales =</span> <span class="st">"free_y"</span>, <span class="at">ncol =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Time"</span>, <span class="at">y =</span> <span class="st">"Wave Height (m)"</span>, <span class="at">title =</span> <span class="st">"STL Decomposition"</span>)</span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"STL decomposition not available"</span>)</span>
+<span id="cb32-15"><a href="#cb32-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>STL decomposition not available</code></pre>
@@ -1245,73 +826,57 @@ window.Quarto = {
 <section id="eva" class="level2">
 <h2 class="anchored" data-anchor-id="eva">Extreme Value Analysis</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href="">Wave Height Return Levels</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href="">Hmax Return Levels</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-3" role="tab" aria-controls="tabset-5-3" aria-selected="false" href="">Wind Return Levels</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-4" role="tab" aria-controls="tabset-5-4" aria-selected="false" href="">Summary Table</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true" href="">Wave Height Return Levels (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false" href="">Wave Height Return Levels (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-3" role="tab" aria-controls="tabset-5-3" aria-selected="false" href="">Hmax Return Levels (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-4" role="tab" aria-controls="tabset-5-4" aria-selected="false" href="">Hmax Return Levels (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-5" role="tab" aria-controls="tabset-5-5" aria-selected="false" href="">Wind Return Levels (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-6" role="tab" aria-controls="tabset-5-6" aria-selected="false" href="">Wind Return Levels (Data)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-7" role="tab" aria-controls="tabset-5-7" aria-selected="false" href="">Summary Table</a></li></ul>
 <div class="tab-content">
 <div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wave)) {</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(return_levels_wave, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Return Period (years)"</span>, <span class="at">y =</span> <span class="st">"Hs (m)"</span>, <span class="at">title =</span> <span class="st">"Wave Height Return Levels"</span>)</span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Return levels not available. Run targets::tar_make()"</span>)</span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wave)) {</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(return_levels_wave, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"steelblue"</span>) <span class="sc">+</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"steelblue"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Return Period (years)"</span>, <span class="at">y =</span> <span class="st">"Hs (m)"</span>, <span class="at">title =</span> <span class="st">"Wave Height Return Levels"</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Return levels not available. Run targets::tar_make()"</span>)</span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Return levels not available. Run targets::tar_make()</code></pre>
 </div>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wave)) {</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(return_levels_wave, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Wave Height Return Levels"</span>)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</details>
 </div>
 </div>
 <div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_hmax)) {</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(return_levels_hmax, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"darkred"</span>) <span class="sc">+</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Return Period (years)"</span>, <span class="at">y =</span> <span class="st">"Hmax (m)"</span>, <span class="at">title =</span> <span class="st">"Maximum Wave Return Levels"</span>)</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Hmax return levels not available"</span>)</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wave)) {</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  return_levels_wave <span class="sc">%&gt;%</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Wave Height Return Levels"</span>)</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
-<div class="cell-output cell-output-stdout">
-<pre><code>Hmax return levels not available</code></pre>
-</div>
 </div>
 </div>
 <div id="tabset-5-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-3-tab">
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wind)) {</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(return_levels_wind, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Return Period (years)"</span>, <span class="at">y =</span> <span class="st">"Wind Speed (m/s)"</span>, <span class="at">title =</span> <span class="st">"Wind Speed Return Levels"</span>)</span>
-<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Wind return levels not available"</span>)</span>
-<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_hmax)) {</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(return_levels_hmax, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"darkred"</span>) <span class="sc">+</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"darkred"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Return Period (years)"</span>, <span class="at">y =</span> <span class="st">"Hmax (m)"</span>, <span class="at">title =</span> <span class="st">"Maximum Wave Return Levels"</span>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Hmax return levels not available"</span>)</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Wind return levels not available</code></pre>
+<pre><code>Hmax return levels not available</code></pre>
 </div>
 </div>
 </div>
@@ -1319,16 +884,60 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wave) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.null</span>(return_levels_hmax)) {</span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    return_levels_wave <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Variable =</span> <span class="st">"Hs"</span>),</span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    return_levels_hmax <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Variable =</span> <span class="st">"Hmax"</span>),</span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wind)) return_levels_wind <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Variable =</span> <span class="st">"Wind"</span>) <span class="cf">else</span> <span class="cn">NULL</span></span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Variable, return_period, return_level, lower, upper) <span class="sc">%&gt;%</span></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">kable</span>(<span class="at">digits =</span> <span class="dv">1</span>, <span class="at">caption =</span> <span class="st">"Return Levels Summary"</span>,</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>          <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Variable"</span>, <span class="st">"Return Period (yrs)"</span>, <span class="st">"Return Level"</span>, <span class="st">"Lower CI"</span>, <span class="st">"Upper CI"</span>))</span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_hmax)) {</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  return_levels_hmax <span class="sc">%&gt;%</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Hmax Return Levels"</span>)</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-5-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-5-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wind)) {</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(return_levels_wind, <span class="fu">aes</span>(<span class="at">x =</span> return_period, <span class="at">y =</span> return_level)) <span class="sc">+</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_ribbon</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower, <span class="at">ymax =</span> upper), <span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">linewidth =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">color =</span> <span class="st">"darkorange"</span>, <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>() <span class="sc">+</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Return Period (years)"</span>, <span class="at">y =</span> <span class="st">"Wind Speed (m/s)"</span>, <span class="at">title =</span> <span class="st">"Wind Speed Return Levels"</span>)</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Wind return levels not available"</span>)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Wind return levels not available</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-5-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-6-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wind)) {</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  return_levels_wind <span class="sc">%&gt;%</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Wind Return Levels"</span>)</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-5-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-7-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wave) <span class="sc">&amp;&amp;</span> <span class="sc">!</span><span class="fu">is.null</span>(return_levels_hmax)) {</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">bind_rows</span>(</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    return_levels_wave <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Variable =</span> <span class="st">"Hs"</span>),</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>    return_levels_hmax <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Variable =</span> <span class="st">"Hmax"</span>),</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(return_levels_wind)) return_levels_wind <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">Variable =</span> <span class="st">"Wind"</span>) <span class="cf">else</span> <span class="cn">NULL</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(Variable, return_period, return_level, lower, upper) <span class="sc">%&gt;%</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">1</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Return Levels Summary"</span>)</span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </div>
@@ -1339,18 +948,20 @@ window.Quarto = {
 <section id="rogue-wind" class="level2">
 <h2 class="anchored" data-anchor-id="rogue-wind">Gust Factor Analysis</h2>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
-<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href="">Summary</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href="">By Wind Category</a></li></ul>
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href="">Summary</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href="">By Wind Category (Plot)</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-3" role="tab" aria-controls="tabset-6-3" aria-selected="false" href="">By Wind Category (Data)</a></li></ul>
 <div class="tab-content">
 <div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
 <p>Gust Factor = Peak Gust / Sustained Wind. Typical value: ~1.3</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(gust_analysis) <span class="sc">&amp;&amp;</span> <span class="st">"summary"</span> <span class="sc">%in%</span> <span class="fu">names</span>(gust_analysis)) {</span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>(gust_analysis<span class="sc">$</span>summary, <span class="at">digits =</span> <span class="dv">2</span>, <span class="at">caption =</span> <span class="st">"Gust Factor Statistics"</span>)</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Gust analysis not available. Run targets::tar_make()"</span>)</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(gust_analysis) <span class="sc">&amp;&amp;</span> <span class="st">"summary"</span> <span class="sc">%in%</span> <span class="fu">names</span>(gust_analysis)) {</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  gust_analysis<span class="sc">$</span>summary <span class="sc">%&gt;%</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Gust Factor Statistics"</span>)</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Gust analysis not available. Run targets::tar_make()"</span>)</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Gust analysis not available. Run targets::tar_make()</code></pre>
@@ -1361,15 +972,27 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(gust_analysis) <span class="sc">&amp;&amp;</span> <span class="st">"by_category"</span> <span class="sc">%in%</span> <span class="fu">names</span>(gust_analysis)) {</span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  gust_cat <span class="ot">&lt;-</span> gust_analysis<span class="sc">$</span>by_category</span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(gust_cat, <span class="fu">aes</span>(<span class="at">x =</span> wind_category, <span class="at">y =</span> mean_gf)) <span class="sc">+</span></span>
-<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
-<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">1.3</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Wind Speed Category"</span>, <span class="at">y =</span> <span class="st">"Gust Factor"</span>,</span>
-<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">"Gust Factor by Wind Speed"</span>)</span>
-<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(gust_analysis) <span class="sc">&amp;&amp;</span> <span class="st">"by_category"</span> <span class="sc">%in%</span> <span class="fu">names</span>(gust_analysis)) {</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  gust_cat <span class="ot">&lt;-</span> gust_analysis<span class="sc">$</span>by_category</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(gust_cat, <span class="fu">aes</span>(<span class="at">x =</span> wind_category, <span class="at">y =</span> mean_gf)) <span class="sc">+</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="fl">1.3</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Wind Speed Category"</span>, <span class="at">y =</span> <span class="st">"Gust Factor"</span>,</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">title =</span> <span class="st">"Gust Factor by Wind Speed"</span>)</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</div>
+<div id="tabset-6-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-3-tab">
+<div class="cell">
+<details class="code-fold">
+<summary>Show code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(gust_analysis) <span class="sc">&amp;&amp;</span> <span class="st">"by_category"</span> <span class="sc">%in%</span> <span class="fu">names</span>(gust_analysis)) {</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  gust_analysis<span class="sc">$</span>by_category <span class="sc">%&gt;%</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">create_dt</span>(<span class="st">"Gust Factor by Wind Category"</span>)</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
 </div>
@@ -1384,21 +1007,21 @@ window.Quarto = {
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>store_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">".."</span>, <span class="st">"_targets"</span>)</span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">dir.exists</span>(store_path)) {</span>
-<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Targets store found at:"</span>, <span class="fu">normalizePath</span>(store_path), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
-<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>    meta <span class="ot">&lt;-</span> targets<span class="sc">::</span><span class="fu">tar_meta</span>(<span class="at">store =</span> store_path)</span>
-<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"Total targets:"</span>, <span class="fu">nrow</span>(meta), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"Completed:"</span>, <span class="fu">sum</span>(meta<span class="sc">$</span>error <span class="sc">==</span> <span class="cn">FALSE</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">cat</span>(<span class="st">"Could not read targets metadata</span><span class="sc">\n</span><span class="st">"</span>))</span>
-<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No targets store found. Run targets::tar_make() to generate analysis.</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>store_path <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">".."</span>, <span class="st">"_targets"</span>)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">dir.exists</span>(store_path)) {</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"Targets store found at:"</span>, <span class="fu">normalizePath</span>(store_path), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tryCatch</span>({</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>    meta <span class="ot">&lt;-</span> targets<span class="sc">::</span><span class="fu">tar_meta</span>(<span class="at">store =</span> store_path)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"Total targets:"</span>, <span class="fu">nrow</span>(meta), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="st">"Completed:"</span>, <span class="fu">sum</span>(meta<span class="sc">$</span>error <span class="sc">==</span> <span class="cn">FALSE</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>  }, <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">cat</span>(<span class="st">"Could not read targets metadata</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="st">"No targets store found. Run targets::tar_make() to generate analysis.</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>Targets store found at: /Users/johngavin/docs_gh/proj/data/weather/irish_buoy_network/irishbuoys/_targets 
-Total targets: 60 
+Total targets: 61 
 Completed: 0 </code></pre>
 </div>
 </div>
@@ -1408,7 +1031,7 @@ Completed: 0 </code></pre>
 <div class="cell">
 <details class="code-fold">
 <summary>Show code</summary>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>R version 4.5.2 (2025-10-31)
@@ -1429,25 +1052,27 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] targets_1.11.4    knitr_1.51        ggplot2_4.0.1     dplyr_1.1.4      
+[1] targets_1.11.4    DT_0.34.0         ggplot2_4.0.1     dplyr_1.1.4      
 [5] irishbuoys_0.0.91 testthat_3.3.2   
 
 loaded via a namespace (and not attached):
- [1] rappdirs_0.3.3     generics_0.1.4     digest_0.6.39      magrittr_2.0.4    
- [5] evaluate_1.0.5     grid_4.5.2         timechange_0.3.0   RColorBrewer_1.1-3
- [9] pkgload_1.4.1      fastmap_1.2.0      rprojroot_2.1.1    jsonlite_2.0.0    
-[13] processx_3.8.6     pkgbuild_1.4.8     backports_1.5.0    brio_1.1.5        
-[17] secretbase_1.1.0   DBI_1.2.3          ps_1.9.1           purrr_1.2.1       
-[21] viridisLite_0.4.2  scales_1.4.0       codetools_0.2-20   httr2_1.2.2       
-[25] duckdb_1.4.3       cli_3.6.5          rlang_1.1.7        bit64_4.6.0-1     
-[29] withr_3.0.2        yaml_2.3.12        otel_0.2.0         tools_4.5.2       
-[33] base64url_1.4      assertthat_0.2.1   vctrs_0.6.5        R6_2.6.1          
-[37] lifecycle_1.0.5    lubridate_1.9.4    htmlwidgets_1.6.4  bit_4.6.0         
-[41] arrow_22.0.0       callr_3.7.6        pkgconfig_2.0.3    desc_1.4.3        
-[45] pillar_1.11.1      gtable_0.3.6       data.table_1.18.0  glue_1.8.0        
-[49] xfun_0.55          tibble_3.3.1       tidyselect_1.2.1   farver_2.1.2      
-[53] igraph_2.2.1       htmltools_0.5.9    labeling_0.4.3     rmarkdown_2.30    
-[57] compiler_4.5.2     prettyunits_1.2.0  S7_0.2.1          </code></pre>
+ [1] gtable_0.3.6       xfun_0.55          bslib_0.9.0        httr2_1.2.2       
+ [5] htmlwidgets_1.6.4  processx_3.8.6     callr_3.7.6        vctrs_0.6.5       
+ [9] tools_4.5.2        crosstalk_1.2.2    ps_1.9.1           generics_0.1.4    
+[13] base64url_1.4      tibble_3.3.1       pkgconfig_2.0.3    data.table_1.18.0 
+[17] secretbase_1.1.0   RColorBrewer_1.1-3 S7_0.2.1           desc_1.4.3        
+[21] assertthat_0.2.1   lifecycle_1.0.5    compiler_4.5.2     farver_2.1.2      
+[25] brio_1.1.5         codetools_0.2-20   htmltools_0.5.9    sass_0.4.10       
+[29] yaml_2.3.12        pillar_1.11.1      jquerylib_0.1.4    cachem_1.1.0      
+[33] tidyselect_1.2.1   digest_0.6.39      duckdb_1.4.3       purrr_1.2.1       
+[37] labeling_0.4.3     arrow_22.0.0       rprojroot_2.1.1    fastmap_1.2.0     
+[41] grid_4.5.2         cli_3.6.5          magrittr_2.0.4     pkgbuild_1.4.8    
+[45] withr_3.0.2        prettyunits_1.2.0  scales_1.4.0       backports_1.5.0   
+[49] rappdirs_0.3.3     bit64_4.6.0-1      lubridate_1.9.4    timechange_0.3.0  
+[53] rmarkdown_2.30     igraph_2.2.1       bit_4.6.0          otel_0.2.0        
+[57] evaluate_1.0.5     knitr_1.51         viridisLite_0.4.2  rlang_1.1.7       
+[61] glue_1.8.0         DBI_1.2.3          pkgload_1.4.1      jsonlite_2.0.0    
+[65] R6_2.6.1          </code></pre>
 </div>
 </div>
 </section>

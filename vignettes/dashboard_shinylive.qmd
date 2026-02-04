@@ -710,8 +710,11 @@ server <- function(input, output, session) {
       "\n--- Data Validation ---\n",
       "Wind-Wave corr: ", ifelse(is.na(cor_wind_wave), "N/A", cor_wind_wave), " (expect ~0.3 for real data)\n",
       "Wave-Hmax corr: ", ifelse(is.na(cor_wave_hmax), "N/A", cor_wave_hmax), " (expect >0.9 for real data)\n",
-      "Max wave_height: ", round(max(data$wave_height, na.rm = TRUE), 1), "m (expect >10m in storms)\n",
-      "Max wind_speed: ", round(max(data$wind_speed, na.rm = TRUE), 1), " knots (expect >40 in storms)"
+      "Max Hs in dataset: ", round(max(data$wave_height, na.rm = TRUE), 1), "m (historical max ~15m Hs)\n",
+      "Max Hmax in dataset: ", round(max(data$hmax, na.rm = TRUE), 1), "m (historical max ~23m individual wave)\n",
+      "Max Hmax/Hs ratio: ", round(max(data$hmax/data$wave_height, na.rm = TRUE), 2), " (>2.0 = rogue wave)\n",
+      "Max wind_speed: ", round(max(data$wind_speed, na.rm = TRUE), 1), " m/s\n",
+      "Max gust factor: ", round(max(data$gust/data$wind_speed, na.rm = TRUE), 2), " (typical ~1.3)"
     )
   })
 
