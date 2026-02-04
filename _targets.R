@@ -44,5 +44,6 @@ for (plan_file in plan_files) {
 list(
   plan_data_acquisition,
   plan_quality_control,
-  plan_wave_analysis
+  plan_wave_analysis,
+  plan_dashboard
 )

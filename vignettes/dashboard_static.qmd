@@ -1,12 +1,11 @@
 ---
 title: "Irish Weather Buoy Explorer"
-subtitle: "Interactive Dashboard with Sortable Tables"
 format:
-  html:
-    page-layout: full
-    toc: true
-    toc-location: left
-    code-fold: true
+  dashboard:
+    orientation: rows
+    nav-buttons: [github]
+    github: https://github.com/JohnGavin/irishbuoys
+    theme: cosmo
 execute:
   echo: false
   warning: false
@@ -16,13 +15,23 @@ execute:
 ```{r setup}
 library(dplyr)
 library(ggplot2)
-library(jsonlite)
 library(DT)
+library(dygraphs)
+library(xts)
+library(tidyr)
 
-# Load the buoy data
-data_path <- "data/buoy_data.json"
-buoy_data <- fromJSON(data_path)
-buoy_data$time <- as.POSIXct(buoy_data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+# Load pre-computed data from targets pipeline
+# Run targets::tar_make() to generate these files
+buoy_data <- readRDS(system.file("extdata", "dashboard_buoy_data.rds", package = "irishbuoys"))
+dashboard_stats <- readRDS(system.file("extdata", "dashboard_stats.rds", package = "irishbuoys"))
+dashboard_ts <- readRDS(system.file("extdata", "dashboard_timeseries.rds", package = "irishbuoys"))
+
+# Fallback: Load from JSON if RDS not available (development mode)
+if (is.null(buoy_data)) {
+  data_path <- "data/buoy_data.json"
+  buoy_data <- jsonlite::fromJSON(data_path)
+  buoy_data$time <- as.POSIXct(buoy_data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+}
 
 # Get unique stations
 stations <- sort(unique(buoy_data$station_id))
@@ -40,30 +49,52 @@ VAR_CHOICES <- c(
 )
 
 # Helper function to create station-specific data
-get_station_data <- function(data, station, days = 30) {
-  cutoff <- max(data$time) - (days * 24 * 3600)
-  if (station == "All Buoys") {
-    data |> filter(time >= cutoff)
-  } else {
-    data |> filter(station_id == station, time >= cutoff)
+get_station_data <- function(data, station, days = NULL) {
+  if (!is.null(days)) {
+    cutoff <- max(data$time) - (days * 24 * 3600)
+    data <- data |> filter(time >= cutoff)
   }
+  if (station != "All Buoys") {
+    data <- data |> filter(station_id == station)
+  }
+  data
 }
 
-# Helper function to create a plot
-create_time_series_plot <- function(data, variable = "wave_height", title_suffix = "") {
+# Helper function to create dygraph time series
+create_dygraph <- function(data, variable = "wave_height", title = "", by_station = TRUE) {
   var_label <- names(VAR_CHOICES)[VAR_CHOICES == variable]
+  if (length(var_label) == 0) var_label <- variable
 
-  ggplot(data, aes(x = time, y = .data[[variable]], color = station_id)) +
-    geom_line(alpha = 0.7) +
-    geom_point(size = 0.5, alpha = 0.5) +
-    labs(
-      title = paste(var_label, title_suffix),
-      x = "Time (UTC)",
-      y = var_label,
-      color = "Station"
-    ) +
-    theme_minimal() +
-    theme(legend.position = "bottom")
+  if (by_station && length(unique(data$station_id)) > 1) {
+    # Create wide format for multiple stations
+    wide_data <- data |>
+      select(time, station_id, all_of(variable)) |>
+      tidyr::pivot_wider(names_from = station_id, values_from = all_of(variable))
+
+    # Convert to xts
+    ts_data <- xts(wide_data[, -1], order.by = wide_data$time)
+  } else {
+    # Single station or already filtered
+    ts_data <- xts(data[[variable]], order.by = data$time)
+    colnames(ts_data) <- var_label
+  }
+
+  dygraph(ts_data, main = title) |>
+    dyOptions(
+      labelsUTC = TRUE,
+      fillGraph = TRUE,
+      fillAlpha = 0.1,
+      drawGrid = TRUE,
+      colors = RColorBrewer::brewer.pal(max(3, ncol(ts_data)), "Set1")[1:ncol(ts_data)]
+    ) |>
+    dyRangeSelector(height = 40) |>
+    dyCrosshair(direction = "vertical") |>
+    dyHighlight(
+      highlightCircleSize = 5,
+      highlightSeriesBackgroundAlpha = 0.2,
+      hideOnMouseOut = FALSE
+    ) |>
+    dyLegend(show = "always", width = 400)
 }
 
 # Helper function for DT tables
@@ -72,427 +103,461 @@ create_dt <- function(data, caption = "") {
     data,
     caption = caption,
     filter = 'top',
+    extensions = 'Buttons',
     options = list(
       pageLength = 15,
       dom = 'Bfrtip',
+      buttons = c('copy', 'csv', 'excel'),
       order = list(list(0, 'desc')),
       scrollX = TRUE
     ),
-    class = 'cell-border stripe hover'
+    class = 'cell-border stripe hover compact'
   )
 }
-```
 
-## Data Overview
-
-This dashboard displays data from the **Irish Weather Buoy Network**, operated by the Marine Institute of Ireland. Data sourced from the [Marine Institute ERDDAP Server](https://erddap.marine.ie/erddap/index.html).
-
-```{r data-summary}
-# Calculate data validation metrics
+# Calculate summary stats
 valid_ww <- complete.cases(buoy_data$wind_speed, buoy_data$wave_height)
 valid_wh <- complete.cases(buoy_data$wave_height, buoy_data$hmax)
 cor_wind_wave <- round(cor(buoy_data$wind_speed[valid_ww], buoy_data$wave_height[valid_ww]), 3)
 cor_wave_hmax <- round(cor(buoy_data$wave_height[valid_wh], buoy_data$hmax[valid_wh]), 3)
-
 days_span <- as.numeric(difftime(max(buoy_data$time), min(buoy_data$time), units = "days"))
 ```
 
+# Overview
+
+## Row {height=30%}
+
+### Column
+
+```{r}
+#| content: valuebox
+#| title: "Total Records"
+list(
+  icon = "database",
+  color = "primary",
+  value = format(nrow(buoy_data), big.mark = ",")
+)
+```
+
+### Column
+
+```{r}
+#| content: valuebox
+#| title: "Time Span"
+list(
+  icon = "calendar",
+  color = "info",
+  value = paste(round(days_span, 0), "days")
+)
+```
+
+### Column
+
+```{r}
+#| content: valuebox
+#| title: "Active Stations"
+list(
+  icon = "geo-alt",
+  color = "success",
+  value = length(stations)
+)
+```
+
+### Column
+
+```{r}
+#| content: valuebox
+#| title: "Wind-Wave Correlation"
+list(
+  icon = "graph-up",
+  color = "warning",
+  value = cor_wind_wave
+)
+```
+
+## Row
+
+### Column {width=60%}
+
+#### All Stations Time Series
+
+```{r}
+#| title: "Wave Height - All Stations (Full History)"
+create_dygraph(buoy_data, "wave_height", "Significant Wave Height (m)")
+```
+
+### Column {width=40%}
+
+#### Data Summary
+
 | Metric | Value |
 |--------|-------|
-| Total Records | `r format(nrow(buoy_data), big.mark = ",")` |
+| Records | `r format(nrow(buoy_data), big.mark = ",")` |
 | Date Range | `r format(min(buoy_data$time), "%Y-%m-%d")` to `r format(max(buoy_data$time), "%Y-%m-%d")` |
-| Time Span | `r round(days_span, 1)` days |
 | Stations | `r paste(stations, collapse = ", ")` |
-| Wind-Wave Correlation | `r cor_wind_wave` |
-| Wave-Hmax Correlation | `r cor_wave_hmax` |
+| Wind-Wave Corr | `r cor_wind_wave` |
+| Wave-Hmax Corr | `r cor_wave_hmax` |
 
----
+**Data Sources:**
 
-## Wave Height by Station {#wave-height}
+- [Marine Institute Ireland](https://www.marine.ie/)
+- [ERDDAP Data Portal](https://erddap.marine.ie/)
 
-::: {.panel-tabset}
+# Wave Height {orientation="columns"}
 
-### All Buoys (Plot)
+## Column {width=65%}
+
+### Row {.tabset}
+
+#### All Stations
 
 ```{r}
-#| fig-height: 5
-stn_data <- get_station_data(buoy_data, "All Buoys", 30)
-create_time_series_plot(stn_data, "wave_height", " - Last 30 Days")
+create_dygraph(buoy_data, "wave_height", "Wave Height - All Stations")
 ```
 
-### All Buoys (Data)
+#### M2
 
 ```{r}
-stn_data <- get_station_data(buoy_data, "All Buoys", 30) |>
-  select(time, station_id, wave_height, hmax, wind_speed, gust) |>
+stn_data <- get_station_data(buoy_data, "M2")
+create_dygraph(stn_data, "wave_height", "Wave Height - M2", by_station = FALSE)
+```
+
+#### M3
+
+```{r}
+stn_data <- get_station_data(buoy_data, "M3")
+create_dygraph(stn_data, "wave_height", "Wave Height - M3", by_station = FALSE)
+```
+
+#### M4
+
+```{r}
+stn_data <- get_station_data(buoy_data, "M4")
+create_dygraph(stn_data, "wave_height", "Wave Height - M4", by_station = FALSE)
+```
+
+#### M5
+
+```{r}
+stn_data <- get_station_data(buoy_data, "M5")
+create_dygraph(stn_data, "wave_height", "Wave Height - M5", by_station = FALSE)
+```
+
+#### M6
+
+```{r}
+stn_data <- get_station_data(buoy_data, "M6")
+create_dygraph(stn_data, "wave_height", "Wave Height - M6", by_station = FALSE)
+```
+
+## Column {width=35%}
+
+### Row {.tabset}
+
+#### Data Table
+
+```{r}
+wave_data <- buoy_data |>
+  select(time, station_id, wave_height, hmax, wave_period) |>
   mutate(
     time = format(time, "%Y-%m-%d %H:%M"),
     wave_height = round(wave_height, 2),
     hmax = round(hmax, 2),
-    wind_speed = round(wind_speed, 1),
-    gust = round(gust, 1)
+    wave_period = round(wave_period, 1)
+  ) |>
+  arrange(desc(time))
+
+create_dt(wave_data, "Wave Height Data - Click columns to sort/filter")
+```
+
+#### Statistics
+
+```{r}
+wave_stats <- buoy_data |>
+  group_by(station_id) |>
+  summarise(
+    n = n(),
+    mean_hs = round(mean(wave_height, na.rm = TRUE), 2),
+    max_hs = round(max(wave_height, na.rm = TRUE), 2),
+    max_hmax = round(max(hmax, na.rm = TRUE), 2),
+    .groups = "drop"
   )
-create_dt(stn_data, "All Stations - Last 30 Days")
+
+create_dt(wave_stats, "Wave Statistics by Station")
 ```
 
-### M2 (Plot)
+# Wind Speed {orientation="columns"}
+
+## Column {width=65%}
+
+### Row {.tabset}
+
+#### All Stations
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M2", 30)
-create_time_series_plot(stn_data, "wave_height", " - M2")
+create_dygraph(buoy_data, "wind_speed", "Wind Speed - All Stations")
 ```
 
-### M2 (Data)
+#### M2
 
 ```{r}
-stn_data <- get_station_data(buoy_data, "M2", 30) |>
-  select(time, wave_height, hmax, wind_speed, gust, air_temperature) |>
-  mutate(
-    time = format(time, "%Y-%m-%d %H:%M"),
-    wave_height = round(wave_height, 2),
-    hmax = round(hmax, 2),
-    wind_speed = round(wind_speed, 1),
-    gust = round(gust, 1)
-  )
-create_dt(stn_data, "M2 - Last 30 Days")
+stn_data <- get_station_data(buoy_data, "M2")
+create_dygraph(stn_data, "wind_speed", "Wind Speed - M2", by_station = FALSE)
 ```
 
-### M3 (Plot)
+#### M3
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M3", 30)
-create_time_series_plot(stn_data, "wave_height", " - M3")
+stn_data <- get_station_data(buoy_data, "M3")
+create_dygraph(stn_data, "wind_speed", "Wind Speed - M3", by_station = FALSE)
 ```
 
-### M3 (Data)
+#### M4
 
 ```{r}
-stn_data <- get_station_data(buoy_data, "M3", 30) |>
-  select(time, wave_height, hmax, wind_speed, gust, air_temperature) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), across(c(wind_speed, gust), ~round(., 1)))
-create_dt(stn_data, "M3 - Last 30 Days")
+stn_data <- get_station_data(buoy_data, "M4")
+create_dygraph(stn_data, "wind_speed", "Wind Speed - M4", by_station = FALSE)
 ```
 
-### M4 (Plot)
+#### M5
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M4", 30)
-create_time_series_plot(stn_data, "wave_height", " - M4")
+stn_data <- get_station_data(buoy_data, "M5")
+create_dygraph(stn_data, "wind_speed", "Wind Speed - M5", by_station = FALSE)
 ```
 
-### M4 (Data)
+#### M6
 
 ```{r}
-stn_data <- get_station_data(buoy_data, "M4", 30) |>
-  select(time, wave_height, hmax, wind_speed, gust, air_temperature) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), across(c(wind_speed, gust), ~round(., 1)))
-create_dt(stn_data, "M4 - Last 30 Days")
+stn_data <- get_station_data(buoy_data, "M6")
+create_dygraph(stn_data, "wind_speed", "Wind Speed - M6", by_station = FALSE)
 ```
 
-### M5 (Plot)
+## Column {width=35%}
+
+### Row {.tabset}
+
+#### Data Table
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M5", 30)
-create_time_series_plot(stn_data, "wave_height", " - M5")
-```
-
-### M5 (Data)
-
-```{r}
-stn_data <- get_station_data(buoy_data, "M5", 30) |>
-  select(time, wave_height, hmax, wind_speed, gust, air_temperature) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), across(c(wind_speed, gust), ~round(., 1)))
-create_dt(stn_data, "M5 - Last 30 Days")
-```
-
-### M6 (Plot)
-
-```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M6", 30)
-create_time_series_plot(stn_data, "wave_height", " - M6")
-```
-
-### M6 (Data)
-
-```{r}
-stn_data <- get_station_data(buoy_data, "M6", 30) |>
-  select(time, wave_height, hmax, wind_speed, gust, air_temperature) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), across(c(wind_speed, gust), ~round(., 1)))
-create_dt(stn_data, "M6 - Last 30 Days")
-```
-
-:::
-
----
-
-## Wind Speed by Station {#wind-speed}
-
-::: {.panel-tabset}
-
-### All Buoys (Plot)
-
-```{r}
-#| fig-height: 5
-stn_data <- get_station_data(buoy_data, "All Buoys", 30)
-create_time_series_plot(stn_data, "wind_speed", " - Last 30 Days")
-```
-
-### All Buoys (Data)
-
-```{r}
-stn_data <- get_station_data(buoy_data, "All Buoys", 30) |>
-  select(time, station_id, wind_speed, gust, wave_height, atmospheric_pressure) |>
+wind_data <- buoy_data |>
+  select(time, station_id, wind_speed, gust, atmospheric_pressure) |>
   mutate(
     time = format(time, "%Y-%m-%d %H:%M"),
     wind_speed = round(wind_speed, 1),
     gust = round(gust, 1),
-    wave_height = round(wave_height, 2),
     atmospheric_pressure = round(atmospheric_pressure, 1)
+  ) |>
+  arrange(desc(time))
+
+create_dt(wind_data, "Wind Data - Click columns to sort/filter")
+```
+
+#### Statistics
+
+```{r}
+wind_stats <- buoy_data |>
+  group_by(station_id) |>
+  summarise(
+    n = n(),
+    mean_wind = round(mean(wind_speed, na.rm = TRUE), 1),
+    max_wind = round(max(wind_speed, na.rm = TRUE), 1),
+    max_gust = round(max(gust, na.rm = TRUE), 1),
+    .groups = "drop"
   )
-create_dt(stn_data, "Wind Speed - All Stations")
+
+create_dt(wind_stats, "Wind Statistics by Station")
 ```
 
-### M2 (Plot)
+# Wind vs Wave {orientation="columns"}
+
+## Column {width=65%}
+
+### Row {.tabset}
+
+#### All Stations
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M2", 30)
-create_time_series_plot(stn_data, "wind_speed", " - M2")
-```
-
-### M2 (Data)
-
-```{r}
-stn_data <- get_station_data(buoy_data, "M2", 30) |>
-  select(time, wind_speed, gust, wave_height, atmospheric_pressure) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(where(is.numeric), ~round(., 1)))
-create_dt(stn_data, "Wind Speed - M2")
-```
-
-### M3 (Plot)
-
-```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M3", 30)
-create_time_series_plot(stn_data, "wind_speed", " - M3")
-```
-
-### M3 (Data)
-
-```{r}
-stn_data <- get_station_data(buoy_data, "M3", 30) |>
-  select(time, wind_speed, gust, wave_height, atmospheric_pressure) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(where(is.numeric), ~round(., 1)))
-create_dt(stn_data, "Wind Speed - M3")
-```
-
-### M4 (Plot)
-
-```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M4", 30)
-create_time_series_plot(stn_data, "wind_speed", " - M4")
-```
-
-### M4 (Data)
-
-```{r}
-stn_data <- get_station_data(buoy_data, "M4", 30) |>
-  select(time, wind_speed, gust, wave_height, atmospheric_pressure) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(where(is.numeric), ~round(., 1)))
-create_dt(stn_data, "Wind Speed - M4")
-```
-
-### M5 (Plot)
-
-```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M5", 30)
-create_time_series_plot(stn_data, "wind_speed", " - M5")
-```
-
-### M5 (Data)
-
-```{r}
-stn_data <- get_station_data(buoy_data, "M5", 30) |>
-  select(time, wind_speed, gust, wave_height, atmospheric_pressure) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(where(is.numeric), ~round(., 1)))
-create_dt(stn_data, "Wind Speed - M5")
-```
-
-### M6 (Plot)
-
-```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M6", 30)
-create_time_series_plot(stn_data, "wind_speed", " - M6")
-```
-
-### M6 (Data)
-
-```{r}
-stn_data <- get_station_data(buoy_data, "M6", 30) |>
-  select(time, wind_speed, gust, wave_height, atmospheric_pressure) |>
-  mutate(time = format(time, "%Y-%m-%d %H:%M"), across(where(is.numeric), ~round(., 1)))
-create_dt(stn_data, "Wind Speed - M6")
-```
-
-:::
-
----
-
-## Wind vs Wave Scatter {#scatter}
-
-::: {.panel-tabset}
-
-### All Buoys (Plot)
-
-```{r}
-#| fig-height: 5
-stn_data <- get_station_data(buoy_data, "All Buoys", 30)
-ggplot(stn_data, aes(x = wind_speed, y = wave_height, color = station_id)) +
-  geom_point(alpha = 0.4, size = 1) +
-  geom_smooth(method = "lm", se = FALSE, linewidth = 0.5) +
+#| fig-height: 6
+ggplot(buoy_data, aes(x = wind_speed, y = wave_height, color = station_id)) +
+  geom_point(alpha = 0.3, size = 1) +
+  geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
   labs(
     title = "Wind Speed vs Wave Height - All Stations",
     x = "Wind Speed (knots)",
-    y = "Wave Height (m)",
+    y = "Significant Wave Height (m)",
     color = "Station"
   ) +
-  theme_minimal()
+  theme_minimal() +
+  theme(legend.position = "bottom")
 ```
 
-### All Buoys (Data)
+#### M2
 
 ```{r}
-stn_data <- get_station_data(buoy_data, "All Buoys", 30) |>
-  select(time, station_id, wind_speed, wave_height, hmax) |>
-  mutate(
-    time = format(time, "%Y-%m-%d %H:%M"),
-    wind_speed = round(wind_speed, 1),
-    wave_height = round(wave_height, 2),
-    hmax = round(hmax, 2)
-  )
-create_dt(stn_data, "Wind vs Wave Data")
-```
-
-### M2 (Plot)
-
-```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M2", 30)
+stn_data <- get_station_data(buoy_data, "M2")
 ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_point(alpha = 0.4, color = "steelblue") +
   geom_smooth(method = "lm", se = TRUE, color = "red") +
   labs(title = "Wind vs Wave - M2", x = "Wind Speed (knots)", y = "Wave Height (m)") +
   theme_minimal()
 ```
 
-### M3 (Plot)
+#### M3
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M3", 30)
+stn_data <- get_station_data(buoy_data, "M3")
 ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_point(alpha = 0.4, color = "steelblue") +
   geom_smooth(method = "lm", se = TRUE, color = "red") +
   labs(title = "Wind vs Wave - M3", x = "Wind Speed (knots)", y = "Wave Height (m)") +
   theme_minimal()
 ```
 
-### M4 (Plot)
+#### M4
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M4", 30)
+stn_data <- get_station_data(buoy_data, "M4")
 ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_point(alpha = 0.4, color = "steelblue") +
   geom_smooth(method = "lm", se = TRUE, color = "red") +
   labs(title = "Wind vs Wave - M4", x = "Wind Speed (knots)", y = "Wave Height (m)") +
   theme_minimal()
 ```
 
-### M5 (Plot)
+#### M5
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M5", 30)
+stn_data <- get_station_data(buoy_data, "M5")
 ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_point(alpha = 0.4, color = "steelblue") +
   geom_smooth(method = "lm", se = TRUE, color = "red") +
   labs(title = "Wind vs Wave - M5", x = "Wind Speed (knots)", y = "Wave Height (m)") +
   theme_minimal()
 ```
 
-### M6 (Plot)
+#### M6
 
 ```{r}
-#| fig-height: 4
-stn_data <- get_station_data(buoy_data, "M6", 30)
+stn_data <- get_station_data(buoy_data, "M6")
 ggplot(stn_data, aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.5, color = "steelblue") +
+  geom_point(alpha = 0.4, color = "steelblue") +
   geom_smooth(method = "lm", se = TRUE, color = "red") +
   labs(title = "Wind vs Wave - M6", x = "Wind Speed (knots)", y = "Wave Height (m)") +
   theme_minimal()
 ```
 
-:::
+## Column {width=35%}
 
----
+### Row {.tabset}
 
-## Recent Observations {#recent-observations}
+#### Correlation Data
 
-```{r recent-obs}
+```{r}
+scatter_data <- buoy_data |>
+  select(time, station_id, wind_speed, wave_height, hmax) |>
+  filter(!is.na(wind_speed), !is.na(wave_height)) |>
+  mutate(
+    time = format(time, "%Y-%m-%d %H:%M"),
+    wind_speed = round(wind_speed, 1),
+    wave_height = round(wave_height, 2),
+    hmax = round(hmax, 2)
+  ) |>
+  arrange(desc(time))
+
+create_dt(scatter_data, "Wind-Wave Data")
+```
+
+#### Regression Stats
+
+```{r}
+reg_stats <- buoy_data |>
+  filter(!is.na(wind_speed), !is.na(wave_height)) |>
+  group_by(station_id) |>
+  summarise(
+    n = n(),
+    correlation = round(cor(wind_speed, wave_height), 3),
+    intercept = round(coef(lm(wave_height ~ wind_speed))[1], 3),
+    slope = round(coef(lm(wave_height ~ wind_speed))[2], 4),
+    .groups = "drop"
+  )
+
+create_dt(reg_stats, "Linear Regression by Station")
+```
+
+# Recent Data
+
+## Row
+
+### Column
+
+```{r}
 recent_data <- buoy_data |>
   arrange(desc(time)) |>
-  head(100) |>
+  head(500) |>
   mutate(
     time = format(time, "%Y-%m-%d %H:%M"),
     wave_height = round(wave_height, 2),
     hmax = round(hmax, 2),
     wind_speed = round(wind_speed, 1),
     gust = round(gust, 1),
-    air_temperature = round(air_temperature, 1)
+    air_temperature = round(air_temperature, 1),
+    sea_temperature = round(sea_temperature, 1),
+    atmospheric_pressure = round(atmospheric_pressure, 1)
   ) |>
-  select(time, station_id, wave_height, hmax, wind_speed, gust, air_temperature)
+  select(time, station_id, wave_height, hmax, wind_speed, gust,
+         air_temperature, sea_temperature, atmospheric_pressure)
 
 datatable(
   recent_data,
-  caption = "Most recent observations - click column headers to sort, use filters above each column",
+  caption = "Most recent 500 observations - click column headers to sort, use filters above each column",
   filter = 'top',
-  colnames = c("Time (UTC)", "Station", "Wave Ht (m)", "Hmax (m)", "Wind (kn)", "Gust (kn)", "Air Temp (C)"),
+  extensions = 'Buttons',
+  colnames = c("Time (UTC)", "Station", "Wave Ht (m)", "Hmax (m)", "Wind (kn)",
+               "Gust (kn)", "Air Temp (C)", "Sea Temp (C)", "Pressure (hPa)"),
   options = list(
-    pageLength = 20,
+    pageLength = 25,
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel'),
     order = list(list(0, 'desc')),
     scrollX = TRUE
   ),
-  class = 'cell-border stripe hover'
+  class = 'cell-border stripe hover compact'
 )
 ```
 
----
+# Reference
 
-## Variable Definitions
+## Row
+
+### Column {width=50%}
+
+#### Variable Definitions
 
 | Variable | Units | Description |
 |----------|-------|-------------|
-| wave_height | meters | Significant wave height (Hs). 4x RMS of wave motion over 17.5 min |
+| wave_height | meters | Significant wave height (Hs). 4× RMS of wave motion over 17.5 min |
 | hmax | meters | Maximum individual wave height in measurement period |
 | wave_period | seconds | Average wave period (zero-crossing analysis) |
 | wind_speed | knots | 10-minute average wind speed. 1 knot = 0.514 m/s |
 | gust | knots | Maximum 3-second wind speed during the hour |
 | atmospheric_pressure | hPa | Barometric pressure (970-1030 typical) |
-| air_temperature | degrees C | Air temperature at buoy (~3m above sea) |
-| sea_temperature | degrees C | Sea surface temperature |
+| air_temperature | °C | Air temperature at buoy (~3m above sea) |
+| sea_temperature | °C | Sea surface temperature |
 
----
+### Column {width=50%}
 
-## Data Sources
+#### Station Information
+
+| Station | Location | Notes |
+|---------|----------|-------|
+| M2 | Southwest Ireland | Deep water buoy |
+| M3 | Southwest Ireland | Deep water buoy |
+| M4 | Southeast Ireland | Deep water buoy |
+| M5 | West Ireland | Deep water buoy |
+| M6 | Northwest Ireland | Shelf edge location |
+
+**Data Sources:**
 
 - [Marine Institute Ireland](https://www.marine.ie/)
 - [ERDDAP Data Portal](https://erddap.marine.ie/)
@@ -500,4 +565,4 @@ datatable(
 
 ---
 
-*Dashboard generated `r Sys.time()` UTC*
+*Dashboard generated `r Sys.time()` UTC using irishbuoys v`r packageVersion("irishbuoys")`*

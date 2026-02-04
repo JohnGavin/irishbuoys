@@ -24,8 +24,11 @@ let
       desc
       devtools
       dplyr
+      DT
       duckdb
+      dygraphs
       evd
+      RColorBrewer
       extRemes
       forecast
       gert
