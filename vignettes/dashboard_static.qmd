@@ -3,8 +3,6 @@ title: "Irish Weather Buoy Explorer"
 format:
   dashboard:
     orientation: rows
-    nav-buttons: [github]
-    github: https://github.com/JohnGavin/irishbuoys
     theme: cosmo
 execute:
   echo: false
@@ -22,16 +20,30 @@ library(tidyr)
 
 # Load pre-computed data from targets pipeline
 # Run targets::tar_make() to generate these files
-buoy_data <- readRDS(system.file("extdata", "dashboard_buoy_data.rds", package = "irishbuoys"))
-dashboard_stats <- readRDS(system.file("extdata", "dashboard_stats.rds", package = "irishbuoys"))
-dashboard_ts <- readRDS(system.file("extdata", "dashboard_timeseries.rds", package = "irishbuoys"))
-
-# Fallback: Load from JSON if RDS not available (development mode)
-if (is.null(buoy_data)) {
-  data_path <- "data/buoy_data.json"
-  buoy_data <- jsonlite::fromJSON(data_path)
-  buoy_data$time <- as.POSIXct(buoy_data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+# Use relative path during vignette rendering (from vignettes/ directory)
+data_dir <- "../inst/extdata"
+if (!dir.exists(data_dir)) {
+  # Fallback for installed package
+  data_dir <- system.file("extdata", package = "irishbuoys")
 }
+
+buoy_data <- readRDS(file.path(data_dir, "dashboard_buoy_data.rds"))
+dashboard_stats <- readRDS(file.path(data_dir, "dashboard_stats.rds"))
+dashboard_ts <- readRDS(file.path(data_dir, "dashboard_timeseries.rds"))
+
+# Get package version from DESCRIPTION (works during vignette rendering)
+pkg_version <- tryCatch(
+  as.character(packageVersion("irishbuoys")),
+  error = function(e) {
+    desc_file <- "../DESCRIPTION"
+    if (file.exists(desc_file)) {
+      desc <- read.dcf(desc_file)
+      desc[1, "Version"]
+    } else {
+      "dev"
+    }
+  }
+)
 
 # Get unique stations
 stations <- sort(unique(buoy_data$station_id))
@@ -565,4 +577,4 @@ datatable(
 
 ---
 
-*Dashboard generated `r Sys.time()` UTC using irishbuoys v`r packageVersion("irishbuoys")`*
+*Dashboard generated `r Sys.time()` UTC using irishbuoys v`r pkg_version`*
