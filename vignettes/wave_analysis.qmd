@@ -1,20 +1,11 @@
 ---
-title: "Comprehensive Wave Analysis"
-subtitle: "Irish Weather Buoy Network Data Analysis"
-author: "irishbuoys package"
-date: today
+title: "Wave Analysis Dashboard"
 format:
-  html:
-    toc: true
-    toc-depth: 3
-    toc-location: left
-    page-layout: full
-    code-fold: true
-    code-summary: "Show code"
-    fig-width: 10
-    fig-height: 6
+  dashboard:
+    orientation: rows
+    theme: cosmo
 execute:
-  echo: true
+  echo: false
   warning: false
   message: false
 ---
@@ -32,201 +23,152 @@ if (requireNamespace("pkgload", quietly = TRUE) && file.exists("../DESCRIPTION")
 library(dplyr)
 library(ggplot2)
 library(DT)
-library(targets)
+library(dygraphs)
+library(xts)
+library(tidyr)
 
 # Set ggplot theme
 theme_set(theme_minimal(base_size = 12))
 
-# Helper to safely read targets (works in dev and installed)
-tar_read_safe <- function(name) {
-  store_path <- file.path("..", "_targets")
-  if (dir.exists(store_path)) {
-    tryCatch(
-      targets::tar_read_raw(deparse(substitute(name)), store = store_path),
-      error = function(e) NULL
-    )
-  } else {
-    NULL
-  }
+# Load data from inst/extdata (works during rendering)
+load_rds <- function(f) {
+  p <- file.path("..", "inst", "extdata", f)
+  if (file.exists(p)) return(readRDS(p))
+  p <- system.file("extdata", f, package = "irishbuoys")
+  if (p != "" && file.exists(p)) return(readRDS(p))
+  NULL
 }
 
-# Helper for DT tables with optimized timestamp display
+# Load all data
+rogue_events <- load_rds("rogue_wave_events.rds")
+rogue_conditions <- rogue_events  # Same data with weather condition fields
+analysis_summary <- load_rds("wave_analysis_summary.rds")
+
+seasonal_data <- load_rds("seasonal_analysis.rds")
+if (!is.null(seasonal_data)) {
+  seasonal_means_wave <- seasonal_data$wave
+  seasonal_means_wind <- seasonal_data$wind
+  wave_stl <- seasonal_data$stl
+} else {
+  seasonal_means_wave <- NULL
+  seasonal_means_wind <- NULL
+  wave_stl <- NULL
+}
+
+return_data <- load_rds("return_levels.rds")
+if (!is.null(return_data)) {
+  return_levels_wave <- return_data$wave
+  return_levels_wind <- return_data$wind
+  return_levels_hmax <- return_data$hmax
+} else {
+  return_levels_wave <- NULL
+  return_levels_wind <- NULL
+  return_levels_hmax <- NULL
+}
+
+if (!is.null(analysis_summary)) {
+  gust_analysis <- analysis_summary$gust_analysis
+  annual_trends_wave <- analysis_summary$trends$annual_wave
+} else {
+  gust_analysis <- NULL
+  annual_trends_wave <- NULL
+}
+
+has_data <- !is.null(rogue_events) && nrow(rogue_events) > 0
+
+# Get package version
+pkg_version <- tryCatch(
+  as.character(packageVersion("irishbuoys")),
+  error = function(e) {
+    desc_file <- "../DESCRIPTION"
+    if (file.exists(desc_file)) {
+      desc <- read.dcf(desc_file)
+      desc[1, "Version"]
+    } else "dev"
+  }
+)
+generated_time <- format(Sys.time(), "%Y-%m-%d %H:%M UTC")
+
+# Helper function for DT tables
 create_dt <- function(data, caption = "") {
-  # Find timestamp columns (typically named 'time')
-  time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp", "datetime"))
+  time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp"))
 
   dt <- datatable(
-    data,
-    caption = caption,
-    filter = 'top',
-    extensions = 'Buttons',
+    data, caption = caption, filter = 'top', extensions = 'Buttons',
     options = list(
-      pageLength = 15,
-      order = list(list(0, 'desc')),
-      scrollX = TRUE,
-      dom = 'Bfrtip',
-      buttons = c('copy', 'csv', 'excel'),
-      # Set column widths - wider for timestamps
-      columnDefs = if (length(time_cols) > 0) {
-        list(list(width = '150px', targets = time_cols - 1))  # 0-indexed
-      } else NULL
+      pageLength = 15, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
+      order = list(list(0, 'desc')), scrollX = TRUE,
+      columnDefs = if (length(time_cols) > 0) list(list(width = '120px', targets = time_cols - 1)) else NULL
     ),
     class = 'cell-border stripe hover compact'
   )
 
-  # Style timestamp columns with smaller, non-wrapping text
   if (length(time_cols) > 0) {
-    dt <- dt %>%
-      DT::formatStyle(
-        columns = names(data)[time_cols],
-        fontSize = '11px',
-        whiteSpace = 'nowrap'
-      )
+    dt <- dt %>% DT::formatStyle(columns = time_cols, fontSize = '10px', whiteSpace = 'nowrap')
   }
-
   dt
 }
 
-# Load targets data
-rogue_events <- tar_read_safe(rogue_wave_events)
-rogue_conditions <- tar_read_safe(rogue_wave_conditions)
-analysis_summary <- tar_read_safe(analysis_summary)
-seasonal_means_wave <- tar_read_safe(seasonal_means_wave)
-seasonal_means_wind <- tar_read_safe(seasonal_means_wind)
-annual_trends_wave <- tar_read_safe(annual_trends_wave)
-return_levels_wave <- tar_read_safe(return_levels_wave)
-return_levels_hmax <- tar_read_safe(return_levels_hmax)
-return_levels_wind <- tar_read_safe(return_levels_wind)
-gust_analysis <- tar_read_safe(gust_factor_analysis)
-wave_stl <- tar_read_safe(wave_height_seasonal)
+# Helper for dygraphs
+create_dygraph <- function(data, x_col, y_col, title = "") {
+  if (is.null(data) || nrow(data) == 0) return(NULL)
+  ts_data <- xts(data[[y_col]], order.by = data[[x_col]])
+  colnames(ts_data) <- y_col
 
-# Fallback to inst/extdata if targets not available
-if (is.null(rogue_events)) {
-  load_rds <- function(f) {
-    # Try relative path (during vignette rendering)
-    p <- file.path("..", "inst", "extdata", f)
-    if (file.exists(p)) return(readRDS(p))
-    # Fallback to installed package
-    p <- system.file("extdata", f, package = "irishbuoys")
-    if (p != "" && file.exists(p)) return(readRDS(p))
-    NULL
-  }
-
-  # Load rogue wave events (contains weather condition fields)
-  rogue_events <- load_rds("rogue_wave_events.rds")
-  rogue_conditions <- rogue_events  # Same data with wind_category, season, etc.
-
-  # Load analysis summary
-  analysis_summary <- load_rds("wave_analysis_summary.rds")
-
-  # Load seasonal analysis
-  seasonal_data <- load_rds("seasonal_analysis.rds")
-  if (!is.null(seasonal_data)) {
-    seasonal_means_wave <- seasonal_data$wave
-    seasonal_means_wind <- seasonal_data$wind
-    wave_stl <- seasonal_data$stl
-  }
-
-  # Load return levels
-  return_data <- load_rds("return_levels.rds")
-  if (!is.null(return_data)) {
-    return_levels_wave <- return_data$wave
-    return_levels_wind <- return_data$wind
-    return_levels_hmax <- return_data$hmax
-  }
-
-  # Extract gust analysis from summary if available
-  if (!is.null(analysis_summary) && "gust_analysis" %in% names(analysis_summary)) {
-    gust_analysis <- analysis_summary$gust_analysis
-  }
-
-  # Extract annual trends from summary
-  if (!is.null(analysis_summary) && "trends" %in% names(analysis_summary)) {
-    annual_trends_wave <- analysis_summary$trends$annual_wave
-  }
+  dygraph(ts_data, main = title, width = "100%") |>
+    dyOptions(labelsUTC = TRUE, fillGraph = TRUE, fillAlpha = 0.1, drawGrid = TRUE) |>
+    dyRangeSelector(height = 40) |>
+    dyCrosshair(direction = "vertical") |>
+    dyHighlight(highlightCircleSize = 5, highlightSeriesBackgroundAlpha = 0.2, hideOnMouseOut = FALSE)
 }
-
-has_targets <- !is.null(rogue_events) && nrow(rogue_events) > 0
 ```
 
-## Overview
+# Overview
 
-This vignette provides comprehensive wave and wind analysis from the Irish Weather Buoy Network using data from the [Marine Institute's ERDDAP server](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html).
+## Row
 
-::: {.callout-note}
-## Data Pipeline
-All analysis is computed via `{targets}` pipeline for reproducibility. Run `targets::tar_make()` to regenerate.
-:::
+### Column
 
----
-
-## Wave Measurement Science {#wave-science}
-
-::: {.panel-tabset}
-
-### Glossary
-
-```{r glossary}
-glossary <- wave_glossary()
-create_dt(glossary, "Wave Measurement Terminology - Click columns to sort, use filters to search")
-```
-
-### Hs = 4 x Sigma
-
-The relationship **Hs = 4σ** comes from wave spectrum theory (Longuet-Higgins, 1952).
+**Wave Analysis Dashboard** for the Irish Weather Buoy Network. All analysis computed via `{targets}` pipeline.
 
 ::: {.callout-important}
-## Step-by-Step Calculation
-
-1. **Measure** sea surface elevation η(t) over 17.5 minutes
-2. **De-trend**: η'(t) = η(t) - mean(η) ← subtract mean from RAW DATA
-3. **Calculate σ** = standard deviation of de-meaned elevations
-4. **Hs = 4 × σ**
+## Rogue Wave Definition
+A rogue wave has **Hmax/Hs > 2.0** (ratio of maximum individual wave to significant wave height).
 :::
 
-**Why 4?** This is a mathematical constant from the Rayleigh distribution:
+| Metric | Value |
+|--------|-------|
+| Rogue Wave Events | `r if(has_data) nrow(rogue_events) else "N/A"` |
+| Stations Analyzed | `r if(has_data) length(unique(rogue_events$station_id)) else "N/A"` |
+| Max Rogue Ratio | `r if(has_data) round(max(rogue_events$rogue_ratio), 2) else "N/A"` |
+| Max Hmax Observed | `r if(has_data) round(max(rogue_events$hmax), 1) else "N/A"` m |
 
-$$H_{1/3} = \int_{H_{67\%}}^{\infty} H \cdot f(H) \, dH = 4.004\sigma \approx 4\sigma$$
+*Analysis generated `r generated_time` using irishbuoys v`r pkg_version`*
 
-### RMS Relationship
+### Column
 
-$$H_{rms} = \frac{H_s}{\sqrt{8}} \approx 0.707 \times H_s$$
+#### Key Definitions
 
-### 17.5-Minute Period
+| Term | Definition | Reference |
+|------|------------|-----------|
+| **Hs** | [Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height): 4× [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of wave elevation |
+| **Hmax** | Maximum individual wave height in [17.5-min period](https://www.ocean-sci.net/15/789/2019/) |
+| **Rogue Wave** | Hmax/Hs > 2.0 ([Dysthe et al., 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203)) |
+| **GEV** | [Generalized Extreme Value](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution) distribution |
+| **STL** | [Seasonal-Trend decomposition using Loess](https://en.wikipedia.org/wiki/STL_decomposition) |
 
-| Wave Type | Typical Period | Waves in 17.5 min |
-|-----------|---------------|-------------------|
-| Wind waves | 3-10 s | 105-350 |
-| Swell | 10-25 s | 42-105 |
-| Average | ~8 s | ~130 |
+# Rogue Waves
 
-WMO minimum: 17 minutes. Marine Institute: 17.5 minutes (lower bound for ~100+ waves).
+## Row
 
-### Hourly Processing
-
-1. Burst Sampling (17.5 min) → 2. FFT → 3. Hs = 4√m₀, Hmax from zero-crossing → 4. Hourly report
-
-:::
-
----
-
-## Rogue Wave Analysis {#rogue-waves}
-
-::: {.callout-important}
-## Definition
-Rogue wave: **Hmax/Hs > 2.0** (or 2.2 strict threshold)
-:::
-
-### Events by Station {#events-by-station}
-
-::: {.panel-tabset}
+### Column {.tabset}
 
 #### All Stations (Plot)
 
-```{r rogue-all-plot}
-#| fig-cap: "Rogue wave events across all stations"
-
-if (has_targets && nrow(rogue_events) > 0) {
+```{r}
+#| fig-width: 12
+#| fig-height: 6
+if (has_data) {
   ggplot(rogue_events, aes(x = time, y = rogue_ratio, color = station_id)) +
     geom_point(alpha = 0.7, size = 2) +
     geom_hline(yintercept = 2.0, linetype = "dashed", color = "red") +
@@ -235,14 +177,14 @@ if (has_targets && nrow(rogue_events) > 0) {
          title = paste("Rogue Wave Events (n =", nrow(rogue_events), ")")) +
     theme(legend.position = "bottom")
 } else {
-  cat("No rogue wave data available. Run targets::tar_make() to generate.")
+  cat("No rogue wave data available. Run targets::tar_make()")
 }
 ```
 
 #### All Stations (Data)
 
-```{r rogue-all-table}
-if (has_targets && nrow(rogue_events) > 0) {
+```{r}
+if (has_data) {
   rogue_events %>%
     arrange(desc(rogue_ratio)) %>%
     select(time, station_id, wave_height, hmax, rogue_ratio) %>%
@@ -252,160 +194,62 @@ if (has_targets && nrow(rogue_events) > 0) {
       hmax = round(hmax, 2),
       rogue_ratio = round(rogue_ratio, 3)
     ) %>%
-    create_dt("All Rogue Wave Events - Click columns to sort")
-} else {
-  cat("No rogue wave data available.")
+    create_dt("All Rogue Wave Events")
 }
 ```
 
-#### M2 (Plot)
+#### M2
 
-```{r rogue-m2-plot}
-if (has_targets) {
+```{r}
+if (has_data) {
   m2 <- rogue_events[rogue_events$station_id == "M2", ]
   if (nrow(m2) > 0) {
     ggplot(m2, aes(x = time, y = hmax, color = rogue_ratio)) +
       geom_point(size = 3) + scale_color_viridis_c(name = "Hmax/Hs") +
-      labs(x = "Time", y = "Hmax (m)", title = paste("M2 Rogue Waves (n =", nrow(m2), ")"))
+      labs(x = "Time", y = "Hmax (m)", title = paste("M2 Rogue Waves (n =", nrow(m2), ")")) +
+      theme_minimal()
   } else cat("No rogue waves at M2")
 }
 ```
 
-#### M2 (Data)
+#### M3
 
-```{r rogue-m2-table}
-if (has_targets) {
-  m2 <- rogue_events[rogue_events$station_id == "M2", ]
-  if (nrow(m2) > 0) {
-    m2 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, wave_height, hmax, rogue_ratio) %>%
-      mutate(
-        time = format(time, "%Y-%m-%d %H:%M"),
-        across(c(wave_height, hmax), ~round(., 2)),
-        rogue_ratio = round(rogue_ratio, 3)
-      ) %>%
-      create_dt("M2 Rogue Waves")
-  }
-}
-```
-
-#### M3 (Plot)
-
-```{r rogue-m3-plot}
-if (has_targets) {
+```{r}
+if (has_data) {
   m3 <- rogue_events[rogue_events$station_id == "M3", ]
   if (nrow(m3) > 0) {
     ggplot(m3, aes(x = time, y = hmax, color = rogue_ratio)) +
       geom_point(size = 3) + scale_color_viridis_c(name = "Hmax/Hs") +
-      labs(x = "Time", y = "Hmax (m)", title = paste("M3 Rogue Waves (n =", nrow(m3), ")"))
+      labs(x = "Time", y = "Hmax (m)", title = paste("M3 Rogue Waves (n =", nrow(m3), ")")) +
+      theme_minimal()
   } else cat("No rogue waves at M3")
 }
 ```
 
-#### M3 (Data)
+#### M4
 
-```{r rogue-m3-table}
-if (has_targets) {
-  m3 <- rogue_events[rogue_events$station_id == "M3", ]
-  if (nrow(m3) > 0) {
-    m3 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, wave_height, hmax, rogue_ratio) %>%
-      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
-      create_dt("M3 Rogue Waves")
-  }
-}
-```
-
-#### M4 (Plot)
-
-```{r rogue-m4-plot}
-if (has_targets) {
+```{r}
+if (has_data) {
   m4 <- rogue_events[rogue_events$station_id == "M4", ]
   if (nrow(m4) > 0) {
     ggplot(m4, aes(x = time, y = hmax, color = rogue_ratio)) +
       geom_point(size = 3) + scale_color_viridis_c(name = "Hmax/Hs") +
-      labs(x = "Time", y = "Hmax (m)", title = paste("M4 Rogue Waves (n =", nrow(m4), ")"))
+      labs(x = "Time", y = "Hmax (m)", title = paste("M4 Rogue Waves (n =", nrow(m4), ")")) +
+      theme_minimal()
   } else cat("No rogue waves at M4")
 }
 ```
 
-#### M4 (Data)
+# Weather Conditions
 
-```{r rogue-m4-table}
-if (has_targets) {
-  m4 <- rogue_events[rogue_events$station_id == "M4", ]
-  if (nrow(m4) > 0) {
-    m4 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, wave_height, hmax, rogue_ratio) %>%
-      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
-      create_dt("M4 Rogue Waves")
-  }
-}
-```
+## Row
 
-#### M5 (Plot)
-
-```{r rogue-m5-plot}
-if (has_targets) {
-  m5 <- rogue_events[rogue_events$station_id == "M5", ]
-  if (nrow(m5) > 0) {
-    ggplot(m5, aes(x = time, y = hmax, color = rogue_ratio)) +
-      geom_point(size = 3) + scale_color_viridis_c(name = "Hmax/Hs") +
-      labs(x = "Time", y = "Hmax (m)", title = paste("M5 Rogue Waves (n =", nrow(m5), ")"))
-  } else cat("No rogue waves at M5")
-}
-```
-
-#### M5 (Data)
-
-```{r rogue-m5-table}
-if (has_targets) {
-  m5 <- rogue_events[rogue_events$station_id == "M5", ]
-  if (nrow(m5) > 0) {
-    m5 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, wave_height, hmax, rogue_ratio) %>%
-      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
-      create_dt("M5 Rogue Waves")
-  }
-}
-```
-
-#### M6 (Plot)
-
-```{r rogue-m6-plot}
-if (has_targets) {
-  m6 <- rogue_events[rogue_events$station_id == "M6", ]
-  if (nrow(m6) > 0) {
-    ggplot(m6, aes(x = time, y = hmax, color = rogue_ratio)) +
-      geom_point(size = 3) + scale_color_viridis_c(name = "Hmax/Hs") +
-      labs(x = "Time", y = "Hmax (m)", title = paste("M6 Rogue Waves (n =", nrow(m6), ")"))
-  } else cat("No rogue waves at M6")
-}
-```
-
-#### M6 (Data)
-
-```{r rogue-m6-table}
-if (has_targets) {
-  m6 <- rogue_events[rogue_events$station_id == "M6", ]
-  if (nrow(m6) > 0) {
-    m6 %>% arrange(desc(rogue_ratio)) %>%
-      select(time, wave_height, hmax, rogue_ratio) %>%
-      mutate(time = format(time, "%Y-%m-%d %H:%M"), across(c(wave_height, hmax), ~round(., 2)), rogue_ratio = round(rogue_ratio, 3)) %>%
-      create_dt("M6 Rogue Waves")
-  }
-}
-```
-
-:::
-
-### By Weather Conditions {#by-weather-conditions}
-
-::: {.panel-tabset}
+### Column {.tabset}
 
 #### Wind Speed (Plot)
 
-```{r rogue-wind}
+```{r}
+#| fig-width: 12
 if (!is.null(rogue_conditions) && "wind_category" %in% names(rogue_conditions)) {
   wind_sum <- rogue_conditions %>%
     group_by(wind_category) %>%
@@ -413,15 +257,16 @@ if (!is.null(rogue_conditions) && "wind_category" %in% names(rogue_conditions)) 
 
   ggplot(wind_sum, aes(x = reorder(wind_category, n), y = n, fill = mean_ratio)) +
     geom_col() + coord_flip() + scale_fill_viridis_c(name = "Mean Ratio") +
-    labs(x = "Wind Category", y = "Count", title = "Rogue Waves by Wind Speed")
+    labs(x = "Wind Category", y = "Count", title = "Rogue Waves by Wind Speed") +
+    theme_minimal()
 } else {
-  cat("Weather condition data not available. Run targets::tar_make()")
+  cat("Weather condition data not available")
 }
 ```
 
 #### Wind Speed (Data)
 
-```{r rogue-wind-table}
+```{r}
 if (!is.null(rogue_conditions) && "wind_category" %in% names(rogue_conditions)) {
   rogue_conditions %>%
     select(any_of(c("time", "station_id", "rogue_ratio", "wind_category", "wind_speed"))) %>%
@@ -435,7 +280,8 @@ if (!is.null(rogue_conditions) && "wind_category" %in% names(rogue_conditions)) 
 
 #### Season (Plot)
 
-```{r rogue-season}
+```{r}
+#| fig-width: 12
 if (!is.null(rogue_conditions) && "season" %in% names(rogue_conditions)) {
   season_sum <- rogue_conditions %>%
     group_by(season) %>%
@@ -444,7 +290,8 @@ if (!is.null(rogue_conditions) && "season" %in% names(rogue_conditions)) {
 
   ggplot(season_sum, aes(x = season, y = n, fill = mean_hmax)) +
     geom_col() + scale_fill_viridis_c(name = "Mean Hmax") +
-    labs(x = "Season", y = "Count", title = "Rogue Waves by Season")
+    labs(x = "Season", y = "Count", title = "Rogue Waves by Season") +
+    theme_minimal()
 } else {
   cat("Season data not available")
 }
@@ -452,7 +299,7 @@ if (!is.null(rogue_conditions) && "season" %in% names(rogue_conditions)) {
 
 #### Season (Data)
 
-```{r rogue-season-table}
+```{r}
 if (!is.null(rogue_conditions) && "season" %in% names(rogue_conditions)) {
   rogue_conditions %>%
     select(any_of(c("time", "station_id", "rogue_ratio", "season", "hmax"))) %>%
@@ -463,7 +310,8 @@ if (!is.null(rogue_conditions) && "season" %in% names(rogue_conditions)) {
 
 #### Time of Day (Plot)
 
-```{r rogue-tod}
+```{r}
+#| fig-width: 12
 if (!is.null(rogue_conditions) && "time_of_day" %in% names(rogue_conditions)) {
   tod_sum <- rogue_conditions %>%
     group_by(time_of_day) %>%
@@ -471,52 +319,38 @@ if (!is.null(rogue_conditions) && "time_of_day" %in% names(rogue_conditions)) {
 
   ggplot(tod_sum, aes(x = time_of_day, y = n)) +
     geom_col(fill = "steelblue") +
-    labs(x = "Time of Day", y = "Count", title = "Rogue Waves by Time of Day")
-} else {
-  cat("Time of day data not available")
+    labs(x = "Time of Day", y = "Count", title = "Rogue Waves by Time of Day") +
+    theme_minimal()
 }
 ```
 
-#### All Conditions (Data)
+# Trends
 
-```{r rogue-conditions-table}
-if (!is.null(rogue_conditions)) {
-  rogue_conditions %>%
-    select(any_of(c("time", "station_id", "rogue_ratio", "wind_category", "season", "time_of_day"))) %>%
-    mutate(time = format(time, "%Y-%m-%d %H:%M"), across(where(is.numeric), ~round(., 3))) %>%
-    create_dt("All Rogue Wave Conditions")
-}
-```
+## Row
 
-:::
+### Column {.tabset}
 
----
+#### Monthly Wave Height (Plot)
 
-## Trend Decomposition {#trends}
+```{r}
+#| fig-width: 12
+if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) {
+  monthly <- seasonal_means_wave$monthly
+  monthly$month_name <- factor(monthly$month_name, levels = month.abb)
 
-::: {.panel-tabset}
-
-### Monthly Wave Height (Plot)
-
-```{r seasonal-wave}
-if (!is.null(seasonal_means_wave)) {
-  if ("monthly" %in% names(seasonal_means_wave)) {
-    monthly <- seasonal_means_wave$monthly
-    monthly$month_name <- factor(monthly$month_name, levels = month.abb)
-
-    ggplot(monthly, aes(x = month_name, y = mean)) +
-      geom_col(fill = "steelblue") +
-      geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3) +
-      labs(x = "Month", y = "Mean Hs (m)", title = "Monthly Wave Height")
-  }
+  ggplot(monthly, aes(x = month_name, y = mean)) +
+    geom_col(fill = "steelblue") +
+    geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3) +
+    labs(x = "Month", y = "Mean Hs (m)", title = "Monthly Wave Height") +
+    theme_minimal()
 } else {
   cat("Seasonal data not available. Run targets::tar_make()")
 }
 ```
 
-### Monthly Wave Height (Data)
+#### Monthly Wave (Data)
 
-```{r seasonal-wave-table}
+```{r}
 if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) {
   seasonal_means_wave$monthly %>%
     mutate(across(where(is.numeric), ~round(., 2))) %>%
@@ -524,37 +358,26 @@ if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) 
 }
 ```
 
-### Monthly Wind Speed (Plot)
+#### Monthly Wind (Plot)
 
-```{r seasonal-wind}
-if (!is.null(seasonal_means_wind)) {
-  if ("monthly" %in% names(seasonal_means_wind)) {
-    monthly <- seasonal_means_wind$monthly
-    monthly$month_name <- factor(monthly$month_name, levels = month.abb)
-
-    ggplot(monthly, aes(x = month_name, y = mean)) +
-      geom_col(fill = "darkorange") +
-      geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3) +
-      labs(x = "Month", y = "Mean Wind Speed (m/s)", title = "Monthly Wind Speed")
-  }
-} else {
-  cat("Wind seasonal data not available")
-}
-```
-
-### Monthly Wind Speed (Data)
-
-```{r seasonal-wind-table}
+```{r}
+#| fig-width: 12
 if (!is.null(seasonal_means_wind) && "monthly" %in% names(seasonal_means_wind)) {
-  seasonal_means_wind$monthly %>%
-    mutate(across(where(is.numeric), ~round(., 2))) %>%
-    create_dt("Monthly Wind Speed Statistics")
+  monthly <- seasonal_means_wind$monthly
+  monthly$month_name <- factor(monthly$month_name, levels = month.abb)
+
+  ggplot(monthly, aes(x = month_name, y = mean)) +
+    geom_col(fill = "darkorange") +
+    geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3) +
+    labs(x = "Month", y = "Mean Wind Speed (m/s)", title = "Monthly Wind Speed") +
+    theme_minimal()
 }
 ```
 
-### Annual Trends (Plot)
+#### Annual Trends (Plot)
 
-```{r annual-trends}
+```{r}
+#| fig-width: 12
 if (!is.null(annual_trends_wave) && "annual_stats" %in% names(annual_trends_wave)) {
   annual <- annual_trends_wave$annual_stats
 
@@ -562,27 +385,18 @@ if (!is.null(annual_trends_wave) && "annual_stats" %in% names(annual_trends_wave
     geom_point(size = 3) + geom_line(alpha = 0.5) +
     geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.3, alpha = 0.5) +
     geom_smooth(method = "lm", se = TRUE, color = "red", alpha = 0.2) +
-    labs(x = "Year", y = "Mean Hs (m)", title = "Annual Wave Height Trend")
+    labs(x = "Year", y = "Mean Hs (m)", title = "Annual Wave Height Trend") +
+    theme_minimal()
 } else {
-  cat("Annual trend data not available. Run targets::tar_make()")
+  cat("Annual trend data not available")
 }
 ```
 
-### Annual Trends (Data)
+#### STL Decomposition
 
-```{r annual-trends-table}
-if (!is.null(annual_trends_wave) && "annual_stats" %in% names(annual_trends_wave)) {
-  annual_trends_wave$annual_stats %>%
-    mutate(across(where(is.numeric), ~round(., 2))) %>%
-    create_dt("Annual Wave Height Statistics")
-}
-```
-
-### STL Decomposition
-
-```{r stl}
+```{r}
+#| fig-width: 12
 #| fig-height: 8
-
 if (!is.null(wave_stl) && "components" %in% names(wave_stl)) {
   stl_df <- wave_stl$components
   stl_long <- tidyr::pivot_longer(stl_df,
@@ -594,38 +408,39 @@ if (!is.null(wave_stl) && "components" %in% names(wave_stl)) {
   ggplot(stl_long, aes(x = time, y = value)) +
     geom_line(color = "steelblue", alpha = 0.7) +
     facet_wrap(~component, scales = "free_y", ncol = 1) +
-    labs(x = "Time", y = "Wave Height (m)", title = "STL Decomposition")
+    labs(x = "Time", y = "Wave Height (m)", title = "STL Decomposition") +
+    theme_minimal()
 } else {
   cat("STL decomposition not available")
 }
 ```
 
-:::
+# Extreme Values
 
----
+## Row
 
-## Extreme Value Analysis {#eva}
+### Column {.tabset}
 
-::: {.panel-tabset}
+#### Wave Return Levels (Plot)
 
-### Wave Height Return Levels (Plot)
-
-```{r return-wave}
+```{r}
+#| fig-width: 12
 if (!is.null(return_levels_wave)) {
   ggplot(return_levels_wave, aes(x = return_period, y = return_level)) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3, fill = "steelblue") +
     geom_line(color = "steelblue", linewidth = 1.2) +
     geom_point(color = "steelblue", size = 3) +
     scale_x_log10() +
-    labs(x = "Return Period (years)", y = "Hs (m)", title = "Wave Height Return Levels")
+    labs(x = "Return Period (years)", y = "Hs (m)", title = "Wave Height Return Levels") +
+    theme_minimal()
 } else {
   cat("Return levels not available. Run targets::tar_make()")
 }
 ```
 
-### Wave Height Return Levels (Data)
+#### Wave Return Levels (Data)
 
-```{r return-wave-table}
+```{r}
 if (!is.null(return_levels_wave)) {
   return_levels_wave %>%
     mutate(across(where(is.numeric), ~round(., 2))) %>%
@@ -633,63 +448,43 @@ if (!is.null(return_levels_wave)) {
 }
 ```
 
-### Hmax Return Levels (Plot)
+#### Wind Return Levels (Plot)
 
-```{r return-hmax}
-if (!is.null(return_levels_hmax)) {
-  ggplot(return_levels_hmax, aes(x = return_period, y = return_level)) +
-    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3, fill = "darkred") +
-    geom_line(color = "darkred", linewidth = 1.2) +
-    geom_point(color = "darkred", size = 3) +
-    scale_x_log10() +
-    labs(x = "Return Period (years)", y = "Hmax (m)", title = "Maximum Wave Return Levels")
-} else {
-  cat("Hmax return levels not available")
-}
-```
-
-### Hmax Return Levels (Data)
-
-```{r return-hmax-table}
-if (!is.null(return_levels_hmax)) {
-  return_levels_hmax %>%
-    mutate(across(where(is.numeric), ~round(., 2))) %>%
-    create_dt("Hmax Return Levels")
-}
-```
-
-### Wind Return Levels (Plot)
-
-```{r return-wind}
+```{r}
+#| fig-width: 12
 if (!is.null(return_levels_wind)) {
   ggplot(return_levels_wind, aes(x = return_period, y = return_level)) +
     geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3, fill = "darkorange") +
     geom_line(color = "darkorange", linewidth = 1.2) +
     geom_point(color = "darkorange", size = 3) +
     scale_x_log10() +
-    labs(x = "Return Period (years)", y = "Wind Speed (m/s)", title = "Wind Speed Return Levels")
-} else {
-  cat("Wind return levels not available")
+    labs(x = "Return Period (years)", y = "Wind Speed (m/s)", title = "Wind Speed Return Levels") +
+    theme_minimal()
 }
 ```
 
-### Wind Return Levels (Data)
+#### Hmax Return Levels (Plot)
 
-```{r return-wind-table}
-if (!is.null(return_levels_wind)) {
-  return_levels_wind %>%
-    mutate(across(where(is.numeric), ~round(., 2))) %>%
-    create_dt("Wind Return Levels")
+```{r}
+#| fig-width: 12
+if (!is.null(return_levels_hmax)) {
+  ggplot(return_levels_hmax, aes(x = return_period, y = return_level)) +
+    geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.3, fill = "darkred") +
+    geom_line(color = "darkred", linewidth = 1.2) +
+    geom_point(color = "darkred", size = 3) +
+    scale_x_log10() +
+    labs(x = "Return Period (years)", y = "Hmax (m)", title = "Maximum Wave Return Levels") +
+    theme_minimal()
 }
 ```
 
-### Summary Table
+#### Summary Table
 
-```{r return-summary}
-if (!is.null(return_levels_wave) && !is.null(return_levels_hmax)) {
+```{r}
+if (!is.null(return_levels_wave)) {
   bind_rows(
-    return_levels_wave %>% mutate(Variable = "Hs"),
-    return_levels_hmax %>% mutate(Variable = "Hmax"),
+    if (!is.null(return_levels_wave)) return_levels_wave %>% mutate(Variable = "Hs") else NULL,
+    if (!is.null(return_levels_hmax)) return_levels_hmax %>% mutate(Variable = "Hmax") else NULL,
     if (!is.null(return_levels_wind)) return_levels_wind %>% mutate(Variable = "Wind") else NULL
   ) %>%
     select(Variable, return_period, return_level, lower, upper) %>%
@@ -698,19 +493,17 @@ if (!is.null(return_levels_wave) && !is.null(return_levels_hmax)) {
 }
 ```
 
-:::
+# Gust Factor
 
----
+## Row
 
-## Gust Factor Analysis {#rogue-wind}
+### Column {.tabset}
 
-::: {.panel-tabset}
-
-### Summary
+#### Summary
 
 Gust Factor = Peak Gust / Sustained Wind. Typical value: ~1.3
 
-```{r gust-summary}
+```{r}
 if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
   gust_analysis$summary %>%
     mutate(across(where(is.numeric), ~round(., 2))) %>%
@@ -720,23 +513,24 @@ if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
 }
 ```
 
-### By Wind Category (Plot)
+#### By Wind Category (Plot)
 
-```{r gust-category}
+```{r}
+#| fig-width: 12
 if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
   gust_cat <- gust_analysis$by_category
 
   ggplot(gust_cat, aes(x = wind_category, y = mean_gf)) +
     geom_col(fill = "darkorange") +
     geom_hline(yintercept = 1.3, linetype = "dashed", color = "red") +
-    labs(x = "Wind Speed Category", y = "Gust Factor",
-         title = "Gust Factor by Wind Speed")
+    labs(x = "Wind Speed Category", y = "Gust Factor", title = "Gust Factor by Wind Speed") +
+    theme_minimal()
 }
 ```
 
-### By Wind Category (Data)
+#### By Wind Category (Data)
 
-```{r gust-category-table}
+```{r}
 if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
   gust_analysis$by_category %>%
     mutate(across(where(is.numeric), ~round(., 2))) %>%
@@ -744,36 +538,40 @@ if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
 }
 ```
 
-:::
+# Reference
+
+## Row
+
+### Column {width=50%}
+
+#### Wave Science Glossary
+
+| Term | Definition | Reference |
+|------|------------|-----------|
+| **Hs (H₁/₃)** | Significant wave height = mean of highest 1/3 of waves | [Wikipedia](https://en.wikipedia.org/wiki/Significant_wave_height) |
+| **Hs = 4σ** | Derived from [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights | [Longuet-Higgins, 1952](https://doi.org/10.1357/002224052806645438) |
+| **RMS** | [Root Mean Square](https://en.wikipedia.org/wiki/Root_mean_square) of wave elevation | H_rms = Hs / √8 |
+| **Hmax** | Maximum individual wave in measurement period | Typically Hmax/Hs ≈ 1.5-1.9 |
+| **17.5 min** | Standard measurement period for ~100+ waves | [WMO guidelines](https://library.wmo.int/) |
+| **Zero-crossing** | Method to identify individual waves in elevation record | [Wave period](https://en.wikipedia.org/wiki/Wave_period) |
+
+### Column {width=50%}
+
+#### Extreme Value Analysis Methods
+
+| Method | Description | Use Case |
+|--------|-------------|----------|
+| **GEV** | [Generalized Extreme Value](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution) | Annual maxima |
+| **GPD** | [Generalized Pareto](https://en.wikipedia.org/wiki/Generalized_Pareto_distribution) | Peaks over threshold |
+| **Return Level** | Value expected to be exceeded once per T years | Design specifications |
+| **STL** | [Seasonal-Trend Loess](https://en.wikipedia.org/wiki/STL_decomposition) | Trend detection |
+
+**References:**
+
+- Longuet-Higgins, M.S. (1952). Statistical distribution of sea waves. *J. Marine Research*, 11, 245-266.
+- Dysthe, K. et al. (2008). Oceanic rogue waves. *Ann. Rev. Fluid Mech.*, 40, 287-310.
+- Coles, S. (2001). *Statistical Modeling of Extreme Values*. Springer.
 
 ---
 
-## Technical Appendix
-
-### Pipeline Status
-
-```{r pipeline-status}
-store_path <- file.path("..", "_targets")
-if (dir.exists(store_path)) {
-  cat("Targets store found at:", normalizePath(store_path), "\n")
-  tryCatch({
-    meta <- targets::tar_meta(store = store_path)
-    cat("Total targets:", nrow(meta), "\n")
-    cat("Completed:", sum(meta$error == FALSE, na.rm = TRUE), "\n")
-  }, error = function(e) cat("Could not read targets metadata\n"))
-} else {
-  cat("No targets store found. Run targets::tar_make() to generate analysis.\n")
-}
-```
-
-### Session Info
-
-```{r session-info}
-sessionInfo()
-```
-
-### References
-
-1. Longuet-Higgins, M.S. (1952). On the statistical distribution of sea waves. *J. Marine Research*, 11, 245-266.
-2. Dysthe, K. et al. (2008). Oceanic rogue waves. *Ann. Rev. Fluid Mech.*, 40, 287-310.
-3. Coles, S. (2001). *Statistical Modeling of Extreme Values*. Springer.
+*Analysis generated `r generated_time` using irishbuoys v`r pkg_version`*
