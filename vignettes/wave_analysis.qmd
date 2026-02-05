@@ -137,11 +137,19 @@ classify_beaufort <- function(ws) {
 
 beaufort_colors <- c(
   "0-5 (Calm-Fresh)" = "#2166ac",
-  "6-7 (Strong-Near Gale)" = "#67a9cf",
-  "8-9 (Gale-Severe)" = "#fddbc7",
-  "10 (Storm)" = "#ef8a62",
+  "6-7 (Strong-Near Gale)" = "#4393c3",
+  "8-9 (Gale-Severe)" = "#d6604d",
+  "10 (Storm)" = "#f4a582",
   "11 (Violent Storm)" = "#b2182b",
   "12 (Hurricane)" = "#67001f"
+)
+
+# Common legend styling for all plotly plots
+legend_style <- list(
+  font = list(color = "#333333", size = 12),
+  bgcolor = "rgba(255,255,255,0.9)",
+  bordercolor = "#cccccc",
+  borderwidth = 1
 )
 ```
 
@@ -221,7 +229,14 @@ if (has_data) {
              showarrow = FALSE, xanchor = "right", yanchor = "bottom", font = list(color = "red", size = 10)),
         list(x = max(rogue_events$time), y = 2.2, text = "Severe (2.2)",
              showarrow = FALSE, xanchor = "right", yanchor = "bottom", font = list(color = "darkred", size = 10))
-      )
+      ),
+      plot_bgcolor = "#f8f8f8",
+      legend = list(
+        font = list(color = "#333333", size = 12),
+        bgcolor = "rgba(255,255,255,0.9)",
+        bordercolor = "#cccccc", borderwidth = 1
+      ),
+      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
     )
 } else {
   cat("No rogue wave data available. Run targets::tar_make()")
@@ -230,30 +245,62 @@ if (has_data) {
 
 #### Events by Station
 
-```{r}
-if (has_data) {
-  # Faceted plotly by station with high contrast colors
-  p <- ggplot(rogue_events, aes(x = time, y = hmax,
-    text = paste0("Station: ", station_id, "<br>",
-                  "Time: ", format(time, "%Y-%m-%d %H:%M"), "<br>",
-                  "Hmax: ", round(hmax, 2), " m<br>",
-                  "Hs: ", round(wave_height, 2), " m<br>",
-                  "Ratio: ", round(rogue_ratio, 3), "<br>",
-                  "Wind: ", round(wind_speed, 1), " m/s<br>",
-                  "Gust: ", round(gust, 1), " m/s<br>",
-                  "Pressure: ", round(atmospheric_pressure, 1), " hPa")
-  )) +
-    geom_point(aes(color = rogue_ratio), size = 3, alpha = 0.9) +
-    scale_color_viridis_c(name = "Hmax/Hs", option = "inferno", begin = 0.2, end = 0.9) +
-    facet_wrap(~station_id, scales = "free_y", ncol = 2) +
-    labs(x = "Time", y = "Hmax (m)") +
-    theme_minimal(base_size = 10) +
-    theme(strip.text = element_text(face = "bold", size = 11))
+Use the **range slider** at the bottom to zoom all panels to a specific time period.
 
-  ggplotly(p, tooltip = "text") |>
-    layout(title = paste0("Rogue Wave Events by Station (",
-           format(min(rogue_events$time), "%Y-%m-%d"), " to ",
-           format(max(rogue_events$time), "%Y-%m-%d"), ")"))
+```{r}
+#| fig-height: 14
+if (has_data) {
+  stations <- sort(unique(rogue_events$station_id))
+
+  # Color scale for rogue ratio (dark on light background)
+  station_colors <- c(M2 = "#e41a1c", M3 = "#377eb8", M4 = "#4daf4a",
+                      M5 = "#984ea3", M6 = "#ff7f00")
+
+  plots <- lapply(seq_along(stations), function(i) {
+    st <- stations[i]
+    d <- rogue_events |> dplyr::filter(station_id == st)
+    n_st <- nrow(d)
+
+    plot_ly(d, x = ~time, y = ~hmax,
+      type = "scatter", mode = "markers",
+      marker = list(
+        size = 8, opacity = 0.85,
+        color = station_colors[st],
+        line = list(width = 0.5, color = "black")
+      ),
+      text = ~paste0("Station: ", station_id, "<br>",
+                     "Time: ", format(time, "%Y-%m-%d %H:%M"), "<br>",
+                     "Hmax: ", round(hmax, 2), " m<br>",
+                     "Hs: ", round(wave_height, 2), " m<br>",
+                     "Ratio: ", round(rogue_ratio, 3), "<br>",
+                     "Wind: ", round(wind_speed, 1), " m/s"),
+      hoverinfo = "text",
+      showlegend = FALSE
+    ) |>
+      layout(
+        annotations = list(list(
+          text = paste0("<b>", st, "</b> (n=", n_st, ")"),
+          x = 0.02, y = 0.95, xref = "paper", yref = "paper",
+          showarrow = FALSE, font = list(size = 13, color = station_colors[st])
+        )),
+        yaxis = list(title = "Hmax (m)")
+      )
+  })
+
+  subplot(plots, nrows = length(stations), shareX = TRUE, titleY = TRUE) |>
+    layout(
+      title = list(
+        text = paste0("Rogue Wave Events by Station (n=", nrow(rogue_events),
+                      ", ", date_caption, ")"),
+        font = list(size = 14)
+      ),
+      xaxis = list(
+        title = "Time",
+        rangeslider = list(type = "date", thickness = 0.05)
+      ),
+      plot_bgcolor = "#f8f8f8",
+      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
+    )
 }
 ```
 
@@ -282,6 +329,9 @@ if (has_data) {
 
 #### Wind Speed (Beaufort)
 
+Wind speed in m/s, colored by [Beaufort scale](https://en.wikipedia.org/wiki/Beaufort_scale) category.
+Conversion: Beaufort 6 = 10.8 m/s, 8 = 17.2 m/s, 10 = 24.5 m/s, 12 = 32.7 m/s.
+
 ```{r}
 if (!is.null(rogue_conditions) && "wind_speed" %in% names(rogue_conditions)) {
   rc <- rogue_conditions |>
@@ -291,7 +341,7 @@ if (!is.null(rogue_conditions) && "wind_speed" %in% names(rogue_conditions)) {
     colors = beaufort_colors,
     type = "scatter", mode = "markers",
     marker = list(size = 10, opacity = 0.8,
-                  line = list(width = 1, color = "white")),
+                  line = list(width = 1, color = "#333333")),
     text = ~paste0("Station: ", station_id, "<br>",
                    "Time: ", format(time, "%Y-%m-%d %H:%M"), "<br>",
                    "Wind: ", round(wind_speed, 1), " m/s<br>",
@@ -302,16 +352,23 @@ if (!is.null(rogue_conditions) && "wind_speed" %in% names(rogue_conditions)) {
     hoverinfo = "text"
   ) |>
     layout(
-      title = paste0("Rogue Waves by Wind Speed (Beaufort Scale, ",
-                     format(min(rc$time), "%Y-%m-%d"), " to ",
-                     format(max(rc$time), "%Y-%m-%d"), ")"),
+      title = paste0("Rogue Waves by Wind Speed (", date_caption, ")"),
       xaxis = list(title = "Wind Speed (m/s)"),
       yaxis = list(title = "Hmax / Hs Ratio"),
+      plot_bgcolor = "#f8f8f8",
       shapes = list(
         list(type = "line", x0 = 0, x1 = max(rc$wind_speed, na.rm = TRUE) * 1.05,
              y0 = 2.0, y1 = 2.0, line = list(color = "red", dash = "dash", width = 2))
       ),
-      legend = list(title = list(text = "Beaufort Scale"))
+      legend = list(
+        title = list(text = "<b>Beaufort Scale</b>",
+                     font = list(color = "#333333", size = 13)),
+        font = list(color = "#333333", size = 12),
+        bgcolor = "rgba(255,255,255,0.9)",
+        bordercolor = "#cccccc", borderwidth = 1,
+        orientation = "h", y = -0.15, x = 0.5, xanchor = "center"
+      ),
+      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
     )
 } else {
   cat("Wind speed data not available")
@@ -352,11 +409,12 @@ if (!is.null(rogue_conditions)) {
       .groups = "drop"
     )
 
+  # Distinct, high-contrast colors for 12 months
   month_colors <- c(
-    "Jan" = "#1f77b4", "Feb" = "#2ca02c", "Mar" = "#bcbd22",
+    "Jan" = "#1f77b4", "Feb" = "#2ca02c", "Mar" = "#8c564b",
     "Apr" = "#ff7f0e", "May" = "#d62728", "Jun" = "#9467bd",
-    "Jul" = "#8c564b", "Aug" = "#e377c2", "Sep" = "#7f7f7f",
-    "Oct" = "#17becf", "Nov" = "#aec7e8", "Dec" = "#98df8a"
+    "Jul" = "#e377c2", "Aug" = "#17becf", "Sep" = "#7f7f7f",
+    "Oct" = "#393b79", "Nov" = "#637939", "Dec" = "#8c6d31"
   )
 
   plot_ly(week_counts, x = ~week, y = ~n, color = ~month_name,
@@ -370,13 +428,20 @@ if (!is.null(rogue_conditions)) {
     hoverinfo = "text"
   ) |>
     layout(
-      title = paste0("Rogue Wave Events by Week of Year (",
-                     format(min(rogue_conditions$time), "%Y-%m-%d"), " to ",
-                     format(max(rogue_conditions$time), "%Y-%m-%d"), ")"),
-      xaxis = list(title = "Week of Year", dtick = 1),
+      title = paste0("Rogue Wave Events by Week of Year (n=",
+                     nrow(rogue_conditions), ", ", date_caption, ")"),
+      xaxis = list(title = "Week of Year", dtick = 2),
       yaxis = list(title = "Count of Rogue Events"),
+      plot_bgcolor = "#f8f8f8",
       barmode = "stack",
-      legend = list(title = list(text = "Month"))
+      legend = list(
+        title = list(text = "<b>Month</b>",
+                     font = list(color = "#333333", size = 13)),
+        font = list(color = "#333333", size = 12),
+        bgcolor = "rgba(255,255,255,0.9)",
+        bordercolor = "#cccccc", borderwidth = 1
+      ),
+      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
     )
 } else {
   cat("Temporal data not available")
@@ -387,26 +452,57 @@ if (!is.null(rogue_conditions)) {
 
 ```{r}
 if (!is.null(rogue_conditions) && "time_of_day" %in% names(rogue_conditions)) {
+  # Order time of day logically
+  rogue_conditions$time_of_day <- factor(rogue_conditions$time_of_day,
+    levels = c("Morning", "Afternoon", "Evening", "Night"))
+
   tod_data <- rogue_conditions |>
     group_by(time_of_day) |>
     summarise(
       n = n(),
+      hours = dplyr::case_when(
+        time_of_day[1] == "Morning" ~ "06:00-12:00",
+        time_of_day[1] == "Afternoon" ~ "12:00-18:00",
+        time_of_day[1] == "Evening" ~ "18:00-22:00",
+        time_of_day[1] == "Night" ~ "22:00-06:00"
+      ),
+      n_hours = dplyr::case_when(
+        time_of_day[1] == "Morning" ~ 6L,
+        time_of_day[1] == "Afternoon" ~ 6L,
+        time_of_day[1] == "Evening" ~ 4L,
+        time_of_day[1] == "Night" ~ 8L
+      ),
+      rate_per_hour = round(n / n_hours, 1),
       mean_ratio = round(mean(rogue_ratio, na.rm = TRUE), 2),
       .groups = "drop"
     )
 
+  tod_colors <- c(Morning = "#f4a582", Afternoon = "#d6604d",
+                  Evening = "#4393c3", Night = "#2166ac")
+
+  total_events <- sum(tod_data$n)
+
   plot_ly(tod_data, x = ~time_of_day, y = ~n,
     type = "bar",
-    marker = list(color = "steelblue"),
-    text = ~paste0("Time of Day: ", time_of_day, "<br>",
-                   "Rogue Events: ", n, "<br>",
+    marker = list(color = ~tod_colors[as.character(time_of_day)]),
+    text = ~paste0(time_of_day, " (", hours, ")<br>",
+                   "Events: ", n, "<br>",
+                   "Rate: ", rate_per_hour, " events/hour<br>",
                    "Mean Ratio: ", mean_ratio),
     hoverinfo = "text"
   ) |>
     layout(
-      title = paste0("Rogue Waves by Time of Day (", date_caption, ")"),
-      xaxis = list(title = "Time of Day"),
-      yaxis = list(title = "Count")
+      title = paste0("Rogue Waves by Time of Day (Total: ", total_events,
+                     " events, ", date_caption, ")"),
+      xaxis = list(title = "Time of Day (hover for hours)"),
+      yaxis = list(title = "Count"),
+      plot_bgcolor = "#f8f8f8",
+      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12)),
+      annotations = list(list(
+        text = paste0("Total: ", total_events, " rogue events"),
+        x = 0.98, y = 0.98, xref = "paper", yref = "paper",
+        showarrow = FALSE, font = list(color = "#333333", size = 11)
+      ))
     )
 }
 ```
