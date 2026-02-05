@@ -367,20 +367,28 @@ plot_data <- scatter_sample |>
   )
 
 p <- ggplot(plot_data, aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.3, size = 1, aes(
+  geom_point(aes(
     text = paste0("Station: ", station_id, "<br>",
                   "Wind: ", round(wind_speed, 1), " m/s<br>",
                   "Wave Ht: ", round(wave_height, 2), " m<br>",
                   "Time: ", format(time, "%Y-%m-%d %H:%M"))
-  )) +
-  geom_smooth(method = "lm", se = TRUE, color = "red", alpha = 0.2) +
-  facet_wrap(~station_label, nrow = 1) +
+  ), color = "#1f77b4", alpha = 0.5, size = 1.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "red", linewidth = 1) +
+  facet_wrap(~station_label, ncol = 2) +
   labs(x = "Wind Speed (m/s)", y = "Wave Height (m)") +
   theme_minimal(base_size = 11) +
-  theme(strip.text = element_text(face = "bold"))
+  theme(
+    strip.text = element_text(face = "bold", size = 11),
+    panel.background = element_rect(fill = "grey95", color = NA),
+    panel.grid.major = element_line(color = "white"),
+    panel.grid.minor = element_line(color = "white")
+  )
 
 ggplotly(p, tooltip = "text") |>
-  layout(title = paste0("Wind Speed vs Wave Height - ordered by slope (", date_caption, ")"))
+  layout(
+    title = paste0("Wind Speed vs Wave Height - ordered by slope (", date_caption, ")"),
+    hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
+  )
 ```
 
 ## Row {height=30%}
@@ -421,7 +429,7 @@ recent_data <- buoy_data |>
   arrange(desc(time)) |>
   head(500) |>
   mutate(
-    `Time (UTC)` = format(time, "%m-%d %H:%M"),
+    `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
     Station = station_id,
     `Hs (m)` = round(wave_height, 2),
     `Hmax (m)` = round(hmax, 2),
