@@ -424,10 +424,68 @@ analyze_gust_factor <- function(data, min_wind_speed = 5) {
   cli::cli_alert_info("Typical gust factor: {round(summary_stats$value[2], 2)}")
   cli::cli_alert_info("'Rogue gust' events (GF > {rogue_threshold}): {n_rogue_gusts} ({round(pct_rogue_gusts, 3)}%)")
 
+  # By-station analysis
+  by_station <- NULL
+  if ("station_id" %in% names(data)) {
+    station_ids <- unique(data$station_id[valid_idx])
+    by_station_list <- lapply(station_ids, function(sid) {
+      idx <- valid_idx & data$station_id == sid
+      if (sum(idx) < 10) return(NULL)
+      gf <- data$gust[idx] / data$wind_speed[idx]
+      data.frame(
+        station_id = sid,
+        n = length(gf),
+        mean_gf = mean(gf, na.rm = TRUE),
+        median_gf = stats::median(gf, na.rm = TRUE),
+        sd_gf = stats::sd(gf, na.rm = TRUE),
+        p95_gf = stats::quantile(gf, 0.95, na.rm = TRUE),
+        p99_gf = stats::quantile(gf, 0.99, na.rm = TRUE),
+        max_gf = max(gf, na.rm = TRUE),
+        n_rogue = sum(gf > rogue_threshold, na.rm = TRUE),
+        pct_rogue = 100 * sum(gf > rogue_threshold, na.rm = TRUE) / length(gf),
+        stringsAsFactors = FALSE
+      )
+    })
+    by_station <- do.call(rbind, Filter(Negate(is.null), by_station_list))
+    row.names(by_station) <- NULL
+
+    # By station and wind category
+    by_station_category_list <- lapply(station_ids, function(sid) {
+      idx <- valid_idx & data$station_id == sid
+      if (sum(idx) < 10) return(NULL)
+      gf <- data$gust[idx] / data$wind_speed[idx]
+      wcat <- cut(
+        data$wind_speed[idx],
+        breaks = c(5, 10, 15, 20, 25, Inf),
+        labels = c("5-10", "10-15", "15-20", "20-25", ">25"),
+        include.lowest = TRUE
+      )
+      agg <- stats::aggregate(
+        gf,
+        by = list(wind_category = wcat),
+        FUN = function(x) c(n = length(x), mean = mean(x), p95 = stats::quantile(x, 0.95))
+      )
+      data.frame(
+        station_id = sid,
+        wind_category = agg$wind_category,
+        n = agg$x[, 1],
+        mean_gf = agg$x[, 2],
+        p95_gf = agg$x[, 3],
+        stringsAsFactors = FALSE
+      )
+    })
+    by_station_category <- do.call(rbind, Filter(Negate(is.null), by_station_category_list))
+    row.names(by_station_category) <- NULL
+  } else {
+    by_station_category <- NULL
+  }
+
   return(list(
     summary = summary_stats,
     extreme_gusts = extreme_gusts,
     by_category = by_category,
+    by_station = by_station,
+    by_station_category = by_station_category,
     rogue_gust_threshold = rogue_threshold,
     n_rogue_gusts = n_rogue_gusts,
     pct_rogue_gusts = pct_rogue_gusts
