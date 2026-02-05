@@ -44,6 +44,24 @@ pkg_version <- tryCatch(
 # Get unique stations
 stations <- sort(unique(buoy_data$station_id))
 
+# Create daily averages for time series (reduces HTML size)
+buoy_daily <- buoy_data |>
+  mutate(date = as.Date(time)) |>
+  group_by(station_id, date) |>
+  summarise(
+    time = as.POSIXct(paste0(unique(date), " 12:00:00"), tz = "UTC"),
+    wave_height = mean(wave_height, na.rm = TRUE),
+    hmax = max(hmax, na.rm = TRUE),
+    wave_period = mean(wave_period, na.rm = TRUE),
+    wind_speed = mean(wind_speed, na.rm = TRUE),
+    gust = max(gust, na.rm = TRUE),
+    atmospheric_pressure = mean(atmospheric_pressure, na.rm = TRUE),
+    air_temperature = mean(air_temperature, na.rm = TRUE),
+    sea_temperature = mean(sea_temperature, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  select(-date)
+
 # Calculate summary stats
 valid_ww <- complete.cases(buoy_data$wind_speed, buoy_data$wave_height)
 valid_wh <- complete.cases(buoy_data$wave_height, buoy_data$hmax)
@@ -51,6 +69,7 @@ cor_wind_wave <- round(cor(buoy_data$wind_speed[valid_ww], buoy_data$wave_height
 cor_wave_hmax <- round(cor(buoy_data$wave_height[valid_wh], buoy_data$hmax[valid_wh]), 3)
 days_span <- round(as.numeric(difftime(max(buoy_data$time), min(buoy_data$time), units = "days")))
 generated_time <- format(Sys.time(), "%Y-%m-%d %H:%M UTC")
+date_caption <- paste0(format(min(buoy_data$time), "%Y-%m-%d"), " to ", format(max(buoy_data$time), "%Y-%m-%d"))
 
 # Helper function to create station-specific data
 get_station_data <- function(data, station) {
@@ -136,7 +155,7 @@ station_info <- data.frame(
 
 ```{r}
 #| title: "Wave Height Time Series - All Stations (Full Dataset)"
-create_dygraph(buoy_data, "wave_height", "Significant Wave Height (Hs) in meters")
+create_dygraph(buoy_daily, "wave_height", "Significant Wave Height (Hs) - Daily Means")
 ```
 
 ## Row {height=25%}
@@ -163,37 +182,37 @@ create_dygraph(buoy_data, "wave_height", "Significant Wave Height (Hs) in meters
 #### All Stations
 
 ```{r}
-create_dygraph(buoy_data, "wave_height", "Wave Height - All Stations")
+create_dygraph(buoy_daily, "wave_height", "Wave Height - All Stations (Daily Means)")
 ```
 
 #### M2
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M2"), "wave_height", "Wave Height - M2", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M2"), "wave_height", "Wave Height - M2 (Daily)", by_station = FALSE)
 ```
 
 #### M3
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M3"), "wave_height", "Wave Height - M3", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M3"), "wave_height", "Wave Height - M3 (Daily)", by_station = FALSE)
 ```
 
 #### M4
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M4"), "wave_height", "Wave Height - M4", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M4"), "wave_height", "Wave Height - M4 (Daily)", by_station = FALSE)
 ```
 
 #### M5
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M5"), "wave_height", "Wave Height - M5", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M5"), "wave_height", "Wave Height - M5 (Daily)", by_station = FALSE)
 ```
 
 #### M6
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M6"), "wave_height", "Wave Height - M6", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M6"), "wave_height", "Wave Height - M6 (Daily)", by_station = FALSE)
 ```
 
 ## Row {height=35%}
@@ -220,14 +239,15 @@ create_dt(wave_stats, "Wave Statistics by Station")
 ```{r}
 wave_data <- buoy_data |>
   select(time, station_id, wave_height, hmax, wave_period) |>
+  arrange(desc(time)) |>
+  head(5000) |>
   mutate(
     time = format(time, "%Y-%m-%d %H:%M"),
     wave_height = round(wave_height, 2),
     hmax = round(hmax, 2),
     wave_period = round(wave_period, 1)
-  ) |>
-  arrange(desc(time))
-create_dt(wave_data, "Wave Height Data")
+  )
+create_dt(wave_data, paste0("Wave Height Data (most recent 5000 of ", format(nrow(buoy_data), big.mark=","), " records)"))
 ```
 
 # Wind Speed
@@ -239,37 +259,37 @@ create_dt(wave_data, "Wave Height Data")
 #### All Stations
 
 ```{r}
-create_dygraph(buoy_data, "wind_speed", "Wind Speed - All Stations")
+create_dygraph(buoy_daily, "wind_speed", "Wind Speed - All Stations (Daily Means)")
 ```
 
 #### M2
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M2"), "wind_speed", "Wind Speed - M2", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M2"), "wind_speed", "Wind Speed - M2 (Daily)", by_station = FALSE)
 ```
 
 #### M3
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M3"), "wind_speed", "Wind Speed - M3", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M3"), "wind_speed", "Wind Speed - M3 (Daily)", by_station = FALSE)
 ```
 
 #### M4
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M4"), "wind_speed", "Wind Speed - M4", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M4"), "wind_speed", "Wind Speed - M4 (Daily)", by_station = FALSE)
 ```
 
 #### M5
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M5"), "wind_speed", "Wind Speed - M5", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M5"), "wind_speed", "Wind Speed - M5 (Daily)", by_station = FALSE)
 ```
 
 #### M6
 
 ```{r}
-create_dygraph(get_station_data(buoy_data, "M6"), "wind_speed", "Wind Speed - M6", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M6"), "wind_speed", "Wind Speed - M6 (Daily)", by_station = FALSE)
 ```
 
 ## Row {height=35%}
@@ -296,14 +316,15 @@ create_dt(wind_stats, "Wind Statistics by Station")
 ```{r}
 wind_data <- buoy_data |>
   select(time, station_id, wind_speed, gust, atmospheric_pressure) |>
+  arrange(desc(time)) |>
+  head(5000) |>
   mutate(
     time = format(time, "%Y-%m-%d %H:%M"),
     wind_speed = round(wind_speed, 1),
     gust = round(gust, 1),
     atmospheric_pressure = round(atmospheric_pressure, 1)
-  ) |>
-  arrange(desc(time))
-create_dt(wind_data, "Wind Data")
+  )
+create_dt(wind_data, paste0("Wind Data (most recent 5000 of ", format(nrow(buoy_data), big.mark=","), " records)"))
 ```
 
 # Wind vs Wave
@@ -319,22 +340,28 @@ reg_stats <- buoy_data |>
   group_by(Station = station_id) |>
   summarise(
     Records = n(),
-    Correlation = round(cor(wind_speed, wave_height), 3),
-    Intercept = round(coef(lm(wave_height ~ wind_speed))[1], 3),
-    Slope = round(coef(lm(wave_height ~ wind_speed))[2], 4),
+    Correlation = round(cor(wind_speed, wave_height), 2),
+    Intercept = round(coef(lm(wave_height ~ wind_speed))[1], 2),
+    Slope = round(coef(lm(wave_height ~ wind_speed))[2], 2),
     .groups = "drop"
   ) |>
   arrange(desc(Slope))
 
 # Order stations by slope (largest first)
 station_order <- reg_stats$Station
-panel_labels <- paste0(station_order, " (slope=", reg_stats$Slope, ")")
+panel_labels <- paste0(station_order, " (slope=", sprintf("%.2f", reg_stats$Slope), ")")
 
-plot_data <- buoy_data |>
-  filter(!is.na(wind_speed), !is.na(wave_height)) |>
+# Sample data for scatter plot to keep HTML size manageable
+set.seed(42)
+scatter_sample <- buoy_data |>
+  filter(!is.na(wind_speed), !is.na(wave_height))
+if (nrow(scatter_sample) > 15000) {
+  scatter_sample <- scatter_sample |> slice_sample(n = 15000)
+}
+plot_data <- scatter_sample |>
   mutate(
     station_label = factor(
-      paste0(station_id, " (slope=", reg_stats$Slope[match(station_id, reg_stats$Station)], ")"),
+      paste0(station_id, " (slope=", sprintf("%.2f", reg_stats$Slope[match(station_id, reg_stats$Station)]), ")"),
       levels = panel_labels
     )
   )
@@ -353,7 +380,7 @@ p <- ggplot(plot_data, aes(x = wind_speed, y = wave_height)) +
   theme(strip.text = element_text(face = "bold"))
 
 ggplotly(p, tooltip = "text") |>
-  layout(title = "Wind Speed vs Wave Height (panels ordered by regression slope)")
+  layout(title = paste0("Wind Speed vs Wave Height - ordered by slope (", date_caption, ")"))
 ```
 
 ## Row {height=30%}
@@ -372,14 +399,15 @@ create_dt(reg_stats, "Linear Regression by Station (ordered by slope)")
 scatter_data <- buoy_data |>
   select(time, station_id, wind_speed, wave_height, hmax) |>
   filter(!is.na(wind_speed), !is.na(wave_height)) |>
+  arrange(desc(time)) |>
+  head(5000) |>
   mutate(
     time = format(time, "%Y-%m-%d %H:%M"),
     wind_speed = round(wind_speed, 1),
     wave_height = round(wave_height, 2),
     hmax = round(hmax, 2)
-  ) |>
-  arrange(desc(time))
-create_dt(scatter_data, "Wind-Wave Data")
+  )
+create_dt(scatter_data, paste0("Wind-Wave Data (most recent 5000 of ", format(nrow(buoy_data), big.mark=","), " records)"))
 ```
 
 # Recent Data
@@ -427,22 +455,26 @@ datatable(
 
 ## Row
 
-### Column {width=50%}
+### Column
 
 #### Variable Definitions
 
 | Variable | Units | Description |
 |----------|-------|-------------|
-| wave_height (Hs) | m | [Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height): 4× [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of wave motion over [17.5-min period](https://www.ocean-sci.net/15/789/2019/) |
-| hmax | m | Maximum individual wave height in measurement period |
-| wave_period | s | Average wave period ([zero-crossing analysis](https://en.wikipedia.org/wiki/Wave_period)) |
-| wind_speed | kn | 10-minute average wind speed ([1 kn = 0.514 m/s](https://en.wikipedia.org/wiki/Knot_(unit))) |
-| gust | kn | Maximum [3-second wind gust](https://glossary.ametsoc.org/wiki/Gust) during the hour |
+| **wave_height (Hs)** | m | [Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height) (Hs): the average height of the highest one-third of waves, equivalent to 4x the [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of sea surface elevation over a [17.5-min measurement period](https://www.ocean-sci.net/15/789/2019/). This is NOT the height of any single wave - it is a statistical measure that represents the "characteristic" wave height as perceived by an observer. Hs is lower than the maximum wave height (Hmax) because it averages over many waves. |
+| hmax | m | Maximum individual wave height recorded in the measurement period. Typically Hmax/Hs ranges from 1.5 to 1.9; values above 2.0 indicate a [rogue wave](https://en.wikipedia.org/wiki/Rogue_wave). |
+| wave_period | s | Average wave period via [zero-crossing analysis](https://en.wikipedia.org/wiki/Wave_period) |
+| wind_speed | m/s | 10-minute average wind speed |
+| gust | m/s | Maximum [3-second wind gust](https://glossary.ametsoc.org/wiki/Gust) during the hour |
 | atmospheric_pressure | hPa | [Barometric pressure](https://en.wikipedia.org/wiki/Atmospheric_pressure) (970-1030 typical) |
-| air_temperature | °C | Air temperature at buoy (~3m above sea) |
-| sea_temperature | °C | [Sea surface temperature](https://en.wikipedia.org/wiki/Sea_surface_temperature) (SST) |
+| air_temperature | C | Air temperature at buoy (~3m above sea) |
+| sea_temperature | C | [Sea surface temperature](https://en.wikipedia.org/wiki/Sea_surface_temperature) (SST) |
 
-### Column {width=50%}
+**Why "Significant Wave Height" in the Overview?** The Overview shows Hs (significant wave height) rather than individual wave heights because Hs is the internationally standard measure used for sea state description, forecasting, and ship design. It captures the overall energy of the sea state and matches what a trained observer would estimate visually.
+
+## Row
+
+### Column
 
 #### Station Information
 
@@ -450,12 +482,10 @@ datatable(
 create_dt(station_info, "Irish Weather Buoy Network Stations")
 ```
 
-**Data Sources:**
+## Row {height=20%}
 
-- [Marine Institute Ireland](https://www.marine.ie/)
-- [ERDDAP Data Portal](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html)
-- [irishbuoys R Package](https://github.com/JohnGavin/irishbuoys)
+### Column
 
----
+**Data Sources:** [Marine Institute Ireland](https://www.marine.ie/) | [ERDDAP Data Portal](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html) | [irishbuoys R Package](https://github.com/JohnGavin/irishbuoys)
 
 *Dashboard generated `r generated_time` using irishbuoys v`r pkg_version`*

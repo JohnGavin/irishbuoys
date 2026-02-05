@@ -76,6 +76,21 @@ if (!is.null(analysis_summary)) {
 
 has_data <- !is.null(rogue_events) && nrow(rogue_events) > 0
 
+# Get dataset date range for captions
+if (!is.null(analysis_summary) && "data_summary" %in% names(analysis_summary)) {
+  data_start <- format(analysis_summary$data_summary$date_range[1], "%Y-%m-%d")
+  data_end <- format(analysis_summary$data_summary$date_range[2], "%Y-%m-%d")
+  date_caption <- paste0(data_start, " to ", data_end)
+} else if (has_data) {
+  data_start <- format(min(rogue_events$time), "%Y-%m-%d")
+  data_end <- format(max(rogue_events$time), "%Y-%m-%d")
+  date_caption <- paste0(data_start, " to ", data_end)
+} else {
+  data_start <- "N/A"
+  data_end <- "N/A"
+  date_caption <- "N/A"
+}
+
 # Get package version
 pkg_version <- tryCatch(
   as.character(packageVersion("irishbuoys")),
@@ -149,6 +164,9 @@ A rogue wave has **Hmax/Hs > 2.0** (ratio of maximum individual wave to signific
 | Stations Analyzed | `r if(has_data) length(unique(rogue_events$station_id)) else "N/A"` |
 | Max Rogue Ratio | `r if(has_data) round(max(rogue_events$rogue_ratio), 2) else "N/A"` |
 | Max Hmax Observed | `r if(has_data) round(max(rogue_events$hmax), 1) else "N/A"` m |
+| Dataset Start | `r if(has_data) format(min(rogue_events$time), "%Y-%m-%d %H:%M UTC") else "N/A"` |
+| Dataset End | `r if(has_data) format(max(rogue_events$time), "%Y-%m-%d %H:%M UTC") else "N/A"` |
+| Days in Dataset | `r if(has_data) round(as.numeric(difftime(max(rogue_events$time), min(rogue_events$time), units="days"))) else "N/A"` |
 
 *Analysis generated `r generated_time` using irishbuoys v`r pkg_version`*
 
@@ -156,8 +174,8 @@ A rogue wave has **Hmax/Hs > 2.0** (ratio of maximum individual wave to signific
 
 #### Key Definitions
 
-| Term | Definition | Reference |
-|------|------------|-----------|
+| Term | Definition |
+|------|------------|
 | **Hs** | [Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height): 4x [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of wave elevation |
 | **Hmax** | Maximum individual wave height in [17.5-min period](https://www.ocean-sci.net/15/789/2019/) |
 | **Rogue Wave** | Hmax/Hs > 2.0 ([Dysthe et al., 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203)) |
@@ -187,7 +205,9 @@ if (has_data) {
     hoverinfo = "text"
   ) |>
     layout(
-      title = paste("All Rogue Wave Events (n =", nrow(rogue_events), ")"),
+      title = paste0("All Rogue Wave Events (n=", nrow(rogue_events),
+                     ", ", format(min(rogue_events$time), "%Y-%m-%d"),
+                     " to ", format(max(rogue_events$time), "%Y-%m-%d"), ")"),
       xaxis = list(title = "Time"),
       yaxis = list(title = "Hmax / Hs Ratio"),
       shapes = list(
@@ -212,9 +232,7 @@ if (has_data) {
 
 ```{r}
 if (has_data) {
-  # Faceted plotly by station with rogue threshold
-  station_counts <- rogue_events |> count(station_id) |> arrange(desc(n))
-
+  # Faceted plotly by station with high contrast colors
   p <- ggplot(rogue_events, aes(x = time, y = hmax,
     text = paste0("Station: ", station_id, "<br>",
                   "Time: ", format(time, "%Y-%m-%d %H:%M"), "<br>",
@@ -225,15 +243,17 @@ if (has_data) {
                   "Gust: ", round(gust, 1), " m/s<br>",
                   "Pressure: ", round(atmospheric_pressure, 1), " hPa")
   )) +
-    geom_point(aes(color = rogue_ratio), size = 3, alpha = 0.8) +
-    scale_color_viridis_c(name = "Hmax/Hs") +
-    facet_wrap(~station_id, scales = "free_y") +
+    geom_point(aes(color = rogue_ratio), size = 3, alpha = 0.9) +
+    scale_color_viridis_c(name = "Hmax/Hs", option = "inferno", begin = 0.2, end = 0.9) +
+    facet_wrap(~station_id, scales = "free_y", ncol = 2) +
     labs(x = "Time", y = "Hmax (m)") +
-    theme_minimal()
+    theme_minimal(base_size = 10) +
+    theme(strip.text = element_text(face = "bold", size = 11))
 
-  # Add station-specific rogue thresholds (Hs * 2.0 per observation)
   ggplotly(p, tooltip = "text") |>
-    layout(title = "Rogue Wave Events by Station (Hmax)")
+    layout(title = paste0("Rogue Wave Events by Station (",
+           format(min(rogue_events$time), "%Y-%m-%d"), " to ",
+           format(max(rogue_events$time), "%Y-%m-%d"), ")"))
 }
 ```
 
@@ -248,7 +268,9 @@ if (has_data) {
       time = format(time, "%Y-%m-%d %H:%M"),
       across(where(is.numeric), ~round(., 2))
     ) |>
-    create_dt("All Rogue Wave Events (sorted by ratio)")
+    create_dt(paste0("All Rogue Wave Events (sorted by ratio, ",
+                     format(min(rogue_events$time), "%Y-%m-%d"), " to ",
+                     format(max(rogue_events$time), "%Y-%m-%d"), ")"))
 }
 ```
 
@@ -280,7 +302,9 @@ if (!is.null(rogue_conditions) && "wind_speed" %in% names(rogue_conditions)) {
     hoverinfo = "text"
   ) |>
     layout(
-      title = "Rogue Waves by Wind Speed (Beaufort Scale)",
+      title = paste0("Rogue Waves by Wind Speed (Beaufort Scale, ",
+                     format(min(rc$time), "%Y-%m-%d"), " to ",
+                     format(max(rc$time), "%Y-%m-%d"), ")"),
       xaxis = list(title = "Wind Speed (m/s)"),
       yaxis = list(title = "Hmax / Hs Ratio"),
       shapes = list(
@@ -346,7 +370,9 @@ if (!is.null(rogue_conditions)) {
     hoverinfo = "text"
   ) |>
     layout(
-      title = "Rogue Wave Events by Week of Year",
+      title = paste0("Rogue Wave Events by Week of Year (",
+                     format(min(rogue_conditions$time), "%Y-%m-%d"), " to ",
+                     format(max(rogue_conditions$time), "%Y-%m-%d"), ")"),
       xaxis = list(title = "Week of Year", dtick = 1),
       yaxis = list(title = "Count of Rogue Events"),
       barmode = "stack",
@@ -378,7 +404,7 @@ if (!is.null(rogue_conditions) && "time_of_day" %in% names(rogue_conditions)) {
     hoverinfo = "text"
   ) |>
     layout(
-      title = "Rogue Waves by Time of Day",
+      title = paste0("Rogue Waves by Time of Day (", date_caption, ")"),
       xaxis = list(title = "Time of Day"),
       yaxis = list(title = "Count")
     )
@@ -443,7 +469,7 @@ if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) 
     hoverinfo = "text"
   ) |>
     layout(
-      title = "Monthly Mean Wave Height",
+      title = paste0("Monthly Mean Wave Height (", date_caption, ")"),
       xaxis = list(title = "Month"),
       yaxis = list(title = "Mean Hs (m)")
     )
@@ -458,7 +484,7 @@ if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) 
 if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) {
   seasonal_means_wave$monthly |>
     mutate(across(where(is.numeric), ~round(., 2))) |>
-    create_dt("Monthly Wave Height Statistics")
+    create_dt(paste0("Monthly Wave Height Statistics (", date_caption, ")"))
 }
 ```
 
@@ -479,7 +505,7 @@ if (!is.null(seasonal_means_wind) && "monthly" %in% names(seasonal_means_wind)) 
     hoverinfo = "text"
   ) |>
     layout(
-      title = "Monthly Mean Wind Speed",
+      title = paste0("Monthly Mean Wind Speed (", date_caption, ")"),
       xaxis = list(title = "Month"),
       yaxis = list(title = "Mean Wind Speed (m/s)")
     )
@@ -503,7 +529,7 @@ if (!is.null(annual_trends_wave) && "annual_stats" %in% names(annual_trends_wave
     hoverinfo = "text"
   ) |>
     layout(
-      title = "Annual Wave Height Trend",
+      title = paste0("Annual Wave Height Trend (", date_caption, ")"),
       xaxis = list(title = "Year"),
       yaxis = list(title = "Mean Hs (m)")
     )
@@ -528,7 +554,8 @@ if (!is.null(wave_stl) && "components" %in% names(wave_stl)) {
   ggplot(stl_long, aes(x = time, y = value)) +
     geom_line(color = "steelblue", alpha = 0.7) +
     facet_wrap(~component, scales = "free_y", ncol = 1) +
-    labs(x = "Time", y = "Wave Height (m)", title = "STL Decomposition") +
+    labs(x = "Time", y = "Wave Height (m)",
+         title = paste0("STL Decomposition (", date_caption, ")")) +
     theme_minimal()
 } else {
   cat("STL decomposition not available")
@@ -561,7 +588,7 @@ if (!is.null(return_levels_wave)) {
       name = "95% CI", showlegend = TRUE
     ) |>
     layout(
-      title = "Wave Height Return Levels (GEV)",
+      title = paste0("Wave Height Return Levels - GEV (", date_caption, ")"),
       xaxis = list(title = "Return Period (years)", type = "log"),
       yaxis = list(title = "Hs (m)")
     )
@@ -600,7 +627,7 @@ if (!is.null(return_levels_wind)) {
       name = "95% CI", showlegend = TRUE
     ) |>
     layout(
-      title = "Wind Speed Return Levels (GEV)",
+      title = paste0("Wind Speed Return Levels - GEV (", date_caption, ")"),
       xaxis = list(title = "Return Period (years)", type = "log"),
       yaxis = list(title = "Wind Speed (m/s)")
     )
@@ -627,7 +654,7 @@ if (!is.null(return_levels_hmax)) {
       name = "95% CI", showlegend = TRUE
     ) |>
     layout(
-      title = "Maximum Wave Height Return Levels (GEV)",
+      title = paste0("Max Wave Height Return Levels - GEV (", date_caption, ")"),
       xaxis = list(title = "Return Period (years)", type = "log"),
       yaxis = list(title = "Hmax (m)")
     )
@@ -655,24 +682,64 @@ if (!is.null(return_levels_wave)) {
 
 ### Column {.tabset}
 
-#### Summary
+#### Summary by Station
 
 Gust Factor = Peak Gust / Sustained Wind. Typical value: ~1.3
+
+```{r}
+if (!is.null(gust_analysis) && "by_station" %in% names(gust_analysis) && !is.null(gust_analysis$by_station)) {
+  gust_analysis$by_station |>
+    mutate(across(where(is.numeric), ~round(., 2))) |>
+    create_dt("Gust Factor Statistics by Station")
+} else if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
+  gust_analysis$summary |>
+    mutate(across(where(is.numeric), ~round(., 2))) |>
+    create_dt("Gust Factor Statistics (all stations)")
+} else {
+  cat("Gust analysis not available. Run targets::tar_make()")
+}
+```
+
+#### Overall Summary
 
 ```{r}
 if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
   gust_analysis$summary |>
     mutate(across(where(is.numeric), ~round(., 2))) |>
-    create_dt("Gust Factor Statistics")
-} else {
-  cat("Gust analysis not available. Run targets::tar_make()")
+    create_dt("Gust Factor Statistics (All Stations Combined)")
 }
 ```
 
 #### By Wind Category
 
 ```{r}
-if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
+if (!is.null(gust_analysis) && "by_station_category" %in% names(gust_analysis) && !is.null(gust_analysis$by_station_category)) {
+  gust_sc <- gust_analysis$by_station_category
+
+  plot_ly(gust_sc, x = ~wind_category, y = ~mean_gf, color = ~station_id,
+    type = "bar",
+    text = ~paste0("Station: ", station_id, "<br>",
+                   "Category: ", wind_category, "<br>",
+                   "Mean GF: ", round(mean_gf, 2), "<br>",
+                   "P95 GF: ", round(p95_gf, 2), "<br>",
+                   "n: ", n),
+    hoverinfo = "text"
+  ) |>
+    layout(
+      title = paste0("Gust Factor by Wind Category and Station (", date_caption, ")"),
+      xaxis = list(title = "Wind Speed Category (m/s)"),
+      yaxis = list(title = "Mean Gust Factor"),
+      barmode = "group",
+      shapes = list(
+        list(type = "line", x0 = -0.5, x1 = 4.5,
+             y0 = 1.3, y1 = 1.3, line = list(color = "red", dash = "dash", width = 2))
+      ),
+      annotations = list(
+        list(x = 4, y = 1.3, text = "Typical (1.3)",
+             showarrow = FALSE, yanchor = "bottom", font = list(color = "red", size = 10))
+      )
+    )
+} else if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
   gust_cat <- gust_analysis$by_category
 
   plot_ly(gust_cat, x = ~wind_category, y = ~mean_gf,
@@ -684,8 +751,8 @@ if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
     hoverinfo = "text"
   ) |>
     layout(
-      title = "Gust Factor by Wind Speed Category",
-      xaxis = list(title = "Wind Speed Category"),
+      title = paste0("Gust Factor by Wind Speed Category (", date_caption, ")"),
+      xaxis = list(title = "Wind Speed Category (m/s)"),
       yaxis = list(title = "Gust Factor"),
       shapes = list(
         list(type = "line", x0 = -0.5, x1 = nrow(gust_cat) - 0.5,
@@ -702,10 +769,43 @@ if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
 #### By Wind Category (Data)
 
 ```{r}
-if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
+if (!is.null(gust_analysis) && "by_station_category" %in% names(gust_analysis) && !is.null(gust_analysis$by_station_category)) {
+  gust_analysis$by_station_category |>
+    mutate(across(where(is.numeric), ~round(., 2))) |>
+    create_dt("Gust Factor by Wind Category and Station")
+} else if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
   gust_analysis$by_category |>
     mutate(across(where(is.numeric), ~round(., 2))) |>
     create_dt("Gust Factor by Wind Category")
+}
+```
+
+#### Rogue Gusts by Station
+
+```{r}
+if (!is.null(gust_analysis) && "by_station" %in% names(gust_analysis) && !is.null(gust_analysis$by_station)) {
+  bs <- gust_analysis$by_station
+
+  plot_ly(bs, x = ~station_id, y = ~pct_rogue,
+    type = "bar",
+    marker = list(color = ~n_rogue,
+                  colorscale = list(c(0, "#fee0d2"), c(1, "#de2d26")),
+                  showscale = TRUE,
+                  colorbar = list(title = "n events")),
+    text = ~paste0("Station: ", station_id, "<br>",
+                   "Rogue Gusts: ", n_rogue, " (", round(pct_rogue, 3), "%)<br>",
+                   "Threshold: GF > ", round(gust_analysis$rogue_gust_threshold, 1), "<br>",
+                   "Total obs: ", n, "<br>",
+                   "Mean GF: ", round(mean_gf, 2), "<br>",
+                   "Max GF: ", round(max_gf, 2)),
+    hoverinfo = "text"
+  ) |>
+    layout(
+      title = paste0("'Rogue Gust' Events by Station (GF > ",
+                     round(gust_analysis$rogue_gust_threshold, 1), ")"),
+      xaxis = list(title = "Station"),
+      yaxis = list(title = "% of Observations")
+    )
 }
 ```
 
