@@ -772,6 +772,129 @@ if (!is.null(return_levels_wave)) {
 }
 ```
 
+# EVA Methodology
+
+## Row
+
+### Column {.tabset}
+
+#### 1. Data: Annual Maxima
+
+The [block maxima](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution) approach extracts the single largest value from each year. This is the simplest EVA method and requires no threshold selection.
+
+**Current approach:** Annual maxima are **pooled across all 5 stations** (M2-M6) — i.e., the maximum across all stations for each year. This is **not** station-specific modelling.
+
+```{r}
+if (!is.null(analysis_summary) && "gev_fits" %in% names(analysis_summary)) {
+  gev_fits <- analysis_summary$gev_fits
+
+  # Show annual maxima for all three variables
+  am_list <- lapply(names(gev_fits), function(var) {
+    am <- gev_fits[[var]]$annual_maxima
+    am$variable <- var
+    am
+  })
+  am_all <- do.call(rbind, am_list)
+  am_wide <- am_all |>
+    tidyr::pivot_wider(names_from = variable, values_from = max_value) |>
+    mutate(across(where(is.numeric), ~round(., 2)))
+  create_dt(am_wide, paste0("Annual Maxima (pooled across all stations, ", date_caption, ")"))
+} else {
+  cat("GEV fit data not available. Re-run targets::tar_make()")
+}
+```
+
+#### 2. GEV Distribution
+
+The **Generalized Extreme Value** distribution has CDF:
+
+$$F(x) = \exp\left\{-\left[1 + \xi\left(\frac{x - \mu}{\sigma}\right)\right]^{-1/\xi}\right\}$$
+
+with three parameters:
+
+| Parameter | Symbol | Interpretation |
+|-----------|--------|----------------|
+| **Location** | $\mu$ | Centre of the distribution (typical annual max) |
+| **Scale** | $\sigma$ | Spread of annual maxima |
+| **Shape** | $\xi$ | Tail behaviour: $\xi > 0$ heavy tail (Frechet), $\xi = 0$ exponential tail (Gumbel), $\xi < 0$ bounded upper tail (Weibull) |
+
+Parameters are estimated by **Maximum Likelihood Estimation** (MLE). The MLE maximises the log-likelihood $\ell(\mu, \sigma, \xi)$ and the **Fisher information matrix** (negative Hessian of $\ell$) provides the 3x3 variance-covariance matrix of $(\hat\mu, \hat\sigma, \hat\xi)$.
+
+#### 3. Why Covariance Matrix Matters
+
+**Return level confidence intervals** are computed via the [delta method](https://en.wikipedia.org/wiki/Delta_method): the variance of the return level $z_T$ is:
+
+$$\text{Var}(z_T) \approx \nabla g^{\top} \cdot \Sigma \cdot \nabla g$$
+
+where $\Sigma$ is the 3x3 parameter covariance matrix and $\nabla g$ is the gradient of the return level function with respect to $(\mu, \sigma, \xi)$.
+
+**When this fails:** If $\hat\xi$ is very negative (< -1), the likelihood surface becomes flat or ill-conditioned near the upper bound. The Hessian cannot be inverted, so $\Sigma$ is unavailable. Point estimates remain valid; only CIs are lost.
+
+**In this analysis:** Wave height has $\hat\xi = -1.162$ (strongly bounded), so CIs are unavailable. Hmax ($\hat\xi = 0.463$, heavy-tailed) and wind speed ($\hat\xi = -0.169$, mildly bounded) both have valid CIs.
+
+#### 4. Model Parameters
+
+```{r}
+if (!is.null(analysis_summary) && "gev_fits" %in% names(analysis_summary)) {
+  gev_fits <- analysis_summary$gev_fits
+
+  params_df <- data.frame(
+    Variable = c("Hs (wave height)", "Hmax", "Wind speed"),
+    Location = c(gev_fits$wave_height$parameters["location"],
+                 gev_fits$hmax$parameters["location"],
+                 gev_fits$wind_speed$parameters["location"]),
+    Scale = c(gev_fits$wave_height$parameters["scale"],
+              gev_fits$hmax$parameters["scale"],
+              gev_fits$wind_speed$parameters["scale"]),
+    Shape = c(gev_fits$wave_height$parameters["shape"],
+              gev_fits$hmax$parameters["shape"],
+              gev_fits$wind_speed$parameters["shape"]),
+    N_years = c(gev_fits$wave_height$n_years,
+                gev_fits$hmax$n_years,
+                gev_fits$wind_speed$n_years),
+    Tail_type = c(
+      ifelse(gev_fits$wave_height$parameters["shape"] < -0.5, "Bounded (Weibull)",
+             ifelse(gev_fits$wave_height$parameters["shape"] > 0.1, "Heavy (Frechet)", "Light (Gumbel-like)")),
+      ifelse(gev_fits$hmax$parameters["shape"] < -0.5, "Bounded (Weibull)",
+             ifelse(gev_fits$hmax$parameters["shape"] > 0.1, "Heavy (Frechet)", "Light (Gumbel-like)")),
+      ifelse(gev_fits$wind_speed$parameters["shape"] < -0.5, "Bounded (Weibull)",
+             ifelse(gev_fits$wind_speed$parameters["shape"] > 0.1, "Heavy (Frechet)", "Light (Gumbel-like)"))
+    ),
+    CIs_available = c("No (shape < -1)", "Yes", "Yes")
+  )
+  params_df$Location <- round(params_df$Location, 2)
+  params_df$Scale <- round(params_df$Scale, 3)
+  params_df$Shape <- round(params_df$Shape, 3)
+
+  create_dt(params_df, "GEV Parameter Estimates (MLE)")
+} else {
+  cat("GEV fit data not available")
+}
+```
+
+#### 5. Limitations
+
+::: {.callout-warning}
+## Current Limitations
+
+**Stations are pooled, not modelled jointly.** The current analysis takes the annual maximum across all 5 stations combined, fitting a single GEV per variable. This ignores:
+
+- **Spatial dependence** between stations (storms affect multiple buoys simultaneously)
+- **Station-specific extremes** (M6 at the shelf edge sees different conditions than coastal M2)
+- **Cross-station prediction** (using offshore M6 to forecast extremes at nearshore stations hours later)
+
+**Only 8 years of data** (2019-2026). GEV fitting to annual maxima requires long records for reliable tail estimation. With n=8, 50-year and 100-year return levels have wide uncertainty.
+
+**No storm propagation modelling.** A more complete analysis would:
+
+1. Fit station-specific GEV models
+2. Model spatial dependence via [max-stable processes](https://doi.org/10.1214/08-AOAS187) or hierarchical Bayesian methods
+3. Estimate storm propagation times between stations (cross-correlation lag analysis)
+4. Use offshore stations (M6) to predict nearshore conditions (M2-M5) with a lead time
+
+These extensions require the [SpatialExtremes](https://cran.r-project.org/package=SpatialExtremes) or [mev](https://cran.r-project.org/package=mev) packages.
+:::
+
 # Gust Factor
 
 ## Row

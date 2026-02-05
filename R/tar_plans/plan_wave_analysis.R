@@ -277,6 +277,23 @@ plan_wave_analysis <- list(
           wind_return_levels = return_levels_wind,
           hmax_return_levels = return_levels_hmax
         ),
+        gev_fits = list(
+          wave_height = list(
+            parameters = gev_wave_height$parameters,
+            n_years = gev_wave_height$n_years,
+            annual_maxima = gev_wave_height$annual_maxima
+          ),
+          hmax = list(
+            parameters = gev_hmax$parameters,
+            n_years = gev_hmax$n_years,
+            annual_maxima = gev_hmax$annual_maxima
+          ),
+          wind_speed = list(
+            parameters = gev_wind_speed$parameters,
+            n_years = gev_wind_speed$n_years,
+            annual_maxima = gev_wind_speed$annual_maxima
+          )
+        ),
         gust_analysis = gust_factor_analysis,
         rogue_comparison = rogue_comparison,
         generated = Sys.time()
