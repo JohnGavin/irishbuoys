@@ -265,30 +265,51 @@ calculate_return_levels <- function(
 
   cli::cli_progress_step("Calculating return levels...")
 
-  # Get return levels with confidence intervals
-  rl_results <- extRemes::return.level(
-    fit$fit,
-    return.period = return_periods,
-    do.ci = TRUE,
-    alpha = 1 - conf_level
+  # Try with confidence intervals first, fall back to point estimates
+  rl_results <- tryCatch(
+    extRemes::return.level(
+      fit$fit,
+      return.period = return_periods,
+      do.ci = TRUE,
+      alpha = 1 - conf_level
+    ),
+    error = function(e) {
+      cli::cli_alert_warning("CI calculation failed ({e$message}), using point estimates only")
+      NULL
+    }
   )
 
-  # Extract values
-  if (is.matrix(rl_results)) {
-    return_levels <- data.frame(
-      return_period = return_periods,
-      return_level = rl_results[, 2],  # Point estimate
-      lower = rl_results[, 1],         # Lower CI
-      upper = rl_results[, 3],         # Upper CI
-      variable = fit$variable
-    )
+  if (!is.null(rl_results)) {
+    # Extract values with CIs
+    if (is.matrix(rl_results)) {
+      return_levels <- data.frame(
+        return_period = return_periods,
+        return_level = rl_results[, 2],
+        lower = rl_results[, 1],
+        upper = rl_results[, 3],
+        variable = fit$variable
+      )
+    } else {
+      return_levels <- data.frame(
+        return_period = return_periods,
+        return_level = as.numeric(rl_results[2]),
+        lower = as.numeric(rl_results[1]),
+        upper = as.numeric(rl_results[3]),
+        variable = fit$variable
+      )
+    }
   } else {
-    # Single return period case
+    # Fallback: point estimates only (no CIs)
+    rl_point <- extRemes::return.level(
+      fit$fit,
+      return.period = return_periods,
+      do.ci = FALSE
+    )
     return_levels <- data.frame(
       return_period = return_periods,
-      return_level = as.numeric(rl_results[2]),
-      lower = as.numeric(rl_results[1]),
-      upper = as.numeric(rl_results[3]),
+      return_level = as.numeric(rl_point),
+      lower = NA_real_,
+      upper = NA_real_,
       variable = fit$variable
     )
   }

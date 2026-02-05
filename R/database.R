@@ -172,18 +172,34 @@ load_to_duckdb <- function(data, con, update_metadata = TRUE) {
   names(data) <- gsub("meanwavedirection", "mean_wave_direction", names(data))
   names(data) <- gsub("qc_flag", "qc_flag", names(data))
 
+  # Convert NaN to NA (ERDDAP returns "NaN" for missing values)
+  numeric_cols <- names(data)[vapply(data, is.numeric, logical(1))]
+  for (col in numeric_cols) {
+    data[[col]][is.nan(data[[col]])] <- NA
+  }
+
   # Get count before insertion
   count_before <- DBI::dbGetQuery(con, "SELECT COUNT(*) as n FROM buoy_data")$n
 
-  # Use DuckDB's INSERT OR IGNORE for efficiency
-  DBI::dbWriteTable(
-    con,
-    "buoy_data",
-    data,
-    append = TRUE,
-    overwrite = FALSE,
-    temporary = FALSE
-  )
+  # Write to staging table, then INSERT ... ON CONFLICT DO NOTHING
+  # This handles duplicate records at chunk boundaries gracefully
+  staging_name <- paste0("staging_", format(Sys.time(), "%H%M%S"))
+  DBI::dbWriteTable(con, staging_name, data, temporary = TRUE, overwrite = TRUE)
+
+  # Get column names that exist in both staging and buoy_data
+  staging_cols <- DBI::dbListFields(con, staging_name)
+  target_cols <- DBI::dbListFields(con, "buoy_data")
+  common_cols <- intersect(staging_cols, target_cols)
+
+  cols_sql <- paste(common_cols, collapse = ", ")
+  DBI::dbExecute(con, paste0(
+    "INSERT INTO buoy_data (", cols_sql, ") ",
+    "SELECT ", cols_sql, " FROM ", staging_name,
+    " ON CONFLICT DO NOTHING"
+  ))
+
+  # Clean up staging table
+  DBI::dbExecute(con, paste0("DROP TABLE IF EXISTS ", staging_name))
 
   # Get count after insertion
   count_after <- DBI::dbGetQuery(con, "SELECT COUNT(*) as n FROM buoy_data")$n
