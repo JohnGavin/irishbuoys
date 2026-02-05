@@ -13,6 +13,7 @@ execute:
 ```{r setup}
 library(dplyr)
 library(ggplot2)
+library(plotly)
 library(DT)
 library(dygraphs)
 library(xts)
@@ -309,77 +310,10 @@ create_dt(wind_data, "Wind Data")
 
 ## Row
 
-### Column {.tabset}
-
-#### All Stations
+### Column {width=100%}
 
 ```{r}
-#| fig-width: 12
-#| fig-height: 6
-ggplot(buoy_data, aes(x = wind_speed, y = wave_height, color = station_id)) +
-  geom_point(alpha = 0.3, size = 1) +
-  geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
-  labs(title = "Wind Speed vs Wave Height", x = "Wind Speed (knots)", y = "Wave Height (m)", color = "Station") +
-  theme_minimal() + theme(legend.position = "bottom")
-```
-
-#### M2
-
-```{r}
-#| fig-width: 12
-ggplot(get_station_data(buoy_data, "M2"), aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.4, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(title = "Wind vs Wave - M2", x = "Wind Speed (knots)", y = "Wave Height (m)") + theme_minimal()
-```
-
-#### M3
-
-```{r}
-#| fig-width: 12
-ggplot(get_station_data(buoy_data, "M3"), aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.4, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(title = "Wind vs Wave - M3", x = "Wind Speed (knots)", y = "Wave Height (m)") + theme_minimal()
-```
-
-#### M4
-
-```{r}
-#| fig-width: 12
-ggplot(get_station_data(buoy_data, "M4"), aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.4, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(title = "Wind vs Wave - M4", x = "Wind Speed (knots)", y = "Wave Height (m)") + theme_minimal()
-```
-
-#### M5
-
-```{r}
-#| fig-width: 12
-ggplot(get_station_data(buoy_data, "M5"), aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.4, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(title = "Wind vs Wave - M5", x = "Wind Speed (knots)", y = "Wave Height (m)") + theme_minimal()
-```
-
-#### M6
-
-```{r}
-#| fig-width: 12
-ggplot(get_station_data(buoy_data, "M6"), aes(x = wind_speed, y = wave_height)) +
-  geom_point(alpha = 0.4, color = "steelblue") +
-  geom_smooth(method = "lm", se = TRUE, color = "red") +
-  labs(title = "Wind vs Wave - M6", x = "Wind Speed (knots)", y = "Wave Height (m)") + theme_minimal()
-```
-
-## Row {height=30%}
-
-### Column {.tabset}
-
-#### Regression Stats
-
-```{r}
+# Compute regression slopes to order panels
 reg_stats <- buoy_data |>
   filter(!is.na(wind_speed), !is.na(wave_height)) |>
   group_by(Station = station_id) |>
@@ -389,8 +323,47 @@ reg_stats <- buoy_data |>
     Intercept = round(coef(lm(wave_height ~ wind_speed))[1], 3),
     Slope = round(coef(lm(wave_height ~ wind_speed))[2], 4),
     .groups = "drop"
+  ) |>
+  arrange(desc(Slope))
+
+# Order stations by slope (largest first)
+station_order <- reg_stats$Station
+panel_labels <- paste0(station_order, " (slope=", reg_stats$Slope, ")")
+
+plot_data <- buoy_data |>
+  filter(!is.na(wind_speed), !is.na(wave_height)) |>
+  mutate(
+    station_label = factor(
+      paste0(station_id, " (slope=", reg_stats$Slope[match(station_id, reg_stats$Station)], ")"),
+      levels = panel_labels
+    )
   )
-create_dt(reg_stats, "Linear Regression by Station")
+
+p <- ggplot(plot_data, aes(x = wind_speed, y = wave_height)) +
+  geom_point(alpha = 0.3, size = 1, aes(
+    text = paste0("Station: ", station_id, "<br>",
+                  "Wind: ", round(wind_speed, 1), " m/s<br>",
+                  "Wave Ht: ", round(wave_height, 2), " m<br>",
+                  "Time: ", format(time, "%Y-%m-%d %H:%M"))
+  )) +
+  geom_smooth(method = "lm", se = TRUE, color = "red", alpha = 0.2) +
+  facet_wrap(~station_label, nrow = 1) +
+  labs(x = "Wind Speed (m/s)", y = "Wave Height (m)") +
+  theme_minimal(base_size = 11) +
+  theme(strip.text = element_text(face = "bold"))
+
+ggplotly(p, tooltip = "text") |>
+  layout(title = "Wind Speed vs Wave Height (panels ordered by regression slope)")
+```
+
+## Row {height=30%}
+
+### Column {.tabset}
+
+#### Regression Stats
+
+```{r}
+create_dt(reg_stats, "Linear Regression by Station (ordered by slope)")
 ```
 
 #### Data

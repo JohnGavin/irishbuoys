@@ -39,3 +39,4 @@ _output/
 # Except allow dashboard data files
 !docs/
 !docs/**
+.DS_Store
