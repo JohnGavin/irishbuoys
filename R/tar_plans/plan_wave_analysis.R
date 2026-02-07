@@ -490,15 +490,33 @@ plan_wave_analysis <- list(
   # ========================================
 
   # All stations rogue wave scatter plot
+  # Sample to max 2000 events to reduce HTML size (keep most extreme)
   targets::tar_target(
     plot_rogue_all,
-    create_plot_rogue_all(rogue_wave_events)
+    {
+      events <- rogue_wave_events
+      if (nrow(events) > 2000) {
+        events <- events[order(-events$rogue_ratio), ][1:2000, ]
+      }
+      create_plot_rogue_all(events)
+    }
   ),
 
   # Rogue waves by station subplot with rangeslider
+  # Sample to max 500 events per station to reduce HTML size
   targets::tar_target(
     plot_rogue_by_station,
-    create_plot_rogue_by_station(rogue_wave_events)
+    {
+      events <- rogue_wave_events
+      if (nrow(events) > 2500) {
+        # Keep top events per station
+        events <- events |>
+          dplyr::group_by(station_id) |>
+          dplyr::slice_max(order_by = rogue_ratio, n = 500) |>
+          dplyr::ungroup()
+      }
+      create_plot_rogue_by_station(events)
+    }
   ),
 
   # Wind speed by Beaufort scale
