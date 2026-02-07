@@ -219,7 +219,36 @@ extreme_waves <- query_buoy_data(
     LIMIT 100
   "
 )
+```
 
+### Tidyverse Alternative (duckplyr)
+
+The same query using `dplyr` verbs with `duckplyr` backend:
+```r
+# Tidyverse alternative using duckplyr
+# Same query as SQL above, but with dplyr verbs
+library(dplyr)
+library(duckplyr)
+
+extreme_waves_tidy <- tbl(con, "buoy_data") |>
+  filter(
+    hmax > 2 * wave_height,
+    wave_height > 0,
+    qc_flag == 1
+  ) |>
+  select(station_id, time, wave_height, hmax) |>
+  arrange(desc(time)) |>
+  head(100) |>
+  collect()
+```
+
+**Why duckplyr?**
+- Familiar tidyverse syntax
+- Lazy evaluation - query runs only on `collect()`
+- Automatic SQL translation for performance
+- Works with any DBI connection
+
+```r
 # Don't forget to disconnect
 DBI::dbDisconnect(con)
 ```
