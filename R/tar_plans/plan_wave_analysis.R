@@ -483,7 +483,117 @@ plan_wave_analysis <- list(
         generated = Sys.time()
       )
     }
-  )
+  ),
 
-  # NOTE: No save_vignette_data target - use tar_load() directly in vignettes
+  # ========================================
+  # Pre-computed Plots (for vignettes)
+  # ========================================
+
+  # All stations rogue wave scatter plot
+  targets::tar_target(
+    plot_rogue_all,
+    create_plot_rogue_all(rogue_wave_events)
+  ),
+
+  # Rogue waves by station subplot with rangeslider
+  targets::tar_target(
+    plot_rogue_by_station,
+    create_plot_rogue_by_station(rogue_wave_events)
+  ),
+
+  # Wind speed by Beaufort scale
+  targets::tar_target(
+    plot_wind_beaufort,
+    create_plot_wind_beaufort(rogue_wave_conditions)
+  ),
+
+  # Week of year stacked bar
+  targets::tar_target(
+    plot_week_of_year,
+    create_plot_week_of_year(rogue_wave_conditions)
+  ),
+
+  # Time of day bar plot
+  targets::tar_target(
+    plot_time_of_day,
+    create_plot_time_of_day(rogue_wave_conditions)
+  ),
+
+  # Monthly wave height bar plot
+  targets::tar_target(
+    plot_monthly_wave,
+    create_plot_monthly_wave(seasonal_means_wave)
+  ),
+
+  # Monthly wind speed bar plot
+  targets::tar_target(
+    plot_monthly_wind,
+    create_plot_monthly_wind(seasonal_means_wind)
+  ),
+
+  # Annual trends line plot
+  targets::tar_target(
+    plot_annual_trends,
+    create_plot_annual_trends(annual_trends_wave)
+  ),
+
+  # Return levels plots
+  targets::tar_target(
+    plot_return_levels_wave,
+    create_plot_return_levels(return_levels_wave_pooled, variable = "wave")
+  ),
+
+  targets::tar_target(
+    plot_return_levels_wind,
+    create_plot_return_levels(return_levels_wind_pooled, variable = "wind")
+  ),
+
+  targets::tar_target(
+    plot_return_levels_hmax,
+    create_plot_return_levels(return_levels_hmax_pooled, variable = "hmax")
+  ),
+
+  # Gust factor plots
+  targets::tar_target(
+    plot_gust_by_category,
+    create_plot_gust_by_category(gust_factor_analysis)
+  ),
+
+  targets::tar_target(
+    plot_rogue_gusts,
+    create_plot_rogue_gusts(gust_factor_analysis)
+  ),
+
+  # STL decomposition plot (pre-computed)
+  targets::tar_target(
+    plot_stl,
+    create_plot_stl(wave_height_seasonal)
+  ),
+
+  # Rogue gust events (gust_ratio > 1.5)
+  targets::tar_target(
+    rogue_gust_events,
+    analysis_data |>
+      dplyr::filter(!is.na(.data$gust), !is.na(.data$wind_speed), .data$wind_speed > 0) |>
+      dplyr::mutate(gust_ratio = .data$gust / .data$wind_speed) |>
+      dplyr::filter(.data$gust_ratio > 1.5) |>
+      dplyr::select(.data$time, .data$station_id, .data$wind_speed, .data$gust,
+                    .data$gust_ratio, .data$wave_height, .data$hmax)
+  ),
+
+  # Rogue gusts plots (new Rogue Gusts page)
+  targets::tar_target(
+    plot_rogue_gusts_all,
+    create_plot_rogue_gusts_all(rogue_gust_events)
+  ),
+
+  targets::tar_target(
+    plot_rogue_gusts_by_station,
+    create_plot_rogue_gusts_by_station(rogue_gust_events)
+  ),
+
+  targets::tar_target(
+    plot_gusts_vs_waves,
+    create_plot_gusts_vs_waves(analysis_data)
+  )
 )

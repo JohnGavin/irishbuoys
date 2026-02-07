@@ -24,21 +24,21 @@ irishbuoys_layout <- function(p, title = NULL, ...) {
       text = title,
       font = list(size = 14, color = "#333333")
     ),
-    plot_bgcolor = "#f8f8f8",
-    paper_bgcolor = "#ffffff",
+    plot_bgcolor = "#cccccc",         # gray80
+    paper_bgcolor = "#f0f0f0",        # lighter grey surround
     legend = list(
       orientation = "h",
       y = -0.15,
       x = 0.5,
       xanchor = "center",
-      font = list(color = "#333333", size = 12),
-      bgcolor = "rgba(255,255,255,0.9)",
-      bordercolor = "#cccccc",
+      font = list(color = "#1a1a1a", size = 12),  # near black for visibility
+      bgcolor = "#e0e0e0",            # grey, not white
+      bordercolor = "#888888",
       borderwidth = 1
     ),
     hoverlabel = list(
-      bgcolor = "white",
-      font = list(color = "black", size = 12)
+      bgcolor = "#f8f8f8",
+      font = list(color = "#1a1a1a", size = 12)
     ),
     margin = list(b = 80),  # Extra bottom margin for legend
     ...
