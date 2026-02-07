@@ -12,6 +12,7 @@
 #' @description
 #' Identifies rogue wave events based on the ratio of maximum wave height
 #' (Hmax) to significant wave height (WaveHeight).
+#' Uses dplyr verbs translated to SQL for efficient DuckDB execution.
 #'
 #' @param con DBI connection to DuckDB database
 #' @param threshold Hmax/WaveHeight ratio threshold (default: 2.0)
@@ -38,49 +39,43 @@ detect_rogue_waves <- function(
     stations = NULL
 ) {
 
- # Build WHERE clauses
-  where_clauses <- c(
-    glue::glue("hmax > {threshold} * wave_height"),
-    glue::glue("wave_height >= {min_wave_height}"),
-    "hmax IS NOT NULL",
-    "wave_height IS NOT NULL"
-  )
+  # Start with lazy table reference
+  tbl_ref <- buoy_tbl(con)
+
+  # Apply filters using dplyr verbs
+  tbl_ref <- tbl_ref |>
+    dplyr::filter(
+      !is.na(.data$hmax),
+      !is.na(.data$wave_height),
+      .data$wave_height >= !!min_wave_height,
+      .data$hmax > !!threshold * .data$wave_height
+    )
 
   if (!is.null(start_date)) {
-    where_clauses <- c(where_clauses, glue::glue("time >= '{start_date}'"))
+    tbl_ref <- tbl_ref |> dplyr::filter(.data$time >= !!start_date)
   }
 
   if (!is.null(end_date)) {
-    where_clauses <- c(where_clauses, glue::glue("time <= '{end_date}'"))
+    tbl_ref <- tbl_ref |> dplyr::filter(.data$time <= !!end_date)
   }
 
   if (!is.null(stations)) {
-    station_list <- paste0("'", stations, "'", collapse = ",")
-    where_clauses <- c(where_clauses, glue::glue("station_id IN ({station_list})"))
+    tbl_ref <- tbl_ref |> dplyr::filter(.data$station_id %in% !!stations)
   }
 
-  where_clause <- paste(where_clauses, collapse = " AND ")
-
-  query <- glue::glue("
-    SELECT
-      station_id,
-      time,
-      wave_height,
-      hmax,
-      hmax / wave_height as rogue_ratio,
-      wave_period,
-      tp as peak_period,
-      wind_speed,
-      wind_direction,
-      gust,
-      atmospheric_pressure,
-      sea_temperature
-    FROM buoy_data
-    WHERE {where_clause}
-    ORDER BY rogue_ratio DESC, time DESC
-  ")
-
-  rogues <- DBI::dbGetQuery(con, query)
+  # Select columns and calculate rogue ratio
+  rogues <- tbl_ref |>
+    dplyr::mutate(
+      rogue_ratio = .data$hmax / .data$wave_height,
+      peak_period = .data$tp
+    ) |>
+    dplyr::select(
+      "station_id", "time", "wave_height", "hmax", "rogue_ratio",
+      "wave_period", "peak_period", "wind_speed", "wind_direction",
+      "gust", "atmospheric_pressure", "sea_temperature"
+    ) |>
+    dplyr::arrange(dplyr::desc(.data$rogue_ratio), dplyr::desc(.data$time)) |>
+    dplyr::collect()
 
   if (nrow(rogues) > 0) {
     cli::cli_alert_success("Detected {nrow(rogues)} rogue wave events (threshold: {threshold})")

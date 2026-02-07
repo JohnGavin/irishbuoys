@@ -30,10 +30,11 @@ incremental_update <- function(
   con <- connect_duckdb(db_path = db_path, create_new = FALSE)
   on.exit(DBI::dbDisconnect(con), add = TRUE)
 
-  # Get the latest timestamp in the database
-  latest_db <- DBI::dbGetQuery(con, "
-    SELECT MAX(time) as max_time FROM buoy_data
-  ")$max_time
+  # Get the latest timestamp in the database (using dplyr)
+  latest_db <- buoy_tbl(con) |>
+    dplyr::summarise(max_time = max(.data$time, na.rm = TRUE)) |>
+    dplyr::collect() |>
+    dplyr::pull(max_time)
 
   if (is.na(latest_db)) {
     cli::cli_alert_warning("Database is empty. Performing initial data load...")
@@ -73,19 +74,19 @@ incremental_update <- function(
     # Load to database
     records_added <- load_to_duckdb(new_data, con, update_metadata = TRUE)
 
-    # Get summary statistics
+    # Get summary statistics (using dplyr)
     if (records_added > 0) {
-      summary_stats <- DBI::dbGetQuery(con, glue::glue("
-        SELECT
-          station_id,
-          COUNT(*) as n_records,
-          MIN(time) as earliest,
-          MAX(time) as latest
-        FROM buoy_data
-        WHERE time >= '{start_time}'
-        GROUP BY station_id
-        ORDER BY station_id
-      "))
+      summary_stats <- buoy_tbl(con) |>
+        dplyr::filter(.data$time >= !!start_time) |>
+        dplyr::group_by(.data$station_id) |>
+        dplyr::summarise(
+          n_records = dplyr::n(),
+          earliest = min(.data$time, na.rm = TRUE),
+          latest = max(.data$time, na.rm = TRUE),
+          .groups = "drop"
+        ) |>
+        dplyr::arrange(.data$station_id) |>
+        dplyr::collect()
 
       cli::cli_h2("Update Summary")
       cli::cli_alert_success("Added {records_added} new records")
@@ -195,15 +196,15 @@ initialize_database <- function(
 
   cli::cli_progress_done(id = pb)
 
-  # Display final statistics
-  stats <- DBI::dbGetQuery(con, "
-    SELECT
-      COUNT(DISTINCT station_id) as n_stations,
-      COUNT(*) as n_records,
-      MIN(time) as earliest_date,
-      MAX(time) as latest_date
-    FROM buoy_data
-  ")
+  # Display final statistics (using dplyr)
+  stats <- buoy_tbl(con) |>
+    dplyr::summarise(
+      n_stations = dplyr::n_distinct(.data$station_id),
+      n_records = dplyr::n(),
+      earliest_date = min(.data$time, na.rm = TRUE),
+      latest_date = max(.data$time, na.rm = TRUE)
+    ) |>
+    dplyr::collect()
 
   cli::cli_h2("Database Statistics")
   cli::cli_alert_success("Total records loaded: {stats$n_records}")
@@ -238,48 +239,47 @@ get_database_stats <- function(db_path = "inst/extdata/irish_buoys.duckdb") {
   con <- connect_duckdb(db_path = db_path, create_new = FALSE)
   on.exit(DBI::dbDisconnect(con), add = TRUE)
 
-  # Overall statistics
-  overall <- DBI::dbGetQuery(con, "
-    SELECT
-      COUNT(*) as total_records,
-      COUNT(DISTINCT station_id) as n_stations,
-      MIN(time) as earliest_date,
-      MAX(time) as latest_date,
-      COUNT(DISTINCT DATE(time)) as n_days
-    FROM buoy_data
-  ")
+  # Overall statistics (using dplyr)
+  overall <- buoy_tbl(con) |>
+    dplyr::summarise(
+      total_records = dplyr::n(),
+      n_stations = dplyr::n_distinct(.data$station_id),
+      earliest_date = min(.data$time, na.rm = TRUE),
+      latest_date = max(.data$time, na.rm = TRUE)
+    ) |>
+    dplyr::collect()
+  # Add n_days - requires SQL for DATE() function
+  overall$n_days <- DBI::dbGetQuery(con, "SELECT COUNT(DISTINCT DATE(time)) as n FROM buoy_data")$n
 
-  # Per-station statistics
-  by_station <- DBI::dbGetQuery(con, "
-    SELECT
-      station_id,
-      COUNT(*) as n_records,
-      MIN(time) as first_observation,
-      MAX(time) as last_observation,
-      AVG(CASE WHEN qc_flag = 1 THEN 1 ELSE 0 END) as pct_good_quality
-    FROM buoy_data
-    GROUP BY station_id
-    ORDER BY station_id
-  ")
+  # Per-station statistics (using dplyr)
+  by_station <- buoy_tbl(con) |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      n_records = dplyr::n(),
+      first_observation = min(.data$time, na.rm = TRUE),
+      last_observation = max(.data$time, na.rm = TRUE),
+      pct_good_quality = mean(dplyr::if_else(.data$qc_flag == 1L, 1, 0), na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    dplyr::arrange(.data$station_id) |>
+    dplyr::collect()
 
-  # Recent updates
-  recent_updates <- DBI::dbGetQuery(con, "
-    SELECT *
-    FROM update_log
-    ORDER BY update_time DESC
-    LIMIT 10
-  ")
+  # Recent updates (using dplyr)
+  recent_updates <- dplyr::tbl(con, "update_log") |>
+    dplyr::arrange(dplyr::desc(.data$update_time)) |>
+    utils::head(10) |>
+    dplyr::collect()
 
-  # Data completeness by variable
-  completeness <- DBI::dbGetQuery(con, "
-    SELECT
-      COUNT(*) as n_total,
-      SUM(CASE WHEN atmospheric_pressure IS NOT NULL THEN 1 ELSE 0 END) / CAST(COUNT(*) AS REAL) as pct_pressure,
-      SUM(CASE WHEN air_temperature IS NOT NULL THEN 1 ELSE 0 END) / CAST(COUNT(*) AS REAL) as pct_temperature,
-      SUM(CASE WHEN wind_speed IS NOT NULL THEN 1 ELSE 0 END) / CAST(COUNT(*) AS REAL) as pct_wind,
-      SUM(CASE WHEN wave_height IS NOT NULL THEN 1 ELSE 0 END) / CAST(COUNT(*) AS REAL) as pct_wave
-    FROM buoy_data
-  ")
+  # Data completeness by variable (using dplyr)
+  completeness <- buoy_tbl(con) |>
+    dplyr::summarise(
+      n_total = dplyr::n(),
+      pct_pressure = mean(dplyr::if_else(!is.na(.data$atmospheric_pressure), 1, 0), na.rm = TRUE),
+      pct_temperature = mean(dplyr::if_else(!is.na(.data$air_temperature), 1, 0), na.rm = TRUE),
+      pct_wind = mean(dplyr::if_else(!is.na(.data$wind_speed), 1, 0), na.rm = TRUE),
+      pct_wave = mean(dplyr::if_else(!is.na(.data$wave_height), 1, 0), na.rm = TRUE)
+    ) |>
+    dplyr::collect()
 
   stats <- list(
     overall = overall,

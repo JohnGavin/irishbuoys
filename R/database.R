@@ -46,6 +46,32 @@ connect_duckdb <- function(
   return(con)
 }
 
+#' Get Lazy Reference to Buoy Data Table
+#'
+#' @description
+#' Returns a lazy dplyr tibble reference to the buoy_data table.
+#' All dplyr operations are translated to SQL and executed in DuckDB.
+#' Call collect() to retrieve results as a data frame.
+#'
+#' @param con DBI connection to DuckDB database
+#' @param table_name Name of the table (default: "buoy_data")
+#'
+#' @return A lazy tibble (tbl_dbi) for use with dplyr verbs
+#'
+#' @export
+#' @examples
+#' \dontrun{
+#' con <- connect_duckdb()
+#' buoy_tbl(con) |>
+#'   dplyr::filter(station_id == "M3", wave_height > 5) |>
+#'   dplyr::select(time, wave_height, hmax) |>
+#'   dplyr::collect()
+#' DBI::dbDisconnect(con)
+#' }
+buoy_tbl <- function(con, table_name = "buoy_data") {
+  dplyr::tbl(con, table_name)
+}
+
 #' Create Database Schema for Buoy Data
 #'
 #' @description
@@ -178,8 +204,11 @@ load_to_duckdb <- function(data, con, update_metadata = TRUE) {
     data[[col]][is.nan(data[[col]])] <- NA
   }
 
-  # Get count before insertion
-  count_before <- DBI::dbGetQuery(con, "SELECT COUNT(*) as n FROM buoy_data")$n
+  # Get count before insertion (using dplyr)
+  count_before <- buoy_tbl(con) |>
+    dplyr::summarise(n = dplyr::n()) |>
+    dplyr::collect() |>
+    dplyr::pull(n)
 
   # Write to staging table, then INSERT ... ON CONFLICT DO NOTHING
   # This handles duplicate records at chunk boundaries gracefully
@@ -201,8 +230,11 @@ load_to_duckdb <- function(data, con, update_metadata = TRUE) {
   # Clean up staging table
   DBI::dbExecute(con, paste0("DROP TABLE IF EXISTS ", staging_name))
 
-  # Get count after insertion
-  count_after <- DBI::dbGetQuery(con, "SELECT COUNT(*) as n FROM buoy_data")$n
+  # Get count after insertion (using dplyr)
+  count_after <- buoy_tbl(con) |>
+    dplyr::summarise(n = dplyr::n()) |>
+    dplyr::collect() |>
+    dplyr::pull(n)
   rows_added <- count_after - count_before
 
   cli::cli_alert_success("Added {rows_added} new records to database")
@@ -230,6 +262,7 @@ load_to_duckdb <- function(data, con, update_metadata = TRUE) {
 #'
 #' @description
 #' Updates the station metadata table with latest observation times.
+#' Uses dplyr for the SELECT query, DBI for the INSERT.
 #'
 #' @param con DBI connection object
 #' @param station_ids Character vector of station IDs to update
@@ -240,22 +273,21 @@ load_to_duckdb <- function(data, con, update_metadata = TRUE) {
 update_station_metadata <- function(con, station_ids) {
 
   for (station in station_ids) {
-    # Get station statistics
-    stats <- DBI::dbGetQuery(con, glue::glue("
-      SELECT
-        station_id,
-        MIN(longitude) as longitude,
-        MIN(latitude) as latitude,
-        MIN(call_sign) as call_sign,
-        MIN(time) as first_obs,
-        MAX(time) as last_obs
-      FROM buoy_data
-      WHERE station_id = '{station}'
-      GROUP BY station_id
-    "))
+    # Get station statistics using dplyr
+    stats <- buoy_tbl(con) |>
+      dplyr::filter(.data$station_id == !!station) |>
+      dplyr::summarise(
+        station_id = dplyr::first(.data$station_id),
+        longitude = min(.data$longitude, na.rm = TRUE),
+        latitude = min(.data$latitude, na.rm = TRUE),
+        call_sign = min(.data$call_sign, na.rm = TRUE),
+        first_obs = min(.data$time, na.rm = TRUE),
+        last_obs = max(.data$time, na.rm = TRUE)
+      ) |>
+      dplyr::collect()
 
     if (nrow(stats) > 0) {
-      # Update or insert station info
+      # Update or insert station info (DBI for INSERT)
       DBI::dbExecute(con, glue::glue("
         INSERT OR REPLACE INTO stations
         (station_id, call_sign, longitude, latitude, first_observation, last_observation)
@@ -306,6 +338,7 @@ log_update <- function(con, start_date, end_date, records_added, stations, notes
 #'
 #' @description
 #' Flexible querying of buoy data with various filtering options.
+#' Uses dplyr verbs translated to SQL for efficient DuckDB execution.
 #'
 #' @param con DBI connection object
 #' @param stations Character vector of station IDs (default: all)
@@ -313,7 +346,7 @@ log_update <- function(con, start_date, end_date, records_added, stations, notes
 #' @param end_date End date for query
 #' @param variables Character vector of variables to return
 #' @param qc_filter Logical, filter for good quality data only (default: TRUE)
-#' @param sql_query Optional custom SQL query
+#' @param sql_query Optional custom SQL query (bypasses dplyr)
 #'
 #' @return Data frame with query results
 #'
@@ -339,48 +372,42 @@ query_buoy_data <- function(
     sql_query = NULL
 ) {
 
-  # Use custom SQL if provided
+  # Use custom SQL if provided (fallback for complex queries)
   if (!is.null(sql_query)) {
-    return(DBI::dbGetQuery(con, sql_query))
+    result <- DBI::dbGetQuery(con, sql_query)
+    cli::cli_alert_success("Retrieved {nrow(result)} records (custom SQL)")
+    return(result)
   }
 
-  # Build query
-  if (is.null(variables)) {
-    select_clause <- "SELECT *"
-  } else {
-    select_clause <- paste("SELECT", paste(variables, collapse = ", "))
-  }
+  # Start with lazy table reference
+tbl_ref <- buoy_tbl(con)
 
-  where_clauses <- c()
-
+  # Apply filters using dplyr verbs (translated to SQL)
   if (!is.null(stations)) {
-    station_list <- paste0("'", stations, "'", collapse = ",")
-    where_clauses <- c(where_clauses, glue::glue("station_id IN ({station_list})"))
+    tbl_ref <- tbl_ref |> dplyr::filter(.data$station_id %in% !!stations)
   }
 
   if (!is.null(start_date)) {
-    where_clauses <- c(where_clauses, glue::glue("time >= '{start_date}'"))
+    tbl_ref <- tbl_ref |> dplyr::filter(.data$time >= !!start_date)
   }
 
   if (!is.null(end_date)) {
-    where_clauses <- c(where_clauses, glue::glue("time <= '{end_date}'"))
+    tbl_ref <- tbl_ref |> dplyr::filter(.data$time <= !!end_date)
   }
 
   if (qc_filter) {
-    where_clauses <- c(where_clauses, "qc_flag = 1")
+    tbl_ref <- tbl_ref |> dplyr::filter(.data$qc_flag == 1L)
   }
 
-  if (length(where_clauses) > 0) {
-    where_clause <- paste("WHERE", paste(where_clauses, collapse = " AND "))
-  } else {
-    where_clause <- ""
+  # Select specific variables if requested
+  if (!is.null(variables)) {
+    tbl_ref <- tbl_ref |> dplyr::select(dplyr::all_of(variables))
   }
 
-  query <- glue::glue("{select_clause} FROM buoy_data {where_clause} ORDER BY time")
-
-  cli::cli_alert_info("Executing query: {query}")
-
-  result <- DBI::dbGetQuery(con, query)
+  # Order by time and collect
+  result <- tbl_ref |>
+    dplyr::arrange(.data$time) |>
+    dplyr::collect()
 
   cli::cli_alert_success("Retrieved {nrow(result)} records")
 

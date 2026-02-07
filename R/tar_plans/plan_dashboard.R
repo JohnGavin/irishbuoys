@@ -10,28 +10,21 @@ plan_dashboard <- list(
   # ========================================
 
   # Prepare main buoy data for dashboard (compressed)
+  # Uses dplyr verbs translated to SQL for efficient DuckDB execution
   targets::tar_target(
     dashboard_buoy_data,
     {
       con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      data <- DBI::dbGetQuery(con, "
-        SELECT
-          station_id,
-          time,
-          wave_height,
-          hmax,
-          wave_period,
-          wind_speed,
-          gust,
-          wind_direction,
-          atmospheric_pressure,
-          air_temperature,
-          sea_temperature
-        FROM buoy_data
-        ORDER BY station_id, time
-      ")
+      data <- buoy_tbl(con) |>
+        dplyr::select(
+          "station_id", "time", "wave_height", "hmax", "wave_period",
+          "wind_speed", "gust", "wind_direction", "atmospheric_pressure",
+          "air_temperature", "sea_temperature"
+        ) |>
+        dplyr::arrange(.data$station_id, .data$time) |>
+        dplyr::collect()
 
       # Convert time
       data$time <- as.POSIXct(data$time, tz = "UTC")

@@ -16,31 +16,25 @@ plan_wave_analysis <- list(
   # ========================================
 
   # Load all historical data from DuckDB (filtered for analysis)
+  # Uses dplyr verbs translated to SQL for efficient DuckDB execution
   targets::tar_target(
     analysis_data,
     {
       con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      data <- DBI::dbGetQuery(con, "
-        SELECT
-          station_id,
-          time,
-          wave_height,
-          hmax,
-          wave_period,
-          tp,
-          wind_speed,
-          wind_direction,
-          gust,
-          atmospheric_pressure,
-          sea_temperature,
-          qc_flag
-        FROM buoy_data
-        WHERE wave_height IS NOT NULL
-          AND qc_flag IS NOT NULL
-        ORDER BY station_id, time
-      ")
+      data <- buoy_tbl(con) |>
+        dplyr::filter(
+          !is.na(.data$wave_height),
+          !is.na(.data$qc_flag)
+        ) |>
+        dplyr::select(
+          "station_id", "time", "wave_height", "hmax", "wave_period", "tp",
+          "wind_speed", "wind_direction", "gust", "atmospheric_pressure",
+          "sea_temperature", "qc_flag"
+        ) |>
+        dplyr::arrange(.data$station_id, .data$time) |>
+        dplyr::collect()
 
       # Convert time
       data$time <- as.POSIXct(data$time, tz = "UTC")
@@ -51,6 +45,7 @@ plan_wave_analysis <- list(
   ),
 
   # Load ALL 22 columns for data glimpse (sample for display)
+  # Uses dplyr verbs for efficient DuckDB execution
   targets::tar_target(
     full_data,
     {
@@ -58,7 +53,9 @@ plan_wave_analysis <- list(
       on.exit(DBI::dbDisconnect(con))
 
       # Get sample of all columns for glimpse
-      data <- DBI::dbGetQuery(con, "SELECT * FROM buoy_data LIMIT 10000")
+      data <- buoy_tbl(con) |>
+        utils::head(10000) |>
+        dplyr::collect()
       data$time <- as.POSIXct(data$time, tz = "UTC")
 
       cli::cli_alert_success("Loaded sample of {nrow(data)} rows (all 22 columns)")

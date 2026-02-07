@@ -5,6 +5,7 @@
 # Core R packages for data work
 core_pkgs <- c(
   "arrow",          # Apache Arrow for data
+  "dbplyr",         # Database backend for dplyr (translates dplyr to SQL)
   "duckdb",         # DuckDB for data queries
   "duckplyr",       # dplyr backend for DuckDB
   "DBI",            # Database interface
