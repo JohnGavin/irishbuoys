@@ -21,6 +21,7 @@ let
       cli
       crew
       DBI
+      dbplyr
       desc
       devtools
       dplyr
