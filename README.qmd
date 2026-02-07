@@ -206,7 +206,8 @@ wave_data <- query_buoy_data(
   qc_filter = TRUE  # Only good quality data
 )
 
-# Custom SQL query
+# Custom SQL query: Find top 10 most extreme rogue waves
+# Ordered by hmax (highest individual wave) because "extreme" = largest waves
 extreme_waves <- query_buoy_data(
   con,
   sql_query = "
@@ -215,8 +216,8 @@ extreme_waves <- query_buoy_data(
     WHERE hmax > 2 * wave_height
       AND wave_height > 0
       AND qc_flag = 1
-    ORDER BY time DESC
-    LIMIT 100
+    ORDER BY hmax DESC
+    LIMIT 10
   "
 )
 ```
@@ -226,7 +227,7 @@ extreme_waves <- query_buoy_data(
 The same query using `dplyr` verbs with `duckplyr` backend:
 ```r
 # Tidyverse alternative using duckplyr
-# Same query as SQL above, but with dplyr verbs
+# Same query as SQL above, ordered by hmax (highest waves first)
 library(dplyr)
 library(duckplyr)
 
@@ -237,8 +238,8 @@ extreme_waves_tidy <- tbl(con, "buoy_data") |>
     qc_flag == 1
   ) |>
   select(station_id, time, wave_height, hmax) |>
-  arrange(desc(time)) |>
-  head(100) |>
+  arrange(desc(hmax)) |>
+  head(10) |>
   collect()
 ```
 
@@ -301,7 +302,7 @@ Data is sourced from the [Marine Institute's ERDDAP server](https://erddap.marin
 ```{r}
 #| echo: false
 #| eval: true
-fs::dir_tree()
+fs::dir_tree(recurse = 2)
 ```
 
 ## Key Features
