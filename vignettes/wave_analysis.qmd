@@ -3,9 +3,7 @@ title: "Wave Analysis Dashboard"
 format:
   dashboard:
     orientation: rows
-    theme:
-      - cosmo
-      - custom.scss
+    theme: cosmo
 execute:
   echo: false
   warning: false
@@ -36,12 +34,12 @@ theme_set(theme_minimal(base_size = 12))
 # Set targets store to project root
 targets::tar_config_set(store = "../_targets")
 
-# Load all targets data and pre-computed plots
+# Load targets data only - generate plots inline to keep file size small
+# NOTE: Pre-computed plotly objects embed all data as JSON (20MB+)
+#       Generating inline from summary data keeps file ~1-2MB
 targets::tar_load(c(
-  # Data
   full_data,
   missing_data_grid,
-  analysis_data,
   rogue_wave_events,
   rogue_wave_conditions,
   rogue_wave_statistics,
@@ -62,22 +60,7 @@ targets::tar_load(c(
   return_levels_hmax_pooled,
   gust_factor_analysis,
   return_level_curves_wave,
-  return_level_curves_wind,
-  # Pre-computed plots (just print these - no computation in vignette)
-  plot_rogue_all,
-  plot_rogue_by_station,
-  plot_wind_beaufort,
-  plot_week_of_year,
-  plot_time_of_day,
-  plot_monthly_wave,
-  plot_monthly_wind,
-  plot_annual_trends,
-  plot_return_levels_wave,
-  plot_return_levels_wind,
-  plot_return_levels_hmax,
-  plot_gust_by_category,
-  plot_rogue_gusts,
-  plot_stl
+  return_level_curves_wind
 ))
 
 # Alias for compatibility
@@ -245,8 +228,8 @@ if (!is.null(missing_data_grid)) {
 #### All Stations
 
 ```{r rogue-waves-all}
-# Pre-computed plot - just print
-plot_rogue_all
+# Generate plot inline to keep file size small
+create_plot_rogue_all(rogue_events)
 ```
 
 #### Events by Station
@@ -255,8 +238,8 @@ Use the **range slider** at the bottom to zoom all panels to a specific time per
 
 ```{r rogue-waves-by-station}
 #| fig-height: 14
-# Pre-computed plot - just print
-plot_rogue_by_station
+# Generate plot inline to keep file size small
+create_plot_rogue_by_station(rogue_events)
 ```
 
 #### Data Table
@@ -295,9 +278,11 @@ This parallels the rogue wave definition (Hmax/Hs > 2.0).
 #### All Stations
 
 ```{r rogue-gusts-all}
-# Pre-computed plot - just print
-targets::tar_load(plot_rogue_gusts_all)
-plot_rogue_gusts_all
+# Generate plot inline - load rogue gust events first
+targets::tar_load(rogue_gust_events)
+if (!is.null(rogue_gust_events) && nrow(rogue_gust_events) > 0) {
+  create_plot_rogue_gusts_all(rogue_gust_events)
+}
 ```
 
 #### Events by Station
@@ -306,9 +291,10 @@ Use the **range slider** at the bottom to zoom all panels to a specific time per
 
 ```{r rogue-gusts-by-station}
 #| fig-height: 14
-# Pre-computed plot - just print
-targets::tar_load(plot_rogue_gusts_by_station)
-plot_rogue_gusts_by_station
+# Generate plot inline
+if (!is.null(rogue_gust_events) && nrow(rogue_gust_events) > 0) {
+  create_plot_rogue_gusts_by_station(rogue_gust_events)
+}
 ```
 
 #### Data Table
@@ -335,8 +321,9 @@ if (!is.null(rogue_gust_events) && nrow(rogue_gust_events) > 0) {
 Comparing wave rogue events (Hmax/Hs > 2.0) with gust rogue events (Gust/Wind > 1.5).
 
 ```{r rogue-gusts-vs-waves}
-targets::tar_load(plot_gusts_vs_waves)
-plot_gusts_vs_waves
+# Generate plot inline - need analysis_data for this
+targets::tar_load(analysis_data)
+create_plot_gusts_vs_waves(analysis_data)
 ```
 
 # Definitions
@@ -387,8 +374,8 @@ The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org
 #### Monthly Wave Height
 
 ```{r trends-monthly-wave}
-# Pre-computed plot - just print
-plot_monthly_wave
+# Generate plot inline
+create_plot_monthly_wave(seasonal_means_wave)
 ```
 
 #### Monthly Wave (Data)
@@ -404,15 +391,15 @@ if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) 
 #### Monthly Wind
 
 ```{r trends-monthly-wind}
-# Pre-computed plot - just print
-plot_monthly_wind
+# Generate plot inline
+create_plot_monthly_wind(seasonal_means_wind)
 ```
 
 #### Annual Trends
 
 ```{r trends-annual}
-# Pre-computed plot - just print
-plot_annual_trends
+# Generate plot inline
+create_plot_annual_trends(annual_trends_wave)
 ```
 
 #### STL Decomposition
@@ -420,8 +407,8 @@ plot_annual_trends
 ```{r trends-stl}
 #| fig-width: 12
 #| fig-height: 8
-# Pre-computed plot - just print
-plot_stl
+# Generate STL plot inline (ggplot2)
+create_plot_stl(wave_height_seasonal)
 ```
 
 # Annual Max Model
@@ -433,8 +420,8 @@ plot_stl
 #### Wave Return Levels
 
 ```{r eva-wave-return}
-# Pre-computed plot - just print
-plot_return_levels_wave
+# Generate plot inline
+create_plot_return_levels(return_levels_wave, variable = "wave")
 ```
 
 #### Wave Return (Data)
@@ -450,15 +437,15 @@ if (!is.null(return_levels_wave)) {
 #### Wind Return Levels
 
 ```{r eva-wind-return}
-# Pre-computed plot - just print
-plot_return_levels_wind
+# Generate plot inline
+create_plot_return_levels(return_levels_wind, variable = "wind")
 ```
 
 #### Hmax Return Levels
 
 ```{r eva-hmax-return}
-# Pre-computed plot - just print
-plot_return_levels_hmax
+# Generate plot inline
+create_plot_return_levels(return_levels_hmax, variable = "hmax")
 ```
 
 #### Summary Table
@@ -659,8 +646,8 @@ if (!is.null(gust_analysis) && "by_station" %in% names(gust_analysis) && !is.nul
 #### By Wind Category
 
 ```{r gust-by-category}
-# Pre-computed plot - just print
-plot_gust_by_category
+# Generate plot inline
+create_plot_gust_by_category(gust_analysis)
 ```
 
 #### Wind Category (Data)
@@ -680,8 +667,8 @@ if (!is.null(gust_analysis) && "by_station_category" %in% names(gust_analysis) &
 #### Rogue Gusts
 
 ```{r gust-rogue}
-# Pre-computed plot - just print
-plot_rogue_gusts
+# Generate plot inline
+create_plot_rogue_gusts(gust_analysis)
 ```
 
 # Reference
