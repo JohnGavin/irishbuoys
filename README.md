@@ -224,7 +224,35 @@ extreme_waves <- query_buoy_data(
     LIMIT 100
   "
 )
+```
 
+### Tidyverse Alternative (duckplyr)
+
+The same query using `dplyr` verbs with `duckplyr` backend:
+
+``` r
+# Tidyverse alternative using duckplyr
+# Same query as SQL above, but with dplyr verbs
+library(dplyr)
+library(duckplyr)
+
+extreme_waves_tidy <- tbl(con, "buoy_data") |>
+  filter(
+    hmax > 2 * wave_height,
+    wave_height > 0,
+    qc_flag == 1
+  ) |>
+  select(station_id, time, wave_height, hmax) |>
+  arrange(desc(time)) |>
+  head(100) |>
+  collect()
+```
+
+**Why duckplyr?** - Familiar tidyverse syntax - Lazy evaluation - query
+runs only on `collect()` - Automatic SQL translation for performance -
+Works with any DBI connection
+
+``` r
 # Don't forget to disconnect
 DBI::dbDisconnect(con)
 ```
@@ -289,21 +317,27 @@ Buoy Network.
     │   ├── database.R
     │   ├── database_parquet.R
     │   ├── dev
+    │   │   ├── check_data_gaps.R
     │   │   ├── generate_dashboard_data.R
     │   │   └── issues
     │   ├── email_summary.R
     │   ├── erddap_client.R
     │   ├── extreme_values.R
     │   ├── irishbuoys-package.R
+    │   ├── plot_functions.R
+    │   ├── plotly_helpers.R
     │   ├── rogue_waves.R
     │   ├── tar_plans
+    │   │   ├── plan_dashboard.R
     │   │   ├── plan_data_acquisition.R
+    │   │   ├── plan_doc_examples.R
     │   │   ├── plan_quality_control.R
     │   │   └── plan_wave_analysis.R
     │   ├── trend_analysis.R
     │   ├── update.R
     │   ├── wave_model.R
     │   └── wave_science.R
+    ├── README.md
     ├── README.qmd
     ├── README.rmarkdown
     ├── _extensions
@@ -672,27 +706,69 @@ Buoy Network.
     │   │   ├── analysis_summary
     │   │   ├── annual_trends_wave
     │   │   ├── annual_trends_wind
+    │   │   ├── code_example_duckplyr_rogue
+    │   │   ├── code_example_sql_rogue
+    │   │   ├── code_example_wave_query
+    │   │   ├── code_example_wave_query_duckplyr
+    │   │   ├── code_parsed_duckplyr_rogue
+    │   │   ├── code_parsed_sql_rogue
+    │   │   ├── code_parsed_wave_query
+    │   │   ├── code_parsed_wave_query_duckplyr
     │   │   ├── current_db_stats
+    │   │   ├── dashboard_buoy_data
+    │   │   ├── dashboard_stats
+    │   │   ├── dashboard_timeseries
     │   │   ├── data_completeness
     │   │   ├── data_update
+    │   │   ├── doc_examples_validation
+    │   │   ├── full_data
     │   │   ├── gev_hmax
+    │   │   ├── gev_hmax_pooled
     │   │   ├── gev_wave_height
+    │   │   ├── gev_wave_pooled
+    │   │   ├── gev_wind_pooled
     │   │   ├── gev_wind_speed
+    │   │   ├── gpd_hmax_per_station
+    │   │   ├── gpd_wave_per_station
+    │   │   ├── gpd_wind_per_station
     │   │   ├── gust_factor_analysis
     │   │   ├── latest_erddap_timestamp
+    │   │   ├── missing_data_grid
     │   │   ├── outlier_check
+    │   │   ├── plot_annual_trends
+    │   │   ├── plot_gust_by_category
+    │   │   ├── plot_gusts_vs_waves
+    │   │   ├── plot_monthly_wave
+    │   │   ├── plot_monthly_wind
+    │   │   ├── plot_return_levels_hmax
+    │   │   ├── plot_return_levels_wave
+    │   │   ├── plot_return_levels_wind
+    │   │   ├── plot_rogue_all
+    │   │   ├── plot_rogue_by_station
+    │   │   ├── plot_rogue_gusts
+    │   │   ├── plot_rogue_gusts_all
+    │   │   ├── plot_rogue_gusts_by_station
+    │   │   ├── plot_stl
+    │   │   ├── plot_time_of_day
+    │   │   ├── plot_week_of_year
+    │   │   ├── plot_wind_beaufort
     │   │   ├── quality_report
     │   │   ├── recent_data
     │   │   ├── return_level_curves_wave
     │   │   ├── return_level_curves_wind
     │   │   ├── return_levels_hmax
+    │   │   ├── return_levels_hmax_pooled
     │   │   ├── return_levels_wave
+    │   │   ├── return_levels_wave_pooled
     │   │   ├── return_levels_wind
+    │   │   ├── return_levels_wind_pooled
     │   │   ├── rogue_comparison
+    │   │   ├── rogue_gust_events
     │   │   ├── rogue_wave_conditions
     │   │   ├── rogue_wave_events
     │   │   ├── rogue_wave_statistics
     │   │   ├── rogue_waves
+    │   │   ├── save_dashboard_data
     │   │   ├── save_vignette_data
     │   │   ├── seasonal_means_wave
     │   │   ├── seasonal_means_wind
@@ -702,8 +778,11 @@ Buoy Network.
     │   ├── user
     │   └── workspaces
     │       ├── analysis_data
+    │       ├── dashboard_buoy_data
     │       ├── data_completeness
     │       ├── gev_wind_speed
+    │       ├── recent_data
+    │       ├── return_level_curves_wave
     │       ├── return_level_curves_wind
     │       ├── seasonal_means_wave
     │       └── stations
@@ -719,36 +798,12 @@ Buoy Network.
     │   ├── articles
     │   │   ├── dashboard_static.html
     │   │   ├── dashboard_static_files
-    │   │   │   ├── figure-html
-    │   │   │   │   ├── unnamed-chunk-1-1.png
-    │   │   │   │   ├── unnamed-chunk-10-1.png
-    │   │   │   │   ├── unnamed-chunk-11-1.png
-    │   │   │   │   ├── unnamed-chunk-12-1.png
-    │   │   │   │   ├── unnamed-chunk-13-1.png
-    │   │   │   │   ├── unnamed-chunk-14-1.png
-    │   │   │   │   ├── unnamed-chunk-15-1.png
-    │   │   │   │   ├── unnamed-chunk-16-1.png
-    │   │   │   │   ├── unnamed-chunk-17-1.png
-    │   │   │   │   ├── unnamed-chunk-18-1.png
-    │   │   │   │   ├── unnamed-chunk-19-1.png
-    │   │   │   │   ├── unnamed-chunk-21-1.png
-    │   │   │   │   ├── unnamed-chunk-23-1.png
-    │   │   │   │   ├── unnamed-chunk-25-1.png
-    │   │   │   │   ├── unnamed-chunk-27-1.png
-    │   │   │   │   ├── unnamed-chunk-28-1.png
-    │   │   │   │   ├── unnamed-chunk-29-1.png
-    │   │   │   │   ├── unnamed-chunk-3-1.png
-    │   │   │   │   ├── unnamed-chunk-30-1.png
-    │   │   │   │   ├── unnamed-chunk-31-1.png
-    │   │   │   │   ├── unnamed-chunk-4-1.png
-    │   │   │   │   ├── unnamed-chunk-5-1.png
-    │   │   │   │   ├── unnamed-chunk-6-1.png
-    │   │   │   │   ├── unnamed-chunk-7-1.png
-    │   │   │   │   ├── unnamed-chunk-8-1.png
-    │   │   │   │   └── unnamed-chunk-9-1.png
     │   │   │   └── libs
+    │   │   │       ├── Dygraph.Plugins.Crosshair-1.0
+    │   │   │       │   └── crosshair.js
     │   │   │       ├── bootstrap
-    │   │   │       │   ├── bootstrap-d5fa03fb90ac27921a6d47853be462c0.min.css
+    │   │   │       │   ├── bootstrap-28163b1fbaa4d35fdae8b703aca03440.min.css
+    │   │   │       │   ├── bootstrap-dark-28163b1fbaa4d35fdae8b703aca03440.min.css
     │   │   │       │   ├── bootstrap-icons.css
     │   │   │       │   ├── bootstrap-icons.woff
     │   │   │       │   └── bootstrap.min.js
@@ -774,6 +829,21 @@ Buoy Network.
     │   │   │       │   │   └── jquery.dataTables.min.css
     │   │   │       │   └── js
     │   │   │       │       └── jquery.dataTables.min.js
+    │   │   │       ├── dt-ext-buttons-1.13.6
+    │   │   │       │   ├── css
+    │   │   │       │   │   └── buttons.dataTables.min.css
+    │   │   │       │   └── js
+    │   │   │       │       ├── buttons.colVis.min.js
+    │   │   │       │       ├── buttons.html5.min.js
+    │   │   │       │       ├── buttons.print.min.js
+    │   │   │       │       └── dataTables.buttons.min.js
+    │   │   │       ├── dygraphs-1.1.1
+    │   │   │       │   ├── dygraph-combined-dev.js
+    │   │   │       │   ├── dygraph-combined.js
+    │   │   │       │   ├── dygraph.css
+    │   │   │       │   └── shapes.js
+    │   │   │       ├── dygraphs-binding-1.1.1.6
+    │   │   │       │   └── dygraphs.js
     │   │   │       ├── htmltools-fill-0.5.9
     │   │   │       │   └── fill.css
     │   │   │       ├── htmlwidgets-1.6.4
@@ -782,42 +852,60 @@ Buoy Network.
     │   │   │       │   ├── jquery-3.6.0.js
     │   │   │       │   ├── jquery-3.6.0.min.js
     │   │   │       │   └── jquery-3.6.0.min.map
+    │   │   │       ├── jszip-1.13.6
+    │   │   │       │   └── jszip.min.js
+    │   │   │       ├── moment-2.8.4
+    │   │   │       │   ├── moment-timezone-with-data.js
+    │   │   │       │   └── moment.js
+    │   │   │       ├── moment-fquarter-1.0.0
+    │   │   │       │   └── moment-fquarter.min.js
+    │   │   │       ├── moment-timezone-0.2.5
+    │   │   │       │   ├── moment-timezone-with-data.js
+    │   │   │       │   └── moment.js
     │   │   │       ├── nouislider-7.0.10
     │   │   │       │   ├── jquery.nouislider.min.css
     │   │   │       │   └── jquery.nouislider.min.js
+    │   │   │       ├── plotly-binding-4.12.0
+    │   │   │       │   └── plotly.js
+    │   │   │       ├── plotly-htmlwidgets-css-2.25.2
+    │   │   │       │   └── plotly-htmlwidgets.css
+    │   │   │       ├── plotly-main-2.25.2
+    │   │   │       │   └── plotly-latest.min.js
+    │   │   │       ├── quarto-dashboard
+    │   │   │       │   ├── components.js
+    │   │   │       │   ├── datatables.min.css
+    │   │   │       │   ├── datatables.min.js
+    │   │   │       │   ├── pdfmake.min.js
+    │   │   │       │   ├── quarto-dashboard.js
+    │   │   │       │   ├── stickythead.js
+    │   │   │       │   ├── vfs_fonts.js
+    │   │   │       │   └── web-components.js
     │   │   │       ├── quarto-html
     │   │   │       │   ├── anchor.min.js
     │   │   │       │   ├── axe
     │   │   │       │   │   └── axe-check.js
     │   │   │       │   ├── popper.min.js
     │   │   │       │   ├── quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css
+    │   │   │       │   ├── quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css
     │   │   │       │   ├── quarto.js
     │   │   │       │   ├── tabsets
     │   │   │       │   │   └── tabsets.js
     │   │   │       │   ├── tippy.css
     │   │   │       │   └── tippy.umd.min.js
-    │   │   │       └── selectize-0.12.0
-    │   │   │           ├── selectize.bootstrap3.css
-    │   │   │           └── selectize.min.js
+    │   │   │       ├── selectize-0.12.0
+    │   │   │       │   ├── selectize.bootstrap3.css
+    │   │   │       │   └── selectize.min.js
+    │   │   │       └── typedarray-0.1
+    │   │   │           └── typedarray.min.js
     │   │   ├── index.html
     │   │   ├── wave_analysis.html
     │   │   └── wave_analysis_files
     │   │       ├── figure-html
-    │   │       │   ├── rogue-all-1.png
-    │   │       │   ├── rogue-all-plot-1.png
-    │   │       │   ├── rogue-m2-1.png
-    │   │       │   ├── rogue-m2-plot-1.png
-    │   │       │   ├── rogue-m3-1.png
-    │   │       │   ├── rogue-m3-plot-1.png
-    │   │       │   ├── rogue-m4-1.png
-    │   │       │   ├── rogue-m4-plot-1.png
-    │   │       │   ├── rogue-m5-1.png
-    │   │       │   ├── rogue-m5-plot-1.png
-    │   │       │   ├── rogue-m6-1.png
-    │   │       │   └── rogue-m6-plot-1.png
+    │   │       │   └── unnamed-chunk-12-1.png
     │   │       └── libs
     │   │           ├── bootstrap
-    │   │           │   ├── bootstrap-d5fa03fb90ac27921a6d47853be462c0.min.css
+    │   │           │   ├── bootstrap-28163b1fbaa4d35fdae8b703aca03440.min.css
+    │   │           │   ├── bootstrap-dark-28163b1fbaa4d35fdae8b703aca03440.min.css
     │   │           │   ├── bootstrap-icons.css
     │   │           │   ├── bootstrap-icons.woff
     │   │           │   └── bootstrap.min.js
@@ -843,6 +931,14 @@ Buoy Network.
     │   │           │   │   └── jquery.dataTables.min.css
     │   │           │   └── js
     │   │           │       └── jquery.dataTables.min.js
+    │   │           ├── dt-ext-buttons-1.13.6
+    │   │           │   ├── css
+    │   │           │   │   └── buttons.dataTables.min.css
+    │   │           │   └── js
+    │   │           │       ├── buttons.colVis.min.js
+    │   │           │       ├── buttons.html5.min.js
+    │   │           │       ├── buttons.print.min.js
+    │   │           │       └── dataTables.buttons.min.js
     │   │           ├── htmltools-fill-0.5.9
     │   │           │   └── fill.css
     │   │           ├── htmlwidgets-1.6.4
@@ -851,23 +947,43 @@ Buoy Network.
     │   │           │   ├── jquery-3.6.0.js
     │   │           │   ├── jquery-3.6.0.min.js
     │   │           │   └── jquery-3.6.0.min.map
+    │   │           ├── jszip-1.13.6
+    │   │           │   └── jszip.min.js
     │   │           ├── nouislider-7.0.10
     │   │           │   ├── jquery.nouislider.min.css
     │   │           │   └── jquery.nouislider.min.js
+    │   │           ├── plotly-binding-4.12.0
+    │   │           │   └── plotly.js
+    │   │           ├── plotly-htmlwidgets-css-2.25.2
+    │   │           │   └── plotly-htmlwidgets.css
+    │   │           ├── plotly-main-2.25.2
+    │   │           │   └── plotly-latest.min.js
+    │   │           ├── quarto-dashboard
+    │   │           │   ├── components.js
+    │   │           │   ├── datatables.min.css
+    │   │           │   ├── datatables.min.js
+    │   │           │   ├── pdfmake.min.js
+    │   │           │   ├── quarto-dashboard.js
+    │   │           │   ├── stickythead.js
+    │   │           │   ├── vfs_fonts.js
+    │   │           │   └── web-components.js
     │   │           ├── quarto-html
     │   │           │   ├── anchor.min.js
     │   │           │   ├── axe
     │   │           │   │   └── axe-check.js
     │   │           │   ├── popper.min.js
     │   │           │   ├── quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css
+    │   │           │   ├── quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css
     │   │           │   ├── quarto.js
     │   │           │   ├── tabsets
     │   │           │   │   └── tabsets.js
     │   │           │   ├── tippy.css
     │   │           │   └── tippy.umd.min.js
-    │   │           └── selectize-0.12.0
-    │   │               ├── selectize.bootstrap3.css
-    │   │               └── selectize.min.js
+    │   │           ├── selectize-0.12.0
+    │   │           │   ├── selectize.bootstrap3.css
+    │   │           │   └── selectize.min.js
+    │   │           └── typedarray-0.1
+    │   │               └── typedarray.min.js
     │   ├── authors.html
     │   ├── deps
     │   │   ├── bootstrap-5.3.1
@@ -931,10 +1047,20 @@ Buoy Network.
     │   │   │       ├── 6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmRduz8A.woff2
     │   │   │       ├── 6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmhduz8A.woff2
     │   │   │       ├── 6xKydSBYKcSV-LCoeQqfX1RYOo3ik4zwmxduz8A.woff2
+    │   │   │       ├── CSR54z1Qlv-GDxkbKVQ_dFsvWNBeudwk.woff2
     │   │   │       ├── CSR54z1Qlv-GDxkbKVQ_dFsvWNReuQ.woff2
+    │   │   │       ├── CSR54z1Qlv-GDxkbKVQ_dFsvWNdeudwk.woff2
+    │   │   │       ├── CSR54z1Qlv-GDxkbKVQ_dFsvWNheudwk.woff2
+    │   │   │       ├── CSR54z1Qlv-GDxkbKVQ_dFsvWNleudwk.woff2
     │   │   │       ├── CSR54z1Qlv-GDxkbKVQ_dFsvWNpeudwk.woff2
+    │   │   │       ├── CSR54z1Qlv-GDxkbKVQ_dFsvWNteudwk.woff2
+    │   │   │       ├── CSR64z1Qlv-GDxkbKVQ_fO0KTet_.woff2
     │   │   │       ├── CSR64z1Qlv-GDxkbKVQ_fO4KTet_.woff2
+    │   │   │       ├── CSR64z1Qlv-GDxkbKVQ_fO8KTet_.woff2
     │   │   │       ├── CSR64z1Qlv-GDxkbKVQ_fOAKTQ.woff2
+    │   │   │       ├── CSR64z1Qlv-GDxkbKVQ_fOMKTet_.woff2
+    │   │   │       ├── CSR64z1Qlv-GDxkbKVQ_fOQKTet_.woff2
+    │   │   │       ├── CSR64z1Qlv-GDxkbKVQ_fOwKTet_.woff2
     │   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvQlMIXxw.woff2
     │   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvUlMI.woff2
     │   │   │       ├── HI_QiYsKILxRpg3hIP6sJ7fM7PqlONvXlMIXxw.woff2
@@ -954,6 +1080,15 @@ Buoy Network.
     │   │   │       ├── JTUSjIg1_i6t8kCHKm459WZhyzbi.woff2
     │   │   │       ├── JTUSjIg1_i6t8kCHKm459Wdhyzbi.woff2
     │   │   │       ├── JTUSjIg1_i6t8kCHKm459Wlhyw.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3-UBGEe.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3CUBGEe.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3GUBGEe.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3KUBGEe.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3OUBGEe.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3iUBGEe.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMa3yUBA.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMawCUBGEe.woff2
+    │   │   │       ├── KFO7CnqEu92Fr1ME7kSn66aGLdTylUAMaxKUBGEe.woff2
     │   │   │       ├── QGYpz_kZZAGCONcK2A4bGOj8mNhN.woff2
     │   │   │       ├── S6u8w4BMUTPHjxsAUi-qJCY.woff2
     │   │   │       ├── S6u8w4BMUTPHjxsAXC-q.woff2
@@ -963,6 +1098,13 @@ Buoy Network.
     │   │   │       ├── S6u9w4BMUTPHh7USSwiPGQ.woff2
     │   │   │       ├── S6uyw4BMUTPHjx4wXg.woff2
     │   │   │       ├── S6uyw4BMUTPHjxAwXjeu.woff2
+    │   │   │       ├── UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa0ZL7SUc.woff2
+    │   │   │       ├── UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2
+    │   │   │       ├── UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1pL7SUc.woff2
+    │   │   │       ├── UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2
+    │   │   │       ├── UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2JL7SUc.woff2
+    │   │   │       ├── UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2ZL7SUc.woff2
+    │   │   │       ├── UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa2pL7SUc.woff2
     │   │   │       ├── XRXV3I6Li01BKofIMeaBXso.woff2
     │   │   │       ├── XRXV3I6Li01BKofINeaB.woff2
     │   │   │       ├── XRXV3I6Li01BKofIO-aBXso.woff2
@@ -1023,6 +1165,7 @@ Buoy Network.
     │   │       ├── autocomplete.jquery.min.js
     │   │       ├── fuse.min.js
     │   │       └── mark.min.js
+    │   ├── extra.css
     │   ├── index.html
     │   ├── katex-auto.js
     │   ├── lightswitch.js
@@ -1094,28 +1237,12 @@ Buoy Network.
     │   └── vignettes
     │       ├── dashboard_static.html
     │       ├── dashboard_static_files
-    │       │   ├── figure-html
-    │       │   │   ├── unnamed-chunk-1-1.png
-    │       │   │   ├── unnamed-chunk-11-1.png
-    │       │   │   ├── unnamed-chunk-13-1.png
-    │       │   │   ├── unnamed-chunk-15-1.png
-    │       │   │   ├── unnamed-chunk-17-1.png
-    │       │   │   ├── unnamed-chunk-19-1.png
-    │       │   │   ├── unnamed-chunk-21-1.png
-    │       │   │   ├── unnamed-chunk-23-1.png
-    │       │   │   ├── unnamed-chunk-25-1.png
-    │       │   │   ├── unnamed-chunk-27-1.png
-    │       │   │   ├── unnamed-chunk-28-1.png
-    │       │   │   ├── unnamed-chunk-29-1.png
-    │       │   │   ├── unnamed-chunk-3-1.png
-    │       │   │   ├── unnamed-chunk-30-1.png
-    │       │   │   ├── unnamed-chunk-31-1.png
-    │       │   │   ├── unnamed-chunk-5-1.png
-    │       │   │   ├── unnamed-chunk-7-1.png
-    │       │   │   └── unnamed-chunk-9-1.png
     │       │   └── libs
+    │       │       ├── Dygraph.Plugins.Crosshair-1.0
+    │       │       │   └── crosshair.js
     │       │       ├── bootstrap
-    │       │       │   ├── bootstrap-d5fa03fb90ac27921a6d47853be462c0.min.css
+    │       │       │   ├── bootstrap-28163b1fbaa4d35fdae8b703aca03440.min.css
+    │       │       │   ├── bootstrap-dark-28163b1fbaa4d35fdae8b703aca03440.min.css
     │       │       │   ├── bootstrap-icons.css
     │       │       │   ├── bootstrap-icons.woff
     │       │       │   └── bootstrap.min.js
@@ -1141,6 +1268,21 @@ Buoy Network.
     │       │       │   │   └── jquery.dataTables.min.css
     │       │       │   └── js
     │       │       │       └── jquery.dataTables.min.js
+    │       │       ├── dt-ext-buttons-1.13.6
+    │       │       │   ├── css
+    │       │       │   │   └── buttons.dataTables.min.css
+    │       │       │   └── js
+    │       │       │       ├── buttons.colVis.min.js
+    │       │       │       ├── buttons.html5.min.js
+    │       │       │       ├── buttons.print.min.js
+    │       │       │       └── dataTables.buttons.min.js
+    │       │       ├── dygraphs-1.1.1
+    │       │       │   ├── dygraph-combined-dev.js
+    │       │       │   ├── dygraph-combined.js
+    │       │       │   ├── dygraph.css
+    │       │       │   └── shapes.js
+    │       │       ├── dygraphs-binding-1.1.1.6
+    │       │       │   └── dygraphs.js
     │       │       ├── htmltools-fill-0.5.9
     │       │       │   └── fill.css
     │       │       ├── htmlwidgets-1.6.4
@@ -1149,35 +1291,59 @@ Buoy Network.
     │       │       │   ├── jquery-3.6.0.js
     │       │       │   ├── jquery-3.6.0.min.js
     │       │       │   └── jquery-3.6.0.min.map
+    │       │       ├── jszip-1.13.6
+    │       │       │   └── jszip.min.js
+    │       │       ├── moment-2.8.4
+    │       │       │   ├── moment-timezone-with-data.js
+    │       │       │   └── moment.js
+    │       │       ├── moment-fquarter-1.0.0
+    │       │       │   └── moment-fquarter.min.js
+    │       │       ├── moment-timezone-0.2.5
+    │       │       │   ├── moment-timezone-with-data.js
+    │       │       │   └── moment.js
     │       │       ├── nouislider-7.0.10
     │       │       │   ├── jquery.nouislider.min.css
     │       │       │   └── jquery.nouislider.min.js
+    │       │       ├── plotly-binding-4.12.0
+    │       │       │   └── plotly.js
+    │       │       ├── plotly-htmlwidgets-css-2.25.2
+    │       │       │   └── plotly-htmlwidgets.css
+    │       │       ├── plotly-main-2.25.2
+    │       │       │   └── plotly-latest.min.js
+    │       │       ├── quarto-dashboard
+    │       │       │   ├── components.js
+    │       │       │   ├── datatables.min.css
+    │       │       │   ├── datatables.min.js
+    │       │       │   ├── pdfmake.min.js
+    │       │       │   ├── quarto-dashboard.js
+    │       │       │   ├── stickythead.js
+    │       │       │   ├── vfs_fonts.js
+    │       │       │   └── web-components.js
     │       │       ├── quarto-html
     │       │       │   ├── anchor.min.js
     │       │       │   ├── axe
     │       │       │   │   └── axe-check.js
     │       │       │   ├── popper.min.js
     │       │       │   ├── quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css
+    │       │       │   ├── quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css
     │       │       │   ├── quarto.js
     │       │       │   ├── tabsets
     │       │       │   │   └── tabsets.js
     │       │       │   ├── tippy.css
     │       │       │   └── tippy.umd.min.js
-    │       │       └── selectize-0.12.0
-    │       │           ├── selectize.bootstrap3.css
-    │       │           └── selectize.min.js
+    │       │       ├── selectize-0.12.0
+    │       │       │   ├── selectize.bootstrap3.css
+    │       │       │   └── selectize.min.js
+    │       │       └── typedarray-0.1
+    │       │           └── typedarray.min.js
     │       ├── wave_analysis.html
     │       └── wave_analysis_files
     │           ├── figure-html
-    │           │   ├── rogue-all-plot-1.png
-    │           │   ├── rogue-m2-plot-1.png
-    │           │   ├── rogue-m3-plot-1.png
-    │           │   ├── rogue-m4-plot-1.png
-    │           │   ├── rogue-m5-plot-1.png
-    │           │   └── rogue-m6-plot-1.png
+    │           │   └── unnamed-chunk-14-1.png
     │           └── libs
     │               ├── bootstrap
-    │               │   ├── bootstrap-d5fa03fb90ac27921a6d47853be462c0.min.css
+    │               │   ├── bootstrap-369bb2ea641c59effaa99e53ee75fd08.min.css
+    │               │   ├── bootstrap-dark-369bb2ea641c59effaa99e53ee75fd08.min.css
     │               │   ├── bootstrap-icons.css
     │               │   ├── bootstrap-icons.woff
     │               │   └── bootstrap.min.js
@@ -1203,6 +1369,14 @@ Buoy Network.
     │               │   │   └── jquery.dataTables.min.css
     │               │   └── js
     │               │       └── jquery.dataTables.min.js
+    │               ├── dt-ext-buttons-1.13.6
+    │               │   ├── css
+    │               │   │   └── buttons.dataTables.min.css
+    │               │   └── js
+    │               │       ├── buttons.colVis.min.js
+    │               │       ├── buttons.html5.min.js
+    │               │       ├── buttons.print.min.js
+    │               │       └── dataTables.buttons.min.js
     │               ├── htmltools-fill-0.5.9
     │               │   └── fill.css
     │               ├── htmlwidgets-1.6.4
@@ -1211,28 +1385,51 @@ Buoy Network.
     │               │   ├── jquery-3.6.0.js
     │               │   ├── jquery-3.6.0.min.js
     │               │   └── jquery-3.6.0.min.map
+    │               ├── jszip-1.13.6
+    │               │   └── jszip.min.js
     │               ├── nouislider-7.0.10
     │               │   ├── jquery.nouislider.min.css
     │               │   └── jquery.nouislider.min.js
+    │               ├── plotly-binding-4.12.0
+    │               │   └── plotly.js
+    │               ├── plotly-htmlwidgets-css-2.25.2
+    │               │   └── plotly-htmlwidgets.css
+    │               ├── plotly-main-2.25.2
+    │               │   └── plotly-latest.min.js
+    │               ├── quarto-dashboard
+    │               │   ├── components.js
+    │               │   ├── datatables.min.css
+    │               │   ├── datatables.min.js
+    │               │   ├── pdfmake.min.js
+    │               │   ├── quarto-dashboard.js
+    │               │   ├── stickythead.js
+    │               │   ├── vfs_fonts.js
+    │               │   └── web-components.js
     │               ├── quarto-html
     │               │   ├── anchor.min.js
     │               │   ├── axe
     │               │   │   └── axe-check.js
     │               │   ├── popper.min.js
     │               │   ├── quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css
+    │               │   ├── quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css
     │               │   ├── quarto.js
     │               │   ├── tabsets
     │               │   │   └── tabsets.js
     │               │   ├── tippy.css
     │               │   └── tippy.umd.min.js
-    │               └── selectize-0.12.0
-    │                   ├── selectize.bootstrap3.css
-    │                   └── selectize.min.js
+    │               ├── selectize-0.12.0
+    │               │   ├── selectize.bootstrap3.css
+    │               │   └── selectize.min.js
+    │               └── typedarray-0.1
+    │                   └── typedarray.min.js
     ├── inst
     │   ├── docs
     │   │   └── parquet_storage_guide.md
     │   ├── extdata
     │   │   ├── analysis_questions.md
+    │   │   ├── dashboard_buoy_data.rds
+    │   │   ├── dashboard_stats.rds
+    │   │   ├── dashboard_timeseries.rds
     │   │   ├── irish_buoys.duckdb
     │   │   ├── return_levels.rds
     │   │   ├── rogue_wave_events.rds
@@ -1300,12 +1497,17 @@ Buoy Network.
     │   ├── wave_model_report.Rd
     │   ├── wave_science.Rd
     │   └── wave_science_documentation.Rd
+    ├── nix-shell-root
+    ├── pkgdown
+    │   └── extra.css
     ├── push_to_cachix.sh
     ├── tests
     │   ├── testthat
     │   │   └── test-data-consistency.R
     │   └── testthat.R
     └── vignettes
+        ├── _targets.yaml
+        ├── custom.scss
         ├── dashboard_shinylive.qmd
         ├── dashboard_shinylive_files
         │   └── mediabag
@@ -1316,7 +1518,8 @@ Buoy Network.
         │   ├── buoy_data_raw.csv
         │   └── stations.json
         ├── shinylive-sw.js
-        └── wave_analysis.qmd
+        ├── wave_analysis.qmd
+        └── wave_analysis.rmarkdown
 
 ## Key Features
 

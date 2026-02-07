@@ -45,5 +45,6 @@ list(
   plan_data_acquisition,
   plan_quality_control,
   plan_wave_analysis,
-  plan_dashboard
+  plan_dashboard,
+  plan_doc_examples
 )
