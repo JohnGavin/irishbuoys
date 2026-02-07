@@ -6,6 +6,7 @@
 core_pkgs <- c(
   "arrow",          # Apache Arrow for data
   "duckdb",         # DuckDB for data queries
+  "duckplyr",       # dplyr backend for DuckDB
   "DBI",            # Database interface
   "dplyr",          # Data manipulation
   "tidyr",          # Data tidying
@@ -33,6 +34,8 @@ analysis_pkgs <- c(
   "forecast",       # Time series forecasting
   "extRemes",       # Extreme value analysis
   "evd",            # Extreme value distributions
+  "mev",            # Multivariate extreme values (GPD)
+  "SpatialExtremes",# Spatial extreme value modelling
   "quantreg",       # Quantile regression
   "zoo",            # Time series infrastructure
   "xts"             # Extensible time series
@@ -42,7 +45,9 @@ analysis_pkgs <- c(
 viz_pkgs <- c(
   "ggplot2",        # Grammar of graphics
   "plotly",         # Interactive plots
-  "scales"          # Scale functions
+  "scales",         # Scale functions
+  "DT",             # Interactive tables
+  "dygraphs"        # Time series plots
 )
 
 # Development tools

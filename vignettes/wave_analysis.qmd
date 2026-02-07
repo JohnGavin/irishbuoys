@@ -3,7 +3,9 @@ title: "Wave Analysis Dashboard"
 format:
   dashboard:
     orientation: rows
-    theme: cosmo
+    theme:
+      - cosmo
+      - custom.scss
 execute:
   echo: false
   warning: false
@@ -27,52 +29,51 @@ library(DT)
 library(dygraphs)
 library(xts)
 library(tidyr)
+library(targets)
 
 theme_set(theme_minimal(base_size = 12))
 
-# Load data from inst/extdata
-load_rds <- function(f) {
-  p <- file.path("..", "inst", "extdata", f)
-  if (file.exists(p)) return(readRDS(p))
-  p <- system.file("extdata", f, package = "irishbuoys")
-  if (p != "" && file.exists(p)) return(readRDS(p))
-  NULL
-}
+# Set targets store to project root
+targets::tar_config_set(store = "../_targets")
 
-# Load all data
-rogue_events <- load_rds("rogue_wave_events.rds")
-rogue_conditions <- rogue_events
-analysis_summary <- load_rds("wave_analysis_summary.rds")
+# Load all targets data directly (no RDS files)
+targets::tar_load(c(
+  full_data,
+  missing_data_grid,
+  analysis_data,
+  rogue_wave_events,
+  rogue_wave_conditions,
+  rogue_wave_statistics,
+  analysis_summary,
+  seasonal_means_wave,
+  seasonal_means_wind,
+  wave_height_seasonal,
+  annual_trends_wave,
+  annual_trends_wind,
+  gpd_wave_per_station,
+  gpd_wind_per_station,
+  gpd_hmax_per_station,
+  gev_wave_pooled,
+  gev_wind_pooled,
+  gev_hmax_pooled,
+  return_levels_wave_pooled,
+  return_levels_wind_pooled,
+  return_levels_hmax_pooled,
+  gust_factor_analysis,
+  return_level_curves_wave,
+  return_level_curves_wind
+))
 
-seasonal_data <- load_rds("seasonal_analysis.rds")
-if (!is.null(seasonal_data)) {
-  seasonal_means_wave <- seasonal_data$wave
-  seasonal_means_wind <- seasonal_data$wind
-  wave_stl <- seasonal_data$stl
-} else {
-  seasonal_means_wave <- NULL
-  seasonal_means_wind <- NULL
-  wave_stl <- NULL
-}
+# Alias for compatibility
+rogue_events <- rogue_wave_events
+rogue_conditions <- rogue_wave_conditions
+wave_stl <- wave_height_seasonal
+gust_analysis <- gust_factor_analysis
 
-return_data <- load_rds("return_levels.rds")
-if (!is.null(return_data)) {
-  return_levels_wave <- return_data$wave
-  return_levels_wind <- return_data$wind
-  return_levels_hmax <- return_data$hmax
-} else {
-  return_levels_wave <- NULL
-  return_levels_wind <- NULL
-  return_levels_hmax <- NULL
-}
-
-if (!is.null(analysis_summary)) {
-  gust_analysis <- analysis_summary$gust_analysis
-  annual_trends_wave <- analysis_summary$trends$annual_wave
-} else {
-  gust_analysis <- NULL
-  annual_trends_wave <- NULL
-}
+# For return levels, use pooled GEV (illustrative)
+return_levels_wave <- return_levels_wave_pooled
+return_levels_wind <- return_levels_wind_pooled
+return_levels_hmax <- return_levels_hmax_pooled
 
 has_data <- !is.null(rogue_events) && nrow(rogue_events) > 0
 
@@ -166,6 +167,19 @@ legend_style <- list(
 A rogue wave has **Hmax/Hs > 2.0** (ratio of maximum individual wave to significant wave height).
 :::
 
+#### Data Structure
+
+```{r}
+#| echo: false
+if (!is.null(full_data)) {
+  dplyr::glimpse(full_data)
+}
+```
+
+### Column
+
+#### Key Metrics
+
 | Metric | Value |
 |--------|-------|
 | Rogue Wave Events | `r if(has_data) nrow(rogue_events) else "N/A"` |
@@ -178,17 +192,33 @@ A rogue wave has **Hmax/Hs > 2.0** (ratio of maximum individual wave to signific
 
 *Analysis generated `r generated_time` using irishbuoys v`r pkg_version`*
 
+## Row
+
 ### Column
 
-#### Key Definitions
+#### Missing Data by Station
 
-| Term | Definition |
-|------|------------|
-| **Hs** | [Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height): 4x [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of wave elevation |
-| **Hmax** | Maximum individual wave height in [17.5-min period](https://www.ocean-sci.net/15/789/2019/) |
-| **Rogue Wave** | Hmax/Hs > 2.0 ([Dysthe et al., 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203)) |
-| **GEV** | [Generalized Extreme Value](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution) distribution |
-| **STL** | [Seasonal-Trend decomposition using Loess](https://en.wikipedia.org/wiki/STL_decomposition) |
+```{r}
+#| echo: false
+if (!is.null(missing_data_grid)) {
+  # Summarize missing data by station
+  missing_summary <- missing_data_grid |>
+    group_by(station_id) |>
+    summarise(
+      total_days = n(),
+      days_with_wave = sum(n_wave_height > 0),
+      days_with_wind = sum(n_wind_speed > 0),
+      days_with_hmax = sum(n_hmax > 0),
+      pct_wave = round(100 * days_with_wave / total_days, 1),
+      pct_wind = round(100 * days_with_wind / total_days, 1),
+      pct_hmax = round(100 * days_with_hmax / total_days, 1),
+      .groups = "drop"
+    )
+  create_dt(missing_summary, "Data availability by station (% of days with observations)")
+} else {
+  cat("Missing data grid not available. Run targets::tar_make()")
+}
+```
 
 # Rogue Waves
 
@@ -212,7 +242,7 @@ if (has_data) {
                    "Gust: ", round(gust, 1), " m/s"),
     hoverinfo = "text"
   ) |>
-    layout(
+    irishbuoys_layout(
       title = paste0("All Rogue Wave Events (n=", nrow(rogue_events),
                      ", ", format(min(rogue_events$time), "%Y-%m-%d"),
                      " to ", format(max(rogue_events$time), "%Y-%m-%d"), ")"),
@@ -229,14 +259,7 @@ if (has_data) {
              showarrow = FALSE, xanchor = "right", yanchor = "bottom", font = list(color = "red", size = 10)),
         list(x = max(rogue_events$time), y = 2.2, text = "Severe (2.2)",
              showarrow = FALSE, xanchor = "right", yanchor = "bottom", font = list(color = "darkred", size = 10))
-      ),
-      plot_bgcolor = "#f8f8f8",
-      legend = list(
-        font = list(color = "#333333", size = 12),
-        bgcolor = "rgba(255,255,255,0.9)",
-        bordercolor = "#cccccc", borderwidth = 1
-      ),
-      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
+      )
     )
 } else {
   cat("No rogue wave data available. Run targets::tar_make()")
@@ -327,9 +350,9 @@ if (has_data) {
 
 ### Column {.tabset}
 
-#### Wind Speed (Beaufort)
+#### Wind speed (m/s)
 
-Wind speed in m/s, colored by [Beaufort scale](https://en.wikipedia.org/wiki/Beaufort_scale) category.
+Wind speed colored by [Beaufort scale](https://en.wikipedia.org/wiki/Beaufort_scale) category.
 Conversion: Beaufort 6 = 10.8 m/s, 8 = 17.2 m/s, 10 = 24.5 m/s, 12 = 32.7 m/s.
 
 ```{r}
@@ -427,21 +450,12 @@ if (!is.null(rogue_conditions)) {
                    "Max Hmax: ", max_hmax, " m"),
     hoverinfo = "text"
   ) |>
-    layout(
+    irishbuoys_layout(
       title = paste0("Rogue Wave Events by Week of Year (n=",
                      nrow(rogue_conditions), ", ", date_caption, ")"),
       xaxis = list(title = "Week of Year", dtick = 2),
       yaxis = list(title = "Count of Rogue Events"),
-      plot_bgcolor = "#f8f8f8",
-      barmode = "stack",
-      legend = list(
-        title = list(text = "<b>Month</b>",
-                     font = list(color = "#333333", size = 13)),
-        font = list(color = "#333333", size = 12),
-        bgcolor = "rgba(255,255,255,0.9)",
-        bordercolor = "#cccccc", borderwidth = 1
-      ),
-      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
+      barmode = "stack"
     )
 } else {
   cat("Temporal data not available")
@@ -564,7 +578,7 @@ if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) 
                    "SD: ", round(sd, 2), " m"),
     hoverinfo = "text"
   ) |>
-    layout(
+    irishbuoys_layout(
       title = paste0("Monthly Mean Wave Height (", date_caption, ")"),
       xaxis = list(title = "Month"),
       yaxis = list(title = "Mean Hs (m)")
@@ -600,7 +614,7 @@ if (!is.null(seasonal_means_wind) && "monthly" %in% names(seasonal_means_wind)) 
                    "SD: ", round(sd, 2), " m/s"),
     hoverinfo = "text"
   ) |>
-    layout(
+    irishbuoys_layout(
       title = paste0("Monthly Mean Wind Speed (", date_caption, ")"),
       xaxis = list(title = "Month"),
       yaxis = list(title = "Mean Wind Speed (m/s)")
@@ -624,7 +638,7 @@ if (!is.null(annual_trends_wave) && "annual_stats" %in% names(annual_trends_wave
                    "SD: ", round(sd, 2), " m"),
     hoverinfo = "text"
   ) |>
-    layout(
+    irishbuoys_layout(
       title = paste0("Annual Wave Height Trend (", date_caption, ")"),
       xaxis = list(title = "Year"),
       yaxis = list(title = "Mean Hs (m)")
@@ -778,65 +792,109 @@ if (!is.null(return_levels_wave)) {
 
 ### Column {.tabset}
 
-#### 1. Data: Annual Maxima
+#### 1. GPD Per-Station (Recommended)
 
-The [block maxima](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution) approach extracts the single largest value from each year. This is the simplest EVA method and requires no threshold selection.
+The **Generalized Pareto Distribution (GPD)** with **Peaks Over Threshold (POT)** approach fits extremes per station using all exceedances above a high threshold (90%, 95%, or 99% quantile).
 
-**Current approach:** Annual maxima are **pooled across all 5 stations** (M2-M6) — i.e., the maximum across all stations for each year. This is **not** station-specific modelling.
+**Advantages over pooled GEV:**
+- Uses many more data points (all exceedances, not just annual maxima)
+- Station-specific return levels
+- Multiple threshold sensitivity analysis
 
 ```{r}
-if (!is.null(analysis_summary) && "gev_fits" %in% names(analysis_summary)) {
-  gev_fits <- analysis_summary$gev_fits
-
-  # Show annual maxima for all three variables
-  am_list <- lapply(names(gev_fits), function(var) {
-    am <- gev_fits[[var]]$annual_maxima
-    am$variable <- var
-    am
+if (!is.null(gpd_wave_per_station)) {
+  # Extract results for 95% threshold
+  gpd_results <- lapply(names(gpd_wave_per_station), function(st) {
+    res <- gpd_wave_per_station[[st]][["medium"]]
+    if (!is.null(res) && is.null(res$error) && !is.null(res$scale)) {
+      data.frame(
+        station = st,
+        threshold_pct = "95%",
+        threshold_value = round(res$u, 2),
+        n_exceedances = res$n_exceed,
+        scale = round(as.numeric(res$scale), 3),
+        shape = round(as.numeric(res$shape), 3),
+        se_scale = round(as.numeric(res$se_scale), 4),
+        se_shape = round(as.numeric(res$se_shape), 4),
+        stringsAsFactors = FALSE
+      )
+    } else {
+      NULL
+    }
   })
-  am_all <- do.call(rbind, am_list)
-  am_wide <- am_all |>
-    tidyr::pivot_wider(names_from = variable, values_from = max_value) |>
-    mutate(across(where(is.numeric), ~round(., 2)))
-  create_dt(am_wide, paste0("Annual Maxima (pooled across all stations, ", date_caption, ")"))
+  gpd_df <- do.call(rbind, gpd_results[!sapply(gpd_results, is.null)])
+  if (!is.null(gpd_df) && nrow(gpd_df) > 0) {
+    create_dt(gpd_df, "GPD Wave Height Parameters (95% threshold)")
+  } else {
+    cat("GPD results not available")
+  }
 } else {
-  cat("GEV fit data not available. Re-run targets::tar_make()")
+  cat("GPD per-station data not available. Run targets::tar_make()")
 }
 ```
 
-#### 2. GEV Distribution
+#### 2. GPD Theory
 
-The **Generalized Extreme Value** distribution has CDF:
+The **Generalized Pareto Distribution** has CDF for exceedances $y = x - u$ above threshold $u$:
 
-$$F(x) = \exp\left\{-\left[1 + \xi\left(\frac{x - \mu}{\sigma}\right)\right]^{-1/\xi}\right\}$$
+$$F(y) = 1 - \left(1 + \frac{\xi y}{\sigma}\right)^{-1/\xi}$$
 
-with three parameters:
+with two parameters:
 
 | Parameter | Symbol | Interpretation |
 |-----------|--------|----------------|
-| **Location** | $\mu$ | Centre of the distribution (typical annual max) |
-| **Scale** | $\sigma$ | Spread of annual maxima |
-| **Shape** | $\xi$ | Tail behaviour: $\xi > 0$ heavy tail (Frechet), $\xi = 0$ exponential tail (Gumbel), $\xi < 0$ bounded upper tail (Weibull) |
+| **Scale** | $\sigma$ | Spread of exceedances |
+| **Shape** | $\xi$ | Tail behaviour (same as GEV) |
 
-Parameters are estimated by **Maximum Likelihood Estimation** (MLE). The MLE maximises the log-likelihood $\ell(\mu, \sigma, \xi)$ and the **Fisher information matrix** (negative Hessian of $\ell$) provides the 3x3 variance-covariance matrix of $(\hat\mu, \hat\sigma, \hat\xi)$.
+**Return levels** for T-year event:
 
-#### 3. Why Covariance Matrix Matters
+$$z_T = u + \frac{\sigma}{\xi}\left[(n_y \lambda T)^\xi - 1\right]$$
 
-**Return level confidence intervals** are computed via the [delta method](https://en.wikipedia.org/wiki/Delta_method): the variance of the return level $z_T$ is:
+where $n_y$ = observations per year, $\lambda$ = exceedance rate.
 
-$$\text{Var}(z_T) \approx \nabla g^{\top} \cdot \Sigma \cdot \nabla g$$
+#### 3. Threshold Sensitivity
 
-where $\Sigma$ is the 3x3 parameter covariance matrix and $\nabla g$ is the gradient of the return level function with respect to $(\mu, \sigma, \xi)$.
-
-**When this fails:** If $\hat\xi$ is very negative (< -1), the likelihood surface becomes flat or ill-conditioned near the upper bound. The Hessian cannot be inverted, so $\Sigma$ is unavailable. Point estimates remain valid; only CIs are lost.
-
-**In this analysis:** Wave height has $\hat\xi = -1.162$ (strongly bounded), so CIs are unavailable. Hmax ($\hat\xi = 0.463$, heavy-tailed) and wind speed ($\hat\xi = -0.169$, mildly bounded) both have valid CIs.
-
-#### 4. Model Parameters
+GPD results depend on threshold choice. Lower thresholds give more data but may violate asymptotic theory. The [mev](https://cran.r-project.org/package=mev) package provides diagnostics.
 
 ```{r}
-if (!is.null(analysis_summary) && "gev_fits" %in% names(analysis_summary)) {
-  gev_fits <- analysis_summary$gev_fits
+if (!is.null(gpd_wave_per_station)) {
+  # Compare thresholds for one station (M3)
+  if ("M3" %in% names(gpd_wave_per_station)) {
+    m3_gpd <- gpd_wave_per_station[["M3"]]
+    threshold_comparison <- lapply(names(m3_gpd), function(thr) {
+      res <- m3_gpd[[thr]]
+      if (!is.null(res) && is.null(res$error) && !is.null(res$scale)) {
+        data.frame(
+          threshold = thr,
+          quantile = paste0(c(low = "90%", medium = "95%", high = "99%")[thr]),
+          u = round(res$u, 2),
+          n_exceed = res$n_exceed,
+          scale = round(as.numeric(res$scale), 3),
+          shape = round(as.numeric(res$shape), 3),
+          stringsAsFactors = FALSE
+        )
+      } else {
+        NULL
+      }
+    })
+    thr_df <- do.call(rbind, threshold_comparison[!sapply(threshold_comparison, is.null)])
+    if (!is.null(thr_df) && nrow(thr_df) > 0) {
+      create_dt(thr_df, "Threshold sensitivity for M3 wave height")
+    }
+  }
+}
+```
+
+#### 4. GEV Pooled (Illustrative)
+
+::: {.callout-note}
+## Limited sample size (n=8 years)
+The pooled GEV analysis below is **illustrative only** due to only 8 annual maxima. The GPD per-station approach (Tab 1) is preferred.
+:::
+
+```{r}
+if (!is.null(analysis_summary) && "gev_pooled_fits" %in% names(analysis_summary)) {
+  gev_fits <- analysis_summary$gev_pooled_fits
 
   params_df <- data.frame(
     Variable = c("Hs (wave height)", "Hmax", "Wind speed"),
@@ -851,48 +909,28 @@ if (!is.null(analysis_summary) && "gev_fits" %in% names(analysis_summary)) {
               gev_fits$wind_speed$parameters["shape"]),
     N_years = c(gev_fits$wave_height$n_years,
                 gev_fits$hmax$n_years,
-                gev_fits$wind_speed$n_years),
-    Tail_type = c(
-      ifelse(gev_fits$wave_height$parameters["shape"] < -0.5, "Bounded (Weibull)",
-             ifelse(gev_fits$wave_height$parameters["shape"] > 0.1, "Heavy (Frechet)", "Light (Gumbel-like)")),
-      ifelse(gev_fits$hmax$parameters["shape"] < -0.5, "Bounded (Weibull)",
-             ifelse(gev_fits$hmax$parameters["shape"] > 0.1, "Heavy (Frechet)", "Light (Gumbel-like)")),
-      ifelse(gev_fits$wind_speed$parameters["shape"] < -0.5, "Bounded (Weibull)",
-             ifelse(gev_fits$wind_speed$parameters["shape"] > 0.1, "Heavy (Frechet)", "Light (Gumbel-like)"))
-    ),
-    CIs_available = c("No (shape < -1)", "Yes", "Yes")
+                gev_fits$wind_speed$n_years)
   )
   params_df$Location <- round(params_df$Location, 2)
   params_df$Scale <- round(params_df$Scale, 3)
   params_df$Shape <- round(params_df$Shape, 3)
 
-  create_dt(params_df, "GEV Parameter Estimates (MLE)")
+  create_dt(params_df, "GEV Parameter Estimates - Pooled (illustrative, n=8)")
 } else {
   cat("GEV fit data not available")
 }
 ```
 
-#### 5. Limitations
+#### 5. Future Work
 
 ::: {.callout-warning}
-## Current Limitations
+## Extensions for Production Use
 
-**Stations are pooled, not modelled jointly.** The current analysis takes the annual maximum across all 5 stations combined, fitting a single GEV per variable. This ignores:
+**Spatial dependence modelling:** The [SpatialExtremes](https://cran.r-project.org/package=SpatialExtremes) package provides max-stable process models that account for joint extremes across stations.
 
-- **Spatial dependence** between stations (storms affect multiple buoys simultaneously)
-- **Station-specific extremes** (M6 at the shelf edge sees different conditions than coastal M2)
-- **Cross-station prediction** (using offshore M6 to forecast extremes at nearshore stations hours later)
+**Bayesian approaches:** The [mev](https://cran.r-project.org/package=mev) package supports profile likelihood and Bayesian methods for improved uncertainty quantification.
 
-**Only 8 years of data** (2019-2026). GEV fitting to annual maxima requires long records for reliable tail estimation. With n=8, 50-year and 100-year return levels have wide uncertainty.
-
-**No storm propagation modelling.** A more complete analysis would:
-
-1. Fit station-specific GEV models
-2. Model spatial dependence via [max-stable processes](https://doi.org/10.1214/08-AOAS187) or hierarchical Bayesian methods
-3. Estimate storm propagation times between stations (cross-correlation lag analysis)
-4. Use offshore stations (M6) to predict nearshore conditions (M2-M5) with a lead time
-
-These extensions require the [SpatialExtremes](https://cran.r-project.org/package=SpatialExtremes) or [mev](https://cran.r-project.org/package=mev) packages.
+**Storm propagation:** Cross-correlation lag analysis between stations could enable offshore-to-nearshore prediction with lead times.
 :::
 
 # Gust Factor
@@ -1034,14 +1072,24 @@ if (!is.null(gust_analysis) && "by_station" %in% names(gust_analysis) && !is.nul
 
 ### Column {width=50%}
 
+#### Key Definitions
+
+| Term | Definition |
+|------|------------|
+| **Hs** | [Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height): 4x [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of wave elevation |
+| **Hmax** | Maximum individual wave height in [17.5-min period](https://www.ocean-sci.net/15/789/2019/) |
+| **Rogue Wave** | Hmax/Hs > 2.0 ([Dysthe et al., 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203)) |
+| **GEV** | [Generalized Extreme Value](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution) distribution |
+| **GPD** | [Generalized Pareto](https://en.wikipedia.org/wiki/Generalized_Pareto_distribution) distribution |
+| **STL** | [Seasonal-Trend decomposition using Loess](https://en.wikipedia.org/wiki/STL_decomposition) |
+
 #### Extreme Value Analysis Methods
 
 | Method | Description | Use Case |
 |--------|-------------|----------|
-| **GEV** | [Generalized Extreme Value](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution) | Annual maxima |
-| **GPD** | [Generalized Pareto](https://en.wikipedia.org/wiki/Generalized_Pareto_distribution) | Peaks over threshold |
+| **GEV** | Block maxima approach | Annual maxima |
+| **GPD** | Peaks over threshold | Per-station extremes |
 | **Return Level** | Value expected to be exceeded once per T years | Design specifications |
-| **STL** | [Seasonal-Trend Loess](https://en.wikipedia.org/wiki/STL_decomposition) | Trend detection |
 
 ### Column {width=50%}
 

@@ -15,7 +15,7 @@ plan_wave_analysis <- list(
   # Data Loading
   # ========================================
 
-  # Load all historical data from DuckDB
+  # Load all historical data from DuckDB (filtered for analysis)
   targets::tar_target(
     analysis_data,
     {
@@ -47,6 +47,48 @@ plan_wave_analysis <- list(
 
       cli::cli_alert_success("Loaded {nrow(data)} QC-passed observations")
       data
+    }
+  ),
+
+  # Load ALL 22 columns for data glimpse (sample for display)
+  targets::tar_target(
+    full_data,
+    {
+      con <- connect_duckdb()
+      on.exit(DBI::dbDisconnect(con))
+
+      # Get sample of all columns for glimpse
+      data <- DBI::dbGetQuery(con, "SELECT * FROM buoy_data LIMIT 10000")
+      data$time <- as.POSIXct(data$time, tz = "UTC")
+
+      cli::cli_alert_success("Loaded sample of {nrow(data)} rows (all 22 columns)")
+      data
+    }
+  ),
+
+  # Missing data grid: daily observation counts by station
+  targets::tar_target(
+    missing_data_grid,
+    {
+      con <- connect_duckdb()
+      on.exit(DBI::dbDisconnect(con))
+
+      # Count observations per day per station for key variables
+      DBI::dbGetQuery(con, "
+        SELECT
+          station_id,
+          DATE_TRUNC('day', time) AS date,
+          COUNT(*) AS n_obs,
+          COUNT(wave_height) AS n_wave_height,
+          COUNT(hmax) AS n_hmax,
+          COUNT(wind_speed) AS n_wind_speed,
+          COUNT(gust) AS n_gust,
+          COUNT(atmospheric_pressure) AS n_pressure,
+          COUNT(sea_temperature) AS n_sea_temp
+        FROM buoy_data
+        GROUP BY station_id, DATE_TRUNC('day', time)
+        ORDER BY station_id, date
+      ")
     }
   ),
 
@@ -173,43 +215,185 @@ plan_wave_analysis <- list(
   ),
 
   # ========================================
-  # Extreme Value Analysis
+  # Extreme Value Analysis - GPD Per-Station (using mev package)
+  # ========================================
+
+  # GPD per-station wave height using mev::fit.gpd() directly
+  targets::tar_target(
+    gpd_wave_per_station,
+    {
+      stations <- unique(analysis_data$station_id)
+      thresholds <- c(low = 0.90, medium = 0.95, high = 0.99)
+
+      results <- lapply(stations, function(st) {
+        d <- analysis_data[analysis_data$station_id == st & !is.na(analysis_data$wave_height), ]
+
+        station_results <- lapply(names(thresholds), function(thr_name) {
+          u <- stats::quantile(d$wave_height, thresholds[thr_name])
+          exceedances <- d$wave_height[d$wave_height > u]
+
+          if (length(exceedances) < 30) {
+            return(list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances), error = "Insufficient exceedances (<30)"
+            ))
+          }
+
+          tryCatch({
+            # Use mev::fit.gpd() which returns scale and shape parameters
+            fit <- mev::fit.gpd(xdat = exceedances, threshold = as.numeric(u))
+            list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances),
+              scale = fit$estimate["scale"],
+              shape = fit$estimate["shape"],
+              se_scale = fit$std.err["scale"],
+              se_shape = fit$std.err["shape"]
+            )
+          }, error = function(e) {
+            list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances), error = e$message
+            )
+          })
+        })
+        names(station_results) <- names(thresholds)
+        station_results
+      })
+      names(results) <- stations
+      results
+    }
+  ),
+
+  # GPD per-station wind speed using mev::fit.gpd()
+  targets::tar_target(
+    gpd_wind_per_station,
+    {
+      stations <- unique(analysis_data$station_id)
+      thresholds <- c(low = 0.90, medium = 0.95, high = 0.99)
+
+      results <- lapply(stations, function(st) {
+        d <- analysis_data[analysis_data$station_id == st & !is.na(analysis_data$wind_speed), ]
+
+        station_results <- lapply(names(thresholds), function(thr_name) {
+          u <- stats::quantile(d$wind_speed, thresholds[thr_name])
+          exceedances <- d$wind_speed[d$wind_speed > u]
+
+          if (length(exceedances) < 30) {
+            return(list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances), error = "Insufficient exceedances (<30)"
+            ))
+          }
+
+          tryCatch({
+            fit <- mev::fit.gpd(xdat = exceedances, threshold = as.numeric(u))
+            list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances),
+              scale = fit$estimate["scale"],
+              shape = fit$estimate["shape"],
+              se_scale = fit$std.err["scale"],
+              se_shape = fit$std.err["shape"]
+            )
+          }, error = function(e) {
+            list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances), error = e$message
+            )
+          })
+        })
+        names(station_results) <- names(thresholds)
+        station_results
+      })
+      names(results) <- stations
+      results
+    }
+  ),
+
+  # GPD per-station Hmax using mev::fit.gpd()
+  targets::tar_target(
+    gpd_hmax_per_station,
+    {
+      stations <- unique(analysis_data$station_id)
+      thresholds <- c(low = 0.90, medium = 0.95, high = 0.99)
+
+      results <- lapply(stations, function(st) {
+        d <- analysis_data[analysis_data$station_id == st & !is.na(analysis_data$hmax), ]
+
+        station_results <- lapply(names(thresholds), function(thr_name) {
+          u <- stats::quantile(d$hmax, thresholds[thr_name])
+          exceedances <- d$hmax[d$hmax > u]
+
+          if (length(exceedances) < 30) {
+            return(list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances), error = "Insufficient exceedances (<30)"
+            ))
+          }
+
+          tryCatch({
+            fit <- mev::fit.gpd(xdat = exceedances, threshold = as.numeric(u))
+            list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances),
+              scale = fit$estimate["scale"],
+              shape = fit$estimate["shape"],
+              se_scale = fit$std.err["scale"],
+              se_shape = fit$std.err["shape"]
+            )
+          }, error = function(e) {
+            list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances), error = e$message
+            )
+          })
+        })
+        names(station_results) <- names(thresholds)
+        station_results
+      })
+      names(results) <- stations
+      results
+    }
+  ),
+
+  # ========================================
+  # GEV Pooled Analysis (illustrative, n=8 years only)
   # ========================================
 
   # Fit GEV to annual maximum wave heights (all stations combined)
+  # NOTE: Limited to ~8 annual maxima - illustrative only
   targets::tar_target(
-    gev_wave_height,
+    gev_wave_pooled,
     {
-      # Filter for valid wave heights
       wave_data <- analysis_data[!is.na(analysis_data$wave_height), ]
       fit_gev_annual_maxima(wave_data, variable = "wave_height")
     }
   ),
 
-  # Calculate wave height return levels
+  # GEV return levels (pooled, illustrative)
   targets::tar_target(
-    return_levels_wave,
-    calculate_return_levels(gev_wave_height, c(10, 50, 100))
+    return_levels_wave_pooled,
+    calculate_return_levels(gev_wave_pooled, c(10, 50, 100))
   ),
 
-  # Fit GEV to annual maximum wind speeds
+  # Fit GEV to annual maximum wind speeds (pooled)
   targets::tar_target(
-    gev_wind_speed,
+    gev_wind_pooled,
     {
       wind_data <- analysis_data[!is.na(analysis_data$wind_speed), ]
       fit_gev_annual_maxima(wind_data, variable = "wind_speed")
     }
   ),
 
-  # Calculate wind speed return levels
   targets::tar_target(
-    return_levels_wind,
-    calculate_return_levels(gev_wind_speed, c(10, 50, 100))
+    return_levels_wind_pooled,
+    calculate_return_levels(gev_wind_pooled, c(10, 50, 100))
   ),
 
-  # Fit GEV to annual maximum Hmax
+  # Fit GEV to annual maximum Hmax (pooled)
   targets::tar_target(
-    gev_hmax,
+    gev_hmax_pooled,
     {
       hmax_data <- analysis_data[!is.na(analysis_data$hmax), ]
       fit_gev_annual_maxima(hmax_data, variable = "hmax")
@@ -217,19 +401,19 @@ plan_wave_analysis <- list(
   ),
 
   targets::tar_target(
-    return_levels_hmax,
-    calculate_return_levels(gev_hmax, c(10, 50, 100))
+    return_levels_hmax_pooled,
+    calculate_return_levels(gev_hmax_pooled, c(10, 50, 100))
   ),
 
-  # Return level plot data for visualization
+  # Return level plot data for visualization (pooled GEV)
   targets::tar_target(
     return_level_curves_wave,
-    create_return_level_plot_data(gev_wave_height, max_return_period = 200)
+    create_return_level_plot_data(gev_wave_pooled, max_return_period = 200)
   ),
 
   targets::tar_target(
     return_level_curves_wind,
-    create_return_level_plot_data(gev_wind_speed, max_return_period = 200)
+    create_return_level_plot_data(gev_wind_pooled, max_return_period = 200)
   ),
 
   # ========================================
@@ -273,25 +457,28 @@ plan_wave_analysis <- list(
           annual_wind = annual_trends_wind
         ),
         extremes = list(
-          wave_return_levels = return_levels_wave,
-          wind_return_levels = return_levels_wind,
-          hmax_return_levels = return_levels_hmax
+          gpd_wave = gpd_wave_per_station,
+          gpd_wind = gpd_wind_per_station,
+          gpd_hmax = gpd_hmax_per_station,
+          gev_wave_pooled = return_levels_wave_pooled,
+          gev_wind_pooled = return_levels_wind_pooled,
+          gev_hmax_pooled = return_levels_hmax_pooled
         ),
-        gev_fits = list(
+        gev_pooled_fits = list(
           wave_height = list(
-            parameters = gev_wave_height$parameters,
-            n_years = gev_wave_height$n_years,
-            annual_maxima = gev_wave_height$annual_maxima
+            parameters = gev_wave_pooled$parameters,
+            n_years = gev_wave_pooled$n_years,
+            annual_maxima = gev_wave_pooled$annual_maxima
           ),
           hmax = list(
-            parameters = gev_hmax$parameters,
-            n_years = gev_hmax$n_years,
-            annual_maxima = gev_hmax$annual_maxima
+            parameters = gev_hmax_pooled$parameters,
+            n_years = gev_hmax_pooled$n_years,
+            annual_maxima = gev_hmax_pooled$annual_maxima
           ),
           wind_speed = list(
-            parameters = gev_wind_speed$parameters,
-            n_years = gev_wind_speed$n_years,
-            annual_maxima = gev_wind_speed$annual_maxima
+            parameters = gev_wind_pooled$parameters,
+            n_years = gev_wind_pooled$n_years,
+            annual_maxima = gev_wind_pooled$annual_maxima
           )
         ),
         gust_analysis = gust_factor_analysis,
@@ -299,46 +486,7 @@ plan_wave_analysis <- list(
         generated = Sys.time()
       )
     }
-  ),
-
-  # Save key results to inst/extdata for vignette
-  targets::tar_target(
-    save_vignette_data,
-    {
-      # Create directory if needed
-      dir.create("inst/extdata", recursive = TRUE, showWarnings = FALSE)
-
-      # Save analysis summary
-      saveRDS(analysis_summary, "inst/extdata/wave_analysis_summary.rds")
-
-      # Save rogue wave events
-      saveRDS(rogue_wave_conditions, "inst/extdata/rogue_wave_events.rds")
-
-      # Save return level data
-      saveRDS(
-        list(
-          wave = return_levels_wave,
-          wind = return_levels_wind,
-          hmax = return_levels_hmax,
-          wave_curve = return_level_curves_wave,
-          wind_curve = return_level_curves_wind
-        ),
-        "inst/extdata/return_levels.rds"
-      )
-
-      # Save seasonal data
-      saveRDS(
-        list(
-          wave = seasonal_means_wave,
-          wind = seasonal_means_wind,
-          stl = wave_height_seasonal
-        ),
-        "inst/extdata/seasonal_analysis.rds"
-      )
-
-      cli::cli_alert_success("Saved vignette data to inst/extdata/")
-
-      TRUE
-    }
   )
+
+  # NOTE: No save_vignette_data target - use tar_load() directly in vignettes
 )
