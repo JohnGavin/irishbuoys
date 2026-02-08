@@ -74,26 +74,25 @@ main { padding-top: 1rem; }
 <h3 id="standard-r-installation">Standard R Installation<a class="anchor" aria-label="anchor" href="#standard-r-installation"></a>
 </h3>
 <p>You can install the development version of irishbuoys from GitHub:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
-<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"johngavin/irishbuoys"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># install.packages("remotes")</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"johngavin/irishbuoys"</span>)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="nix-environment-installation-recommended">Nix Environment Installation (Recommended)<a class="anchor" aria-label="anchor" href="#nix-environment-installation-recommended"></a>
 </h3>
 <p>For a reproducible development environment using Nix:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Clone the repository</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">git</span> clone https://github.com/johngavin/irishbuoys.git</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="bu">cd</span> irishbuoys</span>
+<div class="sourceCode" id="cb2"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Clone the repository</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>git clone https<span class="sc">:</span><span class="er">//</span>github.com<span class="sc">/</span>johngavin<span class="sc">/</span>irishbuoys.git</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>cd irishbuoys</span>
 <span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co"># Generate Nix configuration from DESCRIPTION</span></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="ex">Rscript</span> default.R</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>Rscript default.R</span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Enter Nix shell (first time may take a while)</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="ex">./default.sh</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>.<span class="sc">/</span>default.sh</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co"># Subsequent entries are fast (seconds)</span></span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="ex">./default.sh</span></span></code></pre></div>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>.<span class="sc">/</span>default.sh</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="pure-mode-enforcement-security--reproducibility">Pure Mode Enforcement (Security &amp; Reproducibility)<a class="anchor" aria-label="anchor" href="#pure-mode-enforcement-security--reproducibility"></a>
@@ -108,119 +107,122 @@ main { padding-top: 1rem; }
 <strong>Consistency</strong>: Same environment locally and in CI</li>
 </ul>
 <p><strong>Entering the environment:</strong></p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Recommended: Use default.sh (pure mode enforced automatically)</span></span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="ex">./default.sh</span></span>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Recommended: Use default.sh (pure mode enforced automatically)</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>.<span class="sc">/</span>default.sh</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># Output shows: 🔒 </span><span class="al">SECURITY</span><span class="co">: Running in --pure mode</span></span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co"># Or manually with pure flag:</span></span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="ex">nix-shell</span> <span class="at">--pure</span> default.nix</span></code></pre></div>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>nix<span class="sc">-</span>shell <span class="sc">--</span>pure default.nix</span></code></pre></div>
 <p><strong>Verifying pure mode:</strong></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Check IN_NIX_SHELL (should be "pure", not "impure")</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="bu">echo</span> <span class="va">$IN_NIX_SHELL</span></span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Check IN_NIX_SHELL (should be "pure", not "impure")</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>echo <span class="sc">$</span>IN_NIX_SHELL</span>
 <span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="co"># Expected: pure</span></span>
 <span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a></span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co"># Check tools are from Nix store</span></span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">which</span> R</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>which R</span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># Expected: /nix/store/...</span></span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a></span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="fu">which</span> git</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>which git</span>
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co"># Expected: /nix/store/...</span></span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a></span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co"># Verify R version</span></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="ex">R</span> <span class="at">--version</span></span></code></pre></div>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>R <span class="sc">--</span>version</span></code></pre></div>
 <p><strong>Passing additional environment variables:</strong></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># If you need to pass secrets/tokens through pure mode:</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="ex">nix-shell</span> <span class="at">--pure</span> <span class="at">--keep</span> GITHUB_TOKEN <span class="at">--keep</span> MY_API_KEY default.nix</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># If you need to pass secrets/tokens through pure mode:</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>nix<span class="sc">-</span>shell <span class="sc">--</span>pure <span class="sc">--</span>keep GITHUB_TOKEN <span class="sc">--</span>keep MY_API_KEY default.nix</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="using-with-rix">Using with rix<a class="anchor" aria-label="anchor" href="#using-with-rix"></a>
 </h3>
 <p>To integrate this package into your own Nix environment:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://docs.ropensci.org/rix/" class="external-link">rix</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://docs.ropensci.org/rix/reference/rix.html" class="external-link">rix</a></span><span class="op">(</span></span>
-<span>  r_ver <span class="op">=</span> <span class="st">"4.5.0"</span>,</span>
-<span>  r_pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"duckdb"</span>, <span class="st">"DBI"</span>, <span class="st">"httr2"</span>, <span class="st">"dplyr"</span><span class="op">)</span>,</span>
-<span>  git_pkgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      package_name <span class="op">=</span> <span class="st">"irishbuoys"</span>,</span>
-<span>      repo_url <span class="op">=</span> <span class="st">"https://github.com/johngavin/irishbuoys"</span>,</span>
-<span>      commit <span class="op">=</span> <span class="st">"main"</span>  <span class="co"># Use specific SHA for reproducibility</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  ide <span class="op">=</span> <span class="st">"other"</span>,</span>
-<span>  project_path <span class="op">=</span> <span class="st">"."</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">library</span>(rix)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">rix</span>(</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">r_ver =</span> <span class="st">"4.5.0"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="at">r_pkgs =</span> <span class="fu">c</span>(<span class="st">"duckdb"</span>, <span class="st">"DBI"</span>, <span class="st">"httr2"</span>, <span class="st">"dplyr"</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>  <span class="at">git_pkgs =</span> <span class="fu">list</span>(</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>      <span class="at">package_name =</span> <span class="st">"irishbuoys"</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>      <span class="at">repo_url =</span> <span class="st">"https://github.com/johngavin/irishbuoys"</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>      <span class="at">commit =</span> <span class="st">"main"</span>  <span class="co"># Use specific SHA for reproducibility</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>    )</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>  ),</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>  <span class="at">ide =</span> <span class="st">"other"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>  <span class="at">project_path =</span> <span class="st">"."</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="cachix-binary-cache-faster-builds">Cachix Binary Cache (Faster Builds)<a class="anchor" aria-label="anchor" href="#cachix-binary-cache-faster-builds"></a>
 </h3>
-<div class="panel-tabset">
-
-
-
-<ul class="nav nav-tabs" id="NA" role="tablist">
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#for-other-machines" id="for-other-machines-tab" type="button" role="tab" aria-controls="for-other-machines" aria-selected="true" class="active nav-link">For Other Machines</button></li>
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#two-tier-caching-strategy" id="two-tier-caching-strategy-tab" type="button" role="tab" aria-controls="two-tier-caching-strategy" aria-selected="false" class="nav-link">Two-Tier Caching Strategy</button></li>
-<li role="presentation" class="nav-item"><button data-bs-toggle="tab" data-bs-target="#github-actions-ci" id="github-actions-ci-tab" type="button" role="tab" aria-controls="github-actions-ci" aria-selected="false" class="nav-link">GitHub Actions CI</button></li>
-</ul>
-<div class="tab-content">
-<div class="active  tab-pane" id="for-other-machines" role="tabpanel" aria-labelledby="for-other-machines-tab">
-
+<div class="section level4">
+<h4 id="for-other-machines">For Other Machines<a class="anchor" aria-label="anchor" href="#for-other-machines"></a>
+</h4>
 <p>Use the pre-built R packages from <code>rstats-on-nix</code> Cachix cache for much faster builds:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Install cachix (one-time setup)</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="ex">nix-shell</span> <span class="at">-p</span> cachix <span class="at">--run</span> <span class="st">"cachix use rstats-on-nix"</span></span>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Install cachix (one-time setup)</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>nix<span class="sc">-</span>shell <span class="sc">-</span>p cachix <span class="sc">--</span>run <span class="st">"cachix use rstats-on-nix"</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co"># Now nix-shell will download pre-built packages instead of compiling</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="bu">cd</span> irishbuoys</span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="ex">./default.sh</span>  <span class="co"># Much faster with cache!</span></span></code></pre></div>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>cd irishbuoys</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>.<span class="sc">/</span>default.sh  <span class="co"># Much faster with cache!</span></span></code></pre></div>
 </div>
-<div class="tab-pane" id="two-tier-caching-strategy" role="tabpanel" aria-labelledby="two-tier-caching-strategy-tab">
-
+<div class="section level4">
+<h4 id="two-tier-caching-strategy">Two-Tier Caching Strategy<a class="anchor" aria-label="anchor" href="#two-tier-caching-strategy"></a>
+</h4>
 <p>This project uses a two-tier Cachix strategy:</p>
 <table class="table">
-<colgroup>
-<col width="13%">
-<col width="23%">
-<col width="62%">
-</colgroup>
 <thead><tr>
-<th>Priority</th>
-<th>Cache</th>
-<th>Contains</th>
+<th>
+Priority
+</th>
+<th>
+Cache
+</th>
+<th>
+Contains
+</th>
 </tr></thead>
 <tbody>
 <tr>
-<td>1st</td>
-<td><code>rstats-on-nix</code></td>
-<td>All standard R packages (public, pre-built)</td>
+<td>
+1st
+</td>
+<td>
+<code>rstats-on-nix</code>
+</td>
+<td>
+All standard R packages (public, pre-built)
+</td>
 </tr>
 <tr>
-<td>2nd</td>
-<td><code>johngavin</code></td>
-<td>Project-specific custom packages only</td>
+<td>
+2nd
+</td>
+<td>
+<code>johngavin</code>
+</td>
+<td>
+Project-specific custom packages only
+</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Important</strong>: Standard R packages (dplyr, targets, etc.) are ALL available from <code>rstats-on-nix</code>. The <code>johngavin</code> cache is only for custom packages not in rstats-on-nix.</p>
 <p>For irishbuoys: - All dependencies come from <code>rstats-on-nix</code> - The irishbuoys package itself is loaded via <code><a href="https://pkgload.r-lib.org/reference/load_all.html" class="external-link">pkgload::load_all()</a></code> (development mode) - Nothing needs to be pushed to <code>johngavin</code> cache</p>
 </div>
-<div class="tab-pane" id="github-actions-ci" role="tabpanel" aria-labelledby="github-actions-ci-tab">
-
+<div class="section level4">
+<h4 id="github-actions-ci">GitHub Actions CI<a class="anchor" aria-label="anchor" href="#github-actions-ci"></a>
+</h4>
 <p>CI workflows automatically use both caches:</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># In .github/workflows/r-cmd-check.yaml</span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> cachix/cachix-action@v15</span></span>
-<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="at">    </span><span class="fu">name</span><span class="kw">:</span><span class="at"> rstats-on-nix</span><span class="co">  # Public cache FIRST</span></span>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co"># In .github/workflows/r-cmd-check.yaml</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="sc">-</span> uses<span class="sc">:</span> cachix<span class="sc">/</span>cachix<span class="sc">-</span>action<span class="sc">@</span>v15</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  with<span class="sc">:</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>    name<span class="sc">:</span> rstats<span class="sc">-</span>on<span class="sc">-</span>nix  <span class="co"># Public cache FIRST</span></span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a></span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> cachix/cachix-action@v15</span></span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="at">  </span><span class="fu">with</span><span class="kw">:</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="at">    </span><span class="fu">name</span><span class="kw">:</span><span class="at"> johngavin</span><span class="co">      # Project cache SECOND</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="at">    </span><span class="fu">authToken</span><span class="kw">:</span><span class="at"> </span><span class="st">'${{ secrets.CACHIX_AUTH_TOKEN }}'</span></span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a><span class="at">    </span><span class="fu">skipPush</span><span class="kw">:</span><span class="at"> </span><span class="ch">true</span><span class="co">       # Don't push during checks</span></span></code></pre></div>
-</div>
-</div>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="sc">-</span> uses<span class="sc">:</span> cachix<span class="sc">/</span>cachix<span class="sc">-</span>action<span class="sc">@</span>v15</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>  with<span class="sc">:</span></span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    name<span class="sc">:</span> johngavin      <span class="co"># Project cache SECOND</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    authToken<span class="sc">:</span> <span class="st">'${{ secrets.CACHIX_AUTH_TOKEN }}'</span></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    skipPush<span class="sc">:</span> true       <span class="co"># Don't push during checks</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -230,110 +232,104 @@ main { padding-top: 1rem; }
 <div class="section level3">
 <h3 id="download-recent-data">Download Recent Data<a class="anchor" aria-label="anchor" href="#download-recent-data"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">irishbuoys</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Download last 7 days of data</span></span>
-<span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/download_buoy_data.html">download_buoy_data</a></span><span class="op">(</span></span>
-<span>  start_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">7</span>,</span>
-<span>  end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Get data for specific station</span></span>
-<span><span class="va">m3_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/download_buoy_data.html">download_buoy_data</a></span><span class="op">(</span></span>
-<span>  stations <span class="op">=</span> <span class="st">"M3"</span>,</span>
-<span>  start_date <span class="op">=</span> <span class="st">"2024-01-01"</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Get only wave measurements</span></span>
-<span><span class="va">waves</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/download_buoy_data.html">download_buoy_data</a></span><span class="op">(</span></span>
-<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"WaveHeight"</span>, <span class="st">"WavePeriod"</span>, <span class="st">"Hmax"</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">library</span>(irishbuoys)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="co"># Download last 7 days of data</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">download_buoy_data</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="fu">Sys.Date</span>() <span class="sc">-</span> <span class="dv">7</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="at">end_date =</span> <span class="fu">Sys.Date</span>()</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>)</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co"># Get data for specific station</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>m3_data <span class="ot">&lt;-</span> <span class="fu">download_buoy_data</span>(</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>  <span class="at">stations =</span> <span class="st">"M3"</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="st">"2024-01-01"</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>)</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co"># Get only wave measurements</span></span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>waves <span class="ot">&lt;-</span> <span class="fu">download_buoy_data</span>(</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"WaveHeight"</span>, <span class="st">"WavePeriod"</span>, <span class="st">"Hmax"</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="initialize-and-query-database">Initialize and Query Database<a class="anchor" aria-label="anchor" href="#initialize-and-query-database"></a>
 </h3>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Initialize database with historical data</span></span>
-<span><span class="fu"><a href="reference/initialize_database.html">initialize_database</a></span><span class="op">(</span></span>
-<span>  start_date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
-<span>  end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Connect to database</span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/connect_duckdb.html">connect_duckdb</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Query wave data</span></span>
-<span><span class="va">wave_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/query_buoy_data.html">query_buoy_data</a></span><span class="op">(</span></span>
-<span>  <span class="va">con</span>,</span>
-<span>  stations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M3"</span>, <span class="st">"M4"</span><span class="op">)</span>,</span>
-<span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"wave_height"</span>, <span class="st">"wave_period"</span><span class="op">)</span>,</span>
-<span>  start_date <span class="op">=</span> <span class="st">"2024-01-01"</span>,</span>
-<span>  qc_filter <span class="op">=</span> <span class="cn">TRUE</span>  <span class="co"># Only good quality data</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Custom SQL query: Find top 10 most extreme rogue waves</span></span>
-<span><span class="co"># Ordered by hmax (highest individual wave) because "extreme" = largest waves</span></span>
-<span><span class="va">extreme_waves</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/query_buoy_data.html">query_buoy_data</a></span><span class="op">(</span></span>
-<span>  <span class="va">con</span>,</span>
-<span>  sql_query <span class="op">=</span> <span class="st">"</span></span>
-<span><span class="st">    SELECT station_id, time, wave_height, hmax</span></span>
-<span><span class="st">    FROM buoy_data</span></span>
-<span><span class="st">    WHERE hmax &gt; 2 * wave_height</span></span>
-<span><span class="st">      AND wave_height &gt; 0</span></span>
-<span><span class="st">      AND qc_flag = 1</span></span>
-<span><span class="st">    ORDER BY hmax DESC</span></span>
-<span><span class="st">    LIMIT 10</span></span>
-<span><span class="st">  "</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Initialize database with historical data</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">initialize_database</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="st">"2023-01-01"</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">end_date =</span> <span class="fu">Sys.Date</span>()</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co"># Connect to database</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>con <span class="ot">&lt;-</span> <span class="fu">connect_duckdb</span>()</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co"># Query wave data</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>wave_data <span class="ot">&lt;-</span> <span class="fu">query_buoy_data</span>(</span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  con,</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>  <span class="at">stations =</span> <span class="fu">c</span>(<span class="st">"M3"</span>, <span class="st">"M4"</span>),</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>  <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"time"</span>, <span class="st">"station_id"</span>, <span class="st">"wave_height"</span>, <span class="st">"wave_period"</span>),</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="st">"2024-01-01"</span>,</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>  <span class="at">qc_filter =</span> <span class="cn">TRUE</span>  <span class="co"># Only good quality data</span></span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>)</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a></span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a><span class="co"># Custom SQL query: Find top 10 most extreme rogue waves</span></span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a><span class="co"># Ordered by hmax (highest individual wave) because "extreme" = largest waves</span></span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>extreme_waves <span class="ot">&lt;-</span> <span class="fu">query_buoy_data</span>(</span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>  con,</span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a>  <span class="at">sql_query =</span> <span class="st">"</span></span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a><span class="st">    SELECT station_id, time, wave_height, hmax</span></span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a><span class="st">    FROM buoy_data</span></span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a><span class="st">    WHERE hmax &gt; 2 * wave_height</span></span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a><span class="st">      AND wave_height &gt; 0</span></span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a><span class="st">      AND qc_flag = 1</span></span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a><span class="st">    ORDER BY hmax DESC</span></span>
+<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a><span class="st">    LIMIT 10</span></span>
+<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a><span class="st">  "</span></span>
+<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="tidyverse-alternative-duckplyr">Tidyverse Alternative (duckplyr)<a class="anchor" aria-label="anchor" href="#tidyverse-alternative-duckplyr"></a>
 </h3>
 <p>The same query using <code>dplyr</code> verbs with <code>duckplyr</code> backend:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Tidyverse alternative using duckplyr</span></span>
-<span><span class="co"># Same query as SQL above, ordered by hmax (highest waves first)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://duckplyr.tidyverse.org" class="external-link">duckplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">extreme_waves_tidy</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"buoy_data"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
-<span>    <span class="va">hmax</span> <span class="op">&gt;</span> <span class="fl">2</span> <span class="op">*</span> <span class="va">wave_height</span>,</span>
-<span>    <span class="va">wave_height</span> <span class="op">&gt;</span> <span class="fl">0</span>,</span>
-<span>    <span class="va">qc_flag</span> <span class="op">==</span> <span class="fl">1</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">station_id</span>, <span class="va">time</span>, <span class="va">wave_height</span>, <span class="va">hmax</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">hmax</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><strong>Why duckplyr?</strong> - Familiar tidyverse syntax - Lazy evaluation - query runs only on <code><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect()</a></code> - Automatic SQL translation for performance - Works with any DBI connection</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Don't forget to disconnect</span></span>
-<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html" class="external-link">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="co"># Tidyverse alternative using duckplyr</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="co"># Same query as SQL above, ordered by hmax (highest waves first)</span></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="fu">library</span>(duckplyr)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>extreme_waves_tidy <span class="ot">&lt;-</span> <span class="fu">tbl</span>(con, <span class="st">"buoy_data"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="fu">filter</span>(</span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>    hmax <span class="sc">&gt;</span> <span class="dv">2</span> <span class="sc">*</span> wave_height,</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>    wave_height <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>    qc_flag <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a>  <span class="fu">select</span>(station_id, time, wave_height, hmax) <span class="sc">|&gt;</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(hmax)) <span class="sc">|&gt;</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a>  <span class="fu">head</span>(<span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a>  <span class="fu">collect</span>()</span></code></pre></div>
+<p><strong>Why duckplyr?</strong> - Familiar tidyverse syntax - Lazy evaluation - query runs only on <code>collect()</code> - Automatic SQL translation for performance - Works with any DBI connection</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Don't forget to disconnect</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>DBI<span class="sc">::</span><span class="fu">dbDisconnect</span>(con)</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="incremental-updates">Incremental Updates<a class="anchor" aria-label="anchor" href="#incremental-updates"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Perform incremental update (for scheduled jobs)</span></span>
-<span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/incremental_update.html">incremental_update</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">result</span><span class="op">$</span><span class="va">summary</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Check database statistics</span></span>
-<span><span class="va">stats</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_database_stats.html">get_database_stats</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="co"># Perform incremental update (for scheduled jobs)</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">incremental_update</span>()</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">print</span>(result<span class="sc">$</span>summary)</span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co"># Check database statistics</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a>stats <span class="ot">&lt;-</span> <span class="fu">get_database_stats</span>()</span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="data-dictionary">Data Dictionary<a class="anchor" aria-label="anchor" href="#data-dictionary"></a>
 </h3>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Get complete data dictionary</span></span>
-<span><span class="va">dict</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_data_dictionary.html">get_data_dictionary</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="va">dict</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Get detailed documentation for specific variable</span></span>
-<span><span class="va">wave_docs</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_variable_docs.html">get_variable_docs</a></span><span class="op">(</span><span class="st">"WaveHeight"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wave_docs</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Get complete data dictionary</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>dict <span class="ot">&lt;-</span> <span class="fu">get_data_dictionary</span>()</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="fu">View</span>(dict)</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co"># Get detailed documentation for specific variable</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>wave_docs <span class="ot">&lt;-</span> <span class="fu">get_variable_docs</span>(<span class="st">"WaveHeight"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="fu">print</span>(wave_docs)</span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -376,339 +372,152 @@ main { padding-top: 1rem; }
 <div class="section level2">
 <h2 id="project-structure">Project Structure<a class="anchor" aria-label="anchor" href="#project-structure"></a>
 </h2>
-<div class="sourceCode" id="cb15"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>.</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>├── DESCRIPTION</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>├── LICENSE</span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>├── LICENSE.md</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>├── NAMESPACE</span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>├── R</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>│   ├── data_dictionary.R</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>│   ├── database.R</span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>│   ├── database_parquet.R</span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a>│   ├── dev</span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a>│   │   ├── check_data_gaps.R</span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>│   │   ├── generate_dashboard_data.R</span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>│   │   └── issues</span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>│   ├── email_summary.R</span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>│   ├── erddap_client.R</span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a>│   ├── extreme_values.R</span>
-<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>│   ├── irishbuoys<span class="sc">-</span>package.R</span>
-<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a>│   ├── plot_functions.R</span>
-<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>│   ├── plotly_helpers.R</span>
-<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a>│   ├── rogue_waves.R</span>
-<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a>│   ├── tar_plans</span>
-<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>│   │   ├── plan_dashboard.R</span>
-<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>│   │   ├── plan_data_acquisition.R</span>
-<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a>│   │   ├── plan_doc_examples.R</span>
-<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a>│   │   ├── plan_quality_control.R</span>
-<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a>│   │   └── plan_wave_analysis.R</span>
-<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a>│   ├── trend_analysis.R</span>
-<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a>│   ├── update.R</span>
-<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a>│   ├── wave_model.R</span>
-<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a>│   └── wave_science.R</span>
-<span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a>├── README.md</span>
-<span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a>├── README.qmd</span>
-<span id="cb15-33"><a href="#cb15-33" tabindex="-1"></a>├── README.rmarkdown</span>
-<span id="cb15-34"><a href="#cb15-34" tabindex="-1"></a>├── _extensions</span>
-<span id="cb15-35"><a href="#cb15-35" tabindex="-1"></a>│   └── quarto<span class="sc">-</span>ext</span>
-<span id="cb15-36"><a href="#cb15-36" tabindex="-1"></a>│       └── shinylive</span>
-<span id="cb15-37"><a href="#cb15-37" tabindex="-1"></a>├── _output</span>
-<span id="cb15-38"><a href="#cb15-38" tabindex="-1"></a>│   ├── shinylive<span class="sc">-</span>sw.js</span>
-<span id="cb15-39"><a href="#cb15-39" tabindex="-1"></a>│   └── vignettes</span>
-<span id="cb15-40"><a href="#cb15-40" tabindex="-1"></a>│       ├── dashboard_shinylive.html</span>
-<span id="cb15-41"><a href="#cb15-41" tabindex="-1"></a>│       ├── dashboard_shinylive_files</span>
-<span id="cb15-42"><a href="#cb15-42" tabindex="-1"></a>│       └── data</span>
-<span id="cb15-43"><a href="#cb15-43" tabindex="-1"></a>├── _pkgdown.yml</span>
-<span id="cb15-44"><a href="#cb15-44" tabindex="-1"></a>├── _quarto.yml</span>
-<span id="cb15-45"><a href="#cb15-45" tabindex="-1"></a>├── _targets</span>
-<span id="cb15-46"><a href="#cb15-46" tabindex="-1"></a>│   ├── meta</span>
-<span id="cb15-47"><a href="#cb15-47" tabindex="-1"></a>│   │   ├── crew</span>
-<span id="cb15-48"><a href="#cb15-48" tabindex="-1"></a>│   │   ├── meta</span>
-<span id="cb15-49"><a href="#cb15-49" tabindex="-1"></a>│   │   ├── process</span>
-<span id="cb15-50"><a href="#cb15-50" tabindex="-1"></a>│   │   └── progress</span>
-<span id="cb15-51"><a href="#cb15-51" tabindex="-1"></a>│   ├── objects</span>
-<span id="cb15-52"><a href="#cb15-52" tabindex="-1"></a>│   │   ├── analysis_data</span>
-<span id="cb15-53"><a href="#cb15-53" tabindex="-1"></a>│   │   ├── analysis_summary</span>
-<span id="cb15-54"><a href="#cb15-54" tabindex="-1"></a>│   │   ├── annual_trends_wave</span>
-<span id="cb15-55"><a href="#cb15-55" tabindex="-1"></a>│   │   ├── annual_trends_wind</span>
-<span id="cb15-56"><a href="#cb15-56" tabindex="-1"></a>│   │   ├── code_eval_duckplyr_rogue</span>
-<span id="cb15-57"><a href="#cb15-57" tabindex="-1"></a>│   │   ├── code_eval_sql_rogue</span>
-<span id="cb15-58"><a href="#cb15-58" tabindex="-1"></a>│   │   ├── code_example_duckplyr_rogue</span>
-<span id="cb15-59"><a href="#cb15-59" tabindex="-1"></a>│   │   ├── code_example_sql_rogue</span>
-<span id="cb15-60"><a href="#cb15-60" tabindex="-1"></a>│   │   ├── code_example_wave_query</span>
-<span id="cb15-61"><a href="#cb15-61" tabindex="-1"></a>│   │   ├── code_example_wave_query_duckplyr</span>
-<span id="cb15-62"><a href="#cb15-62" tabindex="-1"></a>│   │   ├── code_parsed_duckplyr_rogue</span>
-<span id="cb15-63"><a href="#cb15-63" tabindex="-1"></a>│   │   ├── code_parsed_sql_rogue</span>
-<span id="cb15-64"><a href="#cb15-64" tabindex="-1"></a>│   │   ├── code_parsed_wave_query</span>
-<span id="cb15-65"><a href="#cb15-65" tabindex="-1"></a>│   │   ├── code_parsed_wave_query_duckplyr</span>
-<span id="cb15-66"><a href="#cb15-66" tabindex="-1"></a>│   │   ├── current_db_stats</span>
-<span id="cb15-67"><a href="#cb15-67" tabindex="-1"></a>│   │   ├── dashboard_buoy_data</span>
-<span id="cb15-68"><a href="#cb15-68" tabindex="-1"></a>│   │   ├── dashboard_stats</span>
-<span id="cb15-69"><a href="#cb15-69" tabindex="-1"></a>│   │   ├── dashboard_timeseries</span>
-<span id="cb15-70"><a href="#cb15-70" tabindex="-1"></a>│   │   ├── data_completeness</span>
-<span id="cb15-71"><a href="#cb15-71" tabindex="-1"></a>│   │   ├── data_update</span>
-<span id="cb15-72"><a href="#cb15-72" tabindex="-1"></a>│   │   ├── doc_examples_validation</span>
-<span id="cb15-73"><a href="#cb15-73" tabindex="-1"></a>│   │   ├── full_data</span>
-<span id="cb15-74"><a href="#cb15-74" tabindex="-1"></a>│   │   ├── gev_hmax</span>
-<span id="cb15-75"><a href="#cb15-75" tabindex="-1"></a>│   │   ├── gev_hmax_pooled</span>
-<span id="cb15-76"><a href="#cb15-76" tabindex="-1"></a>│   │   ├── gev_wave_height</span>
-<span id="cb15-77"><a href="#cb15-77" tabindex="-1"></a>│   │   ├── gev_wave_pooled</span>
-<span id="cb15-78"><a href="#cb15-78" tabindex="-1"></a>│   │   ├── gev_wind_pooled</span>
-<span id="cb15-79"><a href="#cb15-79" tabindex="-1"></a>│   │   ├── gev_wind_speed</span>
-<span id="cb15-80"><a href="#cb15-80" tabindex="-1"></a>│   │   ├── gpd_hmax_per_station</span>
-<span id="cb15-81"><a href="#cb15-81" tabindex="-1"></a>│   │   ├── gpd_wave_per_station</span>
-<span id="cb15-82"><a href="#cb15-82" tabindex="-1"></a>│   │   ├── gpd_wind_per_station</span>
-<span id="cb15-83"><a href="#cb15-83" tabindex="-1"></a>│   │   ├── gust_factor_analysis</span>
-<span id="cb15-84"><a href="#cb15-84" tabindex="-1"></a>│   │   ├── latest_erddap_timestamp</span>
-<span id="cb15-85"><a href="#cb15-85" tabindex="-1"></a>│   │   ├── missing_data_grid</span>
-<span id="cb15-86"><a href="#cb15-86" tabindex="-1"></a>│   │   ├── outlier_check</span>
-<span id="cb15-87"><a href="#cb15-87" tabindex="-1"></a>│   │   ├── plot_annual_trends</span>
-<span id="cb15-88"><a href="#cb15-88" tabindex="-1"></a>│   │   ├── plot_gust_by_category</span>
-<span id="cb15-89"><a href="#cb15-89" tabindex="-1"></a>│   │   ├── plot_gusts_vs_waves</span>
-<span id="cb15-90"><a href="#cb15-90" tabindex="-1"></a>│   │   ├── plot_monthly_wave</span>
-<span id="cb15-91"><a href="#cb15-91" tabindex="-1"></a>│   │   ├── plot_monthly_wind</span>
-<span id="cb15-92"><a href="#cb15-92" tabindex="-1"></a>│   │   ├── plot_return_levels_hmax</span>
-<span id="cb15-93"><a href="#cb15-93" tabindex="-1"></a>│   │   ├── plot_return_levels_wave</span>
-<span id="cb15-94"><a href="#cb15-94" tabindex="-1"></a>│   │   ├── plot_return_levels_wind</span>
-<span id="cb15-95"><a href="#cb15-95" tabindex="-1"></a>│   │   ├── plot_rogue_all</span>
-<span id="cb15-96"><a href="#cb15-96" tabindex="-1"></a>│   │   ├── plot_rogue_by_station</span>
-<span id="cb15-97"><a href="#cb15-97" tabindex="-1"></a>│   │   ├── plot_rogue_gusts</span>
-<span id="cb15-98"><a href="#cb15-98" tabindex="-1"></a>│   │   ├── plot_rogue_gusts_all</span>
-<span id="cb15-99"><a href="#cb15-99" tabindex="-1"></a>│   │   ├── plot_rogue_gusts_by_station</span>
-<span id="cb15-100"><a href="#cb15-100" tabindex="-1"></a>│   │   ├── plot_stl</span>
-<span id="cb15-101"><a href="#cb15-101" tabindex="-1"></a>│   │   ├── plot_time_of_day</span>
-<span id="cb15-102"><a href="#cb15-102" tabindex="-1"></a>│   │   ├── plot_week_of_year</span>
-<span id="cb15-103"><a href="#cb15-103" tabindex="-1"></a>│   │   ├── plot_wind_beaufort</span>
-<span id="cb15-104"><a href="#cb15-104" tabindex="-1"></a>│   │   ├── quality_report</span>
-<span id="cb15-105"><a href="#cb15-105" tabindex="-1"></a>│   │   ├── recent_data</span>
-<span id="cb15-106"><a href="#cb15-106" tabindex="-1"></a>│   │   ├── return_level_curves_wave</span>
-<span id="cb15-107"><a href="#cb15-107" tabindex="-1"></a>│   │   ├── return_level_curves_wind</span>
-<span id="cb15-108"><a href="#cb15-108" tabindex="-1"></a>│   │   ├── return_levels_hmax</span>
-<span id="cb15-109"><a href="#cb15-109" tabindex="-1"></a>│   │   ├── return_levels_hmax_pooled</span>
-<span id="cb15-110"><a href="#cb15-110" tabindex="-1"></a>│   │   ├── return_levels_wave</span>
-<span id="cb15-111"><a href="#cb15-111" tabindex="-1"></a>│   │   ├── return_levels_wave_pooled</span>
-<span id="cb15-112"><a href="#cb15-112" tabindex="-1"></a>│   │   ├── return_levels_wind</span>
-<span id="cb15-113"><a href="#cb15-113" tabindex="-1"></a>│   │   ├── return_levels_wind_pooled</span>
-<span id="cb15-114"><a href="#cb15-114" tabindex="-1"></a>│   │   ├── rogue_comparison</span>
-<span id="cb15-115"><a href="#cb15-115" tabindex="-1"></a>│   │   ├── rogue_gust_events</span>
-<span id="cb15-116"><a href="#cb15-116" tabindex="-1"></a>│   │   ├── rogue_wave_conditions</span>
-<span id="cb15-117"><a href="#cb15-117" tabindex="-1"></a>│   │   ├── rogue_wave_events</span>
-<span id="cb15-118"><a href="#cb15-118" tabindex="-1"></a>│   │   ├── rogue_wave_statistics</span>
-<span id="cb15-119"><a href="#cb15-119" tabindex="-1"></a>│   │   ├── rogue_waves</span>
-<span id="cb15-120"><a href="#cb15-120" tabindex="-1"></a>│   │   ├── save_dashboard_data</span>
-<span id="cb15-121"><a href="#cb15-121" tabindex="-1"></a>│   │   ├── save_vignette_data</span>
-<span id="cb15-122"><a href="#cb15-122" tabindex="-1"></a>│   │   ├── seasonal_means_wave</span>
-<span id="cb15-123"><a href="#cb15-123" tabindex="-1"></a>│   │   ├── seasonal_means_wind</span>
-<span id="cb15-124"><a href="#cb15-124" tabindex="-1"></a>│   │   ├── stations</span>
-<span id="cb15-125"><a href="#cb15-125" tabindex="-1"></a>│   │   ├── wave_anomalies</span>
-<span id="cb15-126"><a href="#cb15-126" tabindex="-1"></a>│   │   └── wave_height_seasonal</span>
-<span id="cb15-127"><a href="#cb15-127" tabindex="-1"></a>│   ├── user</span>
-<span id="cb15-128"><a href="#cb15-128" tabindex="-1"></a>│   └── workspaces</span>
-<span id="cb15-129"><a href="#cb15-129" tabindex="-1"></a>│       ├── analysis_data</span>
-<span id="cb15-130"><a href="#cb15-130" tabindex="-1"></a>│       ├── dashboard_buoy_data</span>
-<span id="cb15-131"><a href="#cb15-131" tabindex="-1"></a>│       ├── data_completeness</span>
-<span id="cb15-132"><a href="#cb15-132" tabindex="-1"></a>│       ├── gev_wind_speed</span>
-<span id="cb15-133"><a href="#cb15-133" tabindex="-1"></a>│       ├── recent_data</span>
-<span id="cb15-134"><a href="#cb15-134" tabindex="-1"></a>│       ├── return_level_curves_wave</span>
-<span id="cb15-135"><a href="#cb15-135" tabindex="-1"></a>│       ├── return_level_curves_wind</span>
-<span id="cb15-136"><a href="#cb15-136" tabindex="-1"></a>│       ├── seasonal_means_wave</span>
-<span id="cb15-137"><a href="#cb15-137" tabindex="-1"></a>│       └── stations</span>
-<span id="cb15-138"><a href="#cb15-138" tabindex="-1"></a>├── _targets.R</span>
-<span id="cb15-139"><a href="#cb15-139" tabindex="-1"></a>├── data<span class="sc">-</span>raw</span>
-<span id="cb15-140"><a href="#cb15-140" tabindex="-1"></a>├── default.R</span>
-<span id="cb15-141"><a href="#cb15-141" tabindex="-1"></a>├── default.nix</span>
-<span id="cb15-142"><a href="#cb15-142" tabindex="-1"></a>├── default.sh</span>
-<span id="cb15-143"><a href="#cb15-143" tabindex="-1"></a>├── docs</span>
-<span id="cb15-144"><a href="#cb15-144" tabindex="-1"></a>│   ├── <span class="fl">404.</span>html</span>
-<span id="cb15-145"><a href="#cb15-145" tabindex="-1"></a>│   ├── LICENSE<span class="sc">-</span>text.html</span>
-<span id="cb15-146"><a href="#cb15-146" tabindex="-1"></a>│   ├── LICENSE.html</span>
-<span id="cb15-147"><a href="#cb15-147" tabindex="-1"></a>│   ├── articles</span>
-<span id="cb15-148"><a href="#cb15-148" tabindex="-1"></a>│   │   ├── dashboard_static.html</span>
-<span id="cb15-149"><a href="#cb15-149" tabindex="-1"></a>│   │   ├── dashboard_static_files</span>
-<span id="cb15-150"><a href="#cb15-150" tabindex="-1"></a>│   │   ├── index.html</span>
-<span id="cb15-151"><a href="#cb15-151" tabindex="-1"></a>│   │   ├── wave_analysis.html</span>
-<span id="cb15-152"><a href="#cb15-152" tabindex="-1"></a>│   │   └── wave_analysis_files</span>
-<span id="cb15-153"><a href="#cb15-153" tabindex="-1"></a>│   ├── authors.html</span>
-<span id="cb15-154"><a href="#cb15-154" tabindex="-1"></a>│   ├── deps</span>
-<span id="cb15-155"><a href="#cb15-155" tabindex="-1"></a>│   │   ├── bootstrap<span class="dv">-5</span>.<span class="fl">3.1</span></span>
-<span id="cb15-156"><a href="#cb15-156" tabindex="-1"></a>│   │   ├── bootstrap<span class="sc">-</span>toc<span class="dv">-1</span>.<span class="fl">0.1</span></span>
-<span id="cb15-157"><a href="#cb15-157" tabindex="-1"></a>│   │   ├── clipboard.js<span class="dv">-2</span>.<span class="fl">0.11</span></span>
-<span id="cb15-158"><a href="#cb15-158" tabindex="-1"></a>│   │   ├── data<span class="sc">-</span>deps.txt</span>
-<span id="cb15-159"><a href="#cb15-159" tabindex="-1"></a>│   │   ├── font<span class="sc">-</span>awesome<span class="dv">-6</span>.<span class="fl">5.2</span></span>
-<span id="cb15-160"><a href="#cb15-160" tabindex="-1"></a>│   │   ├── headroom<span class="dv">-0</span>.<span class="fl">11.0</span></span>
-<span id="cb15-161"><a href="#cb15-161" tabindex="-1"></a>│   │   ├── jquery<span class="dv">-3</span>.<span class="fl">6.0</span></span>
-<span id="cb15-162"><a href="#cb15-162" tabindex="-1"></a>│   │   └── search<span class="dv">-1</span>.<span class="fl">0.0</span></span>
-<span id="cb15-163"><a href="#cb15-163" tabindex="-1"></a>│   ├── extra.css</span>
-<span id="cb15-164"><a href="#cb15-164" tabindex="-1"></a>│   ├── index.html</span>
-<span id="cb15-165"><a href="#cb15-165" tabindex="-1"></a>│   ├── katex<span class="sc">-</span>auto.js</span>
-<span id="cb15-166"><a href="#cb15-166" tabindex="-1"></a>│   ├── lightswitch.js</span>
-<span id="cb15-167"><a href="#cb15-167" tabindex="-1"></a>│   ├── link.svg</span>
-<span id="cb15-168"><a href="#cb15-168" tabindex="-1"></a>│   ├── pkgdown.js</span>
-<span id="cb15-169"><a href="#cb15-169" tabindex="-1"></a>│   ├── pkgdown.yml</span>
-<span id="cb15-170"><a href="#cb15-170" tabindex="-1"></a>│   ├── reference</span>
-<span id="cb15-171"><a href="#cb15-171" tabindex="-1"></a>│   │   ├── add_wave_metrics.html</span>
-<span id="cb15-172"><a href="#cb15-172" tabindex="-1"></a>│   │   ├── analyze_gust_factor.html</span>
-<span id="cb15-173"><a href="#cb15-173" tabindex="-1"></a>│   │   ├── analyze_parquet_storage.html</span>
-<span id="cb15-174"><a href="#cb15-174" tabindex="-1"></a>│   │   ├── analyze_rogue_statistics.html</span>
-<span id="cb15-175"><a href="#cb15-175" tabindex="-1"></a>│   │   ├── calculate_annual_trends.html</span>
-<span id="cb15-176"><a href="#cb15-176" tabindex="-1"></a>│   │   ├── calculate_hs_from_elevation.html</span>
-<span id="cb15-177"><a href="#cb15-177" tabindex="-1"></a>│   │   ├── calculate_return_levels.html</span>
-<span id="cb15-178"><a href="#cb15-178" tabindex="-1"></a>│   │   ├── calculate_rms_wave_height.html</span>
-<span id="cb15-179"><a href="#cb15-179" tabindex="-1"></a>│   │   ├── calculate_seasonal_means.html</span>
-<span id="cb15-180"><a href="#cb15-180" tabindex="-1"></a>│   │   ├── calculate_wave_steepness.html</span>
-<span id="cb15-181"><a href="#cb15-181" tabindex="-1"></a>│   │   ├── compare_rogue_wave_gust.html</span>
-<span id="cb15-182"><a href="#cb15-182" tabindex="-1"></a>│   │   ├── connect_duckdb.html</span>
-<span id="cb15-183"><a href="#cb15-183" tabindex="-1"></a>│   │   ├── convert_duckdb_to_parquet.html</span>
-<span id="cb15-184"><a href="#cb15-184" tabindex="-1"></a>│   │   ├── create_buoy_schema.html</span>
-<span id="cb15-185"><a href="#cb15-185" tabindex="-1"></a>│   │   ├── create_email_summary.html</span>
-<span id="cb15-186"><a href="#cb15-186" tabindex="-1"></a>│   │   ├── create_return_level_plot_data.html</span>
-<span id="cb15-187"><a href="#cb15-187" tabindex="-1"></a>│   │   ├── decompose_stl.html</span>
-<span id="cb15-188"><a href="#cb15-188" tabindex="-1"></a>│   │   ├── detect_anomalies.html</span>
-<span id="cb15-189"><a href="#cb15-189" tabindex="-1"></a>│   │   ├── detect_rogue_waves.html</span>
-<span id="cb15-190"><a href="#cb15-190" tabindex="-1"></a>│   │   ├── download_buoy_data.html</span>
-<span id="cb15-191"><a href="#cb15-191" tabindex="-1"></a>│   │   ├── evaluate_wave_model.html</span>
-<span id="cb15-192"><a href="#cb15-192" tabindex="-1"></a>│   │   ├── explain_hourly_averaging.html</span>
-<span id="cb15-193"><a href="#cb15-193" tabindex="-1"></a>│   │   ├── explain_hs_formula.html</span>
-<span id="cb15-194"><a href="#cb15-194" tabindex="-1"></a>│   │   ├── explain_measurement_period.html</span>
-<span id="cb15-195"><a href="#cb15-195" tabindex="-1"></a>│   │   ├── explain_wave_height_measurement.html</span>
-<span id="cb15-196"><a href="#cb15-196" tabindex="-1"></a>│   │   ├── extreme_values.html</span>
-<span id="cb15-197"><a href="#cb15-197" tabindex="-1"></a>│   │   ├── fit_gev_annual_maxima.html</span>
-<span id="cb15-198"><a href="#cb15-198" tabindex="-1"></a>│   │   ├── fit_gpd_threshold.html</span>
-<span id="cb15-199"><a href="#cb15-199" tabindex="-1"></a>│   │   ├── generate_and_send_summary.html</span>
-<span id="cb15-200"><a href="#cb15-200" tabindex="-1"></a>│   │   ├── generate_weekly_summary.html</span>
-<span id="cb15-201"><a href="#cb15-201" tabindex="-1"></a>│   │   ├── get_data_dictionary.html</span>
-<span id="cb15-202"><a href="#cb15-202" tabindex="-1"></a>│   │   ├── get_database_stats.html</span>
-<span id="cb15-203"><a href="#cb15-203" tabindex="-1"></a>│   │   ├── get_latest_timestamp.html</span>
-<span id="cb15-204"><a href="#cb15-204" tabindex="-1"></a>│   │   ├── get_stations.html</span>
-<span id="cb15-205"><a href="#cb15-205" tabindex="-1"></a>│   │   ├── get_variable_docs.html</span>
-<span id="cb15-206"><a href="#cb15-206" tabindex="-1"></a>│   │   ├── hs_from_rms.html</span>
-<span id="cb15-207"><a href="#cb15-207" tabindex="-1"></a>│   │   ├── incremental_update.html</span>
-<span id="cb15-208"><a href="#cb15-208" tabindex="-1"></a>│   │   ├── incremental_update_parquet.html</span>
-<span id="cb15-209"><a href="#cb15-209" tabindex="-1"></a>│   │   ├── index.html</span>
-<span id="cb15-210"><a href="#cb15-210" tabindex="-1"></a>│   │   ├── init_parquet_storage.html</span>
-<span id="cb15-211"><a href="#cb15-211" tabindex="-1"></a>│   │   ├── initialize_database.html</span>
-<span id="cb15-212"><a href="#cb15-212" tabindex="-1"></a>│   │   ├── inst</span>
-<span id="cb15-213"><a href="#cb15-213" tabindex="-1"></a>│   │   ├── irishbuoys<span class="sc">-</span>package.html</span>
-<span id="cb15-214"><a href="#cb15-214" tabindex="-1"></a>│   │   ├── load_to_duckdb.html</span>
-<span id="cb15-215"><a href="#cb15-215" tabindex="-1"></a>│   │   ├── log_update.html</span>
-<span id="cb15-216"><a href="#cb15-216" tabindex="-1"></a>│   │   ├── predict_wave_height.html</span>
-<span id="cb15-217"><a href="#cb15-217" tabindex="-1"></a>│   │   ├── prepare_wave_features.html</span>
-<span id="cb15-218"><a href="#cb15-218" tabindex="-1"></a>│   │   ├── query_buoy_data.html</span>
-<span id="cb15-219"><a href="#cb15-219" tabindex="-1"></a>│   │   ├── query_parquet.html</span>
-<span id="cb15-220"><a href="#cb15-220" tabindex="-1"></a>│   │   ├── rogue_wave_report.html</span>
-<span id="cb15-221"><a href="#cb15-221" tabindex="-1"></a>│   │   ├── save_to_parquet.html</span>
-<span id="cb15-222"><a href="#cb15-222" tabindex="-1"></a>│   │   ├── train_wave_model.html</span>
-<span id="cb15-223"><a href="#cb15-223" tabindex="-1"></a>│   │   ├── trend_analysis.html</span>
-<span id="cb15-224"><a href="#cb15-224" tabindex="-1"></a>│   │   ├── trend_summary_report.html</span>
-<span id="cb15-225"><a href="#cb15-225" tabindex="-1"></a>│   │   ├── update_station_metadata.html</span>
-<span id="cb15-226"><a href="#cb15-226" tabindex="-1"></a>│   │   ├── wave_glossary.html</span>
-<span id="cb15-227"><a href="#cb15-227" tabindex="-1"></a>│   │   ├── wave_model.html</span>
-<span id="cb15-228"><a href="#cb15-228" tabindex="-1"></a>│   │   ├── wave_model_report.html</span>
-<span id="cb15-229"><a href="#cb15-229" tabindex="-1"></a>│   │   ├── wave_science.html</span>
-<span id="cb15-230"><a href="#cb15-230" tabindex="-1"></a>│   │   └── wave_science_documentation.html</span>
-<span id="cb15-231"><a href="#cb15-231" tabindex="-1"></a>│   └── vignettes</span>
-<span id="cb15-232"><a href="#cb15-232" tabindex="-1"></a>│       ├── dashboard_static.html</span>
-<span id="cb15-233"><a href="#cb15-233" tabindex="-1"></a>│       ├── dashboard_static_files</span>
-<span id="cb15-234"><a href="#cb15-234" tabindex="-1"></a>│       ├── wave_analysis.html</span>
-<span id="cb15-235"><a href="#cb15-235" tabindex="-1"></a>│       └── wave_analysis_files</span>
-<span id="cb15-236"><a href="#cb15-236" tabindex="-1"></a>├── inst</span>
-<span id="cb15-237"><a href="#cb15-237" tabindex="-1"></a>│   ├── docs</span>
-<span id="cb15-238"><a href="#cb15-238" tabindex="-1"></a>│   │   └── parquet_storage_guide.md</span>
-<span id="cb15-239"><a href="#cb15-239" tabindex="-1"></a>│   ├── extdata</span>
-<span id="cb15-240"><a href="#cb15-240" tabindex="-1"></a>│   │   ├── analysis_questions.md</span>
-<span id="cb15-241"><a href="#cb15-241" tabindex="-1"></a>│   │   ├── dashboard_buoy_data.rds</span>
-<span id="cb15-242"><a href="#cb15-242" tabindex="-1"></a>│   │   ├── dashboard_stats.rds</span>
-<span id="cb15-243"><a href="#cb15-243" tabindex="-1"></a>│   │   ├── dashboard_timeseries.rds</span>
-<span id="cb15-244"><a href="#cb15-244" tabindex="-1"></a>│   │   ├── irish_buoys.duckdb</span>
-<span id="cb15-245"><a href="#cb15-245" tabindex="-1"></a>│   │   ├── return_levels.rds</span>
-<span id="cb15-246"><a href="#cb15-246" tabindex="-1"></a>│   │   ├── rogue_wave_events.rds</span>
-<span id="cb15-247"><a href="#cb15-247" tabindex="-1"></a>│   │   ├── seasonal_analysis.rds</span>
-<span id="cb15-248"><a href="#cb15-248" tabindex="-1"></a>│   │   └── wave_analysis_summary.rds</span>
-<span id="cb15-249"><a href="#cb15-249" tabindex="-1"></a>│   └── scripts</span>
-<span id="cb15-250"><a href="#cb15-250" tabindex="-1"></a>│       ├── example_usage.R</span>
-<span id="cb15-251"><a href="#cb15-251" tabindex="-1"></a>│       └── storage_comparison.R</span>
-<span id="cb15-252"><a href="#cb15-252" tabindex="-1"></a>├── man</span>
-<span id="cb15-253"><a href="#cb15-253" tabindex="-1"></a>│   ├── add_wave_metrics.Rd</span>
-<span id="cb15-254"><a href="#cb15-254" tabindex="-1"></a>│   ├── analyze_gust_factor.Rd</span>
-<span id="cb15-255"><a href="#cb15-255" tabindex="-1"></a>│   ├── analyze_parquet_storage.Rd</span>
-<span id="cb15-256"><a href="#cb15-256" tabindex="-1"></a>│   ├── analyze_rogue_statistics.Rd</span>
-<span id="cb15-257"><a href="#cb15-257" tabindex="-1"></a>│   ├── calculate_annual_trends.Rd</span>
-<span id="cb15-258"><a href="#cb15-258" tabindex="-1"></a>│   ├── calculate_hs_from_elevation.Rd</span>
-<span id="cb15-259"><a href="#cb15-259" tabindex="-1"></a>│   ├── calculate_return_levels.Rd</span>
-<span id="cb15-260"><a href="#cb15-260" tabindex="-1"></a>│   ├── calculate_rms_wave_height.Rd</span>
-<span id="cb15-261"><a href="#cb15-261" tabindex="-1"></a>│   ├── calculate_seasonal_means.Rd</span>
-<span id="cb15-262"><a href="#cb15-262" tabindex="-1"></a>│   ├── calculate_wave_steepness.Rd</span>
-<span id="cb15-263"><a href="#cb15-263" tabindex="-1"></a>│   ├── compare_rogue_wave_gust.Rd</span>
-<span id="cb15-264"><a href="#cb15-264" tabindex="-1"></a>│   ├── connect_duckdb.Rd</span>
-<span id="cb15-265"><a href="#cb15-265" tabindex="-1"></a>│   ├── convert_duckdb_to_parquet.Rd</span>
-<span id="cb15-266"><a href="#cb15-266" tabindex="-1"></a>│   ├── create_buoy_schema.Rd</span>
-<span id="cb15-267"><a href="#cb15-267" tabindex="-1"></a>│   ├── create_email_summary.Rd</span>
-<span id="cb15-268"><a href="#cb15-268" tabindex="-1"></a>│   ├── create_return_level_plot_data.Rd</span>
-<span id="cb15-269"><a href="#cb15-269" tabindex="-1"></a>│   ├── decompose_stl.Rd</span>
-<span id="cb15-270"><a href="#cb15-270" tabindex="-1"></a>│   ├── detect_anomalies.Rd</span>
-<span id="cb15-271"><a href="#cb15-271" tabindex="-1"></a>│   ├── detect_rogue_waves.Rd</span>
-<span id="cb15-272"><a href="#cb15-272" tabindex="-1"></a>│   ├── download_buoy_data.Rd</span>
-<span id="cb15-273"><a href="#cb15-273" tabindex="-1"></a>│   ├── evaluate_wave_model.Rd</span>
-<span id="cb15-274"><a href="#cb15-274" tabindex="-1"></a>│   ├── explain_hourly_averaging.Rd</span>
-<span id="cb15-275"><a href="#cb15-275" tabindex="-1"></a>│   ├── explain_hs_formula.Rd</span>
-<span id="cb15-276"><a href="#cb15-276" tabindex="-1"></a>│   ├── explain_measurement_period.Rd</span>
-<span id="cb15-277"><a href="#cb15-277" tabindex="-1"></a>│   ├── explain_wave_height_measurement.Rd</span>
-<span id="cb15-278"><a href="#cb15-278" tabindex="-1"></a>│   ├── extreme_values.Rd</span>
-<span id="cb15-279"><a href="#cb15-279" tabindex="-1"></a>│   ├── fit_gev_annual_maxima.Rd</span>
-<span id="cb15-280"><a href="#cb15-280" tabindex="-1"></a>│   ├── fit_gpd_threshold.Rd</span>
-<span id="cb15-281"><a href="#cb15-281" tabindex="-1"></a>│   ├── generate_and_send_summary.Rd</span>
-<span id="cb15-282"><a href="#cb15-282" tabindex="-1"></a>│   ├── generate_weekly_summary.Rd</span>
-<span id="cb15-283"><a href="#cb15-283" tabindex="-1"></a>│   ├── get_data_dictionary.Rd</span>
-<span id="cb15-284"><a href="#cb15-284" tabindex="-1"></a>│   ├── get_database_stats.Rd</span>
-<span id="cb15-285"><a href="#cb15-285" tabindex="-1"></a>│   ├── get_latest_timestamp.Rd</span>
-<span id="cb15-286"><a href="#cb15-286" tabindex="-1"></a>│   ├── get_stations.Rd</span>
-<span id="cb15-287"><a href="#cb15-287" tabindex="-1"></a>│   ├── get_variable_docs.Rd</span>
-<span id="cb15-288"><a href="#cb15-288" tabindex="-1"></a>│   ├── hs_from_rms.Rd</span>
-<span id="cb15-289"><a href="#cb15-289" tabindex="-1"></a>│   ├── incremental_update.Rd</span>
-<span id="cb15-290"><a href="#cb15-290" tabindex="-1"></a>│   ├── incremental_update_parquet.Rd</span>
-<span id="cb15-291"><a href="#cb15-291" tabindex="-1"></a>│   ├── init_parquet_storage.Rd</span>
-<span id="cb15-292"><a href="#cb15-292" tabindex="-1"></a>│   ├── initialize_database.Rd</span>
-<span id="cb15-293"><a href="#cb15-293" tabindex="-1"></a>│   ├── irishbuoys<span class="sc">-</span>package.Rd</span>
-<span id="cb15-294"><a href="#cb15-294" tabindex="-1"></a>│   ├── load_to_duckdb.Rd</span>
-<span id="cb15-295"><a href="#cb15-295" tabindex="-1"></a>│   ├── log_update.Rd</span>
-<span id="cb15-296"><a href="#cb15-296" tabindex="-1"></a>│   ├── predict_wave_height.Rd</span>
-<span id="cb15-297"><a href="#cb15-297" tabindex="-1"></a>│   ├── prepare_wave_features.Rd</span>
-<span id="cb15-298"><a href="#cb15-298" tabindex="-1"></a>│   ├── query_buoy_data.Rd</span>
-<span id="cb15-299"><a href="#cb15-299" tabindex="-1"></a>│   ├── query_parquet.Rd</span>
-<span id="cb15-300"><a href="#cb15-300" tabindex="-1"></a>│   ├── rogue_wave_report.Rd</span>
-<span id="cb15-301"><a href="#cb15-301" tabindex="-1"></a>│   ├── save_to_parquet.Rd</span>
-<span id="cb15-302"><a href="#cb15-302" tabindex="-1"></a>│   ├── train_wave_model.Rd</span>
-<span id="cb15-303"><a href="#cb15-303" tabindex="-1"></a>│   ├── trend_analysis.Rd</span>
-<span id="cb15-304"><a href="#cb15-304" tabindex="-1"></a>│   ├── trend_summary_report.Rd</span>
-<span id="cb15-305"><a href="#cb15-305" tabindex="-1"></a>│   ├── update_station_metadata.Rd</span>
-<span id="cb15-306"><a href="#cb15-306" tabindex="-1"></a>│   ├── wave_glossary.Rd</span>
-<span id="cb15-307"><a href="#cb15-307" tabindex="-1"></a>│   ├── wave_model.Rd</span>
-<span id="cb15-308"><a href="#cb15-308" tabindex="-1"></a>│   ├── wave_model_report.Rd</span>
-<span id="cb15-309"><a href="#cb15-309" tabindex="-1"></a>│   ├── wave_science.Rd</span>
-<span id="cb15-310"><a href="#cb15-310" tabindex="-1"></a>│   └── wave_science_documentation.Rd</span>
-<span id="cb15-311"><a href="#cb15-311" tabindex="-1"></a>├── nix<span class="sc">-</span>shell<span class="sc">-</span>root</span>
-<span id="cb15-312"><a href="#cb15-312" tabindex="-1"></a>├── pkgdown</span>
-<span id="cb15-313"><a href="#cb15-313" tabindex="-1"></a>│   └── extra.css</span>
-<span id="cb15-314"><a href="#cb15-314" tabindex="-1"></a>├── push_to_cachix.sh</span>
-<span id="cb15-315"><a href="#cb15-315" tabindex="-1"></a>├── tests</span>
-<span id="cb15-316"><a href="#cb15-316" tabindex="-1"></a>│   ├── testthat</span>
-<span id="cb15-317"><a href="#cb15-317" tabindex="-1"></a>│   │   └── test<span class="sc">-</span>data<span class="sc">-</span>consistency.R</span>
-<span id="cb15-318"><a href="#cb15-318" tabindex="-1"></a>│   └── testthat.R</span>
-<span id="cb15-319"><a href="#cb15-319" tabindex="-1"></a>└── vignettes</span>
-<span id="cb15-320"><a href="#cb15-320" tabindex="-1"></a>    ├── _targets.yaml</span>
-<span id="cb15-321"><a href="#cb15-321" tabindex="-1"></a>    ├── custom.scss</span>
-<span id="cb15-322"><a href="#cb15-322" tabindex="-1"></a>    ├── dashboard_shinylive.qmd</span>
-<span id="cb15-323"><a href="#cb15-323" tabindex="-1"></a>    ├── dashboard_shinylive_files</span>
-<span id="cb15-324"><a href="#cb15-324" tabindex="-1"></a>    │   └── mediabag</span>
-<span id="cb15-325"><a href="#cb15-325" tabindex="-1"></a>    ├── dashboard_static.qmd</span>
-<span id="cb15-326"><a href="#cb15-326" tabindex="-1"></a>    ├── data</span>
-<span id="cb15-327"><a href="#cb15-327" tabindex="-1"></a>    │   ├── buoy_data.json</span>
-<span id="cb15-328"><a href="#cb15-328" tabindex="-1"></a>    │   ├── buoy_data.parquet</span>
-<span id="cb15-329"><a href="#cb15-329" tabindex="-1"></a>    │   ├── buoy_data_raw.csv</span>
-<span id="cb15-330"><a href="#cb15-330" tabindex="-1"></a>    │   └── stations.json</span>
-<span id="cb15-331"><a href="#cb15-331" tabindex="-1"></a>    ├── shinylive<span class="sc">-</span>sw.js</span>
-<span id="cb15-332"><a href="#cb15-332" tabindex="-1"></a>    ├── wave_analysis.qmd</span>
-<span id="cb15-333"><a href="#cb15-333" tabindex="-1"></a>    └── wave_analysis.rmarkdown</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="do">## .</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="do">## ├── DESCRIPTION</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="do">## ├── LICENSE</span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="do">## ├── LICENSE.md</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="do">## ├── NAMESPACE</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="do">## ├── R</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="do">## │   ├── data_dictionary.R</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="do">## │   ├── database.R</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="do">## │   ├── database_parquet.R</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="do">## │   ├── dev</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="do">## │   │   ├── check_data_gaps.R</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="do">## │   │   ├── generate_dashboard_data.R</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="do">## │   │   └── issues</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="do">## │   ├── email_summary.R</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a><span class="do">## │   ├── erddap_client.R</span></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a><span class="do">## │   ├── extreme_values.R</span></span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a><span class="do">## │   ├── irishbuoys-package.R</span></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="do">## │   ├── plot_functions.R</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="do">## │   ├── plotly_helpers.R</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="do">## │   ├── rogue_waves.R</span></span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="do">## │   ├── tar_plans</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="do">## │   │   ├── plan_dashboard.R</span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="do">## │   │   ├── plan_data_acquisition.R</span></span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="do">## │   │   ├── plan_doc_examples.R</span></span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="do">## │   │   ├── plan_quality_control.R</span></span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a><span class="do">## │   │   └── plan_wave_analysis.R</span></span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a><span class="do">## │   ├── trend_analysis.R</span></span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a><span class="do">## │   ├── update.R</span></span>
+<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a><span class="do">## │   ├── wave_model.R</span></span>
+<span id="cb15-30"><a href="#cb15-30" tabindex="-1"></a><span class="do">## │   └── wave_science.R</span></span>
+<span id="cb15-31"><a href="#cb15-31" tabindex="-1"></a><span class="do">## ├── README.md</span></span>
+<span id="cb15-32"><a href="#cb15-32" tabindex="-1"></a><span class="do">## ├── README.qmd</span></span>
+<span id="cb15-33"><a href="#cb15-33" tabindex="-1"></a><span class="do">## ├── _extensions</span></span>
+<span id="cb15-34"><a href="#cb15-34" tabindex="-1"></a><span class="do">## │   └── quarto-ext</span></span>
+<span id="cb15-35"><a href="#cb15-35" tabindex="-1"></a><span class="do">## │       └── shinylive</span></span>
+<span id="cb15-36"><a href="#cb15-36" tabindex="-1"></a><span class="do">## ├── _output</span></span>
+<span id="cb15-37"><a href="#cb15-37" tabindex="-1"></a><span class="do">## │   ├── shinylive-sw.js</span></span>
+<span id="cb15-38"><a href="#cb15-38" tabindex="-1"></a><span class="do">## │   └── vignettes</span></span>
+<span id="cb15-39"><a href="#cb15-39" tabindex="-1"></a><span class="do">## │       ├── dashboard_shinylive.html</span></span>
+<span id="cb15-40"><a href="#cb15-40" tabindex="-1"></a><span class="do">## │       ├── dashboard_shinylive_files</span></span>
+<span id="cb15-41"><a href="#cb15-41" tabindex="-1"></a><span class="do">## │       └── data</span></span>
+<span id="cb15-42"><a href="#cb15-42" tabindex="-1"></a><span class="do">## ├── _pkgdown.yml</span></span>
+<span id="cb15-43"><a href="#cb15-43" tabindex="-1"></a><span class="do">## ├── _quarto.yml</span></span>
+<span id="cb15-44"><a href="#cb15-44" tabindex="-1"></a><span class="do">## ├── _targets.R</span></span>
+<span id="cb15-45"><a href="#cb15-45" tabindex="-1"></a><span class="do">## ├── data-raw</span></span>
+<span id="cb15-46"><a href="#cb15-46" tabindex="-1"></a><span class="do">## ├── default.R</span></span>
+<span id="cb15-47"><a href="#cb15-47" tabindex="-1"></a><span class="do">## ├── default.nix</span></span>
+<span id="cb15-48"><a href="#cb15-48" tabindex="-1"></a><span class="do">## ├── default.sh</span></span>
+<span id="cb15-49"><a href="#cb15-49" tabindex="-1"></a><span class="do">## ├── inst</span></span>
+<span id="cb15-50"><a href="#cb15-50" tabindex="-1"></a><span class="do">## │   ├── docs</span></span>
+<span id="cb15-51"><a href="#cb15-51" tabindex="-1"></a><span class="do">## │   │   └── parquet_storage_guide.md</span></span>
+<span id="cb15-52"><a href="#cb15-52" tabindex="-1"></a><span class="do">## │   ├── extdata</span></span>
+<span id="cb15-53"><a href="#cb15-53" tabindex="-1"></a><span class="do">## │   │   ├── analysis_questions.md</span></span>
+<span id="cb15-54"><a href="#cb15-54" tabindex="-1"></a><span class="do">## │   │   ├── dashboard_buoy_data.rds</span></span>
+<span id="cb15-55"><a href="#cb15-55" tabindex="-1"></a><span class="do">## │   │   ├── dashboard_stats.rds</span></span>
+<span id="cb15-56"><a href="#cb15-56" tabindex="-1"></a><span class="do">## │   │   ├── dashboard_timeseries.rds</span></span>
+<span id="cb15-57"><a href="#cb15-57" tabindex="-1"></a><span class="do">## │   │   ├── irish_buoys.duckdb</span></span>
+<span id="cb15-58"><a href="#cb15-58" tabindex="-1"></a><span class="do">## │   │   ├── return_levels.rds</span></span>
+<span id="cb15-59"><a href="#cb15-59" tabindex="-1"></a><span class="do">## │   │   ├── rogue_wave_events.rds</span></span>
+<span id="cb15-60"><a href="#cb15-60" tabindex="-1"></a><span class="do">## │   │   ├── seasonal_analysis.rds</span></span>
+<span id="cb15-61"><a href="#cb15-61" tabindex="-1"></a><span class="do">## │   │   └── wave_analysis_summary.rds</span></span>
+<span id="cb15-62"><a href="#cb15-62" tabindex="-1"></a><span class="do">## │   └── scripts</span></span>
+<span id="cb15-63"><a href="#cb15-63" tabindex="-1"></a><span class="do">## │       ├── example_usage.R</span></span>
+<span id="cb15-64"><a href="#cb15-64" tabindex="-1"></a><span class="do">## │       └── storage_comparison.R</span></span>
+<span id="cb15-65"><a href="#cb15-65" tabindex="-1"></a><span class="do">## ├── man</span></span>
+<span id="cb15-66"><a href="#cb15-66" tabindex="-1"></a><span class="do">## │   ├── add_wave_metrics.Rd</span></span>
+<span id="cb15-67"><a href="#cb15-67" tabindex="-1"></a><span class="do">## │   ├── analyze_gust_factor.Rd</span></span>
+<span id="cb15-68"><a href="#cb15-68" tabindex="-1"></a><span class="do">## │   ├── analyze_parquet_storage.Rd</span></span>
+<span id="cb15-69"><a href="#cb15-69" tabindex="-1"></a><span class="do">## │   ├── analyze_rogue_statistics.Rd</span></span>
+<span id="cb15-70"><a href="#cb15-70" tabindex="-1"></a><span class="do">## │   ├── calculate_annual_trends.Rd</span></span>
+<span id="cb15-71"><a href="#cb15-71" tabindex="-1"></a><span class="do">## │   ├── calculate_hs_from_elevation.Rd</span></span>
+<span id="cb15-72"><a href="#cb15-72" tabindex="-1"></a><span class="do">## │   ├── calculate_return_levels.Rd</span></span>
+<span id="cb15-73"><a href="#cb15-73" tabindex="-1"></a><span class="do">## │   ├── calculate_rms_wave_height.Rd</span></span>
+<span id="cb15-74"><a href="#cb15-74" tabindex="-1"></a><span class="do">## │   ├── calculate_seasonal_means.Rd</span></span>
+<span id="cb15-75"><a href="#cb15-75" tabindex="-1"></a><span class="do">## │   ├── calculate_wave_steepness.Rd</span></span>
+<span id="cb15-76"><a href="#cb15-76" tabindex="-1"></a><span class="do">## │   ├── compare_rogue_wave_gust.Rd</span></span>
+<span id="cb15-77"><a href="#cb15-77" tabindex="-1"></a><span class="do">## │   ├── connect_duckdb.Rd</span></span>
+<span id="cb15-78"><a href="#cb15-78" tabindex="-1"></a><span class="do">## │   ├── convert_duckdb_to_parquet.Rd</span></span>
+<span id="cb15-79"><a href="#cb15-79" tabindex="-1"></a><span class="do">## │   ├── create_buoy_schema.Rd</span></span>
+<span id="cb15-80"><a href="#cb15-80" tabindex="-1"></a><span class="do">## │   ├── create_email_summary.Rd</span></span>
+<span id="cb15-81"><a href="#cb15-81" tabindex="-1"></a><span class="do">## │   ├── create_return_level_plot_data.Rd</span></span>
+<span id="cb15-82"><a href="#cb15-82" tabindex="-1"></a><span class="do">## │   ├── decompose_stl.Rd</span></span>
+<span id="cb15-83"><a href="#cb15-83" tabindex="-1"></a><span class="do">## │   ├── detect_anomalies.Rd</span></span>
+<span id="cb15-84"><a href="#cb15-84" tabindex="-1"></a><span class="do">## │   ├── detect_rogue_waves.Rd</span></span>
+<span id="cb15-85"><a href="#cb15-85" tabindex="-1"></a><span class="do">## │   ├── download_buoy_data.Rd</span></span>
+<span id="cb15-86"><a href="#cb15-86" tabindex="-1"></a><span class="do">## │   ├── evaluate_wave_model.Rd</span></span>
+<span id="cb15-87"><a href="#cb15-87" tabindex="-1"></a><span class="do">## │   ├── explain_hourly_averaging.Rd</span></span>
+<span id="cb15-88"><a href="#cb15-88" tabindex="-1"></a><span class="do">## │   ├── explain_hs_formula.Rd</span></span>
+<span id="cb15-89"><a href="#cb15-89" tabindex="-1"></a><span class="do">## │   ├── explain_measurement_period.Rd</span></span>
+<span id="cb15-90"><a href="#cb15-90" tabindex="-1"></a><span class="do">## │   ├── explain_wave_height_measurement.Rd</span></span>
+<span id="cb15-91"><a href="#cb15-91" tabindex="-1"></a><span class="do">## │   ├── extreme_values.Rd</span></span>
+<span id="cb15-92"><a href="#cb15-92" tabindex="-1"></a><span class="do">## │   ├── fit_gev_annual_maxima.Rd</span></span>
+<span id="cb15-93"><a href="#cb15-93" tabindex="-1"></a><span class="do">## │   ├── fit_gpd_threshold.Rd</span></span>
+<span id="cb15-94"><a href="#cb15-94" tabindex="-1"></a><span class="do">## │   ├── generate_and_send_summary.Rd</span></span>
+<span id="cb15-95"><a href="#cb15-95" tabindex="-1"></a><span class="do">## │   ├── generate_weekly_summary.Rd</span></span>
+<span id="cb15-96"><a href="#cb15-96" tabindex="-1"></a><span class="do">## │   ├── get_data_dictionary.Rd</span></span>
+<span id="cb15-97"><a href="#cb15-97" tabindex="-1"></a><span class="do">## │   ├── get_database_stats.Rd</span></span>
+<span id="cb15-98"><a href="#cb15-98" tabindex="-1"></a><span class="do">## │   ├── get_latest_timestamp.Rd</span></span>
+<span id="cb15-99"><a href="#cb15-99" tabindex="-1"></a><span class="do">## │   ├── get_stations.Rd</span></span>
+<span id="cb15-100"><a href="#cb15-100" tabindex="-1"></a><span class="do">## │   ├── get_variable_docs.Rd</span></span>
+<span id="cb15-101"><a href="#cb15-101" tabindex="-1"></a><span class="do">## │   ├── hs_from_rms.Rd</span></span>
+<span id="cb15-102"><a href="#cb15-102" tabindex="-1"></a><span class="do">## │   ├── incremental_update.Rd</span></span>
+<span id="cb15-103"><a href="#cb15-103" tabindex="-1"></a><span class="do">## │   ├── incremental_update_parquet.Rd</span></span>
+<span id="cb15-104"><a href="#cb15-104" tabindex="-1"></a><span class="do">## │   ├── init_parquet_storage.Rd</span></span>
+<span id="cb15-105"><a href="#cb15-105" tabindex="-1"></a><span class="do">## │   ├── initialize_database.Rd</span></span>
+<span id="cb15-106"><a href="#cb15-106" tabindex="-1"></a><span class="do">## │   ├── irishbuoys-package.Rd</span></span>
+<span id="cb15-107"><a href="#cb15-107" tabindex="-1"></a><span class="do">## │   ├── load_to_duckdb.Rd</span></span>
+<span id="cb15-108"><a href="#cb15-108" tabindex="-1"></a><span class="do">## │   ├── log_update.Rd</span></span>
+<span id="cb15-109"><a href="#cb15-109" tabindex="-1"></a><span class="do">## │   ├── predict_wave_height.Rd</span></span>
+<span id="cb15-110"><a href="#cb15-110" tabindex="-1"></a><span class="do">## │   ├── prepare_wave_features.Rd</span></span>
+<span id="cb15-111"><a href="#cb15-111" tabindex="-1"></a><span class="do">## │   ├── query_buoy_data.Rd</span></span>
+<span id="cb15-112"><a href="#cb15-112" tabindex="-1"></a><span class="do">## │   ├── query_parquet.Rd</span></span>
+<span id="cb15-113"><a href="#cb15-113" tabindex="-1"></a><span class="do">## │   ├── rogue_wave_report.Rd</span></span>
+<span id="cb15-114"><a href="#cb15-114" tabindex="-1"></a><span class="do">## │   ├── save_to_parquet.Rd</span></span>
+<span id="cb15-115"><a href="#cb15-115" tabindex="-1"></a><span class="do">## │   ├── train_wave_model.Rd</span></span>
+<span id="cb15-116"><a href="#cb15-116" tabindex="-1"></a><span class="do">## │   ├── trend_analysis.Rd</span></span>
+<span id="cb15-117"><a href="#cb15-117" tabindex="-1"></a><span class="do">## │   ├── trend_summary_report.Rd</span></span>
+<span id="cb15-118"><a href="#cb15-118" tabindex="-1"></a><span class="do">## │   ├── update_station_metadata.Rd</span></span>
+<span id="cb15-119"><a href="#cb15-119" tabindex="-1"></a><span class="do">## │   ├── wave_glossary.Rd</span></span>
+<span id="cb15-120"><a href="#cb15-120" tabindex="-1"></a><span class="do">## │   ├── wave_model.Rd</span></span>
+<span id="cb15-121"><a href="#cb15-121" tabindex="-1"></a><span class="do">## │   ├── wave_model_report.Rd</span></span>
+<span id="cb15-122"><a href="#cb15-122" tabindex="-1"></a><span class="do">## │   ├── wave_science.Rd</span></span>
+<span id="cb15-123"><a href="#cb15-123" tabindex="-1"></a><span class="do">## │   └── wave_science_documentation.Rd</span></span>
+<span id="cb15-124"><a href="#cb15-124" tabindex="-1"></a><span class="do">## ├── pkgdown</span></span>
+<span id="cb15-125"><a href="#cb15-125" tabindex="-1"></a><span class="do">## │   └── extra.css</span></span>
+<span id="cb15-126"><a href="#cb15-126" tabindex="-1"></a><span class="do">## ├── push_to_cachix.sh</span></span>
+<span id="cb15-127"><a href="#cb15-127" tabindex="-1"></a><span class="do">## ├── tests</span></span>
+<span id="cb15-128"><a href="#cb15-128" tabindex="-1"></a><span class="do">## │   ├── testthat</span></span>
+<span id="cb15-129"><a href="#cb15-129" tabindex="-1"></a><span class="do">## │   │   └── test-data-consistency.R</span></span>
+<span id="cb15-130"><a href="#cb15-130" tabindex="-1"></a><span class="do">## │   └── testthat.R</span></span>
+<span id="cb15-131"><a href="#cb15-131" tabindex="-1"></a><span class="do">## └── vignettes</span></span>
+<span id="cb15-132"><a href="#cb15-132" tabindex="-1"></a><span class="do">##     ├── _targets.yaml</span></span>
+<span id="cb15-133"><a href="#cb15-133" tabindex="-1"></a><span class="do">##     ├── custom.scss</span></span>
+<span id="cb15-134"><a href="#cb15-134" tabindex="-1"></a><span class="do">##     ├── dashboard_shinylive.qmd</span></span>
+<span id="cb15-135"><a href="#cb15-135" tabindex="-1"></a><span class="do">##     ├── dashboard_shinylive_files</span></span>
+<span id="cb15-136"><a href="#cb15-136" tabindex="-1"></a><span class="do">##     │   └── mediabag</span></span>
+<span id="cb15-137"><a href="#cb15-137" tabindex="-1"></a><span class="do">##     ├── dashboard_static.qmd</span></span>
+<span id="cb15-138"><a href="#cb15-138" tabindex="-1"></a><span class="do">##     ├── data</span></span>
+<span id="cb15-139"><a href="#cb15-139" tabindex="-1"></a><span class="do">##     │   ├── buoy_data.json</span></span>
+<span id="cb15-140"><a href="#cb15-140" tabindex="-1"></a><span class="do">##     │   ├── buoy_data.parquet</span></span>
+<span id="cb15-141"><a href="#cb15-141" tabindex="-1"></a><span class="do">##     │   ├── buoy_data_raw.csv</span></span>
+<span id="cb15-142"><a href="#cb15-142" tabindex="-1"></a><span class="do">##     │   └── stations.json</span></span>
+<span id="cb15-143"><a href="#cb15-143" tabindex="-1"></a><span class="do">##     ├── shinylive-sw.js</span></span>
+<span id="cb15-144"><a href="#cb15-144" tabindex="-1"></a><span class="do">##     ├── wave_analysis.qmd</span></span>
+<span id="cb15-145"><a href="#cb15-145" tabindex="-1"></a><span class="do">##     └── wave_analysis.qmd.bak</span></span></code></pre></div>
+<p><em>Note: <code>_targets/</code> (pipeline cache) and <code>docs/</code> (generated site) excluded for clarity.</em></p>
 </div>
 <div class="section level2">
 <h2 id="key-features">Key Features<a class="anchor" aria-label="anchor" href="#key-features"></a>

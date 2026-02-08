@@ -302,8 +302,10 @@ Data is sourced from the [Marine Institute's ERDDAP server](https://erddap.marin
 ```{r}
 #| echo: false
 #| eval: true
-fs::dir_tree(recurse = 2)
+fs::dir_tree(recurse = 2, regexp = "^(_targets|docs)$|^(_targets|docs)/", invert = TRUE)
 ```
+
+*Note: `_targets/` (pipeline cache) and `docs/` (generated site) excluded for clarity.*
 
 ## Key Features
 
