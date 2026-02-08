@@ -57,14 +57,23 @@ COPYRIGHT HOLDER: John Gavin
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. list(text = “Last updated”)</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
 
 
 
-
-
-  </body></html>
+  <script>
+// Add dynamic timestamp to footer
+document.addEventListener('DOMContentLoaded', function() {
+  var footer = document.querySelector('footer');
+  if (footer) {
+    var timestamp = document.createElement('p');
+    timestamp.className = 'text-muted';
+    timestamp.innerHTML = 'Site generated: ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+    footer.appendChild(timestamp);
+  }
+});
+</script></body></html>
 
