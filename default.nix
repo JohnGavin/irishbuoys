@@ -13,7 +13,9 @@
 # Apple Silicon computers.
 # Report any issues to https://github.com/ropensci/rix
 let
- pkgs = import (fetchTarball "https://github.com/rstats-on-nix/nixpkgs/archive/2026-02-02.tar.gz") {};
+ # 2026-01-22 is the last date without segfaults on macOS 26.2
+ # Issue: cli/rlang packages crash on dyn.load() after 2026-01-23
+ pkgs = import (fetchTarball "https://github.com/rstats-on-nix/nixpkgs/archive/2026-01-22.tar.gz") {};
  
   rpkgs = builtins.attrValues {
     inherit (pkgs.rPackages) 
