@@ -3,10 +3,7 @@ url: https://johngavin.github.io/irishbuoys/
 footer:
   structure:
     left: [developed_by]
-    right: [built_with, last_updated]
-  components:
-    last_updated:
-      text: "Last updated"
+    right: [built_with]
 
 template:
   bootstrap: 5
@@ -20,6 +17,19 @@ template:
       main { padding-top: 1rem; }
       .template-home main > .row:first-child { padding-top: 0.5rem; }
       </style>
+    after_body: |
+      <script>
+      // Add dynamic timestamp to footer
+      document.addEventListener('DOMContentLoaded', function() {
+        var footer = document.querySelector('footer');
+        if (footer) {
+          var timestamp = document.createElement('p');
+          timestamp.className = 'text-muted';
+          timestamp.innerHTML = 'Site generated: ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+          footer.appendChild(timestamp);
+        }
+      });
+      </script>
 
 navbar:
   structure:
