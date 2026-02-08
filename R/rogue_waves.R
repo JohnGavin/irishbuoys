@@ -185,13 +185,13 @@ analyze_rogue_statistics <- function(
   # Time distribution (hour of day)
   hourly <- DBI::dbGetQuery(con, glue::glue("
     SELECT
-      EXTRACT(HOUR FROM time) as hour,
+      CAST(strftime(time, '%H') AS INTEGER) as hour,
       COUNT(*) as rogue_count
     FROM buoy_data
     WHERE hmax > {threshold} * wave_height
       AND wave_height >= {min_wave_height}
       AND hmax IS NOT NULL
-    GROUP BY EXTRACT(HOUR FROM time)
+    GROUP BY strftime(time, '%H')
     ORDER BY hour
   "))
 

@@ -15,7 +15,7 @@ plan_quality_control <- list(
           station_id,
           DATE(time) as date,
           COUNT(*) as n_records,
-          COUNT(DISTINCT EXTRACT(HOUR FROM time)) as n_hours,
+          COUNT(DISTINCT CAST(strftime(time, '%H') AS INTEGER)) as n_hours,
           AVG(CASE WHEN qc_flag = 1 THEN 1 ELSE 0 END) as pct_good
         FROM buoy_data
         WHERE time >= CURRENT_DATE - INTERVAL '30 days'
