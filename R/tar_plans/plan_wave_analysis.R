@@ -8,6 +8,23 @@
 #'
 #' Uses crew for parallel execution where beneficial.
 
+#' Validate tibble has minimum expected rows
+#'
+#' @param data Data frame or tibble to validate
+#' @param target_name Name of the target for error messages
+#' @param min_rows Minimum expected rows (default: 1)
+#' @return The data unchanged if valid, otherwise aborts
+validate_tibble_rows <- function(data, target_name, min_rows = 1) {
+  if (!is.data.frame(data)) return(data)
+  if (nrow(data) < min_rows) {
+    cli::cli_abort(c(
+      "x" = "Target {target_name} returned {nrow(data)} rows",
+      "i" = "Expected at least {min_rows} rows"
+    ))
+  }
+  data
+}
+
 plan_wave_analysis <- list(
 
 
@@ -40,7 +57,7 @@ plan_wave_analysis <- list(
       data$time <- as.POSIXct(data$time, tz = "UTC")
 
       cli::cli_alert_success("Loaded {nrow(data)} QC-passed observations")
-      data
+      validate_tibble_rows(data, "analysis_data", min_rows = 100)
     }
   ),
 

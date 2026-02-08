@@ -155,7 +155,7 @@ station_info <- data.frame(
 
 ```{r}
 #| title: "Wave Height Time Series - All Stations (Full Dataset)"
-create_dygraph(buoy_daily, "wave_height", "Significant Wave Height (Hs) - Daily Means")
+create_dygraph(buoy_daily, "wave_height", "Signif Wave (m) - Daily Means")
 ```
 
 ## Row {height=25%}
@@ -168,12 +168,12 @@ create_dygraph(buoy_daily, "wave_height", "Significant Wave Height (Hs) - Daily 
 |--------|-------|--------|-------|
 | Total Records | `r format(nrow(buoy_data), big.mark=",")` | Wind-Wave Correlation | `r cor_wind_wave` |
 | Active Stations | `r length(stations)` | Wave-Hmax Correlation | `r cor_wave_hmax` |
-| Date Range | `r format(min(buoy_data$time), "%Y-%m-%d")` - `r format(max(buoy_data$time), "%Y-%m-%d")` | Max Wave Height | `r round(max(buoy_data$hmax, na.rm=TRUE), 1)` m |
+| Date Range | `r format(min(buoy_data$time), "%Y-%m-%d")` - `r format(max(buoy_data$time), "%Y-%m-%d")` | Max Wave | `r round(max(buoy_data$hmax, na.rm=TRUE), 1)` m |
 | Time Span | `r days_span` days | Max Wind Gust | `r round(max(buoy_data$gust, na.rm=TRUE), 1)` knots |
 
 *Dashboard generated `r generated_time` using irishbuoys v`r pkg_version`*
 
-# Wave Height
+# Max Wave (m)
 
 ## Row
 
@@ -182,37 +182,116 @@ create_dygraph(buoy_daily, "wave_height", "Significant Wave Height (Hs) - Daily 
 #### All Stations
 
 ```{r}
-create_dygraph(buoy_daily, "wave_height", "Wave Height - All Stations (Daily Means)")
+create_dygraph(buoy_daily, "hmax", "Max Wave (m) - All Stations (Daily Max)")
 ```
 
 #### M2
 
 ```{r}
-create_dygraph(get_station_data(buoy_daily, "M2"), "wave_height", "Wave Height - M2 (Daily)", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M2"), "hmax", "Max Wave - M2 (Daily)", by_station = FALSE)
 ```
 
 #### M3
 
 ```{r}
-create_dygraph(get_station_data(buoy_daily, "M3"), "wave_height", "Wave Height - M3 (Daily)", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M3"), "hmax", "Max Wave - M3 (Daily)", by_station = FALSE)
 ```
 
 #### M4
 
 ```{r}
-create_dygraph(get_station_data(buoy_daily, "M4"), "wave_height", "Wave Height - M4 (Daily)", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M4"), "hmax", "Max Wave - M4 (Daily)", by_station = FALSE)
 ```
 
 #### M5
 
 ```{r}
-create_dygraph(get_station_data(buoy_daily, "M5"), "wave_height", "Wave Height - M5 (Daily)", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M5"), "hmax", "Max Wave - M5 (Daily)", by_station = FALSE)
 ```
 
 #### M6
 
 ```{r}
-create_dygraph(get_station_data(buoy_daily, "M6"), "wave_height", "Wave Height - M6 (Daily)", by_station = FALSE)
+create_dygraph(get_station_data(buoy_daily, "M6"), "hmax", "Max Wave - M6 (Daily)", by_station = FALSE)
+```
+
+## Row {height=35%}
+
+### Column {.tabset}
+
+#### Statistics
+
+```{r}
+hmax_stats <- buoy_data |>
+  group_by(station_id) |>
+  summarise(
+    Records = n(),
+    `Max Wave (m)` = round(max(hmax, na.rm = TRUE), 2),
+    `Mean Max Wave (m)` = round(mean(hmax, na.rm = TRUE), 2),
+    `Max Signif (m)` = round(max(wave_height, na.rm = TRUE), 2),
+    `Avg Ratio` = round(mean(hmax / wave_height, na.rm = TRUE), 2),
+    .groups = "drop"
+  )
+create_dt(hmax_stats, paste0("Max Wave Statistics by Station (", date_caption, "). Max Wave: largest individual wave from 17.5-min measurement. Ratio > 2.0 indicates rogue wave. [See Reference](#reference)"))
+```
+
+#### Data Table
+
+```{r}
+hmax_data <- buoy_data |>
+  select(time, station_id, hmax, wave_height) |>
+  mutate(ratio = round(hmax / wave_height, 2)) |>
+  arrange(desc(hmax)) |>
+  head(5000) |>
+  mutate(
+    time = format(time, "%Y-%m-%d %H:%M"),
+    hmax = round(hmax, 2),
+    wave_height = round(wave_height, 2)
+  ) |>
+  rename(`Max Wave (m)` = hmax, `Signif (m)` = wave_height, `Ratio` = ratio)
+create_dt(hmax_data, paste0("Max Wave Data ordered by highest waves (most recent 5000 of ", format(nrow(buoy_data), big.mark=","), " records)"))
+```
+
+# Signif Wave (m)
+
+## Row
+
+### Column {.tabset}
+
+#### All Stations
+
+```{r}
+create_dygraph(buoy_daily, "wave_height", "Signif Wave (m) - All Stations (Daily Means)")
+```
+
+#### M2
+
+```{r}
+create_dygraph(get_station_data(buoy_daily, "M2"), "wave_height", "Signif Wave - M2 (Daily)", by_station = FALSE)
+```
+
+#### M3
+
+```{r}
+create_dygraph(get_station_data(buoy_daily, "M3"), "wave_height", "Signif Wave - M3 (Daily)", by_station = FALSE)
+```
+
+#### M4
+
+```{r}
+create_dygraph(get_station_data(buoy_daily, "M4"), "wave_height", "Signif Wave - M4 (Daily)", by_station = FALSE)
+```
+
+#### M5
+
+```{r}
+create_dygraph(get_station_data(buoy_daily, "M5"), "wave_height", "Signif Wave - M5 (Daily)", by_station = FALSE)
+```
+
+#### M6
+
+```{r}
+create_dygraph(get_station_data(buoy_daily, "M6"), "wave_height", "Signif Wave - M6 (Daily)", by_station = FALSE)
 ```
 
 ## Row {height=35%}
@@ -226,12 +305,12 @@ wave_stats <- buoy_data |>
   group_by(station_id) |>
   summarise(
     Records = n(),
-    `Mean Hs (m)` = round(mean(wave_height, na.rm = TRUE), 2),
-    `Max Hs (m)` = round(max(wave_height, na.rm = TRUE), 2),
-    `Max Hmax (m)` = round(max(hmax, na.rm = TRUE), 2),
+    `Max Wave (m)` = round(max(hmax, na.rm = TRUE), 2),
+    `Max Signif (m)` = round(max(wave_height, na.rm = TRUE), 2),
+    `Avg Signif (m)` = round(mean(wave_height, na.rm = TRUE), 2),
     .groups = "drop"
   )
-create_dt(wave_stats, "Wave Statistics by Station")
+create_dt(wave_stats, "Wave Statistics by Station. Max Wave: largest individual wave from 17.5-min measurement. Signif Wave: mean of top 1/3 of waves. [See Reference](#reference)")
 ```
 
 #### Data Table
@@ -334,6 +413,7 @@ create_dt(wind_data, paste0("Wind Data (most recent 5000 of ", format(nrow(buoy_
 ### Column {width=100%}
 
 ```{r}
+#| fig-height: 18
 # Compute regression slopes to order panels
 reg_stats <- buoy_data |>
   filter(!is.na(wind_speed), !is.na(wave_height)) |>
@@ -369,13 +449,13 @@ plot_data <- scatter_sample |>
 p <- ggplot(plot_data, aes(x = wind_speed, y = wave_height)) +
   geom_point(aes(
     text = paste0("Station: ", station_id, "<br>",
-                  "Wind: ", round(wind_speed, 1), " m/s<br>",
-                  "Wave Ht: ", round(wave_height, 2), " m<br>",
+                  "Wind: ", round(wind_speed, 1), " knots<br>",
+                  "Signif Wave: ", round(wave_height, 2), " m<br>",
                   "Time: ", format(time, "%Y-%m-%d %H:%M"))
   ), color = "#1f77b4", alpha = 0.5, size = 1.5) +
   geom_smooth(method = "lm", se = TRUE, color = "red", linewidth = 1) +
   facet_wrap(~station_label, ncol = 2) +
-  labs(x = "Wind Speed (m/s)", y = "Wave Height (m)") +
+  labs(x = "Wind Speed (knots)", y = "Signif Wave (m)") +
   theme_minimal(base_size = 11) +
   theme(
     strip.text = element_text(face = "bold", size = 11),
@@ -386,7 +466,7 @@ p <- ggplot(plot_data, aes(x = wind_speed, y = wave_height)) +
 
 ggplotly(p, tooltip = "text") |>
   layout(
-    title = paste0("Wind Speed vs Wave Height - ordered by slope (", date_caption, ")"),
+    title = paste0("Wind Speed vs Signif Wave - ordered by slope (", date_caption, ")"),
     hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
   )
 ```
@@ -431,15 +511,15 @@ recent_data <- buoy_data |>
   mutate(
     `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
     Station = station_id,
-    `Hs (m)` = round(wave_height, 2),
-    `Hmax (m)` = round(hmax, 2),
+    `Max Wave (m)` = round(hmax, 2),
+    `Signif (m)` = round(wave_height, 2),
     `Wind (kn)` = round(wind_speed, 1),
     `Gust (kn)` = round(gust, 1),
     `Air (C)` = round(air_temperature, 1),
     `Sea (C)` = round(sea_temperature, 1),
     `hPa` = round(atmospheric_pressure, 1)
   ) |>
-  select(`Time (UTC)`, Station, `Hs (m)`, `Hmax (m)`, `Wind (kn)`, `Gust (kn)`, `Air (C)`, `Sea (C)`, `hPa`)
+  select(`Time (UTC)`, Station, `Max Wave (m)`, `Signif (m)`, `Wind (kn)`, `Gust (kn)`, `Air (C)`, `Sea (C)`, `hPa`)
 
 datatable(
   recent_data,
@@ -463,22 +543,72 @@ datatable(
 
 ## Row
 
-### Column
+### Column {.tabset}
 
-#### Variable Definitions
+#### Column Names
 
-| Variable | Units | Description |
-|----------|-------|-------------|
-| **wave_height (Hs)** | m | [Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height) (Hs): the average height of the highest one-third of waves, equivalent to 4x the [RMS](https://en.wikipedia.org/wiki/Root_mean_square) of sea surface elevation over a [17.5-min measurement period](https://www.ocean-sci.net/15/789/2019/). This is NOT the height of any single wave - it is a statistical measure that represents the "characteristic" wave height as perceived by an observer. Hs is lower than the maximum wave height (Hmax) because it averages over many waves. |
-| hmax | m | Maximum individual wave height recorded in the measurement period. Typically Hmax/Hs ranges from 1.5 to 1.9; values above 2.0 indicate a [rogue wave](https://en.wikipedia.org/wiki/Rogue_wave). |
-| wave_period | s | Average wave period via [zero-crossing analysis](https://en.wikipedia.org/wiki/Wave_period) |
-| wind_speed | m/s | 10-minute average wind speed |
-| gust | m/s | Maximum [3-second wind gust](https://glossary.ametsoc.org/wiki/Gust) during the hour |
-| atmospheric_pressure | hPa | [Barometric pressure](https://en.wikipedia.org/wiki/Atmospheric_pressure) (970-1030 typical) |
-| air_temperature | C | Air temperature at buoy (~3m above sea) |
-| sea_temperature | C | [Sea surface temperature](https://en.wikipedia.org/wiki/Sea_surface_temperature) (SST) |
+| Column Variable | Display Name | Units | Definition |
+|-----------------|--------------|-------|------------|
+| `hmax` | **Max Wave** | m | Largest individual wave during each 17.5-min measurement (hourly) |
+| `wave_height` | **Signif Wave** | m | Mean of highest 1/3 of waves during each 17.5-min measurement (hourly) |
+| `wind_speed` | Wind Speed | knots | 10-minute average wind speed |
+| `gust` | Wind Gust | knots | Maximum 3-second gust during the hour |
+| `wave_period` | Wave Period | s | Average wave period via zero-crossing analysis |
+| `atmospheric_pressure` | Pressure | hPa | Barometric pressure |
+| `air_temperature` | Air Temp | C | Air temperature at buoy (~3m above sea) |
+| `sea_temperature` | Sea Temp | C | Sea surface temperature |
 
-**Why "Significant Wave Height" in the Overview?** The Overview shows Hs (significant wave height) rather than individual wave heights because Hs is the internationally standard measure used for sea state description, forecasting, and ship design. It captures the overall energy of the sea state and matches what a trained observer would estimate visually.
+#### Aggregated Stats
+
+| Statistic | Display Name | Definition |
+|-----------|--------------|------------|
+| Max of hourly `hmax` | Max Wave (m) | Largest individual wave recorded from dataset start to end |
+| Max of hourly `wave_height` | Max Signif (m) | Highest hourly Signif Wave value over dataset period |
+| Mean of hourly `wave_height` | Avg Signif (m) | Mean of hourly Signif Wave values over dataset period |
+
+**Note:** Max Wave column appears FIRST in all tables, followed by Signif Wave columns.
+
+#### Ratios
+
+| Ratio | Typical Range | Interpretation |
+|-------|---------------|----------------|
+| Max Wave / Signif Wave | 1.5 - 1.9 | Normal sea state |
+| Max Wave / Signif Wave | > 2.0 | Potential rogue wave conditions |
+
+This ratio interpretation also appears in captions for plots/tables showing these columns.
+
+#### Measurement Window
+
+Each buoy samples the sea surface every hour. At the top of each hour, a **17.5-minute measurement period** begins. During this window, the buoy measures approximately 300 individual wave heights (crest to preceding trough).
+
+**Important:** The buoy does NOT measure continuously. Only the 17.5-min window is sampled; waves occurring in the remaining 42.5 minutes of each hour are not recorded.
+
+From this 17.5-min sample:
+
+1. Waves are sorted by height, tallest first
+2. **Signif Wave**: Mean of the highest 1/3 (~100 waves) = "mean of top 1/3"
+3. **Max Wave**: The single tallest wave
+
+Both Signif Wave and Max Wave come from the SAME 17.5-min window.
+
+#### Wind Measurement
+
+| Measurement | Window | Frequency | What it Represents |
+|-------------|--------|-----------|-------------------|
+| Wind Speed | 10 min | Hourly | Average wind during 10-min window |
+| Wind Gust | 3 sec | Hourly | Peak 3-second gust in the hour |
+
+#### Glossary
+
+**Technical Terms (for reference only):**
+
+| Term | Equivalent | Notes |
+|------|------------|-------|
+| Hs, H1/3, Significant Wave Height | Signif Wave | All mean the same thing |
+| Hmax, Maximum Wave Height | Max Wave | Largest individual wave |
+| 4σ | Signif Wave | Statistical definition: 4 × standard deviation of sea surface |
+
+These technical terms appear in scientific literature. This dashboard uses "Signif Wave" and "Max Wave" consistently.
 
 ## Row
 

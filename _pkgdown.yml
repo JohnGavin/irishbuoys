@@ -1,5 +1,13 @@
 url: https://johngavin.github.io/irishbuoys/
 
+footer:
+  structure:
+    left: [developed_by]
+    right: [built_with, last_updated]
+  components:
+    last_updated:
+      text: "Last updated"
+
 template:
   bootstrap: 5
   bslib:

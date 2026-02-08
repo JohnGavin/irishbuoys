@@ -16,5 +16,6 @@ Invisible NULL
 }
 \description{
 Updates the station metadata table with latest observation times.
+Uses dplyr for the SELECT query, DBI for the INSERT.
 }
 \keyword{internal}
