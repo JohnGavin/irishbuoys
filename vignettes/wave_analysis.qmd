@@ -365,6 +365,86 @@ The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org
 - WMO recommends 20-30 minutes; 17.5 is the practical lower bound
 - Trade-off: longer = better statistics, shorter = more temporal resolution
 
+# How Signif Wave is Calculated
+
+## Row
+
+### Column {width=60%}
+
+#### Step-by-Step Example
+
+This worked example shows exactly how **Signif Wave** (significant wave height) is calculated from raw buoy measurements during one 17.5-minute sampling window.
+
+```{r worked-example}
+#| echo: false
+# Load pre-computed example from targets
+targets::tar_load(worked_signif_wave_example)
+
+if (!is.null(worked_signif_wave_example)) {
+  example <- worked_signif_wave_example
+
+  cat("**Step 1: Buoy records individual waves during 17.5-min window**\n\n")
+  cat("Approximately 100-300 waves are measured (we show 100 here).\n\n")
+
+  # Show first and last 5 rows
+  waves_display <- rbind(
+    head(example$waves_table, 5),
+    tibble::tibble(wave_number = NA, wave_height_m = NA, in_top_third = NA),
+    tail(example$waves_table, 5)
+  )
+
+  knitr::kable(waves_display,
+    caption = "First and last 5 waves (sorted by height, tallest first)",
+    col.names = c("Rank", "Wave Height (m)", "In Top 1/3?")
+  )
+}
+```
+
+### Column {width=40%}
+
+#### Calculation
+
+```{r worked-calc}
+#| echo: false
+if (!is.null(worked_signif_wave_example)) {
+  example <- worked_signif_wave_example
+
+  cat("**Step 2: Identify the highest 1/3 of waves**\n\n")
+  cat(paste0("Total waves: 100\n"))
+  cat(paste0("Top 1/3 count: ", example$n_top_third, " waves\n\n"))
+
+  cat("**Step 3: Calculate Signif Wave = mean of top 1/3**\n\n")
+  cat(paste0("Signif Wave = mean(top 34 waves) = **", example$signif_wave, " m**\n\n"))
+
+  cat("**Step 4: Max Wave = tallest single wave**\n\n")
+  cat(paste0("Max Wave = **", example$max_wave, " m**\n\n"))
+
+  cat("**Step 5: Calculate Ratio**\n\n")
+  cat(paste0("Ratio = Max Wave / Signif Wave = ", example$max_wave, " / ", example$signif_wave, " = **", example$ratio, "**\n\n"))
+
+  if (example$ratio > 2.0) {
+    cat("::: {.callout-warning}\n")
+    cat("**Rogue Wave Detected!** Ratio > 2.0\n")
+    cat(":::\n")
+  } else {
+    cat("::: {.callout-note}\n")
+    cat("**Normal Sea State.** Ratio in typical range (1.5-1.9)\n")
+    cat(":::\n")
+  }
+}
+```
+
+## Row {height=20%}
+
+### Column
+
+```{r worked-caption}
+#| echo: false
+if (!is.null(worked_signif_wave_example)) {
+  cat(worked_signif_wave_example$caption)
+}
+```
+
 # Trends
 
 ## Row

@@ -438,9 +438,9 @@ convert_duckdb_to_parquet <- function(
   )
 
   # Report compression
+
   cli::cli_alert_success(
-    "Conversion complete: {round(db_size_mb, 2)} MB → {round(parquet_size, 2)} MB (
-    {round(100 * (1 - parquet_size/db_size_mb), 1)}% reduction)"
+    "Conversion complete: {round(db_size_mb, 2)} MB -> {round(parquet_size, 2)} MB ({round(100 * (1 - parquet_size/db_size_mb), 1)}% reduction)"
   )
 
   return(invisible(list(

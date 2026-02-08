@@ -8,7 +8,7 @@ initialize_database(
   db_path = "inst/extdata/irish_buoys.duckdb",
   start_date = Sys.Date() - 365,
   end_date = Sys.Date(),
-  chunk_days = 30
+  chunk_days = 365
 )
 }
 \arguments{

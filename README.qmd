@@ -168,31 +168,36 @@ CI workflows automatically use both caches:
 library(irishbuoys)
 
 # Download last 7 days of data
-data <- download_buoy_data(
+str(data <- download_buoy_data(
   start_date = Sys.Date() - 7,
   end_date = Sys.Date()
-)
+))
 
 # Get data for specific station
-m3_data <- download_buoy_data(
+dim(m3_data <- download_buoy_data(
   stations = "M3",
   start_date = "2024-01-01"
-)
+))
 
-# Get only wave measurements
-waves <- download_buoy_data(
-  variables = c("time", "station_id", "WaveHeight", "WavePeriod", "Hmax")
-)
+# Get earliest available data (buoy network started 2001-02-05)
+str(waves <- download_buoy_data(
+  start_date = "2001-02-05",
+  end_date = "2001-02-06"
+))
 ```
 
 ### Initialize and Query Database
 
 ```r
-# Initialize database with historical data
+# Initialize database with historical data (chunk_days=365 for faster downloads)
 initialize_database(
   start_date = "2023-01-01",
-  end_date = Sys.Date()
+  end_date = Sys.Date(),
+  chunk_days = 365
 )
+
+# Check database statistics immediately after initialization
+stats <- get_database_stats()
 
 # Connect to database
 con <- connect_duckdb()
@@ -260,21 +265,17 @@ DBI::dbDisconnect(con)
 # Perform incremental update (for scheduled jobs)
 result <- incremental_update()
 print(result$summary)
-
-# Check database statistics
-stats <- get_database_stats()
 ```
 
 ### Data Dictionary
 
 ```r
-# Get complete data dictionary
+# Get complete data dictionary (returns tibble)
 dict <- get_data_dictionary()
-View(dict)
+print(dict)
 
 # Get detailed documentation for specific variable
-wave_docs <- get_variable_docs("WaveHeight")
-print(wave_docs)
+(wave_docs <- get_variable_docs("WaveHeight"))
 ```
 
 ## Data Source
@@ -339,3 +340,11 @@ Data provided by the Marine Institute Ireland in collaboration with Met Éireann
 
 - [Marine Institute ERDDAP Server](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html)
 - [Irish Weather Buoy Network on data.gov.ie](https://data.gov.ie/dataset/weather-buoy-network)
+
+---
+
+```{r}
+#| echo: false
+#| eval: true
+cat("*Last updated:", format(Sys.time(), "%Y-%m-%d %H:%M UTC"), "*")
+```

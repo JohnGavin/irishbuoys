@@ -20,7 +20,7 @@
 #' dict <- get_data_dictionary()
 #' print(dict)
 get_data_dictionary <- function() {
-  data.frame(
+  tibble::tibble(
     variable = c(
       # Dimension Variables
       "station_id",
@@ -148,7 +148,6 @@ get_data_dictionary <- function() {
       # QC
       "0, 1, 9"
     ),
-    stringsAsFactors = FALSE
   )
 }
 

@@ -46,5 +46,6 @@ list(
   plan_quality_control,
   plan_wave_analysis,
   plan_dashboard,
-  plan_doc_examples
+  plan_doc_examples,
+  plan_dashboard_captions
 )

@@ -39,6 +39,7 @@ Detect Rogue Waves in Buoy Data
 
 Identifies rogue wave events based on the ratio of maximum wave height
 (Hmax) to significant wave height (WaveHeight).
+Uses dplyr verbs translated to SQL for efficient DuckDB execution.
 }
 \examples{
 \dontrun{

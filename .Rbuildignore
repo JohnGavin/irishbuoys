@@ -24,3 +24,12 @@
 ^LICENSE\.md$
 ^pkgdown$
 ^plans$
+^_pkgdown\.yml$
+^push_to_cachix\.sh$
+^vignettes/\.quarto$
+^vignettes/_targets\.yaml$
+^vignettes/custom\.scss$
+^vignettes/shinylive-sw\.js$
+^vignettes/dashboard_shinylive\.qmd$
+^vignettes/dashboard_static\.qmd$
+^vignettes/wave_analysis\.qmd$

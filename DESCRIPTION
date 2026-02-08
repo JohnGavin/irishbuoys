@@ -19,11 +19,12 @@ Imports:
     DBI,
     dplyr,
     duckdb,
-    duckplyr,
     glue,
     httr2,
     jsonlite,
     lubridate,
+    rlang,
+    tibble,
     utils
 Suggests:
     blastula,

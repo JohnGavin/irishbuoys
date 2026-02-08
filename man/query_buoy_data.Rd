@@ -27,13 +27,14 @@ query_buoy_data(
 
 \item{qc_filter}{Logical, filter for good quality data only (default: TRUE)}
 
-\item{sql_query}{Optional custom SQL query}
+\item{sql_query}{Optional custom SQL query (bypasses dplyr)}
 }
 \value{
 Data frame with query results
 }
 \description{
 Flexible querying of buoy data with various filtering options.
+Uses dplyr verbs translated to SQL for efficient DuckDB execution.
 }
 \examples{
 \dontrun{

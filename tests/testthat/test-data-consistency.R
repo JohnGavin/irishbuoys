@@ -38,7 +38,7 @@ test_that("earliest dates snapshot - historical data preserved", {
   skip_if(is.null(data_path), "Data file not found")
 
   data <- jsonlite::fromJSON(data_path)
-  data$time <- as.POSIXct(data$time, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+  data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
 
   # Get earliest date per station
   earliest_dates <- tapply(data$time, data$station_id, min, na.rm = TRUE)
@@ -91,7 +91,7 @@ test_that("data date range - should span multiple years", {
   skip_if(is.null(data_path), "Data file not found")
 
   data <- jsonlite::fromJSON(data_path)
-  data$time <- as.POSIXct(data$time, format = "%Y-%m-%d %H:%M:%S", tz = "UTC")
+  data$time <- as.POSIXct(data$time, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
 
   date_range <- range(data$time, na.rm = TRUE)
   days_span <- as.numeric(difftime(date_range[2], date_range[1], units = "days"))

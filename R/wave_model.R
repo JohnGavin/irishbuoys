@@ -192,7 +192,7 @@ train_wave_model <- function(
  importance <- importance[order(-importance$importance), ]
 
  cli::cli_alert_success(
-   "Model trained: R² = {round(model$r.squared, 3)}, OOB error = {round(sqrt(model$prediction.error), 2)}m"
+   "Model trained: R^2 = {round(model$r.squared, 3)}, OOB error = {round(sqrt(model$prediction.error), 2)}m"
  )
 
  return(list(
@@ -254,7 +254,7 @@ evaluate_wave_model <- function(model_result, data, target = "wave_height") {
    stringsAsFactors = FALSE
  )
 
- cli::cli_alert_success("Test RMSE: {round(rmse, 3)}m, R²: {round(r_squared, 3)}")
+ cli::cli_alert_success("Test RMSE: {round(rmse, 3)}m, R^2: {round(r_squared, 3)}")
 
  return(list(
    overall = data.frame(
@@ -314,11 +314,11 @@ wave_model_report <- function(model_result, eval_result) {
    "=== Wave Height Prediction Model Report ===\n\n",
    "MODEL PERFORMANCE\n",
    "----------------\n",
-   sprintf("Training R²: %.3f\n", model_result$train_r_squared),
+   sprintf("Training R^2: %.3f\n", model_result$train_r_squared),
    sprintf("OOB RMSE: %.3f m\n", model_result$oob_rmse),
    sprintf("Test RMSE: %.3f m\n", eval_result$overall$value[1]),
    sprintf("Test MAE: %.3f m\n", eval_result$overall$value[2]),
-   sprintf("Test R²: %.3f\n", eval_result$overall$value[3]),
+   sprintf("Test R^2: %.3f\n", eval_result$overall$value[3]),
    sprintf("Test samples: %d\n\n", eval_result$overall$value[5]),
    "TOP PREDICTORS\n",
    "--------------\n"
