@@ -76,7 +76,7 @@ generate_weekly_summary <- function(
       AVG(air_temperature) as hist_avg_air_temp,
       AVG(sea_temperature) as hist_avg_sea_temp
     FROM buoy_data
-    WHERE EXTRACT(WEEK FROM time) = EXTRACT(WEEK FROM TIMESTAMP '{current_date}')
+    WHERE strftime(time, '%W') = strftime(TIMESTAMP '{current_date}', '%W')
       AND time < '{start_date}'
       {qc_clause}
     GROUP BY station_id
