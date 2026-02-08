@@ -57,6 +57,7 @@ reference:
   - title: "Database Management"
     desc: "Functions for DuckDB and Parquet storage"
     contents:
+      - buoy_tbl
       - connect_duckdb
       - create_buoy_schema
       - load_to_duckdb
@@ -70,6 +71,7 @@ reference:
       - incremental_update_parquet
       - initialize_database
       - convert_duckdb_to_parquet
+      - update_station_metadata
 
   - title: "Wave Analysis"
     desc: "Functions for wave science and rogue wave detection"
@@ -117,6 +119,28 @@ reference:
       - evaluate_wave_model
       - predict_wave_height
       - wave_model_report
+
+  - title: "Visualization"
+    desc: "Functions for creating interactive plots"
+    contents:
+      - plot_functions
+      - irishbuoys_layout
+      - irishbuoys_ggplotly
+      - create_plot_rogue_all
+      - create_plot_rogue_by_station
+      - create_plot_wind_beaufort
+      - create_plot_week_of_year
+      - create_plot_time_of_day
+      - create_plot_monthly_wave
+      - create_plot_monthly_wind
+      - create_plot_annual_trends
+      - create_plot_return_levels
+      - create_plot_gust_by_category
+      - create_plot_rogue_gusts
+      - create_plot_stl
+      - create_plot_rogue_gusts_all
+      - create_plot_rogue_gusts_by_station
+      - create_plot_gusts_vs_waves
 
   - title: "Email Reporting"
     desc: "Functions for generating and sending email summaries"

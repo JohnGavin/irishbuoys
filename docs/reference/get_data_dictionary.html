@@ -75,75 +75,20 @@ the variable name, units, data type, description, and typical range.</p>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">dict</span> <span class="op">&lt;-</span> <span class="fu">get_data_dictionary</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">dict</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               variable       category                    units data_type</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1           station_id      dimension                     &lt;NA&gt; character</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2             CallSign      dimension                     &lt;NA&gt; character</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3            longitude      dimension             degrees_east   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4             latitude      dimension            degrees_north   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 time      dimension seconds since 1970-01-01   POSIXct</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6  AtmosphericPressure meteorological                millibars   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7       AirTemperature meteorological                degrees_C   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8             DewPoint meteorological                degrees_C   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9        WindDirection meteorological             degrees_true   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10           WindSpeed meteorological                    knots   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11                Gust meteorological                    knots   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12    RelativeHumidity meteorological                  percent   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13      SeaTemperature  oceanographic                degrees_C   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14            salinity  oceanographic                      PSU   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15          WaveHeight  oceanographic                   meters   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16          WavePeriod  oceanographic                  seconds   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17   MeanWaveDirection  oceanographic             degrees_true   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18                Hmax  oceanographic                   meters   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19                  Tp  oceanographic                  seconds   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20                ThTp  oceanographic             degrees_true   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21               SprTp  oceanographic                  degrees   numeric</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22             QC_Flag        quality                     &lt;NA&gt;   integer</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                                            description</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1         Unique identifier for each weather buoy station (M1-M6, FS1)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                           International radio call sign for the buoy</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3                     Geographic longitude coordinate of buoy position</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4                      Geographic latitude coordinate of buoy position</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                                       Timestamp of measurement (UTC)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                                    Atmospheric pressure at sea level</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7                Air temperature measured 3-4 meters above sea surface</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8   Dew point temperature - temperature at which air becomes saturated</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9          Direction from which wind is blowing relative to True North</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10                            Average wind speed over 10-minute period</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11                    Maximum wind speed measured over 3-second period</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12                                 Relative humidity of the atmosphere</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13                                             Sea surface temperature</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14                          Practical salinity of seawater (PSU scale)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15  Significant wave height (Hs) - mean height of highest 1/3 of waves</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16                 Mean wave period - average time between wave crests</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17                          Mean direction from which waves are coming</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18                             Maximum individual wave height observed</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19              Peak wave period - period of waves with maximum energy</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20                Direction of waves at spectral peak (maximum energy)</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Directional spreading at spectral peak - wave direction variability</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22                Data quality indicator: 0=unknown, 1=good, 9=missing</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  typical_range</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1  M1, M2, M3, M4, M5, M6, FS1</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2                      Various</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3              -15.88 to -5.43</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4               51.22 to 55.00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5                 2002-present</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6                     970-1030</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7                    -10 to 30</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8                    -15 to 25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9                        0-360</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10                        0-60</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11                        0-80</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12                       0-100</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13                        0-25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14                       30-36</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15                        0-15</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16                        0-20</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17                       0-360</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18                        0-30</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19                        0-25</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20                       0-360</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 21                       0-180</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 22                     0, 1, 9</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 22 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    variable            category       units  data_type description typical_range</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span> station_id          dimension      <span style="color: #BB0000;">NA</span>     character Unique ide… M1, M2, M3, …</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span> CallSign            dimension      <span style="color: #BB0000;">NA</span>     character Internatio… Various      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span> longitude           dimension      degre… numeric   Geographic… -15.88 to -5…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span> latitude            dimension      degre… numeric   Geographic… 51.22 to 55.…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span> time                dimension      secon… POSIXct   Timestamp … 2002-present </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span> AtmosphericPressure meteorological milli… numeric   Atmospheri… 970-1030     </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span> AirTemperature      meteorological degre… numeric   Air temper… -10 to 30    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span> DewPoint            meteorological degre… numeric   Dew point … -15 to 25    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span> WindDirection       meteorological degre… numeric   Direction … 0-360        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span> WindSpeed           meteorological knots  numeric   Average wi… 0-60         </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 12 more rows</span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
@@ -155,7 +100,7 @@ the variable name, units, data type, description, and typical range.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. list(text = “Last updated”)</p>
 </div>
 
     </footer></div>
