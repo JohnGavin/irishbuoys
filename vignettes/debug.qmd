@@ -13,13 +13,8 @@ execute:
 ```{r setup}
 #| include: false
 
-# Load package
-if (requireNamespace("pkgload", quietly = TRUE) && file.exists("../DESCRIPTION")) {
-  pkgload::load_all("..", quiet = TRUE)
-} else {
-  library(irishbuoys)
-}
-
+# Debug page only needs targets data, not full package
+# Avoid pkgload::load_all() which can cause segfaults in some environments
 library(dplyr)
 library(targets)
 
