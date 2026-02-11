@@ -42,6 +42,7 @@ Suggests:
     mirai,
     nanoparquet,
     plotly,
+    pointblank,
     quantreg,
     quarto,
     ranger,

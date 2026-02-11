@@ -8,22 +8,10 @@
 #'
 #' Uses crew for parallel execution where beneficial.
 
-#' Validate tibble has minimum expected rows
-#'
-#' @param data Data frame or tibble to validate
-#' @param target_name Name of the target for error messages
-#' @param min_rows Minimum expected rows (default: 1)
-#' @return The data unchanged if valid, otherwise aborts
-validate_tibble_rows <- function(data, target_name, min_rows = 1) {
-  if (!is.data.frame(data)) return(data)
-  if (nrow(data) < min_rows) {
-    cli::cli_abort(c(
-      "x" = "Target {target_name} returned {nrow(data)} rows",
-      "i" = "Expected at least {min_rows} rows"
-    ))
-  }
-  data
-}
+# Note: Validation functions are now in R/validation.R using pointblank
+# - validate_buoy_data(): Comprehensive validation for buoy data
+# - validate_rogue_events(): Validation for rogue wave detection results
+# - validate_tibble_rows_basic(): Simple fallback validation
 
 plan_wave_analysis <- list(
 
@@ -57,7 +45,8 @@ plan_wave_analysis <- list(
       data$time <- as.POSIXct(data$time, tz = "UTC")
 
       cli::cli_alert_success("Loaded {nrow(data)} QC-passed observations")
-      validate_tibble_rows(data, "analysis_data", min_rows = 100)
+      # Validate with pointblank (falls back to basic validation if not installed)
+      validate_buoy_data(data, "analysis_data", min_rows = 100)
     }
   ),
 
@@ -117,7 +106,9 @@ plan_wave_analysis <- list(
       con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      detect_rogue_waves(con, threshold = 2.0, min_wave_height = 2.0)
+      events <- detect_rogue_waves(con, threshold = 2.0, min_wave_height = 2.0)
+      # Validate rogue wave events with pointblank
+      validate_rogue_events(events, "rogue_wave_events", min_rows = 1)
     }
   ),
 
