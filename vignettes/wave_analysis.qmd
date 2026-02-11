@@ -1,5 +1,5 @@
 ---
-title: "Wave Analysis Dashboard"
+title: "Irish Buoys Wave Analysis (2019-2026)"
 format:
   dashboard:
     orientation: rows
@@ -238,6 +238,8 @@ if (!is.null(missing_data_grid)) {
 
 # Rogue Waves
 
+**Rogue Wave Definition:** Max Wave / Signif Wave > 2.0. See [Reference](#reference) for definitions.
+
 ## Row
 
 ### Column {.tabset}
@@ -249,7 +251,122 @@ if (!is.null(missing_data_grid)) {
 create_plot_rogue_all(rogue_events)
 ```
 
-#### Events by Station
+#### M2
+
+```{r rogue-waves-m2}
+if (has_data && "M2" %in% rogue_events$station_id) {
+  m2_events <- rogue_events |> filter(station_id == "M2")
+  if (nrow(m2_events) > 0) {
+    plot_ly(m2_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
+            marker = list(size = 8, color = "#d62728"),
+            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
+                          "<br>Ratio: ", round(rogue_ratio, 2),
+                          "<br>Max Wave: ", round(hmax, 1), "m",
+                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
+      layout(title = paste0("M2 Rogue Events (n=", nrow(m2_events), ")"),
+             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
+             hovermode = "closest")
+  } else {
+    plotly_empty() |> layout(title = "M2: No rogue events")
+  }
+} else {
+  plotly_empty() |> layout(title = "M2: No data")
+}
+```
+
+#### M3
+
+```{r rogue-waves-m3}
+if (has_data && "M3" %in% rogue_events$station_id) {
+  m3_events <- rogue_events |> filter(station_id == "M3")
+  if (nrow(m3_events) > 0) {
+    plot_ly(m3_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
+            marker = list(size = 8, color = "#1f77b4"),
+            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
+                          "<br>Ratio: ", round(rogue_ratio, 2),
+                          "<br>Max Wave: ", round(hmax, 1), "m",
+                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
+      layout(title = paste0("M3 Rogue Events (n=", nrow(m3_events), ")"),
+             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
+             hovermode = "closest")
+  } else {
+    plotly_empty() |> layout(title = "M3: No rogue events")
+  }
+} else {
+  plotly_empty() |> layout(title = "M3: No data")
+}
+```
+
+#### M4
+
+```{r rogue-waves-m4}
+if (has_data && "M4" %in% rogue_events$station_id) {
+  m4_events <- rogue_events |> filter(station_id == "M4")
+  if (nrow(m4_events) > 0) {
+    plot_ly(m4_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
+            marker = list(size = 8, color = "#2ca02c"),
+            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
+                          "<br>Ratio: ", round(rogue_ratio, 2),
+                          "<br>Max Wave: ", round(hmax, 1), "m",
+                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
+      layout(title = paste0("M4 Rogue Events (n=", nrow(m4_events), ")"),
+             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
+             hovermode = "closest")
+  } else {
+    plotly_empty() |> layout(title = "M4: No rogue events")
+  }
+} else {
+  plotly_empty() |> layout(title = "M4: No data")
+}
+```
+
+#### M5
+
+```{r rogue-waves-m5}
+if (has_data && "M5" %in% rogue_events$station_id) {
+  m5_events <- rogue_events |> filter(station_id == "M5")
+  if (nrow(m5_events) > 0) {
+    plot_ly(m5_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
+            marker = list(size = 8, color = "#ff7f0e"),
+            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
+                          "<br>Ratio: ", round(rogue_ratio, 2),
+                          "<br>Max Wave: ", round(hmax, 1), "m",
+                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
+      layout(title = paste0("M5 Rogue Events (n=", nrow(m5_events), ")"),
+             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
+             hovermode = "closest")
+  } else {
+    plotly_empty() |> layout(title = "M5: No rogue events")
+  }
+} else {
+  plotly_empty() |> layout(title = "M5: No data")
+}
+```
+
+#### M6
+
+```{r rogue-waves-m6}
+if (has_data && "M6" %in% rogue_events$station_id) {
+  m6_events <- rogue_events |> filter(station_id == "M6")
+  if (nrow(m6_events) > 0) {
+    plot_ly(m6_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
+            marker = list(size = 8, color = "#9467bd"),
+            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
+                          "<br>Ratio: ", round(rogue_ratio, 2),
+                          "<br>Max Wave: ", round(hmax, 1), "m",
+                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
+      layout(title = paste0("M6 Rogue Events (n=", nrow(m6_events), ")"),
+             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
+             hovermode = "closest")
+  } else {
+    plotly_empty() |> layout(title = "M6: No rogue events")
+  }
+} else {
+  plotly_empty() |> layout(title = "M6: No data")
+}
+```
+
+#### Faceted View
 
 Use the **range slider** at the bottom to zoom all panels to a specific time period.
 
@@ -698,11 +815,11 @@ Ratio = Max Wave / Signif Wave = `r if(!is.null(worked_signif_wave_example)) pas
 
 `r if(!is.null(worked_signif_wave_example)) worked_signif_wave_example$caption else "Worked example not available. Run targets::tar_make()"`
 
-# Definitions
+# Reference
 
 ## Row
 
-### Column {width=50%}
+### Column {.tabset}
 
 #### Key Terms
 
@@ -717,8 +834,8 @@ Ratio = Max Wave / Signif Wave = `r if(!is.null(worked_signif_wave_example)) pas
 | **GEV** | Generalized Extreme Value distribution for annual maxima | Used in [Hourly Max](#hourly-max) |
 | **GPD** | Generalized Pareto Distribution for peaks over threshold | Used in [Hourly Max](#hourly-max) |
 | **Return Level** | Value expected to be exceeded once per T years | Used in [Hourly Max](#hourly-max) |
-
-### Column {width=50%}
+| **Gust Factor** | Peak Gust / Sustained Wind (~1.3 typical) | Used in [Gust Factor](#gust-factor) |
+| **STL** | Seasonal-Trend decomposition (Loess) | Used in [Trends](#trends) |
 
 #### Why Signif Wave = H1/3 = 4sigma
 
@@ -730,41 +847,20 @@ These three notations all mean the same thing:
 
 The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Signif Wave = 4 x sqrt(m0)** where m0 is the variance of sea elevation.
 
-#### Why 17.5-minute measurement?
+See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked example.
+
+#### Measurement Window
+
+**Why 17.5-minute measurement?**
 
 - Statistical requirement: Need ~100+ waves for valid H1/3
-- Wave periods typically 5-15 seconds -> 17.5 min gives ~70-200 waves
+- Wave periods typically 5-15 seconds → 17.5 min gives ~70-200 waves
 - WMO recommends 20-30 minutes; 17.5 is the practical lower bound
 - Trade-off: longer = better statistics, shorter = more temporal resolution
 
-# Reference
+**Data source:** [Marine Institute ERDDAP](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html)
 
-## Row
-
-### Column {width=50%}
-
-#### Key Definitions (with page links)
-
-| Term | Definition | Used In |
-|------|------------|---------|
-| **Signif Wave = H1/3 = 4sigma** | Significant wave height = mean of highest 1/3 = 4 x std dev | [Definitions](#definitions) |
-| **Max Wave** | Max individual wave in 17.5-min period | [Rogue Waves](#rogue-waves) |
-| **Rogue Wave** | Max Wave / Signif Wave > 2.0 | [Rogue Waves](#rogue-waves) |
-| **Rogue Gust** | Gust / Wind > 1.5 | [Rogue Gusts](#rogue-gusts) |
-| **Gust Factor** | Peak Gust / Sustained Wind (~1.3 typical) | [Gust Factor](#gust-factor) |
-| **STL** | Seasonal-Trend decomposition (Loess) | [Trends](#trends) |
-
-#### Extreme Value Methods (with page links)
-
-| Method | Description | Used In |
-|--------|-------------|---------|
-| **GEV** | Block maxima (hourly max) | [Hourly Max](#hourly-max) |
-| **GPD** | Peaks over threshold (all exceedances) | [Hourly Max](#hourly-max) |
-| **Return Level** | Value exceeded once per T years | [Hourly Max](#hourly-max) |
-
-### Column {width=50%}
-
-#### Beaufort Wind Scale
+#### Beaufort Scale
 
 | Beaufort | Description | Wind Speed (m/s) |
 |----------|-------------|-------------------|
@@ -774,6 +870,16 @@ The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org
 | 10 | Storm | 24.5 - 28.4 |
 | 11 | Violent Storm | 28.5 - 32.6 |
 | 12 | Hurricane Force | > 32.7 |
+
+#### Statistical Methods
+
+**Extreme Value Methods:**
+
+| Method | Description | Used In |
+|--------|-------------|---------|
+| **GEV** | Block maxima (hourly max) | [Hourly Max](#hourly-max) |
+| **GPD** | Peaks over threshold (all exceedances) | [Hourly Max](#hourly-max) |
+| **Return Level** | Value exceeded once per T years | [Hourly Max](#hourly-max) |
 
 **References:**
 
