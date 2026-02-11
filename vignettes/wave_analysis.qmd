@@ -161,10 +161,7 @@ legend_style <- list(
 
 **Wave Analysis Dashboard** for the Irish Weather Buoy Network. All analysis computed via `{targets}` pipeline.
 
-::: {.callout-important}
-## Rogue Wave Definition
-A rogue wave has **Hmax/Hs > 2.0** (ratio of maximum individual wave to significant wave height).
-:::
+**Rogue Wave Definition:** A rogue wave has **Max Wave / Signif Wave > 2.0** (ratio of maximum individual wave to significant wave height).
 
 #### Data Structure
 
@@ -184,7 +181,7 @@ if (!is.null(full_data)) {
 | Rogue Wave Events | `r if(has_data) nrow(rogue_events) else "N/A"` |
 | Stations Analyzed | `r if(has_data) length(unique(rogue_events$station_id)) else "N/A"` |
 | Max Rogue Ratio | `r if(has_data) round(max(rogue_events$rogue_ratio), 2) else "N/A"` |
-| Max Hmax Observed | `r if(has_data) round(max(rogue_events$hmax), 1) else "N/A"` m |
+| Max Wave Observed | `r if(has_data) round(max(rogue_events$hmax), 1) else "N/A"` m |
 | Dataset Start | `r if(has_data) format(min(rogue_events$time), "%Y-%m-%d %H:%M UTC") else "N/A"` |
 | Dataset End | `r if(has_data) format(max(rogue_events$time), "%Y-%m-%d %H:%M UTC") else "N/A"` |
 | Days in Dataset | `r if(has_data) round(as.numeric(difftime(max(rogue_events$time), min(rogue_events$time), units="days"))) else "N/A"` |
@@ -215,7 +212,7 @@ if (!is.null(missing_data_grid)) {
     )
   create_dt(missing_summary, "Data availability by station (% of days with observations)")
 } else {
-  cat("Missing data grid not available. Run targets::tar_make()")
+  knitr::asis_output("Missing data grid not available. Run targets::tar_make()")
 }
 ```
 
@@ -244,8 +241,8 @@ create_plot_rogue_by_station(rogue_events)
 
 #### Data Table
 
-**rogue_ratio** = Hmax/Hs (wave). Values > 2.0 define a rogue wave event.
-**gust_ratio** = Gust/Wind (wind). Values > 1.5 indicate a rogue gust.
+**rogue_ratio** = Max Wave / Signif Wave. Values > 2.0 define a rogue wave event.
+**gust_ratio** = Gust / Wind. Values > 1.5 indicate a rogue gust.
 
 ```{r rogue-waves-table}
 if (has_data) {
@@ -265,11 +262,7 @@ if (has_data) {
 
 # Rogue Gusts
 
-::: {.callout-important}
-## Rogue Gust Definition
-A rogue gust has **Gust/Wind > 1.5** (ratio of peak gust to sustained wind speed).
-This parallels the rogue wave definition (Hmax/Hs > 2.0).
-:::
+**Rogue Gust Definition:** A rogue gust has **Gust / Wind > 1.5** (ratio of peak gust to sustained wind speed). This parallels the rogue wave definition (Max Wave / Signif Wave > 2.0).
 
 ## Row
 
@@ -299,7 +292,7 @@ if (!is.null(rogue_gust_events) && nrow(rogue_gust_events) > 0) {
 
 #### Data Table
 
-**gust_ratio** = Gust/Wind. Values > 1.5 define a rogue gust event.
+**gust_ratio** = Gust / Wind. Values > 1.5 define a rogue gust event.
 
 ```{r rogue-gusts-table}
 targets::tar_load(rogue_gust_events)
@@ -318,7 +311,7 @@ if (!is.null(rogue_gust_events) && nrow(rogue_gust_events) > 0) {
 
 #### vs Rogue Waves
 
-Comparing wave rogue events (Hmax/Hs > 2.0) with gust rogue events (Gust/Wind > 1.5).
+Comparing wave rogue events (Max Wave / Signif Wave > 2.0) with gust rogue events (Gust / Wind > 1.5).
 
 ```{r rogue-gusts-vs-waves}
 # Generate plot inline - need analysis_data for this
@@ -326,123 +319,65 @@ targets::tar_load(analysis_data)
 create_plot_gusts_vs_waves(analysis_data)
 ```
 
-# Definitions
+# Gust Factor
+
+**Gust Factor** = Peak Gust / Sustained Wind. Typical value ~1.3.
+**Rogue Gust** threshold: GF > 1.5 (see [Rogue Gusts](#rogue-gusts) page for detailed analysis).
 
 ## Row
 
-### Column {width=50%}
+### Column {.tabset}
 
-#### Key Terms
+#### Overall Summary
 
-| Term | Definition | Reference |
-|------|------------|-----------|
-| **Hs = H1/3 = 4σ** | All three mean the same: significant wave height = mean of highest 1/3 of waves = 4 × standard deviation of sea surface | [Longuet-Higgins 1952](https://doi.org/10.1357/002224052806645438) |
-| **Hmax** | Maximum individual wave height in 17.5-min measurement period | Typically Hmax/Hs ~ 1.5-1.9 |
-| **Rogue Wave** | Wave where **Hmax/Hs > 2.0** | [Dysthe 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203) |
-| **Rogue Ratio** | = Hmax/Hs. Values > 2.0 indicate a rogue wave | Used in [Rogue Waves](#rogue-waves) |
-| **Gust Ratio** | = Peak Gust / Sustained Wind. Typical value ~1.3 | Used in [Rogue Gusts](#rogue-gusts) |
-| **Rogue Gust** | Observation where **Gust/Wind > 1.5** | Used in [Rogue Gusts](#rogue-gusts) |
-| **GEV** | Generalized Extreme Value distribution for annual maxima | Used in [Annual Max Model](#annual-max-model) |
-| **GPD** | Generalized Pareto Distribution for peaks over threshold | Used in [Annual Max Prediction](#annual-max-prediction) |
-| **Return Level** | Value expected to be exceeded once per T years | Used in [Annual Max Model](#annual-max-model) |
-
-### Column {width=50%}
-
-#### Why Hs = H1/3 = 4σ
-
-These three notations all mean the same thing:
-
-- **Hs** = Significant wave height (common abbreviation)
-- **H1/3** = Mean of highest 1/3 of waves (original definition)
-- **4σ** = 4 × standard deviation of sea surface elevation
-
-The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Hs = 4 × sqrt(m0)** where m0 is the variance of sea elevation.
-
-#### Why 17.5-minute measurement?
-
-- Statistical requirement: Need ~100+ waves for valid H1/3
-- Wave periods typically 5-15 seconds → 17.5 min gives ~70-200 waves
-- WMO recommends 20-30 minutes; 17.5 is the practical lower bound
-- Trade-off: longer = better statistics, shorter = more temporal resolution
-
-# How Signif Wave is Calculated
-
-## Row
-
-### Column {width=60%}
-
-#### Step-by-Step Example
-
-This worked example shows exactly how **Signif Wave** (significant wave height) is calculated from raw buoy measurements during one 17.5-minute sampling window.
-
-```{r worked-example}
-#| echo: false
-# Load pre-computed example from targets
-targets::tar_load(worked_signif_wave_example)
-
-if (!is.null(worked_signif_wave_example)) {
-  example <- worked_signif_wave_example
-
-  cat("**Step 1: Buoy records individual waves during 17.5-min window**\n\n")
-  cat("Approximately 100-300 waves are measured (we show 100 here).\n\n")
-
-  # Show first and last 5 rows
-  waves_display <- rbind(
-    head(example$waves_table, 5),
-    tibble::tibble(wave_number = NA, wave_height_m = NA, in_top_third = NA),
-    tail(example$waves_table, 5)
-  )
-
-  knitr::kable(waves_display,
-    caption = "First and last 5 waves (sorted by height, tallest first)",
-    col.names = c("Rank", "Wave Height (m)", "In Top 1/3?")
-  )
+```{r gust-overall}
+if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
+  gust_analysis$summary |>
+    mutate(across(where(is.numeric), ~round(., 2))) |>
+    create_dt("Gust Factor Statistics (All Stations Combined)")
+} else {
+  knitr::asis_output("Gust analysis not available. Run targets::tar_make()")
 }
 ```
 
-### Column {width=40%}
+#### By Station
 
-#### Calculation
-
-```{r worked-calc}
-#| echo: false
-if (!is.null(worked_signif_wave_example)) {
-  example <- worked_signif_wave_example
-
-  cat("**Step 2: Identify the highest 1/3 of waves**\n\n")
-  cat(paste0("Total waves: 100\n"))
-  cat(paste0("Top 1/3 count: ", example$n_top_third, " waves\n\n"))
-
-  cat("**Step 3: Calculate Signif Wave = mean of top 1/3**\n\n")
-  cat(paste0("Signif Wave = mean(top 34 waves) = **", example$signif_wave, " m**\n\n"))
-
-  cat("**Step 4: Max Wave = tallest single wave**\n\n")
-  cat(paste0("Max Wave = **", example$max_wave, " m**\n\n"))
-
-  cat("**Step 5: Calculate Ratio**\n\n")
-  cat(paste0("Ratio = Max Wave / Signif Wave = ", example$max_wave, " / ", example$signif_wave, " = **", example$ratio, "**\n\n"))
-
-  if (example$ratio > 2.0) {
-    cat("::: {.callout-warning}\n")
-    cat("**Rogue Wave Detected!** Ratio > 2.0\n")
-    cat(":::\n")
-  } else {
-    cat("::: {.callout-note}\n")
-    cat("**Normal Sea State.** Ratio in typical range (1.5-1.9)\n")
-    cat(":::\n")
-  }
+```{r gust-by-station}
+if (!is.null(gust_analysis) && "by_station" %in% names(gust_analysis) && !is.null(gust_analysis$by_station)) {
+  gust_analysis$by_station |>
+    mutate(across(where(is.numeric), ~round(., 2))) |>
+    create_dt("Gust Factor Statistics by Station. Stations with sufficient data for analysis.")
+} else {
+  knitr::asis_output("Station data not available")
 }
 ```
 
-## Row {height=20%}
+#### By Wind Category
 
-### Column
+```{r gust-by-category}
+# Generate plot inline
+create_plot_gust_by_category(gust_analysis)
+```
 
-```{r worked-caption}
-#| echo: false
-if (!is.null(worked_signif_wave_example)) {
-  cat(worked_signif_wave_example$caption)
+#### Wind Category (Data)
+
+```{r gust-category-data}
+if (!is.null(gust_analysis) && "by_station_category" %in% names(gust_analysis) && !is.null(gust_analysis$by_station_category)) {
+  gust_analysis$by_station_category |>
+    mutate(across(where(is.numeric), ~round(., 2))) |>
+    create_dt("Gust Factor by Wind Category and Station")
+} else if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
+  gust_analysis$by_category |>
+    mutate(across(where(is.numeric), ~round(., 2))) |>
+    create_dt("Gust Factor by Wind Category")
 }
+```
+
+#### Rogue Gusts
+
+```{r gust-rogue}
+# Generate plot inline
+create_plot_rogue_gusts(gust_analysis)
 ```
 
 # Trends
@@ -533,8 +468,8 @@ create_plot_return_levels(return_levels_hmax, variable = "hmax")
 ```{r eva-summary-table}
 if (!is.null(return_levels_wave)) {
   bind_rows(
-    if (!is.null(return_levels_wave)) return_levels_wave |> mutate(Variable = "Hs") else NULL,
-    if (!is.null(return_levels_hmax)) return_levels_hmax |> mutate(Variable = "Hmax") else NULL,
+    if (!is.null(return_levels_wave)) return_levels_wave |> mutate(Variable = "Signif Wave") else NULL,
+    if (!is.null(return_levels_hmax)) return_levels_hmax |> mutate(Variable = "Max Wave") else NULL,
     if (!is.null(return_levels_wind)) return_levels_wind |> mutate(Variable = "Wind") else NULL
   ) |>
     select(Variable, return_period, return_level, lower, upper) |>
@@ -554,6 +489,7 @@ if (!is.null(return_levels_wave)) {
 The **Generalized Pareto Distribution (GPD)** with **Peaks Over Threshold (POT)** approach fits extremes per station using all exceedances above a high threshold (90%, 95%, or 99% quantile).
 
 **Advantages over pooled GEV:**
+
 - Uses many more data points (all exceedances, not just annual maxima)
 - Station-specific return levels
 - Multiple threshold sensitivity analysis
@@ -583,10 +519,10 @@ if (!is.null(gpd_wave_per_station)) {
   if (!is.null(gpd_df) && nrow(gpd_df) > 0) {
     create_dt(gpd_df, "GPD Wave Height Parameters (95% threshold)")
   } else {
-    cat("GPD results not available")
+    knitr::asis_output("GPD results not available")
   }
 } else {
-  cat("GPD per-station data not available. Run targets::tar_make()")
+  knitr::asis_output("GPD per-station data not available. Run targets::tar_make()")
 }
 ```
 
@@ -644,17 +580,14 @@ if (!is.null(gpd_wave_per_station)) {
 
 #### 4. GEV Pooled (Illustrative)
 
-::: {.callout-note}
-## Limited sample size (n=8 years)
-The pooled GEV analysis below is **illustrative only** due to only 8 annual maxima. The GPD per-station approach (Tab 1) is preferred.
-:::
+**Note: Limited sample size (n=8 years).** The pooled GEV analysis below is illustrative only due to only 8 annual maxima. The GPD per-station approach (Tab 1) is preferred.
 
 ```{r eva-pred-gev-pooled}
 if (!is.null(analysis_summary) && "gev_pooled_fits" %in% names(analysis_summary)) {
   gev_fits <- analysis_summary$gev_pooled_fits
 
   params_df <- data.frame(
-    Variable = c("Hs (wave height)", "Hmax", "Wind speed"),
+    Variable = c("Signif Wave", "Max Wave", "Wind Speed"),
     Location = c(gev_fits$wave_height$parameters["location"],
                  gev_fits$hmax$parameters["location"],
                  gev_fits$wind_speed$parameters["location"]),
@@ -674,82 +607,119 @@ if (!is.null(analysis_summary) && "gev_pooled_fits" %in% names(analysis_summary)
 
   create_dt(params_df, "GEV Parameter Estimates - Pooled (illustrative, n=8)")
 } else {
-  cat("GEV fit data not available")
+  knitr::asis_output("GEV fit data not available")
 }
 ```
 
 #### 5. Future Work
 
-::: {.callout-warning}
-## Extensions for Production Use
+**Extensions for Production Use:**
 
 **Spatial dependence modelling:** The [SpatialExtremes](https://cran.r-project.org/package=SpatialExtremes) package provides max-stable process models that account for joint extremes across stations.
 
 **Bayesian approaches:** The [mev](https://cran.r-project.org/package=mev) package supports profile likelihood and Bayesian methods for improved uncertainty quantification.
 
 **Storm propagation:** Cross-correlation lag analysis between stations could enable offshore-to-nearshore prediction with lead times.
-:::
 
-# Gust Factor
+# How Signif Wave is Calculated
+
+This page shows a step-by-step worked example of how **Signif Wave** (significant wave height) is calculated from raw buoy measurements during one 17.5-minute sampling window.
 
 ## Row
 
-### Column {.tabset}
+### Column {width=60%}
 
-#### Overall Summary
+#### Step-by-Step Example
 
-**Gust Factor** = Peak Gust / Sustained Wind. Typical value ~1.3.
-**Rogue Gust** threshold: GF > 1.5 (see [Rogue Gusts](#rogue-gusts) page for detailed analysis).
+```{r worked-example}
+#| echo: false
+# Load pre-computed example from targets
+targets::tar_load(worked_signif_wave_example)
 
-```{r gust-overall}
-if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
-  gust_analysis$summary |>
-    mutate(across(where(is.numeric), ~round(., 2))) |>
-    create_dt("Gust Factor Statistics (All Stations Combined)")
-} else {
-  cat("Gust analysis not available. Run targets::tar_make()")
+if (!is.null(worked_signif_wave_example)) {
+  example <- worked_signif_wave_example
+
+  # Show first and last 5 rows
+  waves_display <- rbind(
+    head(example$waves_table, 5),
+    tibble::tibble(wave_number = NA, wave_height_m = NA, in_top_third = NA),
+    tail(example$waves_table, 5)
+  )
+
+  knitr::kable(waves_display,
+    caption = "Step 1: Buoy records ~100-300 individual waves during 17.5-min window. Shown: First and last 5 waves (sorted by height, tallest first)",
+    col.names = c("Rank", "Wave Height (m)", "In Top 1/3?")
+  )
 }
 ```
 
-#### By Station
+### Column {width=40%}
 
-```{r gust-by-station}
-if (!is.null(gust_analysis) && "by_station" %in% names(gust_analysis) && !is.null(gust_analysis$by_station)) {
-  gust_analysis$by_station |>
-    mutate(across(where(is.numeric), ~round(., 2))) |>
-    create_dt("Gust Factor Statistics by Station. Stations with sufficient data for analysis.")
-} else {
-  cat("Station data not available")
-}
-```
+#### Calculation
 
-#### By Wind Category
+**Step 2: Identify the highest 1/3 of waves**
 
-```{r gust-by-category}
-# Generate plot inline
-create_plot_gust_by_category(gust_analysis)
-```
+Total waves: 100
+Top 1/3 count: `r if(!is.null(worked_signif_wave_example)) worked_signif_wave_example$n_top_third else "N/A"` waves
 
-#### Wind Category (Data)
+**Step 3: Calculate Signif Wave = mean of top 1/3**
 
-```{r gust-category-data}
-if (!is.null(gust_analysis) && "by_station_category" %in% names(gust_analysis) && !is.null(gust_analysis$by_station_category)) {
-  gust_analysis$by_station_category |>
-    mutate(across(where(is.numeric), ~round(., 2))) |>
-    create_dt("Gust Factor by Wind Category and Station")
-} else if (!is.null(gust_analysis) && "by_category" %in% names(gust_analysis)) {
-  gust_analysis$by_category |>
-    mutate(across(where(is.numeric), ~round(., 2))) |>
-    create_dt("Gust Factor by Wind Category")
-}
-```
+Signif Wave = mean(top 34 waves) = **`r if(!is.null(worked_signif_wave_example)) worked_signif_wave_example$signif_wave else "N/A"` m**
 
-#### Rogue Gusts
+**Step 4: Max Wave = tallest single wave**
 
-```{r gust-rogue}
-# Generate plot inline
-create_plot_rogue_gusts(gust_analysis)
-```
+Max Wave = **`r if(!is.null(worked_signif_wave_example)) worked_signif_wave_example$max_wave else "N/A"` m**
+
+**Step 5: Calculate Ratio**
+
+Ratio = Max Wave / Signif Wave = `r if(!is.null(worked_signif_wave_example)) paste0(worked_signif_wave_example$max_wave, " / ", worked_signif_wave_example$signif_wave, " = **", worked_signif_wave_example$ratio, "**") else "N/A"`
+
+`r if(!is.null(worked_signif_wave_example) && worked_signif_wave_example$ratio > 2.0) "**Rogue Wave Detected!** Ratio > 2.0" else if(!is.null(worked_signif_wave_example)) "**Normal Sea State.** Ratio in typical range (1.5-1.9)" else ""`
+
+## Row {height=20%}
+
+### Column
+
+`r if(!is.null(worked_signif_wave_example)) worked_signif_wave_example$caption else "Worked example not available. Run targets::tar_make()"`
+
+# Definitions
+
+## Row
+
+### Column {width=50%}
+
+#### Key Terms
+
+| Term | Definition | Reference |
+|------|------------|-----------|
+| **Signif Wave = H1/3 = 4sigma** | All three mean the same: significant wave height = mean of highest 1/3 of waves = 4 x standard deviation of sea surface | [Longuet-Higgins 1952](https://doi.org/10.1357/002224052806645438) |
+| **Max Wave** | Maximum individual wave height in 17.5-min measurement period | Typically Max Wave / Signif Wave ~ 1.5-1.9 |
+| **Rogue Wave** | Wave where **Max Wave / Signif Wave > 2.0** | [Dysthe 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203) |
+| **Rogue Ratio** | = Max Wave / Signif Wave. Values > 2.0 indicate a rogue wave | Used in [Rogue Waves](#rogue-waves) |
+| **Gust Ratio** | = Peak Gust / Sustained Wind. Typical value ~1.3 | Used in [Rogue Gusts](#rogue-gusts) |
+| **Rogue Gust** | Observation where **Gust / Wind > 1.5** | Used in [Rogue Gusts](#rogue-gusts) |
+| **GEV** | Generalized Extreme Value distribution for annual maxima | Used in [Annual Max Model](#annual-max-model) |
+| **GPD** | Generalized Pareto Distribution for peaks over threshold | Used in [Annual Max Prediction](#annual-max-prediction) |
+| **Return Level** | Value expected to be exceeded once per T years | Used in [Annual Max Model](#annual-max-model) |
+
+### Column {width=50%}
+
+#### Why Signif Wave = H1/3 = 4sigma
+
+These three notations all mean the same thing:
+
+- **Signif Wave** = Significant wave height (common abbreviation)
+- **H1/3** = Mean of highest 1/3 of waves (original definition)
+- **4sigma** = 4 x standard deviation of sea surface elevation
+
+The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Signif Wave = 4 x sqrt(m0)** where m0 is the variance of sea elevation.
+
+#### Why 17.5-minute measurement?
+
+- Statistical requirement: Need ~100+ waves for valid H1/3
+- Wave periods typically 5-15 seconds -> 17.5 min gives ~70-200 waves
+- WMO recommends 20-30 minutes; 17.5 is the practical lower bound
+- Trade-off: longer = better statistics, shorter = more temporal resolution
 
 # Reference
 
@@ -761,10 +731,10 @@ create_plot_rogue_gusts(gust_analysis)
 
 | Term | Definition | Used In |
 |------|------------|---------|
-| **Hs = H1/3 = 4σ** | Significant wave height = mean of highest 1/3 = 4×std dev | [Definitions](#definitions) |
-| **Hmax** | Max individual wave in 17.5-min period | [Rogue Waves](#rogue-waves) |
-| **Rogue Wave** | Hmax/Hs > 2.0 | [Rogue Waves](#rogue-waves) |
-| **Rogue Gust** | Gust/Wind > 1.5 | [Rogue Gusts](#rogue-gusts) |
+| **Signif Wave = H1/3 = 4sigma** | Significant wave height = mean of highest 1/3 = 4 x std dev | [Definitions](#definitions) |
+| **Max Wave** | Max individual wave in 17.5-min period | [Rogue Waves](#rogue-waves) |
+| **Rogue Wave** | Max Wave / Signif Wave > 2.0 | [Rogue Waves](#rogue-waves) |
+| **Rogue Gust** | Gust / Wind > 1.5 | [Rogue Gusts](#rogue-gusts) |
 | **Gust Factor** | Peak Gust / Sustained Wind (~1.3 typical) | [Gust Factor](#gust-factor) |
 | **STL** | Seasonal-Trend decomposition (Loess) | [Trends](#trends) |
 
