@@ -23,6 +23,7 @@ Imports:
     httr2,
     jsonlite,
     lubridate,
+    pointblank,
     rlang,
     tibble,
     utils
@@ -42,7 +43,6 @@ Suggests:
     mirai,
     nanoparquet,
     plotly,
-    pointblank,
     quantreg,
     quarto,
     ranger,
