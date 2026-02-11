@@ -196,9 +196,9 @@ str(waves <- download_buoy_data(
 ``` r
 # Initialize database with historical data (chunk_days=365 for faster downloads)
 initialize_database(
-  start_date = "2023-01-01",
+  start_date = "2024-01-01",  # Default: recent data for quick start
   end_date = Sys.Date(),
-  chunk_days = 365
+  chunk_days = 365  # Download in 1-year chunks for efficiency
 )
 
 # Check database statistics immediately after initialization
@@ -207,13 +207,13 @@ stats <- get_database_stats()
 # Connect to database
 con <- connect_duckdb()
 
-# Query wave data
+# Query wave data (qc_filter=FALSE returns all data; TRUE filters for qc_flag==1)
 wave_data <- query_buoy_data(
   con,
   stations = c("M3", "M4"),
   variables = c("time", "station_id", "wave_height", "wave_period"),
   start_date = "2024-01-01",
-  qc_filter = TRUE  # Only good quality data
+  qc_filter = FALSE  # Set TRUE to filter for qc_flag==1 only
 )
 
 # Custom SQL query: Find top 10 most extreme rogue waves
@@ -280,6 +280,18 @@ print(dict)
 
 # Get detailed documentation for specific variable
 (wave_docs <- get_variable_docs("WaveHeight"))
+
+# Merge dictionary with database column info
+# Useful for creating documentation or understanding data
+library(dplyr)
+db_cols <- tibble(
+  variable = c("wave_height", "hmax", "wind_speed", "gust"),
+  db_column = c("wave_height", "hmax", "wind_speed", "gust")
+)
+dict |>
+  filter(tolower(variable) %in% db_cols$variable |
+         variable %in% c("WaveHeight", "Hmax", "WindSpeed", "Gust")) |>
+  select(variable, units, description)
 ```
 
 ## Data Source
@@ -521,4 +533,4 @@ Data provided by the Marine Institute Ireland in collaboration with Met
 
 ------------------------------------------------------------------------
 
-    *Last updated: 2026-02-08 20:57 UTC *
+    *Last updated: 2026-02-11 11:53 UTC *
