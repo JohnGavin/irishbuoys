@@ -160,6 +160,34 @@ CI workflows automatically use both caches:
 
 :::
 
+## Documentation
+
+Comprehensive vignettes are available on the [package website](https://johngavin.github.io/irishbuoys/):
+
+### [Static Dashboard](https://johngavin.github.io/irishbuoys/articles/dashboard_static.html)
+Interactive visualization of Irish Weather Buoy Network data.
+- **Real-time station data**: Max Wave, Signif Wave, and Wind Speed by station with tabbed navigation
+- **Time series analysis**: Hourly measurements with interactive plotly charts
+- **Extreme event detection**: Rogue wave identification where Max Wave > 2× Signif Wave
+
+### [Wave Analysis](https://johngavin.github.io/irishbuoys/articles/wave_analysis.html)
+Scientific analysis of wave patterns and extreme value statistics.
+- **Key metrics dashboard**: Station statistics, date coverage, and data quality summary
+- **Extreme value modeling**: GEV/GPD fits for return period estimation
+- **Seasonal patterns**: STL decomposition and annual trend analysis
+
+### [Shinylive Dashboard](https://johngavin.github.io/irishbuoys/articles/dashboard_shinylive.html)
+Client-side interactive dashboard powered by WebR/Shinylive.
+- **Browser-based R**: No server required - runs entirely in your browser
+- **Dynamic filtering**: Station and date range selection with live updates
+- **Offline capable**: Works without internet after initial load
+
+### [Debug](https://johngavin.github.io/irishbuoys/articles/debug.html)
+Pipeline diagnostics and data validation reports.
+- **pointblank validation**: HTML reports showing data quality checks with pass/fail status
+- **Pipeline status**: targets progress tracking with outdated target detection
+- **Session info**: R environment details for reproducibility debugging
+
 ## Quick Start
 
 ### Download Recent Data
