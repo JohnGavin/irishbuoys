@@ -50,25 +50,6 @@ plan_wave_analysis <- list(
     }
   ),
 
-  # Load ALL 22 columns for data glimpse (sample for display)
-  # Uses dplyr verbs for efficient DuckDB execution
-  targets::tar_target(
-    full_data,
-    {
-      con <- connect_duckdb()
-      on.exit(DBI::dbDisconnect(con))
-
-      # Get sample of all columns for glimpse
-      data <- buoy_tbl(con) |>
-        utils::head(10000) |>
-        dplyr::collect()
-      data$time <- as.POSIXct(data$time, tz = "UTC")
-
-      cli::cli_alert_success("Loaded sample of {nrow(data)} rows (all 22 columns)")
-      data
-    }
-  ),
-
   # Missing data grid: daily observation counts by station
   targets::tar_target(
     missing_data_grid,
