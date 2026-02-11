@@ -33,3 +33,4 @@
 ^vignettes/dashboard_shinylive\.qmd$
 ^vignettes/dashboard_static\.qmd$
 ^vignettes/wave_analysis\.qmd$
+^vignettes/debug\.qmd$

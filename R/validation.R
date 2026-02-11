@@ -43,24 +43,27 @@ validate_buoy_data <- function(data,
                                target_name = "analysis_data",
                                min_rows = 100,
                                report_path = NULL) {
+  # Check minimum row count first (before creating agent)
+  if (nrow(data) < min_rows) {
+    cli::cli_abort(c(
+      "x" = "Validation FAILED for {target_name}: insufficient rows",
+      "i" = "Expected at least {min_rows} rows, got {nrow(data)}"
+    ))
+  }
+
   # Define valid station IDs
   valid_stations <- c("M1", "M2", "M3", "M4", "M5", "M6", "FS1")
 
   # Create validation agent
- agent <- pointblank::create_agent(
+  agent <- pointblank::create_agent(
     tbl = data,
     tbl_name = target_name,
-    label = paste0("Validation for ", target_name),
+    label = paste0("Validation for ", target_name, " (", nrow(data), " rows)"),
     actions = pointblank::action_levels(
       warn_at = 0.01,  # Warn if >1% of rows fail
       stop_at = 0.05   # Stop if >5% of rows fail
     )
   ) |>
-    # Check minimum row count
-    pointblank::rows_at_least(
-      n = min_rows,
-      label = paste0("At least ", min_rows, " rows")
-    ) |>
     # Check required columns exist
     pointblank::col_exists(
       columns = c("station_id", "time", "wave_height"),
@@ -177,12 +180,19 @@ validate_rogue_events <- function(data,
                                   target_name = "rogue_wave_events",
                                   min_rows = 1,
                                   report_path = NULL) {
+  # Check minimum row count first (before creating agent)
+  if (nrow(data) < min_rows) {
+    cli::cli_abort(c(
+      "x" = "Validation FAILED for {target_name}: insufficient rows",
+      "i" = "Expected at least {min_rows} rows, got {nrow(data)}"
+    ))
+  }
+
   agent <- pointblank::create_agent(
     tbl = data,
     tbl_name = target_name,
-    label = "Rogue wave events validation"
+    label = paste0("Rogue wave events validation (", nrow(data), " events)")
   ) |>
-    pointblank::rows_at_least(n = min_rows) |>
     pointblank::col_exists(columns = c("station_id", "time", "wave_height", "hmax", "rogue_ratio")) |>
     # Rogue ratio must be > 2.0 by definition
     pointblank::col_vals_gt(
@@ -270,7 +280,8 @@ generate_validation_reports <- function(analysis_data,
 create_validation_summary <- function(...) {
   agents <- list(...)
 
-  purrr::map_dfr(names(agents), function(name) {
+  # Use lapply + bind_rows instead of purrr::map_dfr to avoid purrr dependency
+  results <- lapply(names(agents), function(name) {
     agent <- agents[[name]]
     report <- pointblank::get_agent_report(agent, display_table = FALSE)
 
@@ -281,4 +292,5 @@ create_validation_summary <- function(...) {
       checks_total = nrow(report)
     )
   })
+  dplyr::bind_rows(results)
 }
