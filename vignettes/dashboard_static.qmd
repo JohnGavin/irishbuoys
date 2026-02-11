@@ -604,13 +604,15 @@ datatable(
   DT::formatStyle(columns = 1, fontSize = '10px', whiteSpace = 'nowrap')
 ```
 
-# Definitions
+# Reference
 
 ## Row
 
 ### Column {.tabset}
 
-#### Wave Measurements
+#### Definitions
+
+**Wave Measurements:**
 
 | Variable | Display Name | Units | Definition |
 |----------|--------------|-------|------------|
@@ -620,7 +622,7 @@ datatable(
 
 **Key distinction:** Max Wave is a single wave; Signif Wave is an average of ~100 waves. Both come from the same 17.5-min measurement window each hour.
 
-#### Wind Measurements
+**Wind Measurements:**
 
 | Variable | Display Name | Units | Definition |
 |----------|--------------|-------|------------|
@@ -629,7 +631,7 @@ datatable(
 
 **Gust Factor:** Ratio of Gust to Wind Speed. Typically 1.3-1.6 in normal conditions; >1.8 indicates gusty/unstable conditions.
 
-#### Atmospheric
+**Atmospheric:**
 
 | Variable | Display Name | Units | Definition |
 |----------|--------------|-------|------------|
@@ -637,7 +639,7 @@ datatable(
 | `air_temperature` | **Air Temp** | C | Air temperature at buoy (~3m above sea) |
 | `sea_temperature` | **Sea Temp** | C | Sea surface temperature |
 
-#### Computed Statistics
+**Computed Statistics:**
 
 | Statistic | Definition |
 |-----------|------------|
@@ -645,12 +647,6 @@ datatable(
 | **Max Signif (m)** in tables | Highest `wave_height` value over dataset period |
 | **Avg Signif (m)** in tables | Mean of all hourly `wave_height` values over dataset period |
 | **Ratio** (Max Wave / Signif Wave) | Typical range 1.5-1.9. Ratio > 2.0 indicates potential rogue wave |
-
-# Reference
-
-## Row
-
-### Column {.tabset}
 
 #### Measurement Window
 

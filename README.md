@@ -207,6 +207,15 @@ stats <- get_database_stats()
 # Connect to database
 con <- connect_duckdb()
 
+# Check QC flag distribution by station FIRST
+# qc_flag: 0=unknown, 1=good, 9=missing
+qc_tally <- tbl(con, "buoy_data") |>
+  group_by(station_id, qc_flag) |>
+  summarise(n = n(), .groups = "drop") |>
+  collect() |>
+  tidyr::pivot_wider(names_from = qc_flag, values_from = n, names_prefix = "qc_")
+print(qc_tally)
+
 # Query wave data (qc_filter=FALSE returns all data; TRUE filters for qc_flag==1)
 wave_data <- query_buoy_data(
   con,
@@ -533,4 +542,4 @@ Data provided by the Marine Institute Ireland in collaboration with Met
 
 ------------------------------------------------------------------------
 
-    *Last updated: 2026-02-11 11:53 UTC *
+    *Last updated: 2026-02-11 12:07 UTC *
