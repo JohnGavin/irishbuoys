@@ -39,7 +39,8 @@ analysis_pkgs <- c(
   "SpatialExtremes",# Spatial extreme value modelling
   "quantreg",       # Quantile regression
   "zoo",            # Time series infrastructure
-  "xts"             # Extensible time series
+  "xts",            # Extensible time series
+  "pointblank"      # Data validation
 )
 
 # Visualization packages
