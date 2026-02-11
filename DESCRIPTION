@@ -24,6 +24,7 @@ Imports:
     jsonlite,
     lubridate,
     pointblank,
+    purrr,
     rlang,
     tibble,
     utils
