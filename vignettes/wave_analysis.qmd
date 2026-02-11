@@ -38,7 +38,6 @@ targets::tar_config_set(store = "../_targets")
 # NOTE: Pre-computed plotly objects embed all data as JSON (20MB+)
 #       Generating inline from summary data keeps file ~1-2MB
 targets::tar_load(c(
-  full_data,
   missing_data_grid,
   rogue_wave_events,
   rogue_wave_conditions,
@@ -185,8 +184,8 @@ if (!is.null(analysis_data) && nrow(analysis_data) > 0) {
 
 ```{r overview-glimpse}
 #| echo: false
-if (!is.null(full_data)) {
-  dplyr::glimpse(full_data)
+if (!is.null(analysis_data)) {
+  dplyr::glimpse(analysis_data)
 }
 ```
 
