@@ -43,20 +43,11 @@ validate_buoy_data <- function(data,
                                target_name = "analysis_data",
                                min_rows = 100,
                                report_path = NULL) {
-  if (!requireNamespace("pointblank", quietly = TRUE)) {
-    cli::cli_warn(c(
-      "!" = "pointblank not installed, falling back to basic validation",
-      "i" = "Install with: install.packages('pointblank')"
-    ))
-    return(validate_tibble_rows_basic(data, target_name, min_rows))
-  }
-
   # Define valid station IDs
-
-valid_stations <- c("M1", "M2", "M3", "M4", "M5", "M6", "FS1")
+  valid_stations <- c("M1", "M2", "M3", "M4", "M5", "M6", "FS1")
 
   # Create validation agent
-  agent <- pointblank::create_agent(
+ agent <- pointblank::create_agent(
     tbl = data,
     tbl_name = target_name,
     label = paste0("Validation for ", target_name),
@@ -177,17 +168,15 @@ valid_stations <- c("M1", "M2", "M3", "M4", "M5", "M6", "FS1")
 #' @param data A data frame of rogue wave events
 #' @param target_name Name of the target for error messages
 #' @param min_rows Minimum expected rows (default: 1)
+#' @param report_path Optional path to save HTML validation report
 #'
 #' @return The original data if validation passes
 #'
 #' @export
 validate_rogue_events <- function(data,
                                   target_name = "rogue_wave_events",
-                                  min_rows = 1) {
-  if (!requireNamespace("pointblank", quietly = TRUE)) {
-    return(validate_tibble_rows_basic(data, target_name, min_rows))
-  }
-
+                                  min_rows = 1,
+                                  report_path = NULL) {
   agent <- pointblank::create_agent(
     tbl = data,
     tbl_name = target_name,
@@ -208,6 +197,12 @@ validate_rogue_events <- function(data,
     ) |>
     pointblank::interrogate()
 
+  # Save report if path provided
+  if (!is.null(report_path)) {
+    pointblank::export_report(agent, filename = report_path)
+    cli::cli_alert_success("Validation report saved to {report_path}")
+  }
+
   if (!pointblank::all_passed(agent)) {
     cli::cli_warn("Rogue events validation had issues for {target_name}")
   }
@@ -215,27 +210,51 @@ validate_rogue_events <- function(data,
   data
 }
 
-#' Basic tibble row validation (fallback)
+#' Generate validation reports for website
 #'
-#' Simple validation when pointblank is not available.
-#' This is the original validate_tibble_rows function.
+#' Creates pointblank validation reports and saves them to the docs directory
+#' for inclusion in the pkgdown/GitHub Pages website.
 #'
-#' @param data Data frame or tibble to validate
-#' @param target_name Name of the target for error messages
-#' @param min_rows Minimum expected rows (default: 1)
+#' @param analysis_data The analysis_data tibble to validate
+#' @param rogue_events The rogue_wave_events tibble to validate
+#' @param output_dir Directory to save reports (default: "docs/articles")
 #'
-#' @return The data unchanged if valid, otherwise aborts
+#' @return A list with paths to generated reports
 #'
-#' @keywords internal
-validate_tibble_rows_basic <- function(data, target_name, min_rows = 1) {
-  if (!is.data.frame(data)) return(data)
-  if (nrow(data) < min_rows) {
-    cli::cli_abort(c(
-      "x" = "Target {target_name} returned {nrow(data)} rows",
-      "i" = "Expected at least {min_rows} rows"
-    ))
+#' @export
+generate_validation_reports <- function(analysis_data,
+                                        rogue_events,
+                                        output_dir = "docs/articles") {
+  # Ensure output directory exists
+  if (!dir.exists(output_dir)) {
+    dir.create(output_dir, recursive = TRUE)
   }
-  data
+
+  # Generate analysis_data validation report
+  analysis_report_path <- file.path(output_dir, "validation_analysis_data.html")
+  validate_buoy_data(
+    analysis_data,
+    target_name = "analysis_data",
+    min_rows = 100,
+    report_path = analysis_report_path
+  )
+
+  # Generate rogue_events validation report
+  rogue_report_path <- file.path(output_dir, "validation_rogue_events.html")
+  validate_rogue_events(
+    rogue_events,
+    target_name = "rogue_wave_events",
+    min_rows = 1,
+    report_path = rogue_report_path
+  )
+
+  cli::cli_alert_success("Validation reports generated in {output_dir}")
+
+  list(
+    analysis_data = analysis_report_path,
+    rogue_events = rogue_report_path,
+    generated_time = Sys.time()
+  )
 }
 
 #' Create a validation summary for the pipeline
@@ -249,15 +268,6 @@ validate_tibble_rows_basic <- function(data, target_name, min_rows = 1) {
 #'
 #' @export
 create_validation_summary <- function(...) {
-  if (!requireNamespace("pointblank", quietly = TRUE)) {
-    return(tibble::tibble(
-      target = "N/A",
-      status = "pointblank not installed",
-      checks_passed = NA_integer_,
-      checks_total = NA_integer_
-    ))
-  }
-
   agents <- list(...)
 
   purrr::map_dfr(names(agents), function(name) {

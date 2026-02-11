@@ -50,6 +50,10 @@ articles:
     navbar: Analysis
     contents:
       - wave_analysis
+  - title: Debug
+    navbar: Debug
+    contents:
+      - debug
   - title: internal
     contents:
       - dashboard_shinylive
@@ -158,6 +162,14 @@ reference:
       - generate_weekly_summary
       - create_email_summary
       - generate_and_send_summary
+
+  - title: "Data Validation"
+    desc: "Functions for validating data quality with pointblank"
+    contents:
+      - validate_buoy_data
+      - validate_rogue_events
+      - generate_validation_reports
+      - create_validation_summary
 
   - title: "Documentation"
     desc: "Data dictionary and variable documentation"

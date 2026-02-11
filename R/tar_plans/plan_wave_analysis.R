@@ -621,5 +621,19 @@ plan_wave_analysis <- list(
   targets::tar_target(
     plot_gusts_vs_waves,
     create_plot_gusts_vs_waves(analysis_data)
+  ),
+
+  # ========================================
+  # Validation Reports (pointblank)
+  # ========================================
+
+  # Generate pointblank validation reports for the website
+  targets::tar_target(
+    validation_reports,
+    generate_validation_reports(
+      analysis_data = analysis_data,
+      rogue_events = rogue_wave_events,
+      output_dir = "docs/articles"
+    )
   )
 )
