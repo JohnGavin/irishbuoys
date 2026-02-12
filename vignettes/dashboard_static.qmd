@@ -1,5 +1,5 @@
 ---
-title: "Irish Buoys Explorer (2019-2026)"
+title: "Irish Weather Buoys"
 format:
   dashboard:
     orientation: rows
@@ -99,14 +99,21 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
     colnames(ts_data) <- display_name
   }
 
+  # Calculate y-axis range to ensure all data including max values are visible
+  y_max <- max(ts_data, na.rm = TRUE) * 1.05  # 5% padding above max
+  y_min <- min(0, min(ts_data, na.rm = TRUE))  # Start at 0 or below if negative
+
   dygraph(ts_data, main = title, width = "100%") |>
     dyOptions(
       labelsUTC = TRUE,
       fillGraph = TRUE,
       fillAlpha = 0.1,
       drawGrid = TRUE,
+      drawPoints = FALSE,
+      strokeWidth = 1.5,
       colors = RColorBrewer::brewer.pal(max(3, ncol(ts_data)), "Set1")[1:ncol(ts_data)]
     ) |>
+    dyAxis("y", valueRange = c(y_min, y_max)) |>
     dyRangeSelector(height = 40) |>
     dyCrosshair(direction = "vertical") |>
     dyHighlight(highlightCircleSize = 5, highlightSeriesBackgroundAlpha = 0.2, hideOnMouseOut = FALSE) |>
@@ -845,6 +852,8 @@ A **rogue wave** is an individual wave with height > 2× the Signif Wave (i.e., 
 
 Rogue waves are rare but dangerous. They can appear without warning in otherwise moderate seas. The ratio helps identify when individual waves significantly exceed the average sea state.
 
+**Important:** The raw ERDDAP data does NOT contain a rogue wave indicator. We CALCULATE the ratio ourselves: `rogue_ratio = hmax / wave_height`. If ratio > 2.0, we classify it as a rogue wave event.
+
 **Rogue Winds:**
 
 A **rogue wind** (or extreme gust) is a gust > 1.8× the mean wind speed (i.e., Gust Ratio > 1.8).
@@ -856,16 +865,18 @@ A **rogue wind** (or extreme gust) is a gust > 1.8× the mean wind speed (i.e., 
 
 High gust ratios indicate atmospheric instability, often from convective activity, frontal passages, or turbulent flow. Combined with rogue waves, these events represent the most dangerous marine conditions.
 
-###### Glossary
+**Important:** Similarly, rogue winds are CALCULATED: `gust_ratio = gust / wind_speed`. If ratio > 1.8, we classify it as a rogue wind event.
 
-**Technical Terms (for reference only):**
+###### Technical Terms
 
-| Term | Display Name | Definition |
-|------|--------------|------------|
+**Scientific notation used in literature (for reference only):**
+
+| Scientific Term | Display Name | Definition |
+|-----------------|--------------|------------|
 | Hs, H1/3, Significant Wave Height | **Signif Wave** | Mean height of highest 1/3 of waves in a measurement window. Equivalent to 4× standard deviation (4σ) of sea surface elevation for narrow-band spectra. |
 | Hmax, Maximum Wave Height | **Max Wave** | Tallest single wave (crest-to-trough) in measurement window |
 
-This dashboard uses "Signif Wave" and "Max Wave" consistently instead of technical symbols.
+This dashboard uses "Signif Wave" and "Max Wave" consistently instead of technical symbols (Hs, Hmax).
 
 #### Methodology
 
