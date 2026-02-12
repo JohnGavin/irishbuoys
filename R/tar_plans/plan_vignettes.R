@@ -8,42 +8,39 @@
 #' - Loads pre-computed data via tar_load()/tar_read()
 #' - Does NOT compute anything inline (except trivial formatting)
 #' - Is tracked as a target so changes trigger re-rendering
+#' - Loads R packages inside the Quarto report (not via tar_quarto packages arg)
 #'
 #' @name plan_vignettes
 NULL
 
 plan_vignettes <- list(
 
-
   # Dashboard Static - Main dashboard with all buoy data
   # Dependencies: dashboard_buoy_data, dashboard_stats, dashboard_timeseries
+  # Note: packages should be loaded inside the .qmd file itself
   tarchetypes::tar_quarto(
     vignette_dashboard_static,
-    path = "vignettes/dashboard_static.qmd",
-    packages = c("dplyr", "ggplot2", "plotly", "DT", "dygraphs", "xts", "tidyr")
+    path = "vignettes/dashboard_static.qmd"
   ),
 
-# Wave Analysis - Extreme value analysis and rogue waves
+  # Wave Analysis - Extreme value analysis and rogue waves
   # Dependencies: analysis_data, rogue_wave_events, return_levels, joint_analysis_results
   tarchetypes::tar_quarto(
     vignette_wave_analysis,
-    path = "vignettes/wave_analysis.qmd",
-    packages = c("dplyr", "ggplot2", "plotly", "DT", "dygraphs", "xts", "tidyr", "targets")
+    path = "vignettes/wave_analysis.qmd"
   ),
 
   # Telemetry - Pipeline metrics and performance tracking
   # Dependencies: telemetry_summary
   tarchetypes::tar_quarto(
     vignette_telemetry,
-    path = "vignettes/telemetry.qmd",
-    packages = c("dplyr", "ggplot2", "DT", "targets")
+    path = "vignettes/telemetry.qmd"
   ),
 
   # Debug - Debugging helper (minimal dependencies)
   tarchetypes::tar_quarto(
     vignette_debug,
-    path = "vignettes/debug.qmd",
-    packages = c("dplyr", "targets")
+    path = "vignettes/debug.qmd"
   )
 
   # NOTE: dashboard_shinylive.qmd is NOT included as a target because:
