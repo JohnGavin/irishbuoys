@@ -165,6 +165,43 @@ CI workflows automatically use both caches:
 
 </div>
 
+## Documentation
+
+Comprehensive vignettes are available on the [package
+website](https://johngavin.github.io/irishbuoys/):
+
+### [Static Dashboard](https://johngavin.github.io/irishbuoys/articles/dashboard_static.html)
+
+Interactive visualization of Irish Weather Buoy Network data. -
+**Real-time station data**: Max Wave, Signif Wave, and Wind Speed by
+station with tabbed navigation - **Time series analysis**: Hourly
+measurements with interactive plotly charts - **Extreme event
+detection**: Rogue wave identification where Max Wave \> 2× Signif Wave
+
+### [Wave Analysis](https://johngavin.github.io/irishbuoys/articles/wave_analysis.html)
+
+Scientific analysis of wave patterns and extreme value statistics. -
+**Key metrics dashboard**: Station statistics, date coverage, and data
+quality summary - **Extreme value modeling**: GEV/GPD fits for return
+period estimation - **Seasonal patterns**: STL decomposition and annual
+trend analysis
+
+### [Shinylive Dashboard](https://johngavin.github.io/irishbuoys/articles/dashboard_shinylive.html)
+
+Client-side interactive dashboard powered by WebR/Shinylive. -
+**Browser-based R**: No server required - runs entirely in your
+browser - **Dynamic filtering**: Station and date range selection with
+live updates - **Offline capable**: Works without internet after initial
+load
+
+### [Debug](https://johngavin.github.io/irishbuoys/articles/debug.html)
+
+Pipeline diagnostics and data validation reports. - **pointblank
+validation**: HTML reports showing data quality checks with pass/fail
+status - **Pipeline status**: targets progress tracking with outdated
+target detection - **Session info**: R environment details for
+reproducibility debugging
+
 ## Quick Start
 
 ### Download Recent Data
@@ -359,6 +396,7 @@ Buoy Network.
     │   │   └── plan_wave_analysis.R
     │   ├── trend_analysis.R
     │   ├── update.R
+    │   ├── validation.R
     │   ├── wave_model.R
     │   └── wave_science.R
     ├── README.md
@@ -428,6 +466,7 @@ Buoy Network.
     │   ├── create_plot_week_of_year.Rd
     │   ├── create_plot_wind_beaufort.Rd
     │   ├── create_return_level_plot_data.Rd
+    │   ├── create_validation_summary.Rd
     │   ├── decompose_stl.Rd
     │   ├── detect_anomalies.Rd
     │   ├── detect_rogue_waves.Rd
@@ -468,6 +507,10 @@ Buoy Network.
     │   ├── trend_analysis.Rd
     │   ├── trend_summary_report.Rd
     │   ├── update_station_metadata.Rd
+    │   ├── validate_buoy_data.Rd
+    │   ├── validate_rogue_events.Rd
+    │   ├── validate_tibble_rows_basic.Rd
+    │   ├── validation.Rd
     │   ├── wave_glossary.Rd
     │   ├── wave_model.Rd
     │   ├── wave_model_report.Rd
@@ -489,11 +532,14 @@ Buoy Network.
         ├── dashboard_shinylive_files
         │   └── mediabag
         ├── dashboard_static.qmd
+        ├── dashboard_static_files
         ├── data
         │   ├── buoy_data.json
         │   ├── buoy_data.parquet
         │   ├── buoy_data_raw.csv
         │   └── stations.json
+        ├── debug.qmd
+        ├── debug_fixed_files
         ├── shinylive-sw.js
         └── wave_analysis.qmd
 
@@ -542,4 +588,4 @@ Data provided by the Marine Institute Ireland in collaboration with Met
 
 ------------------------------------------------------------------------
 
-    *Last updated: 2026-02-11 12:07 UTC *
+    *Last updated: 2026-02-12 10:30 UTC *
