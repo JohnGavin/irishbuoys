@@ -210,22 +210,27 @@ reproducibility debugging
 library(irishbuoys)
 
 # Download last 7 days of data
-str(data <- download_buoy_data(
+# Show structure of first 3 rows for efficiency
+data <- download_buoy_data(
   start_date = Sys.Date() - 7,
   end_date = Sys.Date()
-))
+)
+str(head(data, 3))
 
 # Get data for specific station
-dim(m3_data <- download_buoy_data(
+m3_data <- download_buoy_data(
   stations = "M3",
   start_date = "2024-01-01"
-))
+)
+dim(m3_data)
 
 # Get earliest available data (buoy network started 2001-02-05)
-str(waves <- download_buoy_data(
+# Show structure of first 3 rows for efficiency
+waves <- download_buoy_data(
   start_date = "2001-02-05",
   end_date = "2001-02-06"
-))
+)
+str(head(waves, 3))
 ```
 
 ### Initialize and Query Database
@@ -588,4 +593,4 @@ Data provided by the Marine Institute Ireland in collaboration with Met
 
 ------------------------------------------------------------------------
 
-    *Last updated: 2026-02-12 10:30 UTC *
+    *Last updated: 2026-02-12 10:51 UTC *
