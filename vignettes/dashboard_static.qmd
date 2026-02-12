@@ -44,14 +44,19 @@ pkg_version <- tryCatch(
 # Get unique stations
 stations <- sort(unique(buoy_data$station_id))
 
-# Use HOURLY data directly (sample if too large for performance)
+# Use HOURLY data directly - preserve full detail
+# Only sample if dataset is extremely large (>200k rows) to keep HTML manageable
 # Reason: User wants to see actual hourly measurements, not daily aggregates
 set.seed(42)
-if (nrow(buoy_data) > 50000) {
-  # Sample for time series plots to keep HTML manageable
-  buoy_hourly <- buoy_data |> slice_sample(n = 50000)
+if (nrow(buoy_data) > 200000) {
+  # Sample for time series plots only if absolutely necessary
+  buoy_hourly <- buoy_data |> slice_sample(n = 200000)
+  n_hourly_display <- format(200000, big.mark = ",")
+  sampling_note <- paste0(" (sampled to ", n_hourly_display, " observations for performance)")
 } else {
   buoy_hourly <- buoy_data
+  n_hourly_display <- format(nrow(buoy_data), big.mark = ",")
+  sampling_note <- ""
 }
 
 # Calculate summary stats
@@ -159,7 +164,7 @@ max_station_hmax <- buoy_data |> filter(hmax == max(hmax, na.rm = TRUE)) |> pull
 create_dygraph(buoy_hourly, "hmax", paste0("Max Wave (m) - Hourly Data (", date_caption, ")"))
 ```
 
-**Caption:** Time series of [Max Wave](#reference) (m) showing the tallest individual wave recorded during each hourly 17.5-min measurement window. The highest Max Wave (`r max_hmax` m) was recorded at `r max_station_hmax`. M6 (deep Atlantic, 3000m depth) typically shows larger waves due to open ocean exposure.
+**Caption:** Time series of [Max Wave](#reference) (m) showing the tallest individual wave recorded during each hourly 17.5-min measurement window. **Hourly data (`r n_hourly_display` observations`r sampling_note`)** - no daily averaging to preserve full detail. The highest Max Wave (`r max_hmax` m) was recorded at `r max_station_hmax`. M6 (deep Atlantic, 3000m depth) typically shows larger waves due to open ocean exposure.
 
 #### M2
 
@@ -261,7 +266,7 @@ create_dt(hmax_data, paste0(
 create_dygraph(buoy_hourly, "wave_height", paste0("Signif Wave (m) - Hourly Data (", date_caption, ")"))
 ```
 
-**Caption:** Time series of [Signif Wave](#reference) (m) showing the mean of the highest 1/3 of waves measured during each hourly 17.5-min window. This metric smooths out individual wave variability while capturing sea state severity. Max Signif Wave: `r max_signif` m. Clear seasonal pattern with higher values in winter (Oct-Mar).
+**Caption:** Time series of [Signif Wave](#reference) (m) showing the mean of the highest 1/3 of waves measured during each hourly 17.5-min window. **Hourly data (`r n_hourly_display` observations`r sampling_note`)** - no daily averaging to preserve full detail. This metric smooths out individual wave variability while capturing sea state severity. Max Signif Wave: `r max_signif` m. Clear seasonal pattern with higher values in winter (Oct-Mar).
 
 #### M2
 
@@ -359,7 +364,7 @@ create_dt(wave_data, paste0(
 create_dygraph(buoy_hourly, "wind_speed", paste0("Wind Speed (knots) - Hourly Data (", date_caption, ")"))
 ```
 
-**Caption:** Time series of [Wind Speed](#reference) (knots) showing the 10-minute average wind speed recorded each hour. Wind measurements are taken at ~3m above sea level. Gust speeds (not shown here) can be 40-60% higher. Strong correlation with [Signif Wave](#reference) (r = `r cor_wind_wave`).
+**Caption:** Time series of [Wind Speed](#reference) (knots) showing the 10-minute average wind speed recorded each hour. **Hourly data (`r n_hourly_display` observations`r sampling_note`)** - no daily averaging to preserve full detail. Wind measurements are taken at ~3m above sea level. Gust speeds (not shown here) can be 40-60% higher. Strong correlation with [Signif Wave](#reference) (r = `r cor_wind_wave`).
 
 #### M2
 
@@ -452,7 +457,7 @@ create_dt(wind_data, paste0(
 ### Column {width=100%}
 
 ```{r}
-#| fig-height: 24
+#| fig-height: 18
 # Compute regression slopes to order panels
 reg_stats <- buoy_data |>
   filter(!is.na(wind_speed), !is.na(wave_height)) |>
@@ -518,7 +523,7 @@ ggplotly(p, tooltip = "text") |>
   )
 ```
 
-**Caption:** Scatter plots showing relationship between Wind Speed (knots) and Signif Wave (m) for each station. Panels ordered by regression slope (steepest first). The slope indicates how much wave height increases per unit wind speed. M6 (deep Atlantic) shows highest slope due to unlimited fetch for wave development. Correlation: r = `r cor_wind_wave`. See [Reference](#reference) for definitions.
+**Caption:** Scatter plots showing relationship between Wind Speed (knots) and Signif Wave (m) for each station using hourly observations. Panels ordered by regression slope (steepest first). The slope indicates how much wave height increases per unit wind speed. M6 (deep Atlantic) shows highest slope due to unlimited fetch for wave development. Correlation: r = `r cor_wind_wave`. See [Reference](#reference) for definitions.
 
 ## Row {height=25%}
 
@@ -705,7 +710,11 @@ datatable(
 
 ### Column {.tabset}
 
-#### Definitions
+#### Variable Definitions
+
+##### {.tabset}
+
+###### Column Names
 
 **Wave Measurements:**
 
@@ -724,8 +733,6 @@ datatable(
 | `wind_speed` | **Wind Speed** | knots | 10-minute average wind speed measured each hour at ~3m above sea level |
 | `gust` | **Gust** | knots | Peak 3-second wind speed recorded during the hour |
 
-**Gust Factor:** Ratio of Gust to Wind Speed. Typically 1.3-1.6 in normal conditions; >1.8 indicates gusty/unstable conditions.
-
 **Atmospheric:**
 
 | Variable | Display Name | Units | Definition |
@@ -734,21 +741,52 @@ datatable(
 | `air_temperature` | **Air Temp** | C | Air temperature at buoy (~3m above sea) |
 | `sea_temperature` | **Sea Temp** | C | Sea surface temperature |
 
+###### Aggregated Stats
+
 **Computed Statistics (aggregated over all hourly records):**
 
 | Statistic | Source Column | Definition |
 |-----------|---------------|------------|
-| **Max Wave (m)** in tables | `hmax` | Highest `hmax` across all hours (largest single wave ever recorded in dataset) |
-| **Max Signif (m)** in tables | `wave_height` | Highest `wave_height` across all hours (highest hourly "average of top 1/3" value) |
-| **Avg Signif (m)** in tables | `wave_height` | Mean of all hourly `wave_height` values (typical sea state) |
-| **Avg Max Wave (m)** in tables | `hmax` | Mean of all hourly `hmax` values (typical tallest wave per hour) |
-| **Avg Ratio** in tables | `hmax / wave_height` | Mean ratio of Max Wave to Signif Wave. Typical: 1.5-1.9. >2.0 = rogue conditions |
+| **Max Wave (m)** | `hmax` | Highest `hmax` across all hours (largest single wave ever recorded in dataset) |
+| **Max Signif (m)** | `wave_height` | Highest `wave_height` across all hours (highest hourly "average of top 1/3" value) |
+| **Avg Signif (m)** | `wave_height` | Mean of all hourly `wave_height` values (typical sea state) |
+| **Avg Max Wave (m)** | `hmax` | Mean of all hourly `hmax` values (typical tallest wave per hour) |
+| **Avg Ratio** | `hmax / wave_height` | Mean ratio of Max Wave to Signif Wave. Typical: 1.5-1.9. >2.0 = rogue conditions |
 
 **Why different?** Max Wave (m) and Max Signif (m) come from DIFFERENT columns:
 - Max Wave = largest `hmax` = one extreme wave
 - Max Signif = largest `wave_height` = one extreme hourly average
 
-#### Measurement Window
+**Example:** A station might record Max Wave = 15.2m (one extreme individual wave) and Max Signif = 10.8m (one extreme hourly average of top 1/3 waves). These come from different measurement windows.
+
+###### Ratios
+
+**Max Wave / Signif Wave Ratio Interpretation:**
+
+A **rogue wave** is typically defined as a wave with height > 2× the Signif Wave.
+
+| Ratio (Max Wave / Signif Wave) | Interpretation |
+|--------------------------------|----------------|
+| 1.5 - 1.9 | Normal sea state |
+| > 2.0 | Potential rogue wave conditions |
+
+Rogue waves are rare but dangerous. They can appear without warning in otherwise moderate seas. The ratio helps identify when individual waves significantly exceed the average sea state.
+
+**Technical Terms (for reference only):**
+
+| Term | Equivalent | Notes |
+|------|------------|-------|
+| Hs, H1/3, Significant Wave Height | Signif Wave | All mean the same thing |
+| Hmax, Maximum Wave Height | Max Wave | Largest individual wave |
+| 4σ | Signif Wave | Statistical definition: 4 × standard deviation of sea surface elevation |
+
+These technical terms appear in scientific literature. This dashboard uses "Signif Wave" and "Max Wave" consistently.
+
+#### Methodology
+
+##### {.tabset}
+
+###### Measurement Window
 
 Each buoy samples the sea surface **once per hour**. At the top of each hour, a [**17.5-minute measurement period**](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html) begins. During this window, the buoy measures approximately 105 individual wave heights (assuming ~10s wave period).
 
@@ -762,43 +800,57 @@ From this 17.5-min sample:
 
 Both Max Wave and Signif Wave come from the SAME 17.5-min window, reported at the same timestamp.
 
-#### Rogue Waves
+###### Wind Measurement
 
-A **rogue wave** is typically defined as a wave with height > 2× the Signif Wave.
+**Wind Speed vs Gust:**
 
-| Ratio (Max Wave / Signif Wave) | Interpretation |
-|--------------------------------|----------------|
-| 1.5 - 1.9 | Normal sea state |
-| > 2.0 | Potential rogue wave conditions |
+Wind measurements are taken at approximately 3 meters above sea level. Two distinct metrics are reported:
 
-Rogue waves are rare but dangerous. They can appear without warning in otherwise moderate seas.
+| Measurement | Averaging Period | Definition |
+|-------------|-----------------|------------|
+| **Wind Speed** | 10-minute average | Mean wind speed over a 10-minute period, measured once per hour |
+| **Gust** | 3-second peak | Maximum 3-second average wind speed during the hour |
 
-#### Glossary
+**Gust Factor:** The ratio of Gust to Wind Speed indicates atmospheric turbulence and stability:
 
-**Technical Terms (for reference only):**
+| Gust Factor | Interpretation |
+|-------------|----------------|
+| 1.3 - 1.6 | Normal conditions |
+| > 1.8 | Gusty/unstable conditions |
 
-| Term | Equivalent | Notes |
-|------|------------|-------|
-| Hs, H1/3, Significant Wave Height | Signif Wave | All mean the same thing |
-| Hmax, Maximum Wave Height | Max Wave | Largest individual wave |
-| 4σ | Signif Wave | Statistical definition: 4 × standard deviation of sea surface elevation |
+High gust factors often occur with convective activity, frontal passages, or flow over rough terrain/seas. Low pressure systems (<1000 hPa) frequently accompany extreme wind events.
 
-These technical terms appear in scientific literature. This dashboard uses "Signif Wave" and "Max Wave" consistently.
-
-#### Station Information
+###### Station Info
 
 ```{r}
 create_dt(station_info, paste0(
   "Irish Weather Buoy Network Stations. ",
   "Water depth affects wave behavior: shallow (M4) vs deep (M6) stations show different wave characteristics. ",
-  "Distance offshore affects wind exposure and fetch length."
+  "Distance offshore affects wind exposure and fetch length. ",
+  "M6 is in deep Atlantic waters (3000m depth, 320km offshore), experiencing open ocean conditions. ",
+  "Other stations are on the continental shelf (62-155m depth, 30-65km offshore)."
 ))
 ```
 
-## Row {height=20%}
+#### Data Sources
 
-### Column
+**Primary Data:**
 
-**Data Sources:** [Marine Institute Ireland](https://www.marine.ie/) | [ERDDAP Data Portal](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html) | [irishbuoys R Package](https://github.com/JohnGavin/irishbuoys)
+- [Marine Institute Ireland](https://www.marine.ie/) - Irish Weather Buoy Network operator
+- [ERDDAP Data Portal](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html) - Access raw buoy data
+- [ERDDAP Metadata](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html) - Dataset documentation
+
+**Reference Documentation:**
+
+- [NOAA Significant Wave Height Definition](https://www.weather.gov/key/marine_sigwave)
+- [Nortek Wave Measurement Guide](https://www.nortekgroup.com/knowledge-center/wiki/new-to-waves) - Zero-crossing analysis explanation
+
+**Code & Analysis:**
+
+- [irishbuoys R Package](https://github.com/JohnGavin/irishbuoys) - Data processing and dashboard code
+
+---
 
 *Dashboard generated `r generated_time` using irishbuoys v`r pkg_version`*
+
+*Data coverage: `r date_caption` | Total records: `r n_records` hourly observations*
