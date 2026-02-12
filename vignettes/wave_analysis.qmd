@@ -176,16 +176,24 @@ if (!is.null(analysis_data) && nrow(analysis_data) > 0) {
 
 ### Column
 
-**Wave Analysis Dashboard** for the Irish Weather Buoy Network. All analysis computed via `{targets}` pipeline.
-
-**Rogue Wave Definition:** A rogue wave has **Max Wave / Signif Wave > 2.0** (ratio of maximum individual wave to significant wave height).
+**Wave Analysis Dashboard** for the [Irish Weather Buoy Network](https://www.marine.ie/site-area/infrastructure-facilities/marine-institute-buoy-network).
 
 #### Data Structure
 
-```{r overview-glimpse}
+```{r overview-data-structure}
 #| echo: false
-if (!is.null(analysis_data)) {
-  dplyr::glimpse(analysis_data)
+if (!is.null(analysis_summary) && "data_summary" %in% names(analysis_summary)) {
+  n_days <- as.numeric(difftime(
+    analysis_summary$data_summary$date_range[2],
+    analysis_summary$data_summary$date_range[1],
+    units = "days"
+  ))
+  start_date <- format(analysis_summary$data_summary$date_range[1], "%Y-%m-%d")
+  end_date <- format(analysis_summary$data_summary$date_range[2], "%Y-%m-%d")
+  n_cols <- if (!is.null(analysis_data)) ncol(analysis_data) else 22
+
+  cat(sprintf("Primary data: %s days (%s to %s), %d columns",
+              fmt_num(round(n_days)), start_date, end_date, n_cols))
 }
 ```
 
@@ -822,6 +830,10 @@ Ratio = Max Wave / Signif Wave = `r if(!is.null(worked_signif_wave_example)) pas
 ### Column {.tabset}
 
 #### Key Terms
+
+All analysis computed via `{targets}` pipeline.
+
+**Rogue Wave Definition:** A rogue wave has **Max Wave / Signif Wave > 2.0** (ratio of maximum individual wave to significant wave height).
 
 | Term | Definition | Reference |
 |------|------------|-----------|

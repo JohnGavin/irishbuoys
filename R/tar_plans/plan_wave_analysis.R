@@ -13,6 +13,18 @@
 # - validate_rogue_events(): Validation for rogue wave detection results
 # - validate_tibble_rows_basic(): Simple fallback validation
 
+# Row validation helper - fails pipeline if data has too few rows
+validate_tibble_rows <- function(data, target_name, min_rows = 1) {
+  if (!is.data.frame(data)) return(data)
+  if (nrow(data) < min_rows) {
+    cli::cli_abort(c(
+      "x" = "Target {target_name} returned {nrow(data)} rows",
+      "i" = "Expected at least {min_rows} rows"
+    ))
+  }
+  data
+}
+
 plan_wave_analysis <- list(
 
 
@@ -58,7 +70,7 @@ plan_wave_analysis <- list(
       on.exit(DBI::dbDisconnect(con))
 
       # Count observations per day per station for key variables
-      DBI::dbGetQuery(con, "
+      result <- DBI::dbGetQuery(con, "
         SELECT
           station_id,
           DATE_TRUNC('day', time) AS date,
@@ -73,6 +85,7 @@ plan_wave_analysis <- list(
         GROUP BY station_id, DATE_TRUNC('day', time)
         ORDER BY station_id, date
       ")
+      validate_tibble_rows(result, "missing_data_grid", min_rows = 1)
     }
   ),
 
@@ -148,7 +161,7 @@ plan_wave_analysis <- list(
         )
       }
 
-      rogues
+      validate_tibble_rows(rogues, "rogue_wave_conditions", min_rows = 1)
     }
   ),
 
@@ -175,29 +188,44 @@ plan_wave_analysis <- list(
   # Seasonal means by variable
   targets::tar_target(
     seasonal_means_wave,
-    calculate_seasonal_means(analysis_data, variable = "wave_height")
+    {
+      result <- calculate_seasonal_means(analysis_data, variable = "wave_height")
+      validate_tibble_rows(result, "seasonal_means_wave", min_rows = 1)
+    }
   ),
 
   targets::tar_target(
     seasonal_means_wind,
-    calculate_seasonal_means(analysis_data, variable = "wind_speed")
+    {
+      result <- calculate_seasonal_means(analysis_data, variable = "wind_speed")
+      validate_tibble_rows(result, "seasonal_means_wind", min_rows = 1)
+    }
   ),
 
   # Annual trends
   targets::tar_target(
     annual_trends_wave,
-    calculate_annual_trends(analysis_data, variable = "wave_height")
+    {
+      result <- calculate_annual_trends(analysis_data, variable = "wave_height")
+      validate_tibble_rows(result, "annual_trends_wave", min_rows = 1)
+    }
   ),
 
   targets::tar_target(
     annual_trends_wind,
-    calculate_annual_trends(analysis_data, variable = "wind_speed")
+    {
+      result <- calculate_annual_trends(analysis_data, variable = "wind_speed")
+      validate_tibble_rows(result, "annual_trends_wind", min_rows = 1)
+    }
   ),
 
   # Anomaly detection
   targets::tar_target(
     wave_anomalies,
-    detect_anomalies(analysis_data, variable = "wave_height", threshold = 3)
+    {
+      result <- detect_anomalies(analysis_data, variable = "wave_height", threshold = 3)
+      validate_tibble_rows(result, "wave_anomalies", min_rows = 1)
+    }
   ),
 
   # ========================================
@@ -408,13 +436,19 @@ plan_wave_analysis <- list(
 
   targets::tar_target(
     gust_factor_analysis,
-    analyze_gust_factor(analysis_data, min_wind_speed = 5)
+    {
+      result <- analyze_gust_factor(analysis_data, min_wind_speed = 5)
+      validate_tibble_rows(result, "gust_factor_analysis", min_rows = 1)
+    }
   ),
 
   # Compare rogue wave vs rogue gust occurrence
   targets::tar_target(
     rogue_comparison,
-    compare_rogue_wave_gust(analysis_data)
+    {
+      result <- compare_rogue_wave_gust(analysis_data)
+      validate_tibble_rows(result, "rogue_comparison", min_rows = 1)
+    }
   ),
 
   # ========================================
@@ -580,12 +614,15 @@ plan_wave_analysis <- list(
   # Rogue gust events (gust_ratio > 1.5)
   targets::tar_target(
     rogue_gust_events,
-    analysis_data |>
-      dplyr::filter(!is.na(.data$gust), !is.na(.data$wind_speed), .data$wind_speed > 0) |>
-      dplyr::mutate(gust_ratio = .data$gust / .data$wind_speed) |>
-      dplyr::filter(.data$gust_ratio > 1.5) |>
-      dplyr::select(.data$time, .data$station_id, .data$wind_speed, .data$gust,
-                    .data$gust_ratio, .data$wave_height, .data$hmax)
+    {
+      result <- analysis_data |>
+        dplyr::filter(!is.na(.data$gust), !is.na(.data$wind_speed), .data$wind_speed > 0) |>
+        dplyr::mutate(gust_ratio = .data$gust / .data$wind_speed) |>
+        dplyr::filter(.data$gust_ratio > 1.5) |>
+        dplyr::select(.data$time, .data$station_id, .data$wind_speed, .data$gust,
+                      .data$gust_ratio, .data$wave_height, .data$hmax)
+      validate_tibble_rows(result, "rogue_gust_events", min_rows = 1)
+    }
   ),
 
   # Rogue gusts plots (new Rogue Gusts page)

@@ -308,7 +308,7 @@ ui <- navbarPage(
           tags$tr(
             tags$td(tags$b("wave_height")),
             tags$td("meters"),
-            tags$td("Significant wave height (Hs). Calculated as 4x RMS of wave motion over a 17.5 minute measurement period, then averaged hourly. This is the standard oceanographic measure representing the average height of the highest third of waves.")
+            tags$td("Significant wave height (Signif Wave). Calculated as 4x RMS of wave motion over a 17.5 minute measurement period, then averaged hourly. This is the standard oceanographic measure representing the average height of the highest third of waves.")
           ),
           tags$tr(
             tags$td(tags$b("hmax")),
@@ -381,7 +381,7 @@ ui <- navbarPage(
       h4("Expected Correlations (Real Data Validation)"),
       tags$ul(
         tags$li(tags$b("Wind-Wave:"), " Positive correlation (r ~ 0.3-0.5). Higher winds generate larger waves."),
-        tags$li(tags$b("Wave Height-Hmax:"), " Strong positive (r > 0.9). Hmax is derived from same wave record."),
+        tags$li(tags$b("Signif Wave-Max Wave:"), " Strong positive (r > 0.9). Max Wave is derived from same wave record."),
         tags$li(tags$b("Pressure-Wind:"), " Negative correlation. Low pressure systems bring high winds."),
         tags$li(tags$b("Gust-Wind:"), " Strong positive (r > 0.9). Gusts are peak values from same period.")
       ),
@@ -689,7 +689,7 @@ server <- function(input, output, session) {
     cor_wind_wave <- if(sum(valid_ww) > 10) round(cor(data$wind_speed[valid_ww], data$wave_height[valid_ww]), 3) else NA
     cor_wave_hmax <- if(sum(valid_wh) > 10) round(cor(data$wave_height[valid_wh], data$hmax[valid_wh]), 3) else NA
 
-    # Data validation: real ERDDAP data has Wind-Wave corr ~0.3, Wave-Hmax ~0.97
+    # Data validation: real ERDDAP data has Wind-Wave corr ~0.3, Wave-Max Wave ~0.97
     # Fallback sample data has correlations ~0
     is_real_data <- !is.na(cor_wind_wave) && cor_wind_wave > 0.15 &&
                     !is.na(cor_wave_hmax) && cor_wave_hmax > 0.8
@@ -709,10 +709,10 @@ server <- function(input, output, session) {
       "Stations: ", paste(sort(unique(data$station_id)), collapse = ", "), "\n",
       "\n--- Data Validation ---\n",
       "Wind-Wave corr: ", ifelse(is.na(cor_wind_wave), "N/A", cor_wind_wave), " (expect ~0.3 for real data)\n",
-      "Wave-Hmax corr: ", ifelse(is.na(cor_wave_hmax), "N/A", cor_wave_hmax), " (expect >0.9 for real data)\n",
-      "Max Hs in dataset: ", round(max(data$wave_height, na.rm = TRUE), 1), "m (historical max ~15m Hs)\n",
-      "Max Hmax in dataset: ", round(max(data$hmax, na.rm = TRUE), 1), "m (historical max ~23m individual wave)\n",
-      "Max Hmax/Hs ratio: ", round(max(data$hmax/data$wave_height, na.rm = TRUE), 2), " (>2.0 = rogue wave)\n",
+      "Signif Wave-Max Wave corr: ", ifelse(is.na(cor_wave_hmax), "N/A", cor_wave_hmax), " (expect >0.9 for real data)\n",
+      "Max Signif in dataset: ", round(max(data$wave_height, na.rm = TRUE), 1), "m (historical max ~15m Signif Wave)\n",
+      "Max Wave in dataset: ", round(max(data$hmax, na.rm = TRUE), 1), "m (historical max ~23m individual wave)\n",
+      "Max Wave/Signif Wave ratio: ", round(max(data$hmax/data$wave_height, na.rm = TRUE), 2), " (>2.0 = rogue wave)\n",
       "Max wind_speed: ", round(max(data$wind_speed, na.rm = TRUE), 1), " m/s\n",
       "Max gust factor: ", round(max(data$gust/data$wind_speed, na.rm = TRUE), 2), " (typical ~1.3)"
     )
