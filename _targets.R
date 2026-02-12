@@ -15,6 +15,7 @@ tar_option_set(
   packages = c(
     "duckdb", "DBI", "dplyr", "ggplot2", "cli",
     "extRemes",  # For extreme value analysis
+    "copula",    # For joint dependence analysis (issue #13)
     "DT",        # For telemetry tables
     "gert"       # For git metrics
   ),
@@ -47,6 +48,7 @@ list(
   plan_data_acquisition,
   plan_quality_control,
   plan_wave_analysis,
+  plan_joint_analysis,  # Joint distributions between buoys (issue #13)
   plan_dashboard,
   plan_doc_examples,
   plan_dashboard_captions,

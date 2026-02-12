@@ -823,6 +823,266 @@ Ratio = Max Wave / Signif Wave = `r if(!is.null(worked_signif_wave_example)) pas
 
 `r if(!is.null(worked_signif_wave_example)) worked_signif_wave_example$caption else "Worked example not available. Run targets::tar_make()"`
 
+# Joint Analysis
+
+**Question:** Does M6 (furthest offshore, 320km) predict wave conditions at other stations hours in advance?
+
+```{r joint-setup}
+#| include: false
+# Load joint analysis targets
+targets::tar_load(c(
+  joint_analysis_results,
+  station_distances,
+  pair_correlations_wave,
+  m6_prediction_summary,
+  joint_extremes_wave,
+  copula_summary
+), store = "../_targets")
+
+has_joint_data <- !is.null(joint_analysis_results)
+```
+
+## Row
+
+### Column {.tabset}
+
+#### Station Distances
+
+**Station positions and distances (km):**
+
+```{r joint-distances}
+#| echo: false
+if (has_joint_data) {
+  station_info <- joint_analysis_results$station_info
+  dist_matrix <- joint_analysis_results$station_distances
+
+  # Create a nice display table
+  dist_df <- as.data.frame(dist_matrix)
+  dist_df$Station <- rownames(dist_df)
+  dist_df <- dist_df[, c("Station", colnames(dist_matrix))]
+
+  create_dt(dist_df, "Distances between stations (km). M6 is 320km offshore in deep Atlantic (3000m depth).")
+} else {
+  knitr::asis_output("Joint analysis data not available. Run targets::tar_make()")
+}
+```
+
+**Station Map (conceptual positions):**
+
+```{r joint-map}
+#| echo: false
+#| fig-height: 5
+if (has_joint_data) {
+  station_info <- joint_analysis_results$station_info
+
+  p <- ggplot(station_info, aes(x = lon, y = lat)) +
+    geom_point(aes(size = depth_m, color = distance_km), alpha = 0.8) +
+    geom_text(aes(label = station_id), vjust = -1.5, size = 4, fontface = "bold") +
+    scale_size_continuous(name = "Depth (m)", range = c(4, 12)) +
+    scale_color_viridis_c(name = "Distance\nOffshore (km)", option = "plasma") +
+    labs(
+      title = "Irish Weather Buoy Network",
+      subtitle = "M6 is 320km offshore in deep Atlantic; others are on continental shelf",
+      x = "Longitude", y = "Latitude"
+    ) +
+    theme_minimal(base_size = 12) +
+    coord_fixed(ratio = 1.5)
+
+  ggplotly(p) |>
+    layout(legend = list(orientation = "h", y = -0.15))
+}
+```
+
+#### Cross-Correlations
+
+**Cross-correlation between station pairs (wave height):**
+
+Positive optimal lag means the first station leads (predicts) the second.
+
+```{r joint-ccf}
+#| echo: false
+if (has_joint_data && !is.null(pair_correlations_wave)) {
+  ccf_df <- pair_correlations_wave |>
+    mutate(
+      `Station Pair` = paste(station1, "→", station2),
+      `Distance (km)` = round(distance_km, 0),
+      `Optimal Lag (h)` = optimal_lag,
+      `Max Correlation` = round(max_correlation, 3),
+      `Expected Lag (h)` = expected_lag,
+      `Observations` = format(n_obs, big.mark = ",")
+    ) |>
+    select(`Station Pair`, `Distance (km)`, `Optimal Lag (h)`, `Max Correlation`,
+           `Expected Lag (h)`, `Observations`) |>
+    arrange(desc(`Max Correlation`))
+
+  create_dt(ccf_df, paste0(
+    "Cross-correlations between station pairs. ",
+    "Optimal Lag = hours at maximum correlation. ",
+    "Expected Lag assumes ~30 km/h wave propagation (typical swell speed). ",
+    "High correlations between nearby stations (M2-M3) suggest shared storm exposure."
+  ))
+}
+```
+
+#### M6 Predictions
+
+**Can M6 (offshore) predict wave heights at coastal stations?**
+
+M6 is 320km offshore in the deep Atlantic. Waves reaching M6 will propagate toward coastal stations over several hours.
+
+```{r joint-m6-pred}
+#| echo: false
+if (has_joint_data && !is.null(m6_prediction_summary)) {
+  pred_df <- m6_prediction_summary |>
+    mutate(
+      `Target Station` = target_station,
+      `Distance from M6 (km)` = round(distance_km, 0),
+      `Optimal Lag (hours)` = lag_hours,
+      `R²` = round(r_squared, 3),
+      `RMSE (m)` = round(rmse, 2),
+      `Observations` = format(n_obs, big.mark = ",")
+    ) |>
+    select(`Target Station`, `Distance from M6 (km)`, `Optimal Lag (hours)`,
+           `R²`, `RMSE (m)`, `Observations`) |>
+    arrange(desc(`R²`))
+
+  create_dt(pred_df, paste0(
+    "M6 wave height predicting coastal stations. ",
+    "Lag = hours before target observation. ",
+    "R² indicates prediction skill (1.0 = perfect). ",
+    "Higher R² for stations closer to M6's Atlantic exposure."
+  ))
+}
+```
+
+**Interpretation:**
+
+- **Positive lag** means M6 observations *precede* coastal observations
+- **R² > 0.5** indicates useful predictive skill
+- Stations facing the Atlantic (M5, M2, M3) should have better predictions
+- M4 (southeast) may have lower skill due to different storm exposure
+
+#### Joint Extremes
+
+**Do extreme waves occur simultaneously across stations?**
+
+Extreme = top 5% of wave heights at each station.
+
+```{r joint-extremes}
+#| echo: false
+if (has_joint_data && !is.null(joint_extremes_wave)) {
+  # Joint counts matrix
+  joint_counts <- joint_extremes_wave$joint_extreme_counts
+
+  # Convert to data frame for display
+  counts_df <- as.data.frame(joint_counts)
+  counts_df$Station <- rownames(counts_df)
+  counts_df <- counts_df[, c("Station", colnames(joint_counts))]
+
+  create_dt(counts_df, paste0(
+    "Joint extreme event counts. Diagonal = total extreme events per station. ",
+    "Off-diagonal = simultaneous extreme events at both stations. ",
+    "High off-diagonal values indicate spatially correlated extremes (storm events)."
+  ))
+}
+```
+
+**Conditional Probabilities:**
+
+P(Station B extreme | Station A extreme) - probability of extreme at B given extreme at A:
+
+```{r joint-cond-prob}
+#| echo: false
+if (has_joint_data && !is.null(joint_extremes_wave)) {
+  cond_probs <- joint_extremes_wave$conditional_probs
+
+  # Convert to data frame
+  prob_df <- as.data.frame(cond_probs)
+  prob_df$`If Extreme At` <- rownames(prob_df)
+  prob_df <- prob_df[, c("If Extreme At", colnames(cond_probs))]
+
+  # Format as percentages
+  for (col in colnames(cond_probs)) {
+    prob_df[[col]] <- paste0(round(prob_df[[col]] * 100, 1), "%")
+  }
+
+  create_dt(prob_df, paste0(
+    "Conditional probabilities: P(column station extreme | row station extreme). ",
+    "Example: If M6 has extreme wave, what's the probability M2 also has extreme wave? ",
+    "High values indicate strong spatial dependence during storms."
+  ))
+}
+```
+
+#### Copula Analysis
+
+**Tail dependence: How correlated are extreme events?**
+
+Copulas model the dependence structure, especially in the tails (extremes).
+
+```{r joint-copula}
+#| echo: false
+if (has_joint_data && !is.null(copula_summary)) {
+  cop_df <- copula_summary |>
+    mutate(
+      `Station Pair` = pair,
+      `Kendall's τ` = round(kendall_tau, 3),
+      `Upper Tail Dep (λU)` = round(upper_tail_dep, 3),
+      `Lower Tail Dep (λL)` = round(lower_tail_dep, 3),
+      `Observations` = format(n_obs, big.mark = ",")
+    ) |>
+    select(`Station Pair`, `Kendall's τ`, `Upper Tail Dep (λU)`,
+           `Lower Tail Dep (λL)`, `Observations`)
+
+  create_dt(cop_df, paste0(
+    "Gumbel copula fits for station pairs. ",
+    "Kendall's τ = rank correlation (higher = more similar). ",
+    "Upper Tail Dep (λU) = probability of joint extremes in the upper tail (high waves). ",
+    "λU > 0 means extreme waves tend to occur together. ",
+    "Gumbel copula is appropriate for upper tail dependence."
+  ))
+}
+```
+
+**What does tail dependence mean?**
+
+- **λU = 0**: Extremes are independent (one station's extreme doesn't predict the other's)
+- **λU > 0**: Extremes are asymptotically dependent (joint extremes more likely than by chance)
+- **λU → 1**: Perfect dependence in the tail (extremes always occur together)
+
+For ocean buoys, λU > 0.3 indicates that storm events affect multiple stations simultaneously.
+
+#### Theory
+
+**Why analyze joint distributions?**
+
+1. **Forecasting:** If M6 (offshore) shows large waves, can we predict when they'll reach coastal stations?
+
+2. **Risk assessment:** During storms, are all stations simultaneously at risk, or do waves propagate sequentially?
+
+3. **Rogue wave correlation:** Do rogue wave events at one station predict increased risk at others?
+
+**Wave propagation model:**
+
+Waves travel at the **group velocity**, which depends on wave period:
+
+$$v_g = \frac{gT}{4\pi} \approx 1.56T \text{ m/s}$$
+
+For typical swell with period T = 10s: $v_g \approx 15.6$ m/s $\approx 56$ km/h
+
+For longer period swell (T = 15s): $v_g \approx 23$ m/s $\approx 84$ km/h
+
+**Expected lag from M6:**
+
+| Target | Distance (km) | Lag (T=10s) | Lag (T=15s) |
+|--------|--------------|-------------|-------------|
+| M5 | 200 | 3.6 h | 2.4 h |
+| M2 | 420 | 7.5 h | 5.0 h |
+| M3 | 380 | 6.8 h | 4.5 h |
+| M4 | 580 | 10.4 h | 6.9 h |
+
+*Actual lags vary with wave period, direction, and bathymetry.*
+
 # Reference
 
 ## Row

@@ -30,6 +30,7 @@ Imports:
     utils
 Suggests:
     blastula,
+    copula,
     crew,
     dygraphs,
     DT,
