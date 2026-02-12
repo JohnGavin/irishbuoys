@@ -52,5 +52,6 @@ list(
   plan_dashboard,
   plan_doc_examples,
   plan_dashboard_captions,
-  plan_telemetry
+  plan_telemetry,
+  plan_vignettes  # MANDATORY: All vignettes rendered via targets for reproducibility
 )
