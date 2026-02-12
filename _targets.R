@@ -14,7 +14,9 @@ pkgload::load_all(quiet = TRUE)
 tar_option_set(
   packages = c(
     "duckdb", "DBI", "dplyr", "ggplot2", "cli",
-    "extRemes"  # For extreme value analysis
+    "extRemes",  # For extreme value analysis
+    "DT",        # For telemetry tables
+    "gert"       # For git metrics
   ),
   format = "rds",
   memory = "transient",
@@ -47,5 +49,6 @@ list(
   plan_wave_analysis,
   plan_dashboard,
   plan_doc_examples,
-  plan_dashboard_captions
+  plan_dashboard_captions,
+  plan_telemetry
 )
