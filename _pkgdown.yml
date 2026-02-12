@@ -54,6 +54,10 @@ articles:
     navbar: Debug
     contents:
       - debug
+  - title: Telemetry
+    navbar: Telemetry
+    contents:
+      - telemetry
   - title: internal
     contents:
       - dashboard_shinylive

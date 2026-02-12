@@ -24,10 +24,16 @@ main { padding-top: 1rem; }
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Dashboards</h6></li>
-    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Weather Buoy Explorer</a></li>
+    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Weather Buoys</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Analysis</h6></li>
-    <li><a class="dropdown-item" href="../articles/wave_analysis.html">Wave Analysis Dashboard</a></li>
+    <li><a class="dropdown-item" href="../articles/wave_analysis.html">Irish Buoys Wave Analysis (2019-2026)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Debug</h6></li>
+    <li><a class="dropdown-item" href="../articles/debug.html">Debug</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Telemetry</h6></li>
+    <li><a class="dropdown-item" href="../articles/telemetry.html">Telemetry</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -123,14 +129,23 @@ main { padding-top: 1rem; }
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. list(text = “Last updated”)</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
 
 
 
-
-
-  </body></html>
+  <script>
+// Add dynamic timestamp to footer
+document.addEventListener('DOMContentLoaded', function() {
+  var footer = document.querySelector('footer');
+  if (footer) {
+    var timestamp = document.createElement('p');
+    timestamp.className = 'text-muted';
+    timestamp.innerHTML = 'Site generated: ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+    footer.appendChild(timestamp);
+  }
+});
+</script></body></html>
 

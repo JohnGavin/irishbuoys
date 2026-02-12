@@ -26,10 +26,16 @@ main { padding-top: 1rem; }
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Dashboards</h6></li>
-    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Weather Buoy Explorer</a></li>
+    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Weather Buoys</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Analysis</h6></li>
-    <li><a class="dropdown-item" href="../articles/wave_analysis.html">Wave Analysis Dashboard</a></li>
+    <li><a class="dropdown-item" href="../articles/wave_analysis.html">Irish Buoys Wave Analysis (2019-2026)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Debug</h6></li>
+    <li><a class="dropdown-item" href="../articles/debug.html">Debug</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Telemetry</h6></li>
+    <li><a class="dropdown-item" href="../articles/telemetry.html">Telemetry</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -101,13 +107,13 @@ Weather Buoy Network. Supports filtering by date range, stations, and variables.
 <span class="r-in"><span>  end_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading data from ERDDAP server...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> URL: https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?time,station_id,CallSign,longitude,latitude,AtmosphericPressure,AirTemperature,DewPoint,WindDirection,WindSpeed,Gust,RelativeHumidity,SeaTemperature,salinity,WaveHeight,WavePeriod,MeanWaveDirection,Hmax,Tp,ThTp,SprTp,QC_Flag&amp;time%3E%3D2026-02-01T00:00:00Z&amp;time%3C%3D2026-02-08T23:59:59Z</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> URL: https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?time,station_id,CallSign,longitude,latitude,AtmosphericPressure,AirTemperature,DewPoint,WindDirection,WindSpeed,Gust,RelativeHumidity,SeaTemperature,salinity,WaveHeight,WavePeriod,MeanWaveDirection,Hmax,Tp,ThTp,SprTp,QC_Flag&amp;time%3E%3D2026-02-05T00:00:00Z&amp;time%3C%3D2026-02-12T23:59:59Z</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading data from ERDDAP server...
 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Downloaded 940 records</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Downloaded 915 records</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading data from ERDDAP server...
 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Downloading data from ERDDAP server... <span style="color: #B2B2B2;">[340ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Downloading data from ERDDAP server... <span style="color: #B2B2B2;">[518ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Get specific variables for M3 buoy</span></span></span>
@@ -116,13 +122,13 @@ Weather Buoy Network. Supports filtering by date range, stations, and variables.
 <span class="r-in"><span>  variables <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"time"</span>, <span class="st">"WaveHeight"</span>, <span class="st">"WavePeriod"</span>, <span class="st">"Hmax"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading data from ERDDAP server...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> URL: https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?time,WaveHeight,WavePeriod,Hmax&amp;time%3E%3D2026-01-09T00:00:00Z&amp;time%3C%3D2026-02-08T23:59:59Z&amp;station_id=~%22(M3)%22</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> URL: https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?time,WaveHeight,WavePeriod,Hmax&amp;time%3E%3D2026-01-13T00:00:00Z&amp;time%3C%3D2026-02-12T23:59:59Z&amp;station_id=~%22(M3)%22</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading data from ERDDAP server...
 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Downloaded 740 records</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Downloaded 735 records</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Downloading data from ERDDAP server...
 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Downloading data from ERDDAP server... <span style="color: #B2B2B2;">[194ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Downloading data from ERDDAP server... <span style="color: #B2B2B2;">[207ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
@@ -135,14 +141,23 @@ Weather Buoy Network. Supports filtering by date range, stations, and variables.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0. list(text = “Last updated”)</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
 
 
 
-
-
-  </body></html>
+  <script>
+// Add dynamic timestamp to footer
+document.addEventListener('DOMContentLoaded', function() {
+  var footer = document.querySelector('footer');
+  if (footer) {
+    var timestamp = document.createElement('p');
+    timestamp.className = 'text-muted';
+    timestamp.innerHTML = 'Site generated: ' + new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC';
+    footer.appendChild(timestamp);
+  }
+});
+</script></body></html>
 

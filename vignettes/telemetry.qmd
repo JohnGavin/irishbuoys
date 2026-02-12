@@ -41,6 +41,8 @@ tryCatch({
   tar_load(table_telemetry_freshness)
   tar_load(table_telemetry_commits)
   tar_load(table_telemetry_file_types)
+  tar_load(telemetry_target_metrics)
+  tar_load(table_telemetry_target_metrics)
 
   # Plots
   tar_load(plot_telemetry_coverage_timeline)
@@ -252,6 +254,23 @@ if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$ti
   )
 } else {
   htmltools::p("Timing info not available.")
+}
+```
+:::
+
+## Row
+
+### Column
+
+::: {.card title="Target Metrics by Plan"}
+Count, size (MB), and timing (seconds) for each target, grouped by tar_plan.
+TOTAL row shows overall totals.
+
+```{r}
+if (exists("table_telemetry_target_metrics")) {
+  table_telemetry_target_metrics
+} else {
+  htmltools::p("Target metrics not available. Run tar_make() to generate.")
 }
 ```
 :::

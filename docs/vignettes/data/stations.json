@@ -1,0 +1,47 @@
+[
+  {
+    "station_id": "M2",
+    "call_sign": "62091",
+    "longitude": -5.4302,
+    "latitude": 53.4836,
+    "active": true,
+    "first_observation": "2026-01-17",
+    "last_observation": "2026-01-31 19:00:00"
+  },
+  {
+    "station_id": "M5",
+    "call_sign": "62094",
+    "longitude": -6.7043,
+    "latitude": 51.6904,
+    "active": true,
+    "first_observation": "2026-01-17",
+    "last_observation": "2026-01-31 19:00:00"
+  },
+  {
+    "station_id": "M4",
+    "call_sign": "62093",
+    "longitude": -9.9991,
+    "latitude": 55,
+    "active": true,
+    "first_observation": "2026-01-17",
+    "last_observation": "2026-01-31 19:00:00"
+  },
+  {
+    "station_id": "M3",
+    "call_sign": "62092",
+    "longitude": -10.5483,
+    "latitude": 51.216,
+    "active": true,
+    "first_observation": "2026-01-17",
+    "last_observation": "2026-01-31 19:00:00"
+  },
+  {
+    "station_id": "M6",
+    "call_sign": "62095",
+    "longitude": -15.8813,
+    "latitude": 53.0748,
+    "active": true,
+    "first_observation": "2026-01-17",
+    "last_observation": "2026-01-31 19:00:00"
+  }
+]

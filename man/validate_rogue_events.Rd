@@ -4,7 +4,12 @@
 \alias{validate_rogue_events}
 \title{Validate rogue wave events data}
 \usage{
-validate_rogue_events(data, target_name = "rogue_wave_events", min_rows = 1)
+validate_rogue_events(
+  data,
+  target_name = "rogue_wave_events",
+  min_rows = 1,
+  report_path = NULL
+)
 }
 \arguments{
 \item{data}{A data frame of rogue wave events}
@@ -12,6 +17,8 @@ validate_rogue_events(data, target_name = "rogue_wave_events", min_rows = 1)
 \item{target_name}{Name of the target for error messages}
 
 \item{min_rows}{Minimum expected rows (default: 1)}
+
+\item{report_path}{Optional path to save HTML validation report}
 }
 \value{
 The original data if validation passes
