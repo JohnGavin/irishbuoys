@@ -34,17 +34,15 @@ For a reproducible development environment using Nix:
 git clone https://github.com/johngavin/irishbuoys.git
 cd irishbuoys
 
-# Generate Nix configuration from DESCRIPTION
-Rscript default.R
-
-# Enter Nix shell (first time may take a while)
-./default.sh
-
-# Subsequent entries are fast (seconds)
+# Enter Nix shell (first time may take a while, subsequent entries are fast)
 ./default.sh
 ```
 
-### Pure Mode Enforcement (Security & Reproducibility)
+The `default.sh` script automatically: - Generates `default.nix` from
+DESCRIPTION if needed (via `default.R`) - Creates a GC root to prevent
+garbage collection - Enters pure mode for reproducibility
+
+### Pure Mode
 
 This project enforces Nix `--pure` mode to guarantee:
 
@@ -97,8 +95,15 @@ To integrate this package into your own Nix environment:
 library(rix)
 
 rix(
-  r_ver = "4.5.0",
-  r_pkgs = c("duckdb", "DBI", "httr2", "dplyr"),
+  r_ver = "4.5.2",  # Must match project's R version
+  r_pkgs = c(
+    # Core dependencies (from Imports)
+    "arrow", "cli", "dbplyr", "DBI", "dplyr", "duckdb",
+    "glue", "httr2", "jsonlite", "lubridate", "pointblank",
+    "purrr", "rlang", "tibble",
+    # Visualization (from Suggests)
+    "plotly", "ggplot2", "dygraphs", "DT"
+  ),
   git_pkgs = list(
     list(
       package_name = "irishbuoys",
@@ -431,6 +436,7 @@ Buoy Network.
     │   │   ├── dashboard_buoy_data.rds
     │   │   ├── dashboard_stats.rds
     │   │   ├── dashboard_timeseries.rds
+    │   │   ├── irish_buoys.duckdb
     │   │   ├── return_levels.rds
     │   │   ├── rogue_wave_events.rds
     │   │   ├── seasonal_analysis.rds
@@ -528,7 +534,8 @@ Buoy Network.
     ├── tests
     │   ├── testthat
     │   │   ├── _snaps
-    │   │   └── test-data-consistency.R
+    │   │   ├── test-data-consistency.R
+    │   │   └── test-doc-dependencies.R
     │   └── testthat.R
     └── vignettes
         ├── _targets.yaml
@@ -593,4 +600,4 @@ Data provided by the Marine Institute Ireland in collaboration with Met
 
 ------------------------------------------------------------------------
 
-    *Last updated: 2026-02-12 10:51 UTC *
+    *Last updated: 2026-02-12 14:38 UTC *
