@@ -420,6 +420,131 @@ plan_telemetry <- list(
   ),
 
   # ==========================================================================
+  # TARGET METRICS - count, size, timing grouped by plan
+  # ==========================================================================
+
+  # Comprehensive target metrics grouped by tar_plan
+  targets::tar_target(
+    telemetry_target_metrics,
+    {
+      meta <- tryCatch(targets::tar_meta(), error = function(e) NULL)
+      if (is.null(meta) || nrow(meta) == 0) {
+        return(tibble::tibble(
+          plan = character(),
+          target = character(),
+          n_targets = integer(),
+          total_bytes = numeric(),
+          total_seconds = numeric()
+        ))
+      }
+
+      # Map targets to their source plan files
+      # Based on naming conventions: plan_* targets come from plan_*.R
+      plan_mapping <- list(
+        data_acquisition = c("buoy_data", "station_metadata", "erddap"),
+        quality_control = c("validated", "qc_"),
+        wave_analysis = c("analysis_data", "rogue_", "extreme_", "gev_", "gpd_",
+                          "return_", "stl_", "trend_", "gust_", "plot_"),
+        dashboard = c("dashboard_", "caption_"),
+        doc_examples = c("code_readme_", "code_parsed_", "src_", "readme_examples"),
+        dashboard_captions = c("caption_"),
+        telemetry = c("telemetry_", "table_telemetry_", "plot_telemetry_")
+      )
+
+      # Assign each target to a plan
+      assign_plan <- function(target_name) {
+        for (plan_name in names(plan_mapping)) {
+          patterns <- plan_mapping[[plan_name]]
+          for (pattern in patterns) {
+            if (grepl(pattern, target_name, ignore.case = TRUE)) {
+              return(plan_name)
+            }
+          }
+        }
+        return("other")
+      }
+
+      meta$plan <- sapply(meta$name, assign_plan)
+
+      # Calculate metrics per target
+      target_details <- meta |>
+        dplyr::transmute(
+          plan = plan,
+          target = name,
+          bytes = as.numeric(bytes),
+          seconds = as.numeric(seconds),
+          status = dplyr::case_when(
+            !is.na(error) ~ "error",
+            is.na(time) ~ "not_run",
+            TRUE ~ "completed"
+          )
+        )
+
+      # Group by plan with totals
+      plan_summary <- target_details |>
+        dplyr::group_by(plan) |>
+        dplyr::summarise(
+          n_targets = dplyr::n(),
+          completed = sum(status == "completed", na.rm = TRUE),
+          total_bytes = sum(bytes, na.rm = TRUE),
+          total_mb = round(sum(bytes, na.rm = TRUE) / 1024^2, 2),
+          total_seconds = round(sum(seconds, na.rm = TRUE), 1),
+          avg_seconds = round(mean(seconds, na.rm = TRUE), 2),
+          .groups = "drop"
+        ) |>
+        dplyr::arrange(dplyr::desc(n_targets))
+
+      # Add overall totals row
+      totals <- tibble::tibble(
+        plan = "TOTAL",
+        n_targets = sum(plan_summary$n_targets),
+        completed = sum(plan_summary$completed),
+        total_bytes = sum(plan_summary$total_bytes),
+        total_mb = round(sum(plan_summary$total_bytes) / 1024^2, 2),
+        total_seconds = round(sum(plan_summary$total_seconds), 1),
+        avg_seconds = round(mean(target_details$seconds, na.rm = TRUE), 2)
+      )
+
+      list(
+        by_plan = dplyr::bind_rows(totals, plan_summary),
+        by_target = target_details
+      )
+    }
+  ),
+
+  # Formatted table of target metrics by plan
+  targets::tar_target(
+    table_telemetry_target_metrics,
+    {
+      data <- telemetry_target_metrics$by_plan
+      if (is.null(data) || nrow(data) == 0) {
+        return(htmltools::p("No target metrics available"))
+      }
+
+      # Format with totals row highlighted
+      DT::datatable(
+        data,
+        caption = "Target Metrics by Plan (TOTAL row first)",
+        extensions = "Buttons",
+        options = list(
+          dom = "Bfrtip",
+          buttons = c("csv", "excel", "print"),
+          pageLength = 15,
+          scrollX = TRUE,
+          order = list()  # Preserve row order (totals first)
+        ),
+        rownames = FALSE,
+        class = "display compact"
+      ) |>
+        DT::formatStyle(
+          "plan",
+          target = "row",
+          backgroundColor = DT::styleEqual("TOTAL", "#e8f4f8")
+        )
+    }
+  ),
+
+  # ==========================================================================
   # FORMATTED TABLES FOR DISPLAY
   # ==========================================================================
 
