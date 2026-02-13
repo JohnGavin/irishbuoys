@@ -475,7 +475,7 @@ analyze_joint_extremes <- function(
 
   # Pivot to wide format (one column per station)
   extreme_wide <- stats::reshape(
-    data[, c("time", "station_id", "is_extreme")],
+    as.data.frame(data[, c("time", "station_id", "is_extreme")]),
     direction = "wide",
     idvar = "time",
     timevar = "station_id",
