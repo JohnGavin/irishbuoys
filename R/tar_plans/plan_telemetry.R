@@ -123,7 +123,7 @@ plan_telemetry <- list(
   targets::tar_target(
     telemetry_db_file_size,
     {
-      db_path <- get_default_db_path()
+      db_path <- "inst/extdata/irish_buoys.duckdb"
       if (file.exists(db_path)) {
         size_bytes <- file.info(db_path)$size
         tibble::tibble(
@@ -193,7 +193,7 @@ plan_telemetry <- list(
           SELECT
             station_id,
             MAX(time) as latest_observation,
-            ROUND(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - MAX(time))) / 3600, 1) as hours_since_update
+            ROUND(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP::TIMESTAMP - MAX(time))) / 3600, 1) as hours_since_update
           FROM buoy_data
           GROUP BY station_id
           ORDER BY hours_since_update

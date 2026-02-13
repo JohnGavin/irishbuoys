@@ -13,13 +13,13 @@ plan_quality_control <- list(
       DBI::dbGetQuery(con, "
         SELECT
           station_id,
-          DATE(time) as date,
+          CAST(time AS DATE) as date,
           COUNT(*) as n_records,
-          COUNT(DISTINCT CAST(strftime(time, '%H') AS INTEGER)) as n_hours,
+          COUNT(DISTINCT CAST(HOUR(time) AS INTEGER)) as n_hours,
           AVG(CASE WHEN qc_flag = 1 THEN 1 ELSE 0 END) as pct_good
         FROM buoy_data
-        WHERE time >= CURRENT_DATE - INTERVAL '30 days'
-        GROUP BY station_id, DATE(time)
+        WHERE time >= CAST(CAST(CURRENT_TIMESTAMP AS TIMESTAMP) AS DATE) - 30
+        GROUP BY station_id, CAST(time AS DATE)
         ORDER BY station_id, date DESC
       ")
     }
