@@ -15,13 +15,11 @@ NULL
 
 plan_vignettes <- list(
 
-  # Dashboard Static - Main dashboard with all buoy data
-  # Dependencies: dashboard_buoy_data, dashboard_stats, dashboard_timeseries
-  # Note: packages should be loaded inside the .qmd file itself
-  tarchetypes::tar_quarto(
-    vignette_dashboard_static,
-    path = "vignettes/dashboard_static.qmd"
-  ),
+  # Dashboard Static - TEMPORARILY DISABLED due to quarto CLI issues
+  # tarchetypes::tar_quarto(
+  #   vignette_dashboard_static,
+  #   path = "vignettes/dashboard_static.qmd"
+  # ),
 
   # Wave Analysis - Extreme value analysis and rogue waves
   # Dependencies: analysis_data, rogue_wave_events, return_levels, joint_analysis_results
