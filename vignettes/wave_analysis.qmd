@@ -1,5 +1,5 @@
 ---
-title: "Irish Buoys Wave Analysis (2019-2026)"
+title: "Irish Buoys Analysis"
 format:
   dashboard:
     orientation: rows
@@ -115,7 +115,7 @@ create_dt <- function(data, caption = "") {
   time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp"))
 
   dt <- datatable(
-    data, caption = caption, filter = 'top', extensions = 'Buttons',
+    data, caption = caption, filter = 'top', rownames = FALSE, extensions = 'Buttons',
     options = list(
       pageLength = 15, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
       order = list(list(0, 'desc')), scrollX = TRUE,
@@ -168,6 +168,11 @@ if (!is.null(analysis_data) && nrow(analysis_data) > 0) {
   max_gust <- NA
   max_mean_wind <- NA
 }
+
+# Dynamic title based on actual data range
+year_start <- format(as.Date(data_start), "%Y")
+year_end <- format(as.Date(data_end), "%y")
+dynamic_title <- paste0("Irish Buoys Analysis (", year_start, "-", year_end, ")")
 ```
 
 # Overview
@@ -523,52 +528,6 @@ if (!is.null(gust_analysis) && "by_station_category" %in% names(gust_analysis) &
 ```{r gust-rogue}
 # Generate plot inline
 create_plot_rogue_gusts(gust_analysis)
-```
-
-# Trends
-
-## Row
-
-### Column {.tabset}
-
-#### Monthly Wave Height
-
-```{r trends-monthly-wave}
-# Generate plot inline
-create_plot_monthly_wave(seasonal_means_wave)
-```
-
-#### Monthly Wave (Data)
-
-```{r trends-monthly-wave-data}
-if (!is.null(seasonal_means_wave) && "monthly" %in% names(seasonal_means_wave)) {
-  seasonal_means_wave$monthly |>
-    mutate(across(where(is.numeric), ~round(., 2))) |>
-    create_dt(paste0("Monthly Wave Height Statistics (", date_caption, ")"))
-}
-```
-
-#### Monthly Wind
-
-```{r trends-monthly-wind}
-# Generate plot inline
-create_plot_monthly_wind(seasonal_means_wind)
-```
-
-#### Annual Trends
-
-```{r trends-annual}
-# Generate plot inline
-create_plot_annual_trends(annual_trends_wave)
-```
-
-#### STL Decomposition
-
-```{r trends-stl}
-#| fig-width: 12
-#| fig-height: 8
-# Generate STL plot inline (ggplot2)
-create_plot_stl(wave_height_seasonal)
 ```
 
 # Hourly Max

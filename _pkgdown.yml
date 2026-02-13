@@ -33,13 +33,16 @@ template:
 
 navbar:
   structure:
-    left: [intro, articles, reference]
+    left: [intro, articles, reference, all_articles]
     right: [github]
   components:
     github:
       icon: fab fa-github
       href: https://github.com/JohnGavin/irishbuoys
       aria-label: GitHub
+    all_articles:
+      text: All Articles
+      href: articles/index.html
 
 articles:
   - title: Dashboards
@@ -50,10 +53,6 @@ articles:
     navbar: Analysis
     contents:
       - wave_analysis
-  - title: Debug
-    navbar: Debug
-    contents:
-      - debug
   - title: Telemetry
     navbar: Telemetry
     contents:
@@ -64,6 +63,7 @@ articles:
   - title: internal
     contents:
       - dashboard_shinylive
+      - debug
   # Note: dashboard_shinylive requires separate Quarto rendering with shinylive extension
   # Build with: quarto render vignettes/dashboard_shinylive.qmd
 
