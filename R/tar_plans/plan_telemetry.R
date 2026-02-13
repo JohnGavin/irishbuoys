@@ -57,21 +57,21 @@ plan_telemetry <- list(
       con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con), add = TRUE)
 
-      # Query download metadata if tracking table exists
+      # Query download metadata if tracking table exists (dplyr/dbplyr pattern)
       if (DBI::dbExistsTable(con, "download_log")) {
-        stats <- DBI::dbGetQuery(con, "
-          SELECT
-            DATE(download_time) as date,
-            COUNT(*) as n_downloads,
-            SUM(rows_downloaded) as total_rows,
-            AVG(duration_seconds) as avg_duration_sec,
-            SUM(CASE WHEN success THEN 1 ELSE 0 END) as successful,
-            SUM(CASE WHEN NOT success THEN 1 ELSE 0 END) as failed
-          FROM download_log
-          GROUP BY DATE(download_time)
-          ORDER BY date DESC
-        ")
-        tibble::as_tibble(stats)
+        stats <- dplyr::tbl(con, "download_log") |>
+          dplyr::mutate(date = as.Date(download_time)) |>
+          dplyr::group_by(date) |>
+          dplyr::summarise(
+            n_downloads = dplyr::n(),
+            total_rows = sum(rows_downloaded, na.rm = TRUE),
+            avg_duration_sec = mean(duration_seconds, na.rm = TRUE),
+            successful = sum(dplyr::if_else(success, 1L, 0L), na.rm = TRUE),
+            failed = sum(dplyr::if_else(!success, 1L, 0L), na.rm = TRUE),
+            .groups = "drop"
+          ) |>
+          dplyr::arrange(dplyr::desc(date)) |>
+          dplyr::collect()
       } else {
         # Return empty tibble with expected structure
         tibble::tibble(
@@ -100,13 +100,11 @@ plan_telemetry <- list(
       # Get table sizes
       tables <- DBI::dbListTables(con)
 
+      # Use dplyr::tbl() for tidyverse-style queries
       table_info <- lapply(tables, function(tbl) {
-        count_query <- sprintf("SELECT COUNT(*) as n FROM %s", tbl)
-        n_rows <- DBI::dbGetQuery(con, count_query)$n
-
-        # Get column count
-        col_query <- sprintf("SELECT * FROM %s LIMIT 0", tbl)
-        n_cols <- ncol(DBI::dbGetQuery(con, col_query))
+        tbl_ref <- dplyr::tbl(con, tbl)
+        n_rows <- tbl_ref |> dplyr::count() |> dplyr::collect() |> dplyr::pull(n)
+        n_cols <- ncol(tbl_ref |> head(0) |> dplyr::collect())
 
         tibble::tibble(
           table_name = tbl,
@@ -155,19 +153,19 @@ plan_telemetry <- list(
       on.exit(DBI::dbDisconnect(con), add = TRUE)
 
       if (DBI::dbExistsTable(con, "buoy_data")) {
-        coverage <- DBI::dbGetQuery(con, "
-          SELECT
-            station_id,
-            MIN(time) as earliest_observation,
-            MAX(time) as latest_observation,
-            COUNT(*) as total_observations,
-            COUNT(DISTINCT DATE(time)) as days_with_data,
-            ROUND(100.0 * SUM(CASE WHEN qc_flag = 1 THEN 1 ELSE 0 END) / COUNT(*), 1) as pct_qc_good
-          FROM buoy_data
-          GROUP BY station_id
-          ORDER BY station_id
-        ")
-        tibble::as_tibble(coverage)
+        # Use dplyr/dbplyr for tidyverse-style aggregation
+        coverage <- dplyr::tbl(con, "buoy_data") |>
+          dplyr::group_by(station_id) |>
+          dplyr::summarise(
+            earliest_observation = min(time, na.rm = TRUE),
+            latest_observation = max(time, na.rm = TRUE),
+            total_observations = dplyr::n(),
+            days_with_data = dplyr::n_distinct(as.Date(time)),
+            pct_qc_good = round(100.0 * sum(dplyr::if_else(qc_flag == 1L, 1L, 0L), na.rm = TRUE) / dplyr::n(), 1),
+            .groups = "drop"
+          ) |>
+          dplyr::arrange(station_id) |>
+          dplyr::collect()
       } else {
         tibble::tibble(
           station_id = character(),
@@ -189,16 +187,18 @@ plan_telemetry <- list(
       on.exit(DBI::dbDisconnect(con), add = TRUE)
 
       if (DBI::dbExistsTable(con, "buoy_data")) {
-        freshness <- DBI::dbGetQuery(con, "
-          SELECT
-            station_id,
-            MAX(time) as latest_observation,
-            ROUND(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP::TIMESTAMP - MAX(time))) / 3600, 1) as hours_since_update
-          FROM buoy_data
-          GROUP BY station_id
-          ORDER BY hours_since_update
-        ")
-        tibble::as_tibble(freshness)
+        # Use dplyr/dbplyr - compute hours_since_update in R after collect
+        freshness <- dplyr::tbl(con, "buoy_data") |>
+          dplyr::group_by(station_id) |>
+          dplyr::summarise(
+            latest_observation = max(time, na.rm = TRUE),
+            .groups = "drop"
+          ) |>
+          dplyr::collect() |>
+          dplyr::mutate(
+            hours_since_update = round(as.numeric(difftime(Sys.time(), latest_observation, units = "hours")), 1)
+          ) |>
+          dplyr::arrange(hours_since_update)
       } else {
         tibble::tibble(
           station_id = character(),
@@ -277,16 +277,16 @@ plan_telemetry <- list(
       on.exit(DBI::dbDisconnect(con), add = TRUE)
 
       if (DBI::dbExistsTable(con, "buoy_data")) {
-        trends <- DBI::dbGetQuery(con, "
-          SELECT
-            DATE_TRUNC('month', time) as month,
-            qc_flag,
-            COUNT(*) as n_observations
-          FROM buoy_data
-          GROUP BY DATE_TRUNC('month', time), qc_flag
-          ORDER BY month, qc_flag
-        ")
-        tibble::as_tibble(trends)
+        # Use dplyr/dbplyr - truncate to month in R after collect for portability
+        trends <- dplyr::tbl(con, "buoy_data") |>
+          dplyr::collect() |>
+          dplyr::mutate(month = lubridate::floor_date(time, "month")) |>
+          dplyr::group_by(month, qc_flag) |>
+          dplyr::summarise(
+            n_observations = dplyr::n(),
+            .groups = "drop"
+          ) |>
+          dplyr::arrange(month, qc_flag)
       } else {
         tibble::tibble(
           month = as.Date(character()),
@@ -305,19 +305,22 @@ plan_telemetry <- list(
       on.exit(DBI::dbDisconnect(con), add = TRUE)
 
       if (DBI::dbExistsTable(con, "buoy_data")) {
-        rogue <- DBI::dbGetQuery(con, "
-          SELECT
-            DATE_TRUNC('month', time) as month,
-            station_id,
-            COUNT(*) as total_observations,
-            SUM(CASE WHEN hmax > 2 * wave_height AND wave_height > 0 THEN 1 ELSE 0 END) as rogue_events,
-            ROUND(100.0 * SUM(CASE WHEN hmax > 2 * wave_height AND wave_height > 0 THEN 1 ELSE 0 END) / COUNT(*), 2) as rogue_pct
-          FROM buoy_data
-          WHERE qc_flag = 1
-          GROUP BY DATE_TRUNC('month', time), station_id
-          ORDER BY month, station_id
-        ")
-        tibble::as_tibble(rogue)
+        # Use dplyr/dbplyr - filter and collect, then aggregate in R
+        rogue <- dplyr::tbl(con, "buoy_data") |>
+          dplyr::filter(qc_flag == 1L) |>
+          dplyr::collect() |>
+          dplyr::mutate(
+            month = lubridate::floor_date(time, "month"),
+            is_rogue = hmax > 2 * wave_height & wave_height > 0
+          ) |>
+          dplyr::group_by(month, station_id) |>
+          dplyr::summarise(
+            total_observations = dplyr::n(),
+            rogue_events = sum(is_rogue, na.rm = TRUE),
+            rogue_pct = round(100.0 * sum(is_rogue, na.rm = TRUE) / dplyr::n(), 2),
+            .groups = "drop"
+          ) |>
+          dplyr::arrange(month, station_id)
       } else {
         tibble::tibble(
           month = as.Date(character()),
