@@ -58,6 +58,11 @@ articles:
     navbar: Telemetry
     contents:
       - telemetry
+  - title: Data Quality
+    navbar: Data Quality
+    contents:
+      - validation_analysis_data
+      - validation_rogue_events
   - title: internal
     contents:
       - dashboard_shinylive

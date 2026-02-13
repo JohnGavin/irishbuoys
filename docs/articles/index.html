@@ -2,18 +2,105 @@
 <html>
 <head>
 <title>Articles - irishbuoys</title>
-<style>body{font-family:sans-serif;padding:2em;max-width:800px;margin:0 auto;}</style>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; padding: 2em; max-width: 900px; margin: 0 auto; line-height: 1.6; }
+h1 { color: #1a5276; border-bottom: 2px solid #3498db; padding-bottom: 0.5em; }
+h2 { color: #2874a6; margin-top: 2em; }
+.vignette { background: #f8f9fa; border-radius: 8px; padding: 1.5em; margin: 1em 0; border-left: 4px solid #3498db; }
+.vignette h3 { margin-top: 0; color: #1a5276; }
+.vignette h3 a { text-decoration: none; color: inherit; }
+.vignette h3 a:hover { color: #3498db; }
+.selling-points { list-style: none; padding: 0; margin: 0.5em 0; }
+.selling-points li { padding: 0.3em 0; }
+.selling-points li::before { content: "✓ "; color: #27ae60; font-weight: bold; }
+.size { font-size: 0.85em; color: #7f8c8d; }
+a { color: #3498db; }
+.back { margin-top: 2em; padding-top: 1em; border-top: 1px solid #ddd; }
+</style>
 </head>
 <body>
-<h1>Articles</h1>
-<h2>Dashboards</h2>
-<ul>
-<li><a href="dashboard_static.html">Irish Weather Buoy Explorer</a> - Interactive dashboard with sortable tables</li>
-</ul>
-<h2>Analysis</h2>
-<ul>
-<li><a href="wave_analysis.html">Comprehensive Wave Analysis</a> - Wave measurement science, rogue waves, extreme value analysis, trend decomposition</li>
-</ul>
-<p><a href="../index.html">Back to package documentation</a></p>
+<h1>📊 Irish Weather Buoys - Vignettes</h1>
+
+<p>Interactive dashboards and analysis vignettes for the <a href="../index.html">irishbuoys</a> R package.
+All vignettes load pre-computed data from the <code>targets</code> pipeline for reproducibility.</p>
+
+<h2>🌊 Dashboards</h2>
+
+<div class="vignette">
+  <h3><a href="dashboard_static.html">Irish Weather Buoy Explorer</a></h3>
+  <ul class="selling-points">
+    <li><strong>6 interactive pages</strong>: Max Wave, Signif Wave, Wind Speed, Wind vs Wave, Data, Reference</li>
+    <li><strong>Rogue wave detection</strong>: Automatic identification of waves where Max Wave / Signif Wave > 2.0</li>
+    <li><strong>Full historical data</strong>: Hourly observations from all 5 buoys (M2-M6), 2019-present</li>
+  </ul>
+  <p class="size">~14 MB HTML (includes all interactive charts)</p>
+</div>
+
+<h2>📈 Analysis</h2>
+
+<div class="vignette">
+  <h3><a href="wave_analysis.html">Comprehensive Wave Analysis</a></h3>
+  <ul class="selling-points">
+    <li><strong>Extreme value analysis</strong>: GEV and GPD models with return levels (10, 25, 50, 100 years)</li>
+    <li><strong>Joint distribution analysis</strong>: Cross-correlations, M6 predictions, copula tail dependence</li>
+    <li><strong>Rogue wave science</strong>: Worked example of how Signif Wave is calculated from raw measurements</li>
+  </ul>
+  <p class="size">~21 MB HTML (includes all interactive charts)</p>
+</div>
+
+<h2>🔧 Technical</h2>
+
+<div class="vignette">
+  <h3><a href="telemetry.html">Pipeline Telemetry</a> <span class="size">(if available)</span></h3>
+  <ul class="selling-points">
+    <li><strong>Data coverage metrics</strong>: Completeness by station and time period</li>
+    <li><strong>Pipeline performance</strong>: Target execution times and dependencies</li>
+    <li><strong>Git activity tracking</strong>: Commits, branches, and development metrics</li>
+  </ul>
+</div>
+
+<div class="vignette">
+  <h3><a href="debug.html">Debug Dashboard</a></h3>
+  <ul class="selling-points">
+    <li><strong>Validation status</strong>: Data quality checks via pointblank</li>
+    <li><strong>Pipeline health</strong>: Target status and error tracking</li>
+    <li><strong>Session diagnostics</strong>: R version, packages, environment</li>
+  </ul>
+</div>
+
+<h2>✅ Data Quality (pointblank)</h2>
+
+<div class="vignette">
+  <h3><a href="validation_analysis_data.html">Analysis Data Validation</a></h3>
+  <ul class="selling-points">
+    <li><strong>Comprehensive checks</strong>: Column existence, value ranges, station IDs</li>
+    <li><strong>Physical bounds</strong>: Wave height 0-30m, wind speed 0-100 m/s</li>
+    <li><strong>Interactive report</strong>: pointblank interrogation with pass/fail details</li>
+  </ul>
+</div>
+
+<div class="vignette">
+  <h3><a href="validation_rogue_events.html">Rogue Wave Validation</a></h3>
+  <ul class="selling-points">
+    <li><strong>Event validation</strong>: Rogue wave ratio > 2.0, required columns</li>
+    <li><strong>Quality assurance</strong>: Ensures detected rogue waves meet criteria</li>
+    <li><strong>Interactive report</strong>: pointblank interrogation for rogue events</li>
+  </ul>
+</div>
+
+<h2>📱 Interactive (WebR)</h2>
+
+<div class="vignette">
+  <h3><a href="dashboard_shinylive.html">Shinylive Dashboard</a> <span class="size">(experimental)</span></h3>
+  <ul class="selling-points">
+    <li><strong>Runs in browser</strong>: No server required - pure WebAssembly/WebR</li>
+    <li><strong>Interactive filters</strong>: Select stations, variables, date ranges dynamically</li>
+    <li><strong>Portable</strong>: Share as static HTML file, works offline</li>
+  </ul>
+  <p class="size">Note: Initial load takes 30-60 seconds while WebR initializes</p>
+</div>
+
+<p class="back"><a href="../index.html">← Back to package documentation</a></p>
+
 </body>
 </html>

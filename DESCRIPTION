@@ -24,12 +24,14 @@ Imports:
     jsonlite,
     lubridate,
     pointblank,
-    purrr,
     rlang,
     tibble,
     utils
 Suggests:
     blastula,
+    rprojroot,
+    withr,
+    copula,
     crew,
     dygraphs,
     DT,

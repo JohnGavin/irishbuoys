@@ -38,6 +38,8 @@ analysis_pkgs <- c(
   "mev",            # Multivariate extreme values (GPD)
   "SpatialExtremes",# Spatial extreme value modelling
   "quantreg",       # Quantile regression
+  "copula",         # Copula models for dependence
+  "copula",         # Copula models for dependence
   "zoo",            # Time series infrastructure
   "xts",            # Extensible time series
   "pointblank"      # Data validation
@@ -85,6 +87,6 @@ rix::rix(
 cat("default.nix generated with analysis vignette packages\n")
 cat("Core: arrow, duckdb, dplyr, tidyr, lubridate, jsonlite, httr2\n")
 cat("Pipeline: targets, tarchetypes, crew, mirai\n")
-cat("Analysis: mgcv, forecast, extRemes, evd, quantreg, zoo, xts\n")
+cat("Analysis: mgcv, forecast, extRemes, evd, copula, quantreg, zoo, xts\n")
 cat("Viz: ggplot2, plotly, scales\n")
 cat("Dev: rix, desc, devtools, usethis, testthat, gert, quarto\n")
