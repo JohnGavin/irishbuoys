@@ -1089,15 +1089,19 @@ For longer period swell (T = 15s): $v_g \approx 23$ m/s $\approx 84$ km/h
 
 ### Column {.tabset}
 
-#### Key Terms
+#### Definitions
 
-All analysis computed via `{targets}` pipeline.
+##### {.tabset}
 
-**Rogue Wave Definition:** A rogue wave has **Max Wave / Signif Wave > 2.0** (ratio of maximum individual wave to significant wave height).
+###### Key Terms
+
+**Table: Key Oceanographic and Meteorological Terms**
+
+All analysis computed via [`{targets}`](https://docs.ropensci.org/targets/) pipeline.
 
 | Term | Definition | Reference |
 |------|------------|-----------|
-| **Signif Wave = H1/3 = 4sigma** | All three mean the same: significant wave height = mean of highest 1/3 of waves = 4 x standard deviation of sea surface | [Longuet-Higgins 1952](https://doi.org/10.1357/002224052806645438) |
+| **Signif Wave = H1/3 = 4σ** | All three mean the same: significant wave height = mean of highest 1/3 of waves = 4 × standard deviation of sea surface | [Longuet-Higgins 1952](https://doi.org/10.1357/002224052806645438) |
 | **Max Wave** | Maximum individual wave height in 17.5-min measurement period | Typically Max Wave / Signif Wave ~ 1.5-1.9 |
 | **Rogue Wave** | Wave where **Max Wave / Signif Wave > 2.0** | [Dysthe 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203) |
 | **Rogue Ratio** | = Max Wave / Signif Wave. Values > 2.0 indicate a rogue wave | Used in [Rogue Waves](#rogue-waves) |
@@ -1109,55 +1113,125 @@ All analysis computed via `{targets}` pipeline.
 | **Gust Factor** | Peak Gust / Sustained Wind (~1.3 typical) | Used in [Gust Factor](#gust-factor) |
 | **STL** | Seasonal-Trend decomposition (Loess) | Used in [Trends](#trends) |
 
-#### Why Signif Wave = H1/3 = 4sigma
+*Caption: Terminology used throughout this dashboard. Rogue events are identified when ratios exceed defined thresholds.*
+
+###### Rogue Events
+
+**Table: Rogue Event Thresholds**
+
+| Event Type | Ratio Formula | Threshold | Interpretation |
+|------------|---------------|-----------|----------------|
+| **Rogue Wave** | Max Wave / Signif Wave | > 2.0 | Individual wave significantly exceeds average sea state |
+| **Rogue Gust** | Gust / Wind Speed | > 1.5 | Peak gust significantly exceeds sustained wind |
+
+**Normal ranges:**
+
+- Wave Ratio: 1.5–1.9 (normal sea state)
+- Gust Ratio: 1.2–1.4 (typical conditions)
+
+*Caption: Rogue events are rare extremes. Wave ratios > 2.0 occur in ~1-2% of observations; gust ratios > 1.5 occur in ~3-5%.*
+
+###### Beaufort Scale
+
+**Table: Beaufort Wind Scale**
+
+| Beaufort | Description | Wind Speed (m/s) | Sea State |
+|----------|-------------|------------------|-----------|
+| 0-5 | Calm to Fresh Breeze | 0 – 10.7 | Ripples to moderate waves |
+| 6-7 | Strong Breeze to Near Gale | 10.8 – 17.1 | Large waves, whitecaps |
+| 8-9 | Gale to Severe Gale | 17.2 – 24.4 | High waves, spray |
+| 10 | Storm | 24.5 – 28.4 | Very high waves |
+| 11 | Violent Storm | 28.5 – 32.6 | Exceptionally high waves |
+| 12 | Hurricane Force | > 32.7 | Air filled with foam |
+
+*Caption: Beaufort scale converts wind speed to descriptive categories. Used in [Gust Factor](#gust-factor) analysis.*
+
+#### Methodology
+
+##### {.tabset}
+
+###### Signif Wave Calculation
+
+**Why Signif Wave = H1/3 = 4σ**
 
 These three notations all mean the same thing:
 
 - **Signif Wave** = Significant wave height (common abbreviation)
 - **H1/3** = Mean of highest 1/3 of waves (original definition)
-- **4sigma** = 4 x standard deviation of sea surface elevation
+- **4σ** = 4 × standard deviation of sea surface elevation
 
-The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Signif Wave = 4 x sqrt(m0)** where m0 is the variance of sea elevation.
+The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Signif Wave = 4 × sqrt(m0)** where m0 is the variance of sea elevation.
 
 See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked example.
 
-#### Measurement Window
+###### Measurement Window
 
 **Why 17.5-minute measurement?**
 
-- Statistical requirement: Need ~100+ waves for valid H1/3
-- Wave periods typically 5-15 seconds → 17.5 min gives ~70-200 waves
-- WMO recommends 20-30 minutes; 17.5 is the practical lower bound
-- Trade-off: longer = better statistics, shorter = more temporal resolution
+| Requirement | Specification | Rationale |
+|-------------|---------------|-----------|
+| **Sample size** | ~100+ waves | Statistical validity for H1/3 |
+| **Wave periods** | 5–15 seconds | 17.5 min yields ~70–200 waves |
+| **WMO standard** | 20–30 minutes | 17.5 is practical lower bound |
+| **Trade-off** | Resolution vs. statistics | Shorter = more temporal detail |
+
+*Caption: Measurement window balances statistical requirements with temporal resolution.*
 
 **Data source:** [Marine Institute ERDDAP](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html)
 
-#### Beaufort Scale
+###### Extreme Value Methods
 
-| Beaufort | Description | Wind Speed (m/s) |
-|----------|-------------|-------------------|
-| 0-5 | Calm to Fresh Breeze | 0 - 10.7 |
-| 6-7 | Strong Breeze to Near Gale | 10.8 - 17.1 |
-| 8-9 | Gale to Severe Gale | 17.2 - 24.4 |
-| 10 | Storm | 24.5 - 28.4 |
-| 11 | Violent Storm | 28.5 - 32.6 |
-| 12 | Hurricane Force | > 32.7 |
+**Table: Statistical Methods for Extreme Value Analysis**
 
-#### Statistical Methods
+| Method | Full Name | Input Data | Used In |
+|--------|-----------|------------|---------|
+| **GEV** | Generalized Extreme Value | Block maxima (hourly max) | [Hourly Max](#hourly-max) |
+| **GPD** | Generalized Pareto Distribution | Peaks over threshold | [Hourly Max](#hourly-max) |
+| **Return Level** | N/A | GEV/GPD fitted parameters | [Hourly Max](#hourly-max) |
 
-**Extreme Value Methods:**
+*Caption: GEV fits annual/block maxima; GPD fits all exceedances above a threshold. Both estimate return levels (values exceeded once per T years).*
 
-| Method | Description | Used In |
-|--------|-------------|---------|
-| **GEV** | Block maxima (hourly max) | [Hourly Max](#hourly-max) |
-| **GPD** | Peaks over threshold (all exceedances) | [Hourly Max](#hourly-max) |
-| **Return Level** | Value exceeded once per T years | [Hourly Max](#hourly-max) |
+#### References
 
-**References:**
+##### {.tabset}
 
-- Longuet-Higgins, M.S. (1952). Statistical distribution of sea waves. *J. Marine Research*, 11, 245-266.
-- Dysthe, K. et al. (2008). Oceanic rogue waves. *Ann. Rev. Fluid Mech.*, 40, 287-310.
-- Coles, S. (2001). *Statistical Modeling of Extreme Values*. Springer.
+###### Academic
+
+**Key Papers:**
+
+| Author | Year | Title | DOI |
+|--------|------|-------|-----|
+| Longuet-Higgins, M.S. | 1952 | Statistical distribution of sea waves | [10.1357/002224052806645438](https://doi.org/10.1357/002224052806645438) |
+| Dysthe, K. et al. | 2008 | Oceanic rogue waves | [10.1146/annurev.fluid.40.111406.102203](https://doi.org/10.1146/annurev.fluid.40.111406.102203) |
+| Coles, S. | 2001 | *Statistical Modeling of Extreme Values* (Springer) | — |
+
+*Caption: Foundational papers for wave statistics and extreme value theory.*
+
+###### R Packages
+
+**Table: R Packages Used in Analysis**
+
+| Package | Purpose | Link |
+|---------|---------|------|
+| [`targets`](https://docs.ropensci.org/targets/) | Pipeline orchestration | [CRAN](https://cran.r-project.org/package=targets) |
+| [`mev`](https://lbelzile.github.io/mev/) | Extreme value analysis | [CRAN](https://cran.r-project.org/package=mev) |
+| [`extRemes`](https://www.ral.ucar.edu/staff/ericg/extRemes/) | GEV/GPD fitting | [CRAN](https://cran.r-project.org/package=extRemes) |
+| [`plotly`](https://plotly.com/r/) | Interactive visualisation | [CRAN](https://cran.r-project.org/package=plotly) |
+| [`DT`](https://rstudio.github.io/DT/) | Interactive tables | [CRAN](https://cran.r-project.org/package=DT) |
+
+*Caption: Core R packages enabling reproducible analysis and interactive dashboards.*
+
+###### Data Sources
+
+**Primary Data:**
+
+| Source | Description | URL |
+|--------|-------------|-----|
+| Marine Institute Ireland | Buoy network operator | [marine.ie](https://www.marine.ie/) |
+| ERDDAP Data Portal | Raw buoy data access | [erddap.marine.ie](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html) |
+| ERDDAP Metadata | Dataset documentation | [info/IWBNetwork](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html) |
+
+*Caption: All buoy data sourced from Marine Institute Ireland via ERDDAP protocol.*
 
 ---
 
