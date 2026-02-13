@@ -58,11 +58,9 @@ articles:
     navbar: Telemetry
     contents:
       - telemetry
-  - title: Data Quality
-    navbar: Data Quality
-    contents:
-      - validation_analysis_data
-      - validation_rogue_events
+  # Note: validation_analysis_data.html and validation_rogue_events.html are
+  # pointblank reports (pre-generated HTML), not Quarto vignettes.
+  # They are available at docs/articles/ but not built by pkgdown.
   - title: internal
     contents:
       - dashboard_shinylive
@@ -179,6 +177,19 @@ reference:
       - validate_rogue_events
       - generate_validation_reports
       - create_validation_summary
+
+  - title: "Joint Analysis"
+    desc: "Functions for multi-station spatial analysis"
+    contents:
+      - analyze_joint_extremes
+      - analyze_station_pairs
+      - cross_correlation_stations
+      - fit_bivariate_copula
+      - get_station_info
+      - haversine_distance
+      - joint_analysis_summary
+      - predict_station_lagged
+      - station_distance_matrix
 
   - title: "Documentation"
     desc: "Data dictionary and variable documentation"
