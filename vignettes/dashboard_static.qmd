@@ -1,5 +1,5 @@
 ---
-title: "Irish Weather Buoys"
+title: "Irish Buoys"
 format:
   dashboard:
     orientation: rows
