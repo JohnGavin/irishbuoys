@@ -34,7 +34,7 @@ plan_vignettes <- list(
   # Dependencies: telemetry_summary
   tarchetypes::tar_quarto(
     vignette_telemetry,
-    path = "docs/telemetry.qmd"
+    path = "vignettes/telemetry.qmd"
   ),
 
   # Debug - Debugging helper (minimal dependencies)

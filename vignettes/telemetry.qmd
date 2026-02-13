@@ -1,0 +1,333 @@
+---
+title: "Telemetry"
+format:
+  dashboard:
+    orientation: rows
+    theme: cosmo
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+
+# This vignette performs NO computation.
+# All data is loaded from pre-computed targets via tar_load().
+library(targets)
+
+# Set targets store relative to vignette location
+targets::tar_config_set(store = "../_targets")
+
+# Load all telemetry targets
+# These are computed by plan_telemetry.R during tar_make()
+tryCatch({
+  tar_load(telemetry_summary)
+  tar_load(telemetry_station_coverage)
+  tar_load(telemetry_db_info)
+  tar_load(telemetry_db_file_size)
+  tar_load(telemetry_data_freshness)
+  tar_load(telemetry_pipeline_status)
+  tar_load(telemetry_qc_trends)
+  tar_load(telemetry_rogue_frequency)
+  tar_load(telemetry_git_commits)
+  tar_load(telemetry_commit_frequency)
+  tar_load(telemetry_file_types)
+
+  # Tables
+  tar_load(table_telemetry_station_coverage)
+  tar_load(table_telemetry_db_info)
+  tar_load(table_telemetry_freshness)
+  tar_load(table_telemetry_commits)
+  tar_load(table_telemetry_file_types)
+  tar_load(telemetry_target_metrics)
+  tar_load(table_telemetry_target_metrics)
+
+  # Plots
+  tar_load(plot_telemetry_coverage_timeline)
+  tar_load(plot_telemetry_qc_trends)
+  tar_load(plot_telemetry_commit_frequency)
+  tar_load(plot_telemetry_rogue_frequency)
+
+  targets_loaded <- TRUE
+}, error = function(e) {
+  targets_loaded <<- FALSE
+})
+```
+
+# Overview
+
+Project health and data pipeline metrics for the irishbuoys package.
+
+## Row {height=20%}
+
+### Column
+
+::: {.valuebox title="Total Observations" icon="database"}
+```{r}
+if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
+  format(telemetry_summary$total_observations, big.mark = ",")
+} else {
+  "Run tar_make()"
+}
+```
+:::
+
+### Column
+
+::: {.valuebox title="Database Size" icon="hdd"}
+```{r}
+if (exists("telemetry_summary") && !is.null(telemetry_summary$db_size_mb)) {
+  paste0(telemetry_summary$db_size_mb, " MB")
+} else {
+  "N/A"
+}
+```
+:::
+
+### Column
+
+::: {.valuebox title="Active Stations" icon="broadcast"}
+```{r}
+if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
+  telemetry_summary$stations_active
+} else {
+  "N/A"
+}
+```
+:::
+
+### Column
+
+::: {.valuebox title="Commits (30d)" icon="git-branch"}
+```{r}
+if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
+  telemetry_summary$n_commits_30d
+} else {
+  "N/A"
+}
+```
+:::
+
+## Row
+
+### Column
+
+::: {.card title="Last Updated"}
+```{r}
+if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
+  format(telemetry_summary$generated_at, "%Y-%m-%d %H:%M UTC")
+} else {
+  "Targets not built. Run tar_make() to generate telemetry data."
+}
+```
+:::
+
+# Data Coverage
+
+Station data availability and freshness metrics.
+
+## Row
+
+### Column {.tabset}
+
+#### Coverage Timeline
+
+```{r}
+#| fig-height: 6
+if (exists("plot_telemetry_coverage_timeline") && !is.null(plot_telemetry_coverage_timeline)) {
+  plot_telemetry_coverage_timeline
+} else {
+  htmltools::p("Plot not available. Run tar_make() to generate.")
+}
+```
+
+#### Station Details
+
+```{r}
+if (exists("table_telemetry_station_coverage")) {
+  table_telemetry_station_coverage
+} else {
+  htmltools::p("Table not available. Run tar_make() to generate.")
+}
+```
+
+#### Data Freshness
+
+```{r}
+if (exists("table_telemetry_freshness")) {
+  table_telemetry_freshness
+} else {
+  htmltools::p("Table not available. Run tar_make() to generate.")
+}
+```
+
+# Data Quality
+
+QC flag trends and rogue wave detection metrics.
+
+## Row
+
+### Column {width=50%}
+
+::: {.card title="QC Flag Distribution Over Time"}
+```{r}
+#| fig-height: 5
+if (exists("plot_telemetry_qc_trends") && !is.null(plot_telemetry_qc_trends)) {
+  plot_telemetry_qc_trends
+} else {
+  htmltools::p("Plot not available. Run tar_make() to generate.")
+}
+```
+:::
+
+### Column {width=50%}
+
+::: {.card title="Rogue Wave Event Frequency"}
+```{r}
+#| fig-height: 5
+if (exists("plot_telemetry_rogue_frequency") && !is.null(plot_telemetry_rogue_frequency)) {
+  plot_telemetry_rogue_frequency
+} else {
+  htmltools::p("Plot not available. Run tar_make() to generate.")
+}
+```
+:::
+
+# Database
+
+Storage metrics and table information.
+
+## Row
+
+### Column {.tabset}
+
+#### Tables
+
+```{r}
+if (exists("table_telemetry_db_info")) {
+  table_telemetry_db_info
+} else {
+  htmltools::p("Table not available. Run tar_make() to generate.")
+}
+```
+#### File Size
+
+```{r}
+if (exists("telemetry_db_file_size") && nrow(telemetry_db_file_size) > 0) {
+  knitr::kable(telemetry_db_file_size, format = "html")
+} else {
+  htmltools::p("Database file info not available.")
+}
+```
+
+# Pipeline
+
+Targets pipeline status and timing metrics.
+
+## Row
+
+### Column {width=40%}
+
+::: {.card title="Target Status Summary"}
+```{r}
+if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$status_summary)) {
+  knitr::kable(telemetry_pipeline_status$status_summary, format = "html")
+} else {
+  htmltools::p("Pipeline status not available.")
+}
+```
+:::
+
+### Column {width=60%}
+
+::: {.card title="Pipeline Timing"}
+```{r}
+if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$timing)) {
+  timing <- telemetry_pipeline_status$timing
+  htmltools::tags$ul(
+    htmltools::tags$li(paste("Total runtime:", round(timing$total_runtime_sec, 1), "seconds")),
+    htmltools::tags$li(paste("Average target:", round(timing$avg_runtime_sec, 2), "seconds")),
+    htmltools::tags$li(paste("Slowest target:", round(timing$max_runtime_sec, 1), "seconds")),
+    htmltools::tags$li(paste("Last run:", format(timing$last_run, "%Y-%m-%d %H:%M")))
+  )
+} else {
+  htmltools::p("Timing info not available.")
+}
+```
+:::
+
+## Row
+
+### Column
+
+::: {.card title="Target Metrics by Plan"}
+Count, size (MB), and timing (seconds) for each target, grouped by tar_plan.
+TOTAL row shows overall totals.
+
+```{r}
+if (exists("table_telemetry_target_metrics")) {
+  table_telemetry_target_metrics
+} else {
+  htmltools::p("Target metrics not available. Run tar_make() to generate.")
+}
+```
+:::
+
+# Git Activity
+
+Repository commit history and activity.
+
+## Row
+
+### Column {width=40%}
+
+::: {.card title="Commit Frequency (Last 30 Days)"}
+```{r}
+#| fig-height: 4
+if (exists("plot_telemetry_commit_frequency") && !is.null(plot_telemetry_commit_frequency)) {
+  plot_telemetry_commit_frequency
+} else {
+  htmltools::p("Plot not available. Run tar_make() to generate.")
+}
+```
+:::
+
+### Column {width=60%}
+
+::: {.card title="Recent Commits"}
+```{r}
+if (exists("table_telemetry_commits")) {
+  table_telemetry_commits
+} else {
+  htmltools::p("Table not available. Run tar_make() to generate.")
+}
+```
+:::
+
+# Project
+
+Project structure and file statistics.
+
+## Row
+
+### Column
+
+::: {.card title="File Types"}
+```{r}
+if (exists("table_telemetry_file_types")) {
+  table_telemetry_file_types
+} else {
+  htmltools::p("Table not available. Run tar_make() to generate.")
+}
+```
+:::
+
+---
+
+```{r}
+#| echo: false
+cat("*Generated:", format(Sys.time(), "%Y-%m-%d %H:%M UTC"), "*\n")
+cat("*All data loaded from pre-computed targets via tar_load()*")
+```
