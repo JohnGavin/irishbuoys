@@ -19,26 +19,41 @@
 #' p |> irishbuoys_layout(title = "Weight vs MPG")
 #' }
 irishbuoys_layout <- function(p, title = NULL, ...) {
+
   p |> plotly::layout(
     title = list(
       text = title,
-      font = list(size = 14, color = "#333333")
+      font = list(size = 14, color = "white")
     ),
-    plot_bgcolor = "#cccccc",         # gray80
-    paper_bgcolor = "#f0f0f0",        # lighter grey surround
+    plot_bgcolor = "black",
+    paper_bgcolor = "#1a1a1a",
+    xaxis = list(
+      gridcolor = "white",
+      gridwidth = 0.5,
+      zerolinecolor = "white",
+      tickfont = list(color = "white"),
+      titlefont = list(color = "white")
+    ),
+    yaxis = list(
+      gridcolor = "white",
+      gridwidth = 0.5,
+      zerolinecolor = "white",
+      tickfont = list(color = "white"),
+      titlefont = list(color = "white")
+    ),
     legend = list(
       orientation = "h",
       y = -0.15,
       x = 0.5,
       xanchor = "center",
-      font = list(color = "#1a1a1a", size = 12),  # near black for visibility
-      bgcolor = "#e0e0e0",            # grey, not white
-      bordercolor = "#888888",
+      font = list(color = "white", size = 12),
+      bgcolor = "#333333",
+      bordercolor = "#666666",
       borderwidth = 1
     ),
     hoverlabel = list(
-      bgcolor = "#f8f8f8",
-      font = list(color = "#1a1a1a", size = 12)
+      bgcolor = "white",
+      font = list(color = "black", size = 12)
     ),
     margin = list(b = 80),  # Extra bottom margin for legend
     ...
