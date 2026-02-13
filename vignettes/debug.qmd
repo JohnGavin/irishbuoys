@@ -182,11 +182,11 @@ The pipeline dependency graph (requires `tar_visnetwork()` to be run interactive
 
 ```{r pipeline-graph}
 #| echo: false
-knitr::asis_output("
-To view the interactive pipeline graph, run in R:
-
-```r
-targets::tar_visnetwork()
+cat('To view the interactive pipeline graph, run in R:\n\n')
+cat('\`\`\`r\n')
+cat('targets::tar_visnetwork()\n')
+cat('\`\`\`\n\n')
+cat('This will open an interactive visualization showing all targets and their dependencies.\n')
 ```
 
 This will open an interactive visualization showing all targets and their dependencies.

@@ -69,22 +69,23 @@ plan_wave_analysis <- list(
       con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      # Count observations per day per station for key variables
-      result <- DBI::dbGetQuery(con, "
-        SELECT
-          station_id,
-          DATE_TRUNC('day', time) AS date,
-          COUNT(*) AS n_obs,
-          COUNT(wave_height) AS n_wave_height,
-          COUNT(hmax) AS n_hmax,
-          COUNT(wind_speed) AS n_wind_speed,
-          COUNT(gust) AS n_gust,
-          COUNT(atmospheric_pressure) AS n_pressure,
-          COUNT(sea_temperature) AS n_sea_temp
-        FROM buoy_data
-        GROUP BY station_id, DATE_TRUNC('day', time)
-        ORDER BY station_id, date
-      ")
+      # Use dplyr/dbplyr - count observations per day per station for key variables
+      result <- dplyr::tbl(con, "buoy_data") |>
+        dplyr::collect() |>
+        dplyr::mutate(date = as.Date(time)) |>
+        dplyr::group_by(station_id, date) |>
+        dplyr::summarise(
+          n_obs = dplyr::n(),
+          n_wave_height = sum(!is.na(wave_height)),
+          n_hmax = sum(!is.na(hmax)),
+          n_wind_speed = sum(!is.na(wind_speed)),
+          n_gust = sum(!is.na(gust)),
+          n_pressure = sum(!is.na(atmospheric_pressure)),
+          n_sea_temp = sum(!is.na(sea_temperature)),
+          .groups = "drop"
+        ) |>
+        dplyr::arrange(station_id, date)
+
       validate_tibble_rows(result, "missing_data_grid", min_rows = 1)
     }
   ),

@@ -295,14 +295,14 @@ generate_and_send_summary <- function(
       cli::cli_alert_danger("Failed to send email: {e$message}")
       # Save email to file as backup
       html_file <- paste0("email_summary_", Sys.Date(), ".html")
-      blastula::save_email(email, html_file)
+      writeLines(as.character(email), html_file)
       cli::cli_alert_info("Email saved to {html_file}")
     })
   } else {
     cli::cli_alert_warning("Email credentials not configured")
     # Save to file instead
     html_file <- paste0("email_summary_", Sys.Date(), ".html")
-    blastula::save_email(email, html_file)
+    writeLines(as.character(email), html_file)
     cli::cli_alert_info("Summary saved to {html_file}")
   }
 
