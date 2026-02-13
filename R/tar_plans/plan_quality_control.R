@@ -1,6 +1,7 @@
 #' Targets Plan: Quality Control and Data Validation
 #'
 #' This plan performs quality checks and validation on the buoy data
+#' Uses dplyr/dbplyr patterns for tidyverse consistency
 
 plan_quality_control <- list(
   # Check data completeness
@@ -10,18 +11,23 @@ plan_quality_control <- list(
       con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      DBI::dbGetQuery(con, "
-        SELECT
-          station_id,
-          CAST(time AS DATE) as date,
-          COUNT(*) as n_records,
-          COUNT(DISTINCT CAST(HOUR(time) AS INTEGER)) as n_hours,
-          AVG(CASE WHEN qc_flag = 1 THEN 1 ELSE 0 END) as pct_good
-        FROM buoy_data
-        WHERE time >= CAST(CAST(CURRENT_TIMESTAMP AS TIMESTAMP) AS DATE) - 30
-        GROUP BY station_id, CAST(time AS DATE)
-        ORDER BY station_id, date DESC
-      ")
+      # Use dplyr/dbplyr - collect then filter and aggregate in R for portability
+      cutoff_date <- as.POSIXct(Sys.Date() - 30)
+      dplyr::tbl(con, "buoy_data") |>
+        dplyr::collect() |>
+        dplyr::filter(time >= cutoff_date) |>
+        dplyr::mutate(
+          date = as.Date(time),
+          hour = lubridate::hour(time)
+        ) |>
+        dplyr::group_by(station_id, date) |>
+        dplyr::summarise(
+          n_records = dplyr::n(),
+          n_hours = dplyr::n_distinct(hour),
+          pct_good = mean(qc_flag == 1, na.rm = TRUE),
+          .groups = "drop"
+        ) |>
+        dplyr::arrange(station_id, dplyr::desc(date))
     }
   ),
 
@@ -32,42 +38,30 @@ plan_quality_control <- list(
       con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      # Check for extreme values
-      DBI::dbGetQuery(con, "
-        SELECT
-          station_id,
-          time,
-          'wave_height' as variable,
-          wave_height as value
-        FROM buoy_data
-        WHERE wave_height > 15
-          AND qc_flag = 1
+      # Use dplyr/dbplyr - check extreme values with bind_rows instead of UNION ALL
+      buoy_tbl <- dplyr::tbl(con, "buoy_data") |>
+        dplyr::filter(qc_flag == 1L) |>
+        dplyr::collect()
 
-        UNION ALL
+      # Wave height outliers
+      wave_outliers <- buoy_tbl |>
+        dplyr::filter(wave_height > 15) |>
+        dplyr::transmute(station_id, time, variable = "wave_height", value = wave_height)
 
-        SELECT
-          station_id,
-          time,
-          'wind_speed' as variable,
-          wind_speed as value
-        FROM buoy_data
-        WHERE wind_speed > 60
-          AND qc_flag = 1
+      # Wind speed outliers
+      wind_outliers <- buoy_tbl |>
+        dplyr::filter(wind_speed > 60) |>
+        dplyr::transmute(station_id, time, variable = "wind_speed", value = wind_speed)
 
-        UNION ALL
+      # Hmax outliers
+      hmax_outliers <- buoy_tbl |>
+        dplyr::filter(hmax > 25) |>
+        dplyr::transmute(station_id, time, variable = "hmax", value = hmax)
 
-        SELECT
-          station_id,
-          time,
-          'hmax' as variable,
-          hmax as value
-        FROM buoy_data
-        WHERE hmax > 25
-          AND qc_flag = 1
-
-        ORDER BY time DESC
-        LIMIT 100
-      ")
+      # Combine and return top 100 most recent
+      dplyr::bind_rows(wave_outliers, wind_outliers, hmax_outliers) |>
+        dplyr::arrange(dplyr::desc(time)) |>
+        head(100)
     }
   ),
 
@@ -78,20 +72,20 @@ plan_quality_control <- list(
       con <- connect_duckdb()
       on.exit(DBI::dbDisconnect(con))
 
-      DBI::dbGetQuery(con, "
-        SELECT
-          station_id,
-          time,
-          wave_height,
-          hmax,
-          hmax / NULLIF(wave_height, 0) as height_ratio
-        FROM buoy_data
-        WHERE hmax > 2 * wave_height
-          AND wave_height > 0
-          AND qc_flag = 1
-        ORDER BY time DESC
-        LIMIT 100
-      ")
+      # Use dplyr/dbplyr for rogue wave detection
+      dplyr::tbl(con, "buoy_data") |>
+        dplyr::filter(
+          hmax > 2 * wave_height,
+          wave_height > 0,
+          qc_flag == 1L
+        ) |>
+        dplyr::collect() |>
+        dplyr::mutate(
+          height_ratio = hmax / wave_height
+        ) |>
+        dplyr::select(station_id, time, wave_height, hmax, height_ratio) |>
+        dplyr::arrange(dplyr::desc(time)) |>
+        head(100)
     }
   ),
 
