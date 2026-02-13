@@ -66,10 +66,11 @@ Project health and data pipeline metrics for the irishbuoys package.
 
 ::: {.valuebox title="Total Observations" icon="database"}
 ```{r}
+#| output: asis
 if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
-  format(telemetry_summary$total_observations, big.mark = ",")
+  cat(format(telemetry_summary$total_observations, big.mark = ","))
 } else {
-  "Run tar_make()"
+  cat("Run tar_make()")
 }
 ```
 :::
@@ -78,10 +79,11 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
 
 ::: {.valuebox title="Database Size" icon="hdd"}
 ```{r}
+#| output: asis
 if (exists("telemetry_summary") && !is.null(telemetry_summary$db_size_mb)) {
-  paste0(telemetry_summary$db_size_mb, " MB")
+  cat(paste0(telemetry_summary$db_size_mb, " MB"))
 } else {
-  "N/A"
+  cat("N/A")
 }
 ```
 :::
@@ -90,10 +92,11 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary$db_size_mb)) {
 
 ::: {.valuebox title="Active Stations" icon="broadcast"}
 ```{r}
+#| output: asis
 if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
-  telemetry_summary$stations_active
+  cat(telemetry_summary$stations_active)
 } else {
-  "N/A"
+  cat("N/A")
 }
 ```
 :::
@@ -102,10 +105,11 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
 
 ::: {.valuebox title="Commits (30d)" icon="git-branch"}
 ```{r}
+#| output: asis
 if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
-  telemetry_summary$n_commits_30d
+  cat(telemetry_summary$n_commits_30d)
 } else {
-  "N/A"
+  cat("N/A")
 }
 ```
 :::
@@ -116,10 +120,11 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
 
 ::: {.card title="Last Updated"}
 ```{r}
+#| output: asis
 if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
-  format(telemetry_summary$generated_at, "%Y-%m-%d %H:%M UTC")
+  cat(format(telemetry_summary$generated_at, "%Y-%m-%d %H:%M UTC"))
 } else {
-  "Targets not built. Run tar_make() to generate telemetry data."
+  cat("Targets not built. Run tar_make() to generate telemetry data.")
 }
 ```
 :::
