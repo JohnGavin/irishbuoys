@@ -26,6 +26,47 @@ NULL
 #' DBI::dbDisconnect(con)
 #' }
 prepare_wave_features <- function(data, lags = 1:3) {
+  # Defensive: NULL check
+  if (is.null(data)) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} cannot be NULL",
+      "i" = "Provide a data frame with buoy observations"
+    ))
+  }
+
+  # Defensive: Type check
+  if (!inherits(data, "data.frame")) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} must be a data frame",
+      "i" = "You provided {.cls {class(data)}}"
+    ))
+  }
+
+  # Defensive: Required columns
+  required_cols <- c("station_id", "time", "wave_height")
+  missing_cols <- setdiff(required_cols, names(data))
+  if (length(missing_cols) > 0) {
+    cli::cli_abort(c(
+      "x" = "Missing required columns: {.val {missing_cols}}",
+      "i" = "Data must contain: {.val {required_cols}}"
+    ))
+  }
+
+  # Defensive: Empty data
+  if (nrow(data) == 0) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} has 0 rows",
+      "i" = "Provide data with at least one observation"
+    ))
+  }
+
+  # Defensive: lags validation
+  if (!is.numeric(lags) || any(lags < 1)) {
+    cli::cli_abort(c(
+      "x" = "{.arg lags} must be positive integers",
+      "i" = "You provided {.val {lags}}"
+    ))
+  }
 
  cli::cli_progress_step("Preparing features for wave prediction...")
 
@@ -123,6 +164,45 @@ train_wave_model <- function(
    seed = 42,
    ...
 ) {
+  # Defensive: NULL check
+  if (is.null(data)) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} cannot be NULL",
+      "i" = "Provide a data frame with prepared features from {.fn prepare_wave_features}"
+    ))
+  }
+
+  # Defensive: Type check
+  if (!inherits(data, "data.frame")) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} must be a data frame",
+      "i" = "You provided {.cls {class(data)}}"
+    ))
+  }
+
+  # Defensive: Empty data
+  if (nrow(data) == 0) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} has 0 rows",
+      "i" = "Provide data with observations"
+    ))
+  }
+
+  # Defensive: target column exists
+  if (!target %in% names(data)) {
+    cli::cli_abort(c(
+      "x" = "Target column {.val {target}} not found in data",
+      "i" = "Available columns: {.val {head(names(data), 10)}}"
+    ))
+  }
+
+  # Defensive: train_fraction validation
+  if (!is.numeric(train_fraction) || train_fraction <= 0 || train_fraction >= 1) {
+    cli::cli_abort(c(
+      "x" = "{.arg train_fraction} must be between 0 and 1 (exclusive)",
+      "i" = "You provided {.val {train_fraction}}"
+    ))
+  }
 
  if (!requireNamespace("ranger", quietly = TRUE)) {
    cli::cli_abort("Package 'ranger' is required. Add it to your Nix environment.")
@@ -220,6 +300,35 @@ train_wave_model <- function(
 #'
 #' @export
 evaluate_wave_model <- function(model_result, data, target = "wave_height") {
+  # Defensive: NULL checks
+  if (is.null(model_result)) {
+    cli::cli_abort(c(
+      "x" = "{.arg model_result} cannot be NULL",
+      "i" = "Provide result from {.fn train_wave_model}"
+    ))
+  }
+
+  if (is.null(data)) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} cannot be NULL",
+      "i" = "Provide the full prepared data frame"
+    ))
+  }
+
+  # Defensive: Type checks
+  if (!is.list(model_result) || is.null(model_result$model)) {
+    cli::cli_abort(c(
+      "x" = "{.arg model_result} must be a list from {.fn train_wave_model}",
+      "i" = "You provided {.cls {class(model_result)}}"
+    ))
+  }
+
+  if (!inherits(data, "data.frame")) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} must be a data frame",
+      "i" = "You provided {.cls {class(data)}}"
+    ))
+  }
 
  cli::cli_progress_step("Evaluating model on test data...")
 
@@ -283,6 +392,35 @@ evaluate_wave_model <- function(model_result, data, target = "wave_height") {
 #'
 #' @export
 predict_wave_height <- function(model_result, new_data) {
+  # Defensive: NULL checks
+  if (is.null(model_result)) {
+    cli::cli_abort(c(
+      "x" = "{.arg model_result} cannot be NULL",
+      "i" = "Provide result from {.fn train_wave_model}"
+    ))
+  }
+
+  if (is.null(new_data)) {
+    cli::cli_abort(c(
+      "x" = "{.arg new_data} cannot be NULL",
+      "i" = "Provide a data frame with predictor values"
+    ))
+  }
+
+  # Defensive: Type checks
+  if (!is.list(model_result) || is.null(model_result$model)) {
+    cli::cli_abort(c(
+      "x" = "{.arg model_result} must be a list from {.fn train_wave_model}",
+      "i" = "You provided {.cls {class(model_result)}}"
+    ))
+  }
+
+  if (!inherits(new_data, "data.frame")) {
+    cli::cli_abort(c(
+      "x" = "{.arg new_data} must be a data frame",
+      "i" = "You provided {.cls {class(new_data)}}"
+    ))
+  }
 
  # Check for required predictors
  missing <- setdiff(model_result$predictors, names(new_data))

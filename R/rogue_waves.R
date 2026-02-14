@@ -38,6 +38,30 @@ detect_rogue_waves <- function(
     end_date = NULL,
     stations = NULL
 ) {
+  # Defensive: NULL check for connection
+  if (is.null(con)) {
+    cli::cli_abort(c(
+      "x" = "{.arg con} cannot be NULL",
+      "i" = "Provide a DBI connection from {.fn connect_duckdb}"
+    ))
+  }
+
+  # Defensive: Valid DBI connection
+  if (!inherits(con, "DBIConnection")) {
+    cli::cli_abort(c(
+      "x" = "{.arg con} must be a DBI connection",
+      "i" = "You provided {.cls {class(con)}}",
+      ">" = "Use {.code con <- connect_duckdb()} to create a connection"
+    ))
+  }
+
+  # Defensive: Numeric threshold
+  if (!is.numeric(threshold) || length(threshold) != 1 || threshold <= 0) {
+    cli::cli_abort(c(
+      "x" = "{.arg threshold} must be a positive number",
+      "i" = "Standard rogue wave threshold is 2.0"
+    ))
+  }
 
   # Start with lazy table reference
   tbl_ref <- buoy_tbl(con)
@@ -239,6 +263,34 @@ analyze_rogue_statistics <- function(
 #' steepness <- calculate_wave_steepness(3, 4)
 #' # steepness = 0.12 (dangerous - breaking waves)
 calculate_wave_steepness <- function(wave_height, wave_period) {
+  # Defensive: NULL checks
+  if (is.null(wave_height)) {
+    cli::cli_abort(c(
+      "x" = "{.arg wave_height} cannot be NULL",
+      "i" = "Provide numeric wave height values in meters"
+    ))
+  }
+  if (is.null(wave_period)) {
+    cli::cli_abort(c(
+      "x" = "{.arg wave_period} cannot be NULL",
+      "i" = "Provide numeric wave period values in seconds"
+    ))
+  }
+
+  # Defensive: Type checks
+  if (!is.numeric(wave_height)) {
+    cli::cli_abort(c(
+      "x" = "{.arg wave_height} must be numeric",
+      "i" = "You provided {.cls {class(wave_height)}}"
+    ))
+  }
+  if (!is.numeric(wave_period)) {
+    cli::cli_abort(c(
+      "x" = "{.arg wave_period} must be numeric",
+      "i" = "You provided {.cls {class(wave_period)}}"
+    ))
+  }
+
   # Wavelength L = g * T^2 / (2 * pi) = 1.56 * T^2
   wavelength <- 1.56 * wave_period^2
   steepness <- wave_height / wavelength
@@ -257,6 +309,41 @@ calculate_wave_steepness <- function(wave_height, wave_period) {
 #'
 #' @export
 add_wave_metrics <- function(data, rogue_threshold = 2.0) {
+  # Defensive: NULL check
+  if (is.null(data)) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} cannot be NULL",
+      "i" = "Provide a data frame with wave measurements"
+    ))
+  }
+
+  # Defensive: Type check
+  if (!inherits(data, "data.frame")) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} must be a data frame",
+      "i" = "You provided {.cls {class(data)}}"
+    ))
+  }
+
+  # Defensive: Required columns
+  required_cols <- c("wave_height", "hmax", "wave_period")
+  missing_cols <- setdiff(required_cols, names(data))
+  if (length(missing_cols) > 0) {
+    cli::cli_abort(c(
+      "x" = "Missing required columns: {.val {missing_cols}}",
+      "i" = "Data must contain: {.val {required_cols}}"
+    ))
+  }
+
+  # Defensive: Empty data
+  if (nrow(data) == 0) {
+    cli::cli_alert_warning("Data has 0 rows, returning empty data frame with metric columns")
+    data$rogue_ratio <- numeric(0)
+    data$is_rogue <- logical(0)
+    data$steepness <- numeric(0)
+    data$danger_level <- character(0)
+    return(data)
+  }
 
   data$rogue_ratio <- data$hmax / data$wave_height
   data$is_rogue <- data$rogue_ratio > rogue_threshold & data$wave_height >= 2

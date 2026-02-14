@@ -43,6 +43,22 @@ validate_buoy_data <- function(data,
                                target_name = "analysis_data",
                                min_rows = 100,
                                report_path = NULL) {
+  # Defensive: NULL check
+  if (is.null(data)) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} cannot be NULL",
+      "i" = "Provide a data frame with buoy measurements"
+    ))
+  }
+
+  # Defensive: Type check
+  if (!inherits(data, "data.frame")) {
+    cli::cli_abort(c(
+      "x" = "{.arg data} must be a data frame",
+      "i" = "You provided {.cls {class(data)}}"
+    ))
+  }
+
   # Check minimum row count first (before creating agent)
   if (nrow(data) < min_rows) {
     cli::cli_abort(c(
