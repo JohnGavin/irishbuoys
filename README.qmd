@@ -360,6 +360,9 @@ Data is sourced from the [Marine Institute's ERDDAP server](https://erddap.marin
 
 ## Project Structure
 
+<details>
+<summary><strong>Click to expand project tree</strong></summary>
+
 ```{r}
 #| echo: false
 #| eval: true
@@ -367,6 +370,8 @@ fs::dir_tree(recurse = 2, regexp = "^(_targets|docs)$|^(_targets|docs)/", invert
 ```
 
 *Note: `_targets/` (pipeline cache) and `docs/` (generated site) excluded for clarity.*
+
+</details>
 
 <details>
 <summary><strong>Key Features</strong></summary>

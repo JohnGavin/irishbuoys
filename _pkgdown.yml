@@ -53,10 +53,12 @@ articles:
     navbar: Analysis
     contents:
       - wave_analysis
-  - title: Telemetry
-    navbar: Telemetry
+  - title: Monitoring
+    navbar: Monitoring
+    desc: "Pipeline telemetry and debugging tools"
     contents:
       - telemetry
+      - debug
   - title: Validation
     navbar: ~
     desc: "Data validation reports generated with pointblank"
@@ -70,9 +72,9 @@ articles:
   - title: internal
     contents:
       - dashboard_shinylive
-      - debug
   # Note: dashboard_shinylive requires separate Quarto rendering with shinylive extension
-  # Build with: quarto render vignettes/dashboard_shinylive.qmd
+  # and is currently not deployed (404). Build locally with:
+  # quarto render vignettes/dashboard_shinylive.qmd
 
 reference:
   - title: "Data Access"
