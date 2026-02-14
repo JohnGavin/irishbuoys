@@ -132,8 +132,9 @@ steepness = 2 * pi * wave_height / (g * wave_period^2)
 - Use plotly for Shinylive dashboards (munsell workaround)
 
 **Open Items**:
-- [ ] Add adversarial tests based on /qa-package analysis
-- [ ] Improve NULL handling in `calculate_wave_steepness`
+- [x] Add adversarial tests based on /qa-package analysis (59 tests added)
+- [x] Improve NULL handling in `calculate_wave_steepness` (all 8 functions fixed)
+- [ ] Issue #8: Multi-page analytical vignette with parallel processing
 
 ---
 
@@ -229,5 +230,6 @@ DBI::dbDisconnect(con)
 | Date | Duration | Focus | Changes |
 |------|----------|-------|---------|
 <!-- session-log-start -->
+| 2026-02-14 | - | Defensive programming | Added NULL guards to 8 functions, 59 adversarial tests |
 | 2025-02-14 | - | Initial setup | Created MEMORY.md |
 <!-- session-log-end -->

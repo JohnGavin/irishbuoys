@@ -57,9 +57,16 @@ articles:
     navbar: Telemetry
     contents:
       - telemetry
-  # Note: validation_analysis_data.html and validation_rogue_events.html are
-  # pointblank reports (pre-generated HTML), not Quarto vignettes.
-  # They are available at docs/articles/ but not built by pkgdown.
+  - title: Validation
+    navbar: ~
+    desc: "Data validation reports generated with pointblank"
+    contents:
+      - title: validation_analysis_data
+        href: articles/validation_analysis_data.html
+      - title: validation_rogue_events
+        href: articles/validation_rogue_events.html
+  # Note: validation reports are pre-generated HTML from pointblank, not Quarto.
+  # Generate with: irishbuoys::generate_validation_reports()
   - title: internal
     contents:
       - dashboard_shinylive

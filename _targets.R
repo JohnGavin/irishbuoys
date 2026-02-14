@@ -53,5 +53,6 @@ list(
   plan_doc_examples,
   plan_dashboard_captions,
   plan_telemetry,
+  plan_evidence,  # Claude session evidence and verification logs
   plan_vignettes  # MANDATORY: All vignettes rendered via targets for reproducibility
 )
