@@ -654,5 +654,29 @@ plan_wave_analysis <- list(
       rogue_events = rogue_wave_events,
       output_dir = "docs/articles"
     )
+  ),
+
+  # ========================================
+  # Random Forest Wave Prediction
+  # ========================================
+
+  targets::tar_target(
+    wave_features,
+    prepare_wave_features(analysis_data, lags = 1:3)
+  ),
+
+  targets::tar_target(
+    wave_rf_model,
+    train_wave_model(wave_features, seed = 42)
+  ),
+
+  targets::tar_target(
+    wave_rf_eval,
+    evaluate_wave_model(wave_rf_model, wave_features)
+  ),
+
+  targets::tar_target(
+    wave_rf_report,
+    wave_model_report(wave_rf_model, wave_rf_eval)
   )
 )

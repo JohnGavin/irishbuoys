@@ -1042,6 +1042,203 @@ For longer period swell (T = 15s): $v_g \approx 23$ m/s $\approx 84$ km/h
 
 *Actual lags vary with wave period, direction, and bathymetry.*
 
+# Predictions {#predictions}
+
+Random Forest model predicting **significant wave height** from meteorological variables and lagged features. Model uses `ranger` with 500 trees trained on 70% of data (time-ordered split).
+
+```{r predictions-setup}
+#| include: false
+# Load RF targets separately (may not exist if pipeline hasn't run)
+wave_rf_model <- wave_rf_eval <- wave_rf_report <- NULL
+tryCatch({
+  targets::tar_load(c(wave_rf_model, wave_rf_eval, wave_rf_report),
+                    store = "../_targets")
+}, error = function(e) {
+  cli::cli_alert_warning("RF targets not available: {e$message}")
+})
+
+has_rf <- !is.null(wave_rf_model) && !is.null(wave_rf_eval)
+
+if (has_rf) {
+  rf_metrics <- wave_rf_eval$overall
+  rf_r2 <- rf_metrics$value[rf_metrics$metric == "R_squared"]
+  rf_rmse <- rf_metrics$value[rf_metrics$metric == "RMSE"]
+  rf_mae <- rf_metrics$value[rf_metrics$metric == "MAE"]
+  rf_n_test <- rf_metrics$value[rf_metrics$metric == "N_test"]
+}
+```
+
+## Row {height=15%}
+
+### Column
+
+```{r rf-valuebox-r2}
+#| content: valuebox
+#| title: "Test R-squared"
+list(
+  value = if (has_rf) round(rf_r2, 3) else "N/A",
+  icon = "bullseye",
+  color = if (has_rf && rf_r2 > 0.9) "success" else if (has_rf && rf_r2 > 0.7) "primary" else "warning"
+)
+```
+
+### Column
+
+```{r rf-valuebox-rmse}
+#| content: valuebox
+#| title: "Test RMSE (m)"
+list(
+  value = if (has_rf) paste0(round(rf_rmse, 3), " m") else "N/A",
+  icon = "activity",
+  color = if (has_rf && rf_rmse < 0.5) "success" else if (has_rf && rf_rmse < 1.0) "primary" else "warning"
+)
+```
+
+### Column
+
+```{r rf-valuebox-mae}
+#| content: valuebox
+#| title: "Test MAE (m)"
+list(
+  value = if (has_rf) paste0(round(rf_mae, 3), " m") else "N/A",
+  icon = "bar-chart",
+  color = "info"
+)
+```
+
+### Column
+
+```{r rf-valuebox-ntest}
+#| content: valuebox
+#| title: "Test Samples"
+list(
+  value = if (has_rf) fmt_num(rf_n_test) else "N/A",
+  icon = "database",
+  color = "secondary"
+)
+```
+
+## Row {height=45%}
+
+### Column {.tabset}
+
+#### Actual vs Predicted
+
+```{r rf-actual-vs-predicted}
+#| echo: false
+if (has_rf) {
+  preds <- wave_rf_eval$predictions
+  # Sample if too many points for plotly
+  if (nrow(preds) > 5000) {
+    set.seed(42)
+    preds_plot <- preds[sample(nrow(preds), 5000), ]
+  } else {
+    preds_plot <- preds
+  }
+
+  plot_ly(preds_plot, x = ~actual, y = ~predicted, type = "scatter", mode = "markers",
+          color = ~category,
+          marker = list(size = 4, opacity = 0.5),
+          text = ~paste0("Actual: ", round(actual, 2), " m",
+                         "<br>Predicted: ", round(predicted, 2), " m",
+                         "<br>Residual: ", round(residual, 2), " m",
+                         "<br>Category: ", category)) |>
+    add_trace(x = c(0, max(preds$actual, na.rm = TRUE)),
+              y = c(0, max(preds$actual, na.rm = TRUE)),
+              type = "scatter", mode = "lines",
+              line = list(dash = "dash", color = "black", width = 1),
+              name = "Perfect prediction", showlegend = TRUE,
+              hoverinfo = "skip") |>
+    layout(
+      title = paste0("Actual vs Predicted Wave Height (n=",
+                     fmt_num(nrow(preds)), ", R\u00b2=", round(rf_r2, 3), ")"),
+      xaxis = list(title = "Actual Wave Height (m)"),
+      yaxis = list(title = "Predicted Wave Height (m)"),
+      legend = legend_style,
+      hovermode = "closest"
+    )
+} else {
+  plotly_empty() |> layout(title = "RF model not available. Run targets::tar_make()")
+}
+```
+
+#### Residuals by Category
+
+```{r rf-residuals-by-category}
+#| echo: false
+if (has_rf) {
+  preds <- wave_rf_eval$predictions
+  plot_ly(preds, y = ~residual, x = ~category, type = "box",
+          color = ~category,
+          boxpoints = "outliers") |>
+    layout(
+      title = "Prediction Residuals by Wave Height Category",
+      xaxis = list(title = "Wave Height Category"),
+      yaxis = list(title = "Residual (Actual - Predicted, m)"),
+      showlegend = FALSE,
+      shapes = list(
+        list(type = "line", x0 = -0.5, x1 = 3.5, y0 = 0, y1 = 0,
+             line = list(dash = "dash", color = "grey", width = 1))
+      )
+    )
+} else {
+  plotly_empty() |> layout(title = "RF model not available")
+}
+```
+
+## Row {height=40%}
+
+### Column {.tabset}
+
+#### Feature Importance
+
+```{r rf-feature-importance}
+#| echo: false
+if (has_rf) {
+  imp <- head(wave_rf_model$importance, 10)
+  imp <- imp[order(imp$importance), ]  # ascending for horizontal bar
+  imp$variable <- factor(imp$variable, levels = imp$variable)
+
+  plot_ly(imp, y = ~variable, x = ~importance, type = "bar",
+          orientation = "h",
+          marker = list(color = "#1f77b4")) |>
+    layout(
+      title = "Top 10 Feature Importance (Impurity-based)",
+      xaxis = list(title = "Importance"),
+      yaxis = list(title = ""),
+      margin = list(l = 150)
+    )
+} else {
+  plotly_empty() |> layout(title = "RF model not available")
+}
+```
+
+#### Performance by Category
+
+```{r rf-category-table}
+#| echo: false
+if (has_rf) {
+  cat_df <- wave_rf_eval$by_category
+  cat_df$rmse <- round(cat_df$rmse, 3)
+  cat_df$mae <- round(cat_df$mae, 3)
+  create_dt(cat_df, "Model performance by wave height category (test set)")
+} else {
+  knitr::asis_output("RF model not available. Run targets::tar_make()")
+}
+```
+
+#### Model Report
+
+```{r rf-report}
+#| echo: false
+#| results: asis
+if (has_rf) {
+  cat("```\n", wave_rf_report, "\n```", sep = "")
+} else {
+  cat("RF model not available. Run `targets::tar_make()`")
+}
+```
+
 # Reference
 
 ## Row
