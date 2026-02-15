@@ -33,16 +33,13 @@ template:
 
 navbar:
   structure:
-    left: [intro, articles, reference, all_articles]
+    left: [intro, articles, reference]
     right: [github]
   components:
     github:
       icon: fab fa-github
       href: https://github.com/JohnGavin/irishbuoys
       aria-label: GitHub
-    all_articles:
-      text: All Articles
-      href: articles/index.html
 
 articles:
   - title: Dashboards
