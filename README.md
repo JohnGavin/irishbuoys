@@ -426,6 +426,7 @@ Buoy Network.
     │   │   ├── plan_doc_examples.R
     │   │   ├── plan_evidence.R
     │   │   ├── plan_joint_analysis.R
+    │   │   ├── plan_pkgctx.R
     │   │   ├── plan_quality_control.R
     │   │   ├── plan_telemetry.R
     │   │   ├── plan_vignettes.R
@@ -460,6 +461,7 @@ Buoy Network.
     │   │   └── parquet_storage_guide.md
     │   ├── extdata
     │   │   ├── analysis_questions.md
+    │   │   ├── ctx
     │   │   ├── dashboard_buoy_data.rds
     │   │   ├── dashboard_stats.rds
     │   │   ├── dashboard_timeseries.rds
@@ -566,6 +568,8 @@ Buoy Network.
     │   └── wave_science_documentation.Rd
     ├── pkgdown
     │   └── extra.css
+    ├── plans
+    │   └── PLAN_telemetry_overhaul.md
     ├── push_to_cachix.sh
     ├── tests
     │   ├── testthat
@@ -656,4 +660,4 @@ collaboration with Met Éireann and the UK Met Office.
 
 ------------------------------------------------------------------------
 
-    *Last updated: 2026-02-14 15:06 UTC *
+    *Last updated: 2026-02-15 13:19 UTC *
