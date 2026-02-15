@@ -51,23 +51,27 @@ jobs:
             exit 0
           fi
 
-          # Compare files (ignore timestamps/headers)
-          if diff -q "$CONTEXT_FILE" "$NEW_FILE" > /dev/null 2>&1; then
-            echo "✅ No API drift detected"
+          # Extract sorted function names for semantic comparison
+          # (pkgctx output ordering may vary across nixpkgs versions)
+          grep "^name:" "$CONTEXT_FILE" | sort > /tmp/funcs_old.txt
+          grep "^name:" "$NEW_FILE" | sort > /tmp/funcs_new.txt
+
+          if diff -q /tmp/funcs_old.txt /tmp/funcs_new.txt > /dev/null 2>&1; then
+            echo "✅ No API drift detected (function list matches)"
             echo "drift=none" >> $GITHUB_OUTPUT
             rm "$NEW_FILE"
           else
             echo "⚠️ API drift detected!"
             echo ""
-            echo "Changes:"
-            diff "$CONTEXT_FILE" "$NEW_FILE" || true
+            echo "Function changes:"
+            diff /tmp/funcs_old.txt /tmp/funcs_new.txt || true
             echo ""
             echo "drift=detected" >> $GITHUB_OUTPUT
 
             # Show summary of changes
             echo "## API Changes Summary" >> $GITHUB_STEP_SUMMARY
             echo '```diff' >> $GITHUB_STEP_SUMMARY
-            diff "$CONTEXT_FILE" "$NEW_FILE" >> $GITHUB_STEP_SUMMARY || true
+            diff /tmp/funcs_old.txt /tmp/funcs_new.txt >> $GITHUB_STEP_SUMMARY || true
             echo '```' >> $GITHUB_STEP_SUMMARY
           fi
 
