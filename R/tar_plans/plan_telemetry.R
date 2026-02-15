@@ -269,7 +269,7 @@ plan_telemetry <- list(
   # QUALITY METRICS
   # ==========================================================================
 
-  # QC flag distribution over time
+  # QC flag distribution over time (with seasonal coloring)
   targets::tar_target(
     telemetry_qc_trends,
     {
@@ -278,10 +278,19 @@ plan_telemetry <- list(
 
       if (DBI::dbExistsTable(con, "buoy_data")) {
         # Use dplyr/dbplyr - truncate to month in R after collect for portability
+        # Add season column for seasonal coloring in plots
         trends <- dplyr::tbl(con, "buoy_data") |>
           dplyr::collect() |>
-          dplyr::mutate(month = lubridate::floor_date(time, "month")) |>
-          dplyr::group_by(month, qc_flag) |>
+          dplyr::mutate(
+            month = lubridate::floor_date(time, "month"),
+            season = dplyr::case_when(
+              lubridate::month(time) %in% c(12L, 1L, 2L) ~ "Winter",
+              lubridate::month(time) %in% c(3L, 4L, 5L) ~ "Spring",
+              lubridate::month(time) %in% c(6L, 7L, 8L) ~ "Summer",
+              TRUE ~ "Autumn"
+            )
+          ) |>
+          dplyr::group_by(month, season, qc_flag) |>
           dplyr::summarise(
             n_observations = dplyr::n(),
             .groups = "drop"
@@ -290,6 +299,7 @@ plan_telemetry <- list(
       } else {
         tibble::tibble(
           month = as.Date(character()),
+          season = character(),
           qc_flag = integer(),
           n_observations = integer()
         )
@@ -623,35 +633,46 @@ plan_telemetry <- list(
     }
   ),
 
-  # QC trends plot
+  # QC trends plot (with seasonal coloring)
   targets::tar_target(
     plot_telemetry_qc_trends,
     {
       data <- telemetry_qc_trends
       if (nrow(data) == 0) return(NULL)
 
-      data |>
+      # Aggregate by month and QC flag for main plot
+      data_agg <- data |>
+        dplyr::group_by(month, season, qc_flag) |>
+        dplyr::summarise(n_observations = sum(n_observations), .groups = "drop") |>
         dplyr::mutate(
           qc_label = dplyr::case_when(
             qc_flag == 0 ~ "Unknown",
             qc_flag == 1 ~ "Good",
             qc_flag == 9 ~ "Missing",
             TRUE ~ as.character(qc_flag)
-          )
-        ) |>
+          ),
+          # Ensure season is ordered correctly
+          season = factor(season, levels = c("Winter", "Spring", "Summer", "Autumn"))
+        )
+
+      data_agg |>
         ggplot2::ggplot(ggplot2::aes(x = month, y = n_observations, fill = qc_label)) +
         ggplot2::geom_col() +
         ggplot2::scale_fill_manual(
           values = c("Good" = "#2ecc71", "Unknown" = "#f39c12", "Missing" = "#e74c3c")
         ) +
+        ggplot2::facet_wrap(~season, ncol = 2, scales = "free_x") +
         ggplot2::labs(
-          title = "QC Flag Distribution Over Time",
-          subtitle = "Monthly observation counts by quality flag",
+          title = "QC Flag Distribution Over Time (2019-Present)",
+          subtitle = "Monthly observation counts by quality flag, faceted by season",
           x = "Month",
           y = "Observations",
           fill = "QC Status"
         ) +
-        ggplot2::theme_minimal()
+        ggplot2::theme_minimal() +
+        ggplot2::theme(
+          axis.text.x = ggplot2::element_text(angle = 45, hjust = 1, size = 7)
+        )
     }
   ),
 
@@ -713,6 +734,450 @@ plan_telemetry <- list(
         pipeline_status = telemetry_pipeline_status,
         n_commits_30d = sum(telemetry_commit_frequency$n_commits, na.rm = TRUE)
       )
+    }
+  ),
+
+  # ==========================================================================
+  # VIGNETTE TITLES (for consistency between .qmd and _pkgdown.yml)
+  # ==========================================================================
+
+  # Canonical vignette titles - single source of truth
+  # Use tar_read(vignette_titles) in YAML templating or _pkgdown.yml updates
+  targets::tar_target(
+    vignette_titles,
+    tibble::tribble(
+      ~file,                           ~title,                        ~navbar_text,    ~section,
+      "dashboard_static.qmd",          "Irish Buoys Dashboard",       "Dashboard",     "Dashboards",
+      "wave_analysis.qmd",             "Wave Analysis",               "Analysis",      "Analysis",
+      "telemetry.qmd",                 "Telemetry",                   "Telemetry",     "Monitoring",
+      "validation_analysis_data.qmd",  "Validation: Analysis Data",   "Analysis Data", "Validation",
+      "validation_rogue_events.qmd",   "Validation: Rogue Waves",     "Rogue Waves",   "Validation"
+    )
+  ),
+
+  # ==========================================================================
+  # LLM USAGE & COSTS (project-specific Claude Code usage)
+  # ==========================================================================
+
+  # Read Claude Code session files for this project
+  targets::tar_target(
+    telemetry_llm_sessions,
+    {
+      # Project-specific session directory
+      project_dir <- path.expand("~/.claude/projects/-Users-johngavin-docs-gh-proj-data-weather-irish-buoy-network")
+
+      if (!dir.exists(project_dir)) {
+        return(tibble::tibble(
+          session_id = character(),
+          timestamp = as.POSIXct(character()),
+          model = character(),
+          input_tokens = integer(),
+          output_tokens = integer(),
+          cache_creation = integer(),
+          cache_read = integer()
+        ))
+      }
+
+      # Find all session JSONL files
+      session_files <- list.files(project_dir, pattern = "\\.jsonl$", full.names = TRUE)
+      session_files <- session_files[!grepl("^agent-", basename(session_files))]
+
+      if (length(session_files) == 0) {
+        return(tibble::tibble(
+          session_id = character(),
+          timestamp = as.POSIXct(character()),
+          model = character(),
+          input_tokens = integer(),
+          output_tokens = integer(),
+          cache_creation = integer(),
+          cache_read = integer()
+        ))
+      }
+
+      # Extract usage data from each session file
+      usage_list <- lapply(session_files, function(f) {
+        tryCatch({
+          lines <- readLines(f, warn = FALSE)
+          session_id <- tools::file_path_sans_ext(basename(f))
+
+          # Parse each line and extract assistant messages with usage
+          parsed <- lapply(lines, function(line) {
+            tryCatch({
+              obj <- jsonlite::fromJSON(line)
+              if (!is.null(obj$type) && obj$type == "assistant" && !is.null(obj$message$usage)) {
+                tibble::tibble(
+                  session_id = session_id,
+                  message_id = obj$message$id %||% obj$uuid %||% NA_character_,
+                  timestamp = as.POSIXct(obj$timestamp, format = "%Y-%m-%dT%H:%M:%OS", tz = "UTC"),
+                  model = obj$message$model %||% "unknown",
+                  input_tokens = as.integer(obj$message$usage$input_tokens %||% 0L),
+                  output_tokens = as.integer(obj$message$usage$output_tokens %||% 0L),
+                  cache_creation = as.integer(obj$message$usage$cache_creation_input_tokens %||% 0L),
+                  cache_read = as.integer(obj$message$usage$cache_read_input_tokens %||% 0L)
+                )
+              } else {
+                NULL
+              }
+            }, error = function(e) NULL)
+          })
+
+          dplyr::bind_rows(parsed) |>
+            # Deduplicate by message_id (streaming can create duplicate entries)
+            dplyr::distinct(message_id, .keep_all = TRUE)
+        }, error = function(e) NULL)
+      })
+
+      dplyr::bind_rows(usage_list) |>
+        dplyr::filter(!is.na(timestamp)) |>
+        # Final deduplication across all sessions by message_id
+        dplyr::distinct(message_id, .keep_all = TRUE) |>
+        dplyr::arrange(timestamp)
+    }
+  ),
+
+  # Daily aggregated usage
+  targets::tar_target(
+    telemetry_llm_daily,
+    {
+      if (nrow(telemetry_llm_sessions) == 0) {
+        return(tibble::tibble(
+          date = as.Date(character()),
+          model = character(),
+          n_requests = integer(),
+          total_input = integer(),
+          total_output = integer(),
+          total_cache_creation = integer(),
+          total_cache_read = integer(),
+          total_tokens = integer(),
+          estimated_cost_usd = numeric()
+        ))
+      }
+
+      telemetry_llm_sessions |>
+        dplyr::mutate(date = as.Date(timestamp)) |>
+        dplyr::group_by(date, model) |>
+        dplyr::summarise(
+          n_requests = dplyr::n(),
+          total_input = sum(input_tokens, na.rm = TRUE),
+          total_output = sum(output_tokens, na.rm = TRUE),
+          total_cache_creation = sum(cache_creation, na.rm = TRUE),
+          total_cache_read = sum(cache_read, na.rm = TRUE),
+          total_tokens = sum(input_tokens + output_tokens + cache_creation + cache_read, na.rm = TRUE),
+          # Estimate cost (approximate rates as of 2025)
+          # Opus: ~$15/M input, ~$75/M output, cache creation ~$18.75/M, cache read ~$1.875/M
+          # Sonnet: ~$3/M input, ~$15/M output, cache creation ~$3.75/M, cache read ~$0.375/M
+          estimated_cost_usd = dplyr::case_when(
+            grepl("opus", model, ignore.case = TRUE) ~
+              (total_input * 15 + total_output * 75 + total_cache_creation * 18.75 + total_cache_read * 1.875) / 1e6,
+            grepl("sonnet", model, ignore.case = TRUE) ~
+              (total_input * 3 + total_output * 15 + total_cache_creation * 3.75 + total_cache_read * 0.375) / 1e6,
+            TRUE ~ (total_input * 3 + total_output * 15) / 1e6  # Default to sonnet rates
+          ),
+          .groups = "drop"
+        ) |>
+        dplyr::arrange(date, model) |>
+        dplyr::distinct()  # Remove duplicate rows from summarise
+    }
+  ),
+
+  # LLM usage summary statistics
+  targets::tar_target(
+    telemetry_llm_summary,
+    {
+      if (nrow(telemetry_llm_daily) == 0) {
+        return(tibble::tibble(
+          metric = character(),
+          value = character()
+        ))
+      }
+
+      total_cost <- sum(telemetry_llm_daily$estimated_cost_usd, na.rm = TRUE)
+      total_tokens <- sum(telemetry_llm_daily$total_tokens, na.rm = TRUE)
+      total_requests <- sum(telemetry_llm_daily$n_requests, na.rm = TRUE)
+      days_active <- dplyr::n_distinct(telemetry_llm_daily$date)
+      date_range <- range(telemetry_llm_daily$date, na.rm = TRUE)
+
+      tibble::tibble(
+        metric = c("Total Cost (USD)", "Total Tokens", "Total Requests",
+                   "Days Active", "Avg Cost/Day", "Avg Tokens/Day", "Date Range"),
+        value = c(
+          sprintf("$%.2f", total_cost),
+          format(total_tokens, big.mark = ","),
+          format(total_requests, big.mark = ","),
+          as.character(days_active),
+          sprintf("$%.2f", total_cost / max(days_active, 1)),
+          format(round(total_tokens / max(days_active, 1)), big.mark = ","),
+          paste(date_range, collapse = " to ")
+        )
+      )
+    }
+  ),
+
+  # Cost by model breakdown
+  targets::tar_target(
+    telemetry_llm_by_model,
+    {
+      if (nrow(telemetry_llm_daily) == 0) {
+        return(tibble::tibble(
+          model = character(),
+          total_cost = numeric(),
+          total_tokens = integer(),
+          n_requests = integer(),
+          pct_cost = numeric()
+        ))
+      }
+
+      total <- sum(telemetry_llm_daily$estimated_cost_usd, na.rm = TRUE)
+
+      telemetry_llm_daily |>
+        dplyr::group_by(model) |>
+        dplyr::summarise(
+          total_cost = sum(estimated_cost_usd, na.rm = TRUE),
+          total_tokens = sum(total_tokens, na.rm = TRUE),
+          n_requests = sum(n_requests, na.rm = TRUE),
+          .groups = "drop"
+        ) |>
+        dplyr::mutate(
+          pct_cost = round(100 * total_cost / total, 1),
+          model_clean = gsub("claude-", "", model)
+        ) |>
+        dplyr::arrange(dplyr::desc(total_cost))
+    }
+  ),
+
+  # Plot: Daily cost trend
+  targets::tar_target(
+    plot_telemetry_llm_cost_trend,
+    {
+      data <- telemetry_llm_daily
+      if (nrow(data) == 0) return(NULL)
+
+      data |>
+        dplyr::group_by(date) |>
+        dplyr::summarise(daily_cost = sum(estimated_cost_usd, na.rm = TRUE), .groups = "drop") |>
+        ggplot2::ggplot(ggplot2::aes(x = date, y = daily_cost)) +
+        ggplot2::geom_col(fill = "steelblue", alpha = 0.7) +
+        ggplot2::geom_smooth(method = "loess", se = FALSE, color = "darkred") +
+        ggplot2::scale_y_continuous(labels = scales::dollar_format()) +
+        ggplot2::labs(
+          title = "Daily LLM Costs (irishbuoys project)",
+          subtitle = "Estimated cost based on Claude API pricing",
+          x = "Date",
+          y = "Cost (USD)"
+        ) +
+        ggplot2::theme_minimal()
+    }
+  ),
+
+  # Plot: Token usage by type
+  targets::tar_target(
+    plot_telemetry_llm_tokens,
+    {
+      data <- telemetry_llm_daily
+      if (nrow(data) == 0) return(NULL)
+
+      token_data <- data |>
+        dplyr::group_by(date) |>
+        dplyr::summarise(
+          Input = sum(total_input, na.rm = TRUE),
+          Output = sum(total_output, na.rm = TRUE),
+          `Cache Create` = sum(total_cache_creation, na.rm = TRUE),
+          `Cache Read` = sum(total_cache_read, na.rm = TRUE),
+          .groups = "drop"
+        ) |>
+        tidyr::pivot_longer(-date, names_to = "type", values_to = "tokens")
+
+      token_data |>
+        ggplot2::ggplot(ggplot2::aes(x = date, y = tokens / 1e6, fill = type)) +
+        ggplot2::geom_col() +
+        ggplot2::scale_fill_manual(values = c(
+          "Input" = "#3498db",
+          "Output" = "#e74c3c",
+          "Cache Create" = "#f39c12",
+          "Cache Read" = "#2ecc71"
+        )) +
+        ggplot2::labs(
+          title = "Token Usage by Type",
+          subtitle = "Daily breakdown of input, output, and cache tokens",
+          x = "Date",
+          y = "Tokens (millions)",
+          fill = "Type"
+        ) +
+        ggplot2::theme_minimal()
+    }
+  ),
+
+  # Plot: Cost by model
+  targets::tar_target(
+    plot_telemetry_llm_by_model,
+    {
+      data <- telemetry_llm_by_model
+      if (nrow(data) == 0) return(NULL)
+
+      data |>
+        ggplot2::ggplot(ggplot2::aes(x = reorder(model_clean, total_cost), y = total_cost)) +
+        ggplot2::geom_col(fill = "steelblue") +
+        ggplot2::coord_flip() +
+        ggplot2::scale_y_continuous(labels = scales::dollar_format()) +
+        ggplot2::labs(
+          title = "Cost by Model",
+          subtitle = "Total estimated cost per Claude model",
+          x = NULL,
+          y = "Cost (USD)"
+        ) +
+        ggplot2::theme_minimal()
+    }
+  ),
+
+  # Formatted tables
+  targets::tar_target(
+    table_telemetry_llm_summary,
+    create_telemetry_dt(
+      telemetry_llm_summary,
+      caption = "LLM Usage Summary (irishbuoys project)"
+    )
+  ),
+
+  targets::tar_target(
+    table_telemetry_llm_daily,
+    create_telemetry_dt(
+      telemetry_llm_daily |>
+        dplyr::mutate(
+          estimated_cost_usd = round(estimated_cost_usd, 4),
+          model = gsub("claude-", "", model)
+        ),
+      caption = "Daily LLM Usage"
+    )
+  ),
+
+  targets::tar_target(
+    table_telemetry_llm_by_model,
+    create_telemetry_dt(
+      telemetry_llm_by_model |>
+        dplyr::select(-model) |>
+        dplyr::rename(model = model_clean) |>
+        dplyr::mutate(total_cost = round(total_cost, 2)),
+      caption = "Usage by Model"
+    )
+  ),
+
+  # ==========================================================================
+  # TEST STATISTICS
+  # ==========================================================================
+
+  # Collect test statistics from testthat files
+  targets::tar_target(
+    telemetry_test_stats,
+    {
+      test_dir <- "tests/testthat"
+      if (!dir.exists(test_dir)) {
+        return(tibble::tibble(
+          file = character(),
+          test_type = character(),
+          n_tests = integer(),
+          n_expectations = integer()
+        ))
+      }
+
+      test_files <- list.files(test_dir, pattern = "^test-.*\\.R$", full.names = TRUE)
+
+      # Parse test files to count tests and categorize
+      stats <- lapply(test_files, function(f) {
+        content <- readLines(f, warn = FALSE)
+        file_name <- basename(f)
+
+        # Count test_that() blocks
+        n_tests <- sum(grepl("^\\s*test_that\\s*\\(", content))
+
+        # Count expectations
+        n_expectations <- sum(grepl("expect_", content))
+
+        # Count snapshot tests
+        n_snapshots <- sum(grepl("expect_snapshot", content))
+
+        # Count adversarial/null guard tests
+        n_adversarial <- sum(grepl("adversarial|null|NULL|invalid", content, ignore.case = TRUE))
+
+        # Categorize the test file
+        test_type <- dplyr::case_when(
+          grepl("adversarial", file_name, ignore.case = TRUE) ~ "Adversarial/Edge Cases",
+          grepl("snapshot", file_name, ignore.case = TRUE) ~ "Snapshot Tests",
+          grepl("integration", file_name, ignore.case = TRUE) ~ "Integration Tests",
+          n_snapshots > 0 ~ "Contains Snapshots",
+          n_adversarial > n_tests / 2 ~ "Defensive/Null Guards",
+          TRUE ~ "Unit Tests"
+        )
+
+        tibble::tibble(
+          file = file_name,
+          test_type = test_type,
+          n_tests = n_tests,
+          n_expectations = n_expectations,
+          n_snapshots = n_snapshots
+        )
+      })
+
+      dplyr::bind_rows(stats) |>
+        dplyr::arrange(test_type, file)
+    }
+  ),
+
+  # Summary by test type
+  targets::tar_target(
+    telemetry_test_summary,
+    {
+      telemetry_test_stats |>
+        dplyr::group_by(test_type) |>
+        dplyr::summarise(
+          n_files = dplyr::n(),
+          total_tests = sum(n_tests, na.rm = TRUE),
+          total_expectations = sum(n_expectations, na.rm = TRUE),
+          total_snapshots = sum(n_snapshots, na.rm = TRUE),
+          .groups = "drop"
+        ) |>
+        dplyr::bind_rows(
+          tibble::tibble(
+            test_type = "TOTAL",
+            n_files = sum(telemetry_test_stats$n_tests > 0, na.rm = TRUE),
+            total_tests = sum(telemetry_test_stats$n_tests, na.rm = TRUE),
+            total_expectations = sum(telemetry_test_stats$n_expectations, na.rm = TRUE),
+            total_snapshots = sum(telemetry_test_stats$n_snapshots, na.rm = TRUE)
+          )
+        )
+    }
+  ),
+
+  # Formatted table for display
+  targets::tar_target(
+    table_telemetry_test_stats,
+    create_telemetry_dt(
+      telemetry_test_stats,
+      caption = "Test Files by Type"
+    )
+  ),
+
+  targets::tar_target(
+    table_telemetry_test_summary,
+    {
+      data <- telemetry_test_summary
+      DT::datatable(
+        data,
+        caption = "Test Summary by Category",
+        extensions = "Buttons",
+        options = list(
+          dom = "Bfrtip",
+          buttons = c("csv", "excel", "print"),
+          pageLength = 15,
+          scrollX = TRUE
+        ),
+        rownames = FALSE,
+        class = "display compact"
+      ) |>
+        DT::formatStyle(
+          "test_type",
+          target = "row",
+          backgroundColor = DT::styleEqual("TOTAL", "#e8f4f8")
+        )
     }
   )
 )
