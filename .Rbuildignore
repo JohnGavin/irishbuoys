@@ -34,3 +34,6 @@
 ^vignettes/dashboard_static\.qmd$
 ^vignettes/wave_analysis\.qmd$
 ^vignettes/debug\.qmd$
+^vignettes/telemetry\.qmd$
+^\.claude$
+^_targets\.yaml$

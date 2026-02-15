@@ -13,6 +13,9 @@ on:
       - 'NAMESPACE'
   workflow_dispatch:  # Manual trigger
 
+permissions:
+  contents: write
+
 jobs:
   detect-api-drift:
     runs-on: ubuntu-latest
