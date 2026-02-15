@@ -48,35 +48,20 @@ articles:
   - title: Dashboards
     navbar: Dashboards
     contents:
-      - title: "Irish Buoys Dashboard"
-        href: articles/dashboard_static.html
+      - dashboard_static
   - title: Analysis
     navbar: Analysis
     contents:
-      - title: "Wave Analysis"
-        href: articles/wave_analysis.html
+      - wave_analysis
   - title: Monitoring
     navbar: Monitoring
     desc: "Pipeline telemetry and debugging tools"
     contents:
-      - title: "Telemetry"
-        href: articles/telemetry.html
-  - title: Validation
-    navbar: ~
-    desc: "Data validation reports generated with pointblank"
-    contents:
-      - title: "Validation: Analysis Data"
-        href: articles/validation_analysis_data.html
-      - title: "Validation: Rogue Waves"
-        href: articles/validation_rogue_events.html
-  # Note: validation reports are pre-generated HTML from pointblank, not Quarto.
-  # Generate with: irishbuoys::generate_validation_reports()
+      - telemetry
+      - debug
   - title: internal
     contents:
       - dashboard_shinylive
-  # Note: dashboard_shinylive requires separate Quarto rendering with shinylive extension
-  # and is currently not deployed (404). Build locally with:
-  # quarto render vignettes/dashboard_shinylive.qmd
 
 reference:
   - title: "Data Access"
@@ -103,7 +88,6 @@ reference:
       - incremental_update_parquet
       - initialize_database
       - convert_duckdb_to_parquet
-      - update_station_metadata
 
   - title: "Wave Analysis"
     desc: "Functions for wave science and rogue wave detection"
@@ -155,7 +139,6 @@ reference:
   - title: "Visualization"
     desc: "Functions for creating interactive plots"
     contents:
-      - plot_functions
       - irishbuoys_layout
       - irishbuoys_ggplotly
       - create_plot_rogue_all

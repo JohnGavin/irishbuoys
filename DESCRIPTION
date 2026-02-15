@@ -8,6 +8,7 @@ Description: Provides tools to download, process, and analyze data from the Iris
     data via the Marine Institute's ERDDAP server, storing data in DuckDB for
     efficient querying, and building predictive models for wave height and weather
     conditions.
+URL: https://johngavin.github.io/irishbuoys/
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
