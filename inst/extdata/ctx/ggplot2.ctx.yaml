@@ -1,0 +1,2720 @@
+Fetching R package: ggplot2
+  → Downloading from CRAN...
+  → Version: 4.0.2
+  → Parsing source...
+---
+kind: context_header
+llm_instructions: This is an LLM-optimized API specification for the R package 'ggplot2'. Use this context to write correct code using ggplot2 functions. Each 'function' record describes a public function with its signature, arguments, and purpose. The 'package' record contains metadata. All listed functions are part of the public API.
+---
+kind: package
+schema_version: '1.1'
+name: ggplot2
+version: 4.0.2
+language: R
+description: Create Elegant Data Visualisations Using the Grammar of Graphics
+---
+kind: function
+name: ggplot
+exported: true
+signature: ggplot(data = NULL,mapping = aes(),...,environment = parent.frame())
+arguments:
+  '...': Other arguments passed on to methods.
+  data: Default dataset to use for plot.
+  environment: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] Used prior to tidy evaluation.'
+  mapping: Default list of aesthetic mappings to use for plot.
+---
+kind: function
+name: is_ggplot
+exported: true
+signature: is_ggplot(x) S7::S7_inherits(x, class_ggplot)
+---
+kind: function
+name: is.ggplot
+exported: true
+signature: is.ggplot(x)
+---
+kind: function
+name: scale_colour_brewer
+exported: true
+signature: scale_colour_brewer(name = waiver(), ..., type = "seq", palette = 1,direction = 1, aesthetics = "colour")
+---
+kind: function
+name: scale_fill_brewer
+exported: true
+signature: scale_fill_brewer(name = waiver(), ..., type = "seq", palette = 1,direction = 1, aesthetics = "fill")
+---
+kind: function
+name: scale_colour_distiller
+exported: true
+signature: scale_colour_distiller(name = waiver(), ..., type = "seq",palette = 1, direction = -1, values = NULL,space = "Lab", na.value = "grey50",guide = "colourbar", aesthetics = "colour")
+---
+kind: function
+name: scale_fill_distiller
+exported: true
+signature: scale_fill_distiller(name = waiver(), ..., type = "seq",palette = 1, direction = -1, values = NULL,space = "Lab", na.value = "grey50",guide = "colourbar", aesthetics = "fill")
+---
+kind: function
+name: scale_colour_fermenter
+exported: true
+signature: scale_colour_fermenter(name = waiver(), ..., type = "seq",palette = 1, direction = -1,na.value = "grey50", guide = "coloursteps",aesthetics = "colour")
+---
+kind: function
+name: scale_fill_fermenter
+exported: true
+signature: scale_fill_fermenter(name = waiver(), ..., type = "seq", palette = 1,direction = -1, na.value = "grey50",guide = "coloursteps", aesthetics = "fill")
+---
+kind: function
+name: translate_shape_string
+exported: true
+signature: translate_shape_string(shape_string)
+arguments:
+  shape_string: A character vector giving point shapes.
+returns: An integer vector with translated shapes.
+---
+kind: function
+name: geom_sf
+exported: true
+signature: geom_sf(mapping = aes(), data = NULL, stat = "sf",position = "identity", na.rm = FALSE, show.legend = NA,inherit.aes = TRUE, ...)
+---
+kind: function
+name: geom_sf_label
+exported: true
+signature: geom_sf_label(mapping = aes(), data = NULL,stat = "sf_coordinates", position = "nudge",...,parse = FALSE,label.padding = unit(0.25, "lines"),label.r = unit(0.15, "lines"),label.size = deprecated(),border.colour = NULL,border.color = NULL,text.colour = NULL,text.color = NULL,na.rm = FALSE,show.legend = NA,inherit.aes = TRUE,fun.geometry = NULL)
+---
+kind: function
+name: geom_sf_text
+exported: true
+signature: geom_sf_text(mapping = aes(), data = NULL,stat = "sf_coordinates", position = "nudge",...,parse = FALSE,check_overlap = FALSE,na.rm = FALSE,show.legend = NA,inherit.aes = TRUE,fun.geometry = NULL)
+---
+kind: function
+name: make_constructor
+exported: true
+signature: make_constructor(x, ...)
+arguments:
+  '...': Name-value pairs to use as additional arguments in the constructor.
+  checks: A list of calls to be evaluated before construction of the object, such as one constructed with \link[rlang:defusing-advanced]{exprs()}.
+  env: An environment to search for the object.
+  omit: A character vector of automatically retrieved argument names that should not be converted to user-facing arguments.
+  x: An object to setup a constructor for.
+returns: A function
+---
+kind: function
+name: scale_linetype
+exported: true
+signature: scale_linetype(name = waiver(), ..., aesthetics = "linetype")
+arguments:
+  '...': 'Arguments passed on to \link[=discrete_scale]{discrete_scale} One of: NULL for no breaks waiver() for the default breaks (the scale limits) A character vector of breaks A function that takes the limits as input and returns breaks as output.'
+  aesthetics: The names of the aesthetics that this scale works with.
+  name: The name of the scale.
+---
+kind: function
+name: scale_linetype_binned
+exported: true
+signature: scale_linetype_binned(name = waiver(), ..., aesthetics = "linetype")
+---
+kind: function
+name: scale_linetype_continuous
+exported: true
+signature: scale_linetype_continuous(...)
+---
+kind: function
+name: scale_alpha
+exported: true
+signature: scale_alpha(name = waiver(), ..., range = NULL, aesthetics = "alpha")
+arguments:
+  '...': Other arguments passed on to \link[=continuous_scale]{continuous_scale()}, \link[=binned_scale]{binned_scale()}, or \link[=discrete_scale]{discrete_scale()} as appropriate, to control name, limits, breaks, labels and so forth.
+  aesthetics: The names of the aesthetics that this scale works with.
+  name: The name of the scale.
+  range: Output range of alpha values.
+---
+kind: function
+name: scale_alpha_binned
+exported: true
+signature: scale_alpha_binned(name = waiver(), ..., range = NULL, aesthetics = "alpha")
+---
+kind: function
+name: scale_alpha_discrete
+exported: true
+signature: scale_alpha_discrete(...)
+---
+kind: function
+name: scale_alpha_ordinal
+exported: true
+signature: scale_alpha_ordinal(name = waiver(), ..., range = NULL, aesthetics = "alpha")
+---
+kind: function
+name: scale_alpha_datetime
+exported: true
+signature: scale_alpha_datetime(name = waiver(), ..., range = NULL, aesthetics = "alpha")
+---
+kind: function
+name: scale_alpha_date
+exported: true
+signature: scale_alpha_date(name = waiver(), ..., range = NULL, aesthetics = "alpha")
+---
+kind: function
+name: stat_summary
+exported: true
+signature: stat_summary(mapping = NULL, data = NULL,geom = "pointrange", position = "identity",...,fun.data = NULL,fun = NULL,fun.max = NULL,fun.min = NULL,fun.args = list(),na.rm = FALSE,orientation = NA,show.legend = NA,inherit.aes = TRUE,fun.y = deprecated(),fun.ymin = deprecated(),fun.ymax = deprecated())
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  bins: Number of bins.
+  binwidth: The width of the bins.
+  breaks: Alternatively, you can supply a numeric vector giving the bin boundaries.
+  data: The data to be displayed in this layer.
+  fun.args: Optional additional arguments passed on to the functions.
+  fun.data: A function that is given the complete data and should return a data frame with variables ymin, y, and ymax.
+  fun.min, fun, fun.max: Alternatively, supply three individual functions that are each passed a vector of values and should return a single number.
+  fun.ymin, fun.y, fun.ymax: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] Use the versions specified above instead.'
+  geom: The geometric object to use to display the data for this layer.
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  orientation: The orientation of the layer.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+---
+kind: function
+name: mean_se
+exported: true
+signature: mean_se(x, mult = 1)
+arguments:
+  mult: number of multiples of standard error.
+  x: numeric vector.
+returns: 'A data frame with three columns: The mean.'
+---
+kind: function
+name: position_dodge
+exported: true
+signature: position_dodge(width = NULL, preserve = "total", orientation = "x",reverse = FALSE)
+arguments:
+  orientation: Fallback orientation when the layer or the data does not indicate an explicit orientation, like geom_point().
+  padding: Padding between elements at the same position.
+  preserve: Should dodging preserve the "total" width of all elements at a position, or the width of a "single" element?
+  reverse: If TRUE, will reverse the default stacking order.
+  width: Dodging width, when different to the width of the individual elements.
+---
+kind: function
+name: geom_jitter
+exported: true
+signature: geom_jitter(mapping = NULL, data = NULL,stat = "identity", position = "jitter",...,width = NULL,height = NULL,na.rm = FALSE,show.legend = NA,inherit.aes = TRUE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  data: The data to be displayed in this layer.
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+  stat: The statistical transformation to use on the data for this layer.
+  width, height: Amount of vertical and horizontal jitter.
+---
+kind: function
+name: guide_train
+exported: true
+signature: guide_train(guide, scale, aesthetic = NULL)
+---
+kind: function
+name: guide_merge
+exported: true
+signature: guide_merge(guide, new_guide)
+---
+kind: function
+name: guide_geom
+exported: true
+signature: guide_geom(guide, layers, default_mapping = NULL)
+---
+kind: function
+name: guide_transform
+exported: true
+signature: guide_transform(guide, coord, panel_params)
+---
+kind: function
+name: guide_gengrob
+exported: true
+signature: guide_gengrob(guide, theme)
+---
+kind: function
+name: old_guide
+exported: true
+signature: old_guide(guide)
+arguments:
+  guide: An old guide object
+---
+kind: function
+name: autolayer
+exported: true
+signature: autolayer(object, ...)
+arguments:
+  '...': other arguments passed to specific methods
+  object: an object, whose class will determine the behaviour of autolayer
+returns: a ggplot layer
+---
+kind: function
+name: theme
+exported: true
+signature: theme(...,line,rect,text,title,point,polygon,geom,spacing,margins,aspect.ratio,axis.title,axis.title.x,axis.title.x.top,axis.title.x.bottom,axis.title.y,axis.title.y.left,axis.title.y.right,axis.text,axis.text.x,axis.text.x.top,axis.text.x.bottom,axis.text.y,axis.text.y.left,axis.text.y.right,axis.text.theta,axis.text.r,axis.ticks,axis.ticks.x,axis.ticks.x.top,axis.ticks.x.bottom,axis.ticks.y,axis.ticks.y.left,axis.ticks.y.right,axis.ticks.theta,axis.ticks.r,axis.minor.ticks.x.top,axis.minor.ticks.x.bottom,axis.minor.ticks.y.left,axis.minor.ticks.y.right,axis.minor.ticks.theta,axis.minor.ticks.r,axis.ticks.length,axis.ticks.length.x,axis.ticks.length.x.top,axis.ticks.length.x.bottom,axis.ticks.length.y,axis.ticks.length.y.left,axis.ticks.length.y.right,axis.ticks.length.theta,axis.ticks.length.r,axis.minor.ticks.length,axis.minor.ticks.length.x,axis.minor.ticks.length.x.top,axis.minor.ticks.length.x.bottom,axis.minor.ticks.length.y,axis.minor.ticks.length.y.left,axis.minor.ticks.length.y.right,axis.minor.ticks.length.theta,axis.minor.ticks.length.r,axis.line,axis.line.x,axis.line.x.top,axis.line.x.bottom,axis.line.y,axis.line.y.left,axis.line.y.right,axis.line.theta,axis.line.r,legend.background,legend.margin,legend.spacing,legend.spacing.x,legend.spacing.y,legend.key,legend.key.size,legend.key.height,legend.key.width,legend.key.spacing,legend.key.spacing.x,legend.key.spacing.y,legend.key.justification,legend.frame,legend.ticks,legend.ticks.length,legend.axis.line,legend.text,legend.text.position,legend.title,legend.title.position,legend.position,legend.position.inside,legend.direction,legend.byrow,legend.justification,legend.justification.top,legend.justification.bottom,legend.justification.left,legend.justification.right,legend.justification.inside,legend.location,legend.box,legend.box.just,legend.box.margin,legend.box.background,legend.box.spacing,panel.background,panel.border,panel.spacing,panel.spacing.x,panel.spacing.y,panel.grid,panel.grid.major,panel.grid.minor,panel.grid.major.x,panel.grid.major.y,panel.grid.minor.x,panel.grid.minor.y,panel.ontop,panel.widths,panel.heights,plot.background,plot.title,plot.title.position,plot.subtitle,plot.caption,plot.caption.position,plot.tag,plot.tag.position,plot.tag.location,plot.margin,strip.background,strip.background.x,strip.background.y,strip.clip,strip.placement,strip.text,strip.text.x,strip.text.x.bottom,strip.text.x.top,strip.text.y,strip.text.y.left,strip.text.y.right,strip.switch.pad.grid,strip.switch.pad.wrap,complete = FALSE,validate = TRUE)
+arguments:
+  '...': additional element specifications not part of base ggplot2.
+  aspect.ratio: aspect ratio of the panel
+  ? axis.line, axis.line.x, axis.line.x.top, axis.line.x.bottom, axis.line.y, axis.line.y.left, axis.line.y.right, axis.line.theta, axis.line.r
+  : lines along axes (\link[=element_line]{element_line()}).
+  ? axis.minor.ticks.length, axis.minor.ticks.length.x, axis.minor.ticks.length.x.top, axis.minor.ticks.length.x.bottom, axis.minor.ticks.length.y, axis.minor.ticks.length.y.left, axis.minor.ticks.length.y.right, axis.minor.ticks.length.theta, axis.minor.ticks.length.r
+  : length of minor tick marks (unit), or relative to axis.ticks.length when provided with rel().
+  ? axis.minor.ticks.x.top, axis.minor.ticks.x.bottom, axis.minor.ticks.y.left, axis.minor.ticks.y.right, axis.minor.ticks.theta, axis.minor.ticks.r,
+  : minor tick marks along axes (\link[=element_line]{element_line()}).
+  ? axis.text, axis.text.x, axis.text.y, axis.text.x.top, axis.text.x.bottom, axis.text.y.left, axis.text.y.right, axis.text.theta, axis.text.r
+  : tick labels along axes (\link[=element_text]{element_text()}).
+  ? axis.ticks, axis.ticks.x, axis.ticks.x.top, axis.ticks.x.bottom, axis.ticks.y, axis.ticks.y.left, axis.ticks.y.right, axis.ticks.theta, axis.ticks.r
+  : tick marks along axes (\link[=element_line]{element_line()}).
+  ? axis.ticks.length, axis.ticks.length.x, axis.ticks.length.x.top, axis.ticks.length.x.bottom, axis.ticks.length.y, axis.ticks.length.y.left, axis.ticks.length.y.right, axis.ticks.length.theta, axis.ticks.length.r
+  : length of tick marks (unit).
+  axis.title, axis.title.x, axis.title.y, axis.title.x.top, axis.title.x.bottom, axis.title.y.left, axis.title.y.right: labels of axes (\link[=element_text]{element_text()}).
+  complete: set this to TRUE if this is a complete theme, such as the one returned by \link[=theme_grey]{theme_grey()}.
+  geom: defaults for geoms (\link[=element_geom]{element_geom()})
+  legend.axis.line: lines along axes in legends (\link[=element_line]{element_line()})
+  legend.background: background of legend (\link[=element_rect]{element_rect()}; inherits from rect)
+  legend.box: arrangement of multiple legends ("horizontal" or "vertical")
+  legend.box.background: background of legend area (\link[=element_rect]{element_rect()}; inherits from rect)
+  legend.box.just: justification of each legend within the overall bounding box, when there are multiple legends...
+  legend.box.margin: margins around the full legend area, as specified using \link[=margin]{margin()}; inherits from margins.
+  legend.box.spacing: The spacing between the plotting area and the legend box (unit); inherits from spacing.
+  legend.byrow: whether the legend-matrix is filled by columns (FALSE, the default) or by rows (TRUE).
+  legend.direction: layout of items in legends ("horizontal" or "vertical")
+  legend.frame: frame drawn around the bar (\link[=element_rect]{element_rect()}).
+  legend.justification: anchor point for positioning legend inside plot ("center" or two-element numeric vector) or the...
+  ? legend.justification.top, legend.justification.bottom, legend.justification.left, legend.justification.right, legend.justification.inside
+  : Same as legend.justification but specified per legend.position option.
+  legend.key: background underneath legend keys (\link[=element_rect]{element_rect()}; inherits from rect)
+  legend.key.justification: Justification for positioning legend keys when more space is available than needed for display.
+  legend.key.size, legend.key.height, legend.key.width: size of legend keys (unit); key background height & width inherit from legend.key.size or can be specified separately.
+  legend.key.spacing, legend.key.spacing.x, legend.key.spacing.y: spacing between legend keys given as a unit.
+  legend.location: Relative placement of legends outside the plot as a string.
+  legend.margin: the margin around each legend (\link[=margin]{margin()}); inherits from margins.
+  legend.position: the default position of legends ("none", "left", "right", "bottom", "top", "inside")
+  legend.position.inside: A numeric vector of length two setting the placement of legends that have the "inside" position.
+  legend.spacing, legend.spacing.x, legend.spacing.y: the spacing between legends (unit).
+  legend.text: legend item labels (\link[=element_text]{element_text()}; inherits from text)
+  legend.text.position: placement of legend text relative to legend keys or bars ("top", "right", "bottom" or "left").
+  legend.ticks: tick marks shown along bars or axes (\link[=element_line]{element_line()})
+  legend.ticks.length: length of tick marks in legend (\link[grid:unit]{unit()}); inherits from legend.key.size.
+  legend.title: title of legend (\link[=element_text]{element_text()}; inherits from title)
+  legend.title.position: placement of legend title relative to the main legend ("top", "right", "bottom" or "left").
+  line: all line elements (\link[=element_line]{element_line()})
+  margins: all margins (\link[=margin]{margin()})
+  panel.background: background of plotting area, drawn underneath plot (\link[=element_rect]{element_rect()}; inherits...
+  panel.border: border around plotting area, drawn on top of plot so that it covers tick marks and grid lines.
+  panel.grid, panel.grid.major, panel.grid.minor, panel.grid.major.x, panel.grid.major.y, panel.grid.minor.x, panel.grid.minor.y: grid lines (\link[=element_line]{element_line()}).
+  panel.ontop: option to place the panel (background, gridlines) over the data layers (logical).
+  panel.spacing, panel.spacing.x, panel.spacing.y: spacing between facet panels (unit).
+  panel.widths, panel.heights: Sizes for panels (units).
+  plot.background: background of the entire plot (\link[=element_rect]{element_rect()}; inherits from rect)
+  plot.caption: caption below the plot (text appearance) (\link[=element_text]{element_text()}; inherits from...
+  plot.margin: margin around entire plot (unit with the sizes of the top, right, bottom, and left margins); inherits from margin.
+  plot.subtitle: plot subtitle (text appearance) (\link[=element_text]{element_text()}; inherits from title)...
+  plot.tag: upper-left label to identify a plot (text appearance) (\link[=element_text]{element_text()};...
+  plot.tag.location: The placement of the tag as a string, one of "panel", "plot" or "margin".
+  plot.tag.position: The position of the tag as a string ("topleft", "top", "topright", "left", "right", "bottomleft", "bottom", "bottomright") or a coordinate.
+  plot.title: plot title (text appearance) (\link[=element_text]{element_text()}; inherits from title)...
+  plot.title.position, plot.caption.position: Alignment of the plot title/subtitle and caption.
+  point: all point elements (\link[=element_point]{element_point()})
+  polygon: all polygon elements (\link[=element_polygon]{element_polygon()})
+  rect: all rectangular elements (\link[=element_rect]{element_rect()})
+  spacing: all spacings (\link[grid:unit]{unit()})
+  strip.background, strip.background.x, strip.background.y: background of facet labels (\link[=element_rect]{element_rect()}; inherits from rect).
+  strip.clip: should strip background edges and strip labels be clipped to the extend of the strip background?
+  strip.placement: placement of strip with respect to axes, either "inside" or "outside".
+  strip.switch.pad.grid, strip.switch.pad.wrap: space between strips and axes when strips are switched (unit); inherits from spacing.
+  strip.text, strip.text.x, strip.text.y, strip.text.x.top, strip.text.x.bottom, strip.text.y.left, strip.text.y.right: facet labels (\link[=element_text]{element_text()}; inherits from text).
+  text: all text elements (\link[=element_text]{element_text()})
+  title: 'all title elements: plot, axes, legends (\link[=element_text]{element_text()}; inherits from text)'
+  validate: TRUE to run check_element(), FALSE to bypass checks.
+---
+kind: function
+name: is_theme
+exported: true
+signature: is_theme(x) S7::S7_inherits(x, class_theme)
+---
+kind: function
+name: is.theme
+exported: true
+signature: is.theme(x)
+---
+kind: function
+name: complete_theme
+exported: true
+signature: complete_theme(theme = NULL, default = theme_get())
+arguments:
+  default: A complete [=theme]theme to fill in missing pieces.
+  theme: An incomplete [=theme]theme object to complete, or NULL to complete the default theme.
+returns: A [=theme]theme object.
+---
+kind: function
+name: calc_element
+exported: true
+signature: calc_element(element, theme, verbose = FALSE, skip_blank = FALSE,call = caller_env())
+arguments:
+  element: The name of the theme element to calculate
+  skip_blank: If TRUE, elements of type element_blank in the inheritance hierarchy will be ignored.
+  theme: A theme object (like \link[=theme_grey]{theme_grey()})
+  verbose: If TRUE, print out which elements this one inherits from
+---
+kind: function
+name: stat_summary_bin
+exported: true
+signature: stat_summary_bin(mapping = NULL, data = NULL,geom = "pointrange", position = "identity",...,fun.data = NULL,fun = NULL,fun.max = NULL,fun.min = NULL,fun.args = list(),bins = 30,binwidth = NULL,breaks = NULL,na.rm = FALSE,orientation = NA,show.legend = NA,inherit.aes = TRUE,fun.y = deprecated(),fun.ymin = deprecated(),fun.ymax = deprecated())
+---
+kind: function
+name: geom_boxplot
+exported: true
+signature: geom_boxplot(mapping = NULL, data = NULL,stat = "boxplot", position = "dodge2",...,outliers = TRUE,outlier.colour = NULL,outlier.color = NULL,outlier.fill = NULL,outlier.shape = NULL,outlier.size = NULL,outlier.stroke = 0.5,outlier.alpha = NULL,whisker.colour    = NULL,whisker.color     = NULL,whisker.linetype  = NULL,whisker.linewidth = NULL,staple.colour     = NULL,staple.color      = NULL,staple.linetype   = NULL,staple.linewidth  = NULL,median.colour     = NULL,median.color      = NULL,median.linetype   = NULL,median.linewidth  = NULL,box.colour        = NULL,box.color         = NULL,box.linetype      = NULL,box.linewidth     = NULL,notch = FALSE,notchwidth = 0.5,staplewidth = 0,varwidth = FALSE,na.rm = FALSE,orientation = NA,show.legend = NA,inherit.aes = TRUE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  box.colour, box.color, box.linetype, box.linewidth: Default aesthetics for the boxes.
+  coef: Length of the whiskers as multiple of IQR.
+  data: The data to be displayed in this layer.
+  geom, stat: Use to override the default connection between geom_boxplot() and stat_boxplot().
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  median.colour, median.color, median.linetype, median.linewidth: Default aesthetics for the median line.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  notch: If FALSE (default) make a standard box plot.
+  notchwidth: For a notched box plot, width of the notch relative to the body (defaults to notchwidth = 0.5).
+  orientation: The orientation of the layer.
+  outlier.colour, outlier.color, outlier.fill, outlier.shape, outlier.size, outlier.stroke, outlier.alpha: Default aesthetics for outliers.
+  outliers: Whether to display (TRUE) or discard (FALSE) outliers from the plot.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+  staple.colour, staple.color, staple.linetype, staple.linewidth: Default aesthetics for the staples.
+  staplewidth: The relative width of staples to the width of the box.
+  varwidth: If FALSE (default) make a standard box plot.
+  whisker.colour, whisker.color, whisker.linetype, whisker.linewidth: Default aesthetics for the whiskers.
+---
+kind: function
+name: scale_x_continuous
+exported: true
+signature: scale_x_continuous(name = waiver(), breaks = waiver(),minor_breaks = waiver(), n.breaks = NULL,labels = waiver(), limits = NULL,expand = waiver(), oob = censor,na.value = NA_real_, transform = "identity",trans = deprecated(),guide = waiver(), position = "bottom",sec.axis = waiver())
+---
+kind: function
+name: scale_y_continuous
+exported: true
+signature: scale_y_continuous(name = waiver(), breaks = waiver(),minor_breaks = waiver(), n.breaks = NULL,labels = waiver(), limits = NULL,expand = waiver(), oob = censor,na.value = NA_real_, transform = "identity",trans = deprecated(),guide = waiver(), position = "left",sec.axis = waiver())
+---
+kind: function
+name: scale_x_log10
+exported: true
+signature: scale_x_log10(...)
+---
+kind: function
+name: scale_y_log10
+exported: true
+signature: scale_y_log10(...)
+---
+kind: function
+name: scale_x_reverse
+exported: true
+signature: scale_x_reverse(...)
+---
+kind: function
+name: scale_y_reverse
+exported: true
+signature: scale_y_reverse(...)
+---
+kind: function
+name: scale_x_sqrt
+exported: true
+signature: scale_x_sqrt(...)
+---
+kind: function
+name: scale_y_sqrt
+exported: true
+signature: scale_y_sqrt(...)
+---
+kind: function
+name: guide_axis_theta
+exported: true
+signature: guide_axis_theta(title = waiver(), theme = NULL, angle = waiver(),minor.ticks = FALSE, cap = "none", order = 0,position = waiver())
+arguments:
+  angle: Compared to setting the angle in \link[=theme]{theme()} / \link[=element_text]{element_text()}, this also uses some heuristics to automatically pick the hjust and vjust that you probably want.
+  cap: A character to cut the axis line back to the last breaks.
+  minor.ticks: Whether to draw the minor ticks (TRUE) or not draw minor ticks (FALSE, default).
+  order: A positive integer of length 1 that specifies the order of this guide among multiple guides.
+  position: 'Where this guide should be drawn: one of top, bottom, left, or right.'
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+  title: A character string or expression indicating a title of guide.
+---
+kind: function
+name: position_stack
+exported: true
+signature: position_stack(vjust = 1, reverse = FALSE)
+arguments:
+  reverse: If TRUE, will reverse the default stacking order.
+  vjust: Vertical adjustment for geoms that have a position (like points or lines), not a dimension (like bars or areas).
+---
+kind: function
+name: position_fill
+exported: true
+signature: position_fill(vjust = 1, reverse = FALSE)
+---
+kind: function
+name: is_theme_element
+exported: true
+signature: is_theme_element(x, type = "any")
+---
+kind: function
+name: rel
+exported: true
+signature: rel(x)
+---
+kind: function
+name: element_render
+exported: true
+signature: element_render(theme, element, ..., name = NULL)
+arguments:
+  '...': Other arguments provided to \link[=element_grob]{element_grob()}
+  element: The element name given as character vector
+  name: Character vector added to the name of the grob
+  theme: The theme object
+---
+kind: function
+name: element_grob
+exported: true
+signature: element_grob(element, ...)
+arguments:
+  '...': Other arguments to control specific of rendering.
+  element: Theme element, i.e.
+---
+kind: function
+name: register_theme_elements
+exported: true
+signature: register_theme_elements(..., element_tree = NULL, complete = TRUE)
+arguments:
+  '...': Element specifications
+  class: The name of the element class.
+  complete: If TRUE (the default), elements are set to inherit from blank elements.
+  description: An optional character vector providing a description for the element.
+  element_tree: Addition of or modification to the element tree, which specifies the inheritance relationship of the theme elements.
+  inherit: A vector of strings, naming the elements that this element inherits from.
+  reset_current: If TRUE (the default), the currently active theme is reset to the default theme.
+---
+kind: function
+name: reset_theme_settings
+exported: true
+signature: reset_theme_settings(reset_current = TRUE)
+---
+kind: function
+name: get_element_tree
+exported: true
+signature: get_element_tree()
+---
+kind: function
+name: el_def
+exported: true
+signature: el_def(class = NULL, inherit = NULL, description = NULL)
+---
+kind: function
+name: lims
+exported: true
+signature: lims(...)
+arguments:
+  '...': 'For xlim() and ylim(): Two numeric values, specifying the left/lower limit and the right/upper limit of the scale.'
+---
+kind: function
+name: xlim
+exported: true
+signature: xlim(...)
+---
+kind: function
+name: ylim
+exported: true
+signature: ylim(...)
+---
+kind: function
+name: expand_limits
+exported: true
+signature: expand_limits(...)
+arguments:
+  '...': named list of aesthetics specifying the value (or values) that should be included in each scale.
+---
+kind: function
+name: is_geom
+exported: true
+signature: is_geom(x) inherits(x, "Geom")
+---
+kind: function
+name: coord_munch
+exported: true
+signature: coord_munch(coord, data, range, segment_length = 0.01, is_closed = FALSE)
+arguments:
+  coord: Coordinate system definition.
+  data: Data set to transform - should have variables x and y are chopped up into small pieces (as defined by group).
+  is_closed: Whether data should be considered as a closed polygon.
+  range: Panel range specification.
+  segment_length: Target segment length
+---
+kind: function
+name: geom_label
+exported: true
+signature: geom_label(mapping = NULL, data = NULL,stat = "identity", position = "nudge",...,parse = FALSE,label.padding = unit(0.25, "lines"),label.r = unit(0.15, "lines"),label.size = deprecated(),border.colour = NULL,border.color = NULL,text.colour = NULL,text.color = NULL,size.unit = "mm",na.rm = FALSE,show.legend = NA,inherit.aes = TRUE)
+---
+kind: function
+name: is_coord
+exported: true
+signature: is_coord(x) inherits(x, "Coord")
+---
+kind: function
+name: is.Coord
+exported: true
+signature: is.Coord(x)
+---
+kind: function
+name: is_margin
+exported: true
+signature: is_margin(x) S7::S7_inherits(x, margin)
+---
+kind: function
+name: margin_part
+exported: true
+signature: margin_part(t = NA, r = NA, b = NA, l = NA, unit = "pt")
+---
+kind: function
+name: margin_auto
+exported: true
+signature: margin_auto(t = 0, r = t, b = t, l = r, unit = "pt")
+---
+kind: function
+name: coord_transform
+exported: true
+signature: coord_transform(x = "identity", y = "identity", xlim = NULL, ylim = NULL,limx = deprecated(), limy = deprecated(), clip = "on",expand = TRUE, reverse = "none")
+arguments:
+  '...': Arguments forwarded to coord_transform().
+  clip: Should drawing be clipped to the extent of the plot panel?
+  expand: If TRUE, the default, adds a small expansion factor to the limits to ensure that data and axes don't overlap.
+  limx, limy: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] use xlim and ylim instead.'
+  reverse: A string giving which directions to reverse.
+  x, y: Transformers for x and y axes or their names.
+  xlim, ylim: Limits for the x and y axes.
+---
+kind: function
+name: coord_trans
+exported: true
+signature: coord_trans(...)
+---
+kind: function
+name: geom_abline
+exported: true
+signature: geom_abline(mapping = NULL, data = NULL,stat = "identity",...,slope,intercept,na.rm = FALSE,show.legend = NA,inherit.aes = FALSE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  data: The data to be displayed in this layer.
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+  stat: The statistical transformation to use on the data for this layer.
+  xintercept, yintercept, slope, intercept: Parameters that control the position of the line.
+---
+kind: function
+name: zeroGrob
+exported: true
+signature: zeroGrob()
+---
+kind: function
+name: stat_sf
+exported: true
+signature: stat_sf(mapping = NULL, data = NULL, geom = "rect",position = "identity", na.rm = FALSE, show.legend = NA,inherit.aes = TRUE, ...)
+---
+kind: function
+name: scale_shape
+exported: true
+signature: scale_shape(name = waiver(), ..., solid = NULL, aesthetics = "shape")
+arguments:
+  '...': 'Arguments passed on to \link[=discrete_scale]{discrete_scale} One of: NULL for no breaks waiver() for the default breaks (the scale limits) A character vector of breaks A function that takes the limits as input and returns breaks as output.'
+  aesthetics: The names of the aesthetics that this scale works with.
+  name: The name of the scale.
+  solid: Should the shapes be solid, TRUE, or hollow, FALSE?
+---
+kind: function
+name: scale_shape_binned
+exported: true
+signature: scale_shape_binned(name = waiver(), ..., solid = TRUE, aesthetics = "shape")
+---
+kind: function
+name: scale_shape_ordinal
+exported: true
+signature: scale_shape_ordinal(...)
+---
+kind: function
+name: scale_shape_continuous
+exported: true
+signature: scale_shape_continuous(...)
+---
+kind: function
+name: facet_wrap
+exported: true
+signature: facet_wrap(facets, nrow = NULL, ncol = NULL, scales = "fixed",space = "fixed", shrink = TRUE, labeller = "label_value",as.table = TRUE, switch = deprecated(), drop = TRUE,dir = "h", strip.position = 'top', axes = "margins",axis.labels = "all")
+arguments:
+  as.table: 'htmllifecycle-superseded.svgoptions: alt=''[Superseded]''[Superseded] The as.table argument is now absorbed into the dir argument via the two letter options.'
+  axes: Determines which axes will be drawn in case of fixed scales.
+  axis.labels: Determines whether to draw labels for interior axes when the scale is fixed and the axis argument is not "margins".
+  dir: 'Direction: either "h" for horizontal, the default, or "v", for vertical.'
+  drop: If TRUE, the default, all factor levels not used in the data will automatically be dropped.
+  facets: A set of variables or expressions quoted by \link[=vars]{vars()} and defining faceting groups on the rows or columns dimension.
+  labeller: A function that takes one data frame of labels and returns a list or data frame of character vectors.
+  nrow, ncol: Number of rows and columns.
+  scales: Should scales be fixed ("fixed", the default), free ("free"), or free in one dimension ("free_x", "free_y")?
+  shrink: If TRUE, will shrink scales to fit output of statistics, not raw data.
+  space: If "fixed" (default), all panels have the same size and the number of rows and columns in the layout can be arbitrary.
+  strip.position: By default, the labels are displayed on the top of the plot.
+  switch: By default, the labels are displayed on the top and right of the plot.
+---
+kind: function
+name: vars
+exported: true
+signature: vars(self)
+arguments:
+  '...': <\link[rlang:topic-data-mask]{data-masking}> Variables or expressions automatically quoted.
+---
+kind: function
+name: wrap_dims
+exported: true
+signature: wrap_dims(n, nrow = NULL, ncol = NULL)
+arguments:
+  n: length of structure
+  nrow, ncol: desired dimensions for the grid
+returns: the grid dimension as a vector with nrow and then ncol
+---
+kind: function
+name: annotation_raster
+exported: true
+signature: annotation_raster(raster, xmin, xmax, ymin, ymax,interpolate = FALSE)
+arguments:
+  interpolate: If TRUE interpolate linearly, if FALSE (the default) don't interpolate.
+  raster: raster object to display, may be an array or a nativeRaster
+  xmin, xmax: x location (in data coordinates) giving horizontal location of raster
+  ymin, ymax: y location (in data coordinates) giving vertical location of raster
+---
+kind: function
+name: update_geom_defaults
+exported: true
+signature: update_geom_defaults(geom, new)
+---
+kind: function
+name: update_stat_defaults
+exported: true
+signature: update_stat_defaults(stat, new)
+---
+kind: function
+name: get_geom_defaults
+exported: true
+signature: get_geom_defaults(geom, theme = theme_get())
+arguments:
+  geom: 'Some definition of a geom: A function that creates a layer, e.g.'
+  theme: A \link{theme} object.
+returns: A list of aesthetics
+---
+kind: function
+name: reset_geom_defaults
+exported: true
+signature: reset_geom_defaults() reset_defaults("geom")
+---
+kind: function
+name: reset_stat_defaults
+exported: true
+signature: reset_stat_defaults() reset_defaults("stat")
+---
+kind: function
+name: position_nudge
+exported: true
+signature: position_nudge(x = NULL, y = NULL)
+arguments:
+  x, y: Amount of vertical and horizontal distance to move.
+---
+kind: function
+name: stat_sf_coordinates
+exported: true
+signature: stat_sf_coordinates(mapping = aes(), data = NULL, geom = "point",position = "identity", na.rm = FALSE,show.legend = NA, inherit.aes = TRUE,fun.geometry = NULL,...)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  data: The data to be displayed in this layer.
+  fun.geometry: A function that takes a sfc object and returns a sfc_POINT with the same length as the input.
+  geom: The geometric object to use to display the data for this layer.
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+---
+kind: function
+name: scale_colour_hue
+exported: true
+signature: scale_colour_hue(name = waiver(), ..., h = c(0, 360) + 15, c = 100,l = 65, h.start = 0, direction = 1,na.value = "grey50", aesthetics = "colour")
+---
+kind: function
+name: scale_fill_hue
+exported: true
+signature: scale_fill_hue(name = waiver(), ..., h = c(0, 360) + 15, c = 100,l = 65, h.start = 0, direction = 1,na.value = "grey50", aesthetics = "fill")
+---
+kind: function
+name: geom_dotplot
+exported: true
+signature: geom_dotplot(mapping = NULL, data = NULL,position = "identity",...,binwidth = NULL,binaxis = "x",method = "dotdensity",binpositions = "bygroup",stackdir = "up",stackratio = 1,dotsize = 1,stackgroups = FALSE,origin = NULL,right = TRUE,width = 0.9,drop = FALSE,na.rm = FALSE,show.legend = NA,inherit.aes = TRUE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  binaxis: The axis to bin along, "x" (default) or "y"
+  binpositions: When method is "dotdensity", "bygroup" (default) determines positions of the bins for each group separately.
+  binwidth: When method is "dotdensity", this specifies maximum bin width.
+  data: The data to be displayed in this layer.
+  dotsize: The diameter of the dots relative to binwidth, default 1.
+  drop: If TRUE, remove all bins with zero counts
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  method: '"dotdensity" (default) for dot-density binning, or "histodot" for fixed bin widths (like stat_bin)'
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  origin: When method is "histodot", origin of first bin
+  position: A position adjustment to use on the data for this layer.
+  right: When method is "histodot", should intervals be closed on the right (a, b], or not [a, b)
+  show.legend: logical.
+  stackdir: which direction to stack the dots.
+  stackgroups: should dots be stacked across groups?
+  stackratio: how close to stack the dots.
+  width: When binaxis is "y", the spacing of the dot stacks for dodging.
+---
+kind: function
+name: remove_missing
+exported: true
+signature: remove_missing(df, na.rm = FALSE, vars = names(df), name = "",finite = FALSE)
+arguments:
+  df: data.frame
+  finite: If TRUE, will also remove non-finite values.
+  na.rm: If true, will suppress warning message.
+  name: Optional function name to improve error message.
+  vars: Character vector of variables to check for missings in
+---
+kind: function
+name: should_stop
+exported: true
+signature: should_stop(expr)
+arguments:
+  expr: code to evaluate.
+---
+kind: function
+name: waiver
+exported: true
+signature: waiver() structure(list(), class = "waiver")
+arguments:
+  x: An object to test
+---
+kind: function
+name: is_waiver
+exported: true
+signature: is_waiver(x) inherits(x, "waiver")
+---
+kind: function
+name: gg_dep
+exported: true
+signature: gg_dep(version, msg)
+arguments:
+  msg: The message to print.
+  version: The last version of ggplot2 where this function was good (in other words, the last version where it was not deprecated).
+---
+kind: function
+name: has_flipped_aes
+exported: true
+signature: has_flipped_aes(data, params = list(), main_is_orthogonal = NA,range_is_orthogonal = NA, group_has_equal = FALSE,ambiguous = FALSE, main_is_continuous = FALSE,main_is_optional = FALSE, default = FALSE)
+---
+kind: function
+name: flip_data
+exported: true
+signature: flip_data(data, flip = NULL)
+---
+kind: function
+name: flipped_names
+exported: true
+signature: flipped_names(flip = FALSE)
+---
+kind: function
+name: alpha
+exported: true
+signature: alpha(n) seq(0.1, 1, length.out = n)
+---
+kind: function
+name: after_stat
+exported: true
+signature: after_stat(x)
+---
+kind: function
+name: stat
+exported: true
+signature: stat(x)
+---
+kind: function
+name: after_scale
+exported: true
+signature: after_scale(x)
+---
+kind: function
+name: from_theme
+exported: true
+signature: from_theme(x)
+---
+kind: function
+name: stage
+exported: true
+signature: stage(start = NULL, after_stat = NULL, after_scale = NULL)
+---
+kind: function
+name: geom_density_2d
+exported: true
+signature: geom_density_2d(mapping = NULL, data = NULL,stat = "density_2d", position = "identity",...,contour_var = "density",lineend = "butt",linejoin = "round",linemitre = 10,na.rm = FALSE,show.legend = NA,inherit.aes = TRUE)
+arguments:
+  '...': Arguments passed on to \link[=geom_contour]{geom_contour} The width of the contour bins.
+  adjust: A multiplicative bandwidth adjustment to be used if 'h' is 'NULL'.
+  contour: If TRUE, contour the results of the 2d density estimation.
+  contour_var: Character string identifying the variable to contour by.
+  data: The data to be displayed in this layer.
+  geom, stat: Use to override the default connection between geom_density_2d() and stat_density_2d().
+  h: Bandwidth (vector of length two).
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  lineend: Line end style (round, butt, square).
+  linejoin: Line join style (round, mitre, bevel).
+  linemitre: Line mitre limit (number greater than 1).
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  n: Number of grid points in each direction.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+---
+kind: function
+name: geom_density_2d_filled
+exported: true
+signature: geom_density_2d_filled(mapping = NULL, data = NULL,stat = "density_2d_filled", position = "identity",...,contour_var = "density",na.rm = FALSE,show.legend = NA,inherit.aes = TRUE)
+---
+kind: function
+name: geom_errorbarh
+exported: true
+signature: geom_errorbarh(..., orientation = "y")
+---
+kind: function
+name: scale_colour_identity
+exported: true
+signature: scale_colour_identity(name = waiver(), ..., guide = "none",aesthetics = "colour")
+---
+kind: function
+name: scale_fill_identity
+exported: true
+signature: scale_fill_identity(name = waiver(), ..., guide = "none",aesthetics = "fill")
+---
+kind: function
+name: scale_shape_identity
+exported: true
+signature: scale_shape_identity(name = waiver(), ..., guide = "none",aesthetics = "shape")
+---
+kind: function
+name: scale_linetype_identity
+exported: true
+signature: scale_linetype_identity(name = waiver(), ..., guide = "none",aesthetics = "linetype")
+---
+kind: function
+name: scale_linewidth_identity
+exported: true
+signature: scale_linewidth_identity(name = waiver(), ..., guide = "none",aesthetics = "linewidth")
+---
+kind: function
+name: scale_alpha_identity
+exported: true
+signature: scale_alpha_identity(name = waiver(), ..., guide = "none",aesthetics = "alpha")
+---
+kind: function
+name: scale_size_identity
+exported: true
+signature: scale_size_identity(name = waiver(), ..., guide = "none",aesthetics = "size")
+---
+kind: function
+name: scale_discrete_identity
+exported: true
+signature: scale_discrete_identity(aesthetics, name = waiver(), ...,guide = "none")
+---
+kind: function
+name: scale_continuous_identity
+exported: true
+signature: scale_continuous_identity(aesthetics, name = waiver(), ...,guide = "none")
+---
+kind: function
+name: annotation_custom
+exported: true
+signature: annotation_custom(grob, xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf)
+arguments:
+  grob: grob to display
+  xmin, xmax: x location (in data coordinates) giving horizontal location of raster
+  ymin, ymax: y location (in data coordinates) giving vertical location of raster
+---
+kind: function
+name: layer
+exported: true
+signature: layer(geom = NULL, stat = NULL,data = NULL, mapping = NULL,position = NULL, params = list(),inherit.aes = TRUE, check.aes = TRUE, check.param = TRUE,show.legend = NA, key_glyph = NULL, layout = NULL, layer_class = Layer)
+arguments:
+  check.aes, check.param: If TRUE, the default, will check that supplied parameters and aesthetics are understood by the geom or stat.
+  data: The data to be displayed in this layer.
+  geom: The geometric object to use to display the data for this layer.
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  key_glyph: A legend key drawing function or a string providing the function name minus the draw_key_ prefix.
+  layer_class: The type of layer object to be constructed.
+  layout: Argument to control layout at the layer level.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  params: Additional parameters to the geom and stat.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+  stat: The statistical transformation to use on the data for this layer.
+---
+kind: function
+name: layer_data
+exported: true
+signature: layer_data(self, plot_data)
+---
+kind: function
+name: is_layer
+exported: true
+signature: is_layer(x) inherits(x, "Layer")
+---
+kind: function
+name: coord_fixed
+exported: true
+signature: coord_fixed(ratio = 1, ...)
+arguments:
+  '...': Arguments passed on to \link[=coord_cartesian]{coord_cartesian} Limits for the x and y axes.
+  ratio: aspect ratio, expressed as y / x.
+---
+kind: function
+name: coord_quickmap
+exported: true
+signature: coord_quickmap(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
+---
+kind: function
+name: benchplot
+exported: true
+signature: benchplot(x)
+purpose: Benchmark plot creation time.
+arguments:
+  x: code to create ggplot2 plot
+---
+kind: function
+name: ggsave
+exported: true
+signature: ggsave(filename, plot = get_last_plot(),device = NULL, path = NULL, scale = 1,width = NA, height = NA, units = c("in", "cm", "mm", "px"),dpi = 300, limitsize = TRUE, bg = NULL,create.dir = FALSE,...)
+arguments:
+  '...': Other arguments passed on to the graphics device function, as specified by device.
+  bg: Background colour.
+  create.dir: Whether to create new directories if a non-existing directory is specified in the filename or path (TRUE) or return an error (FALSE, default).
+  device: Device to use.
+  dpi: Plot resolution.
+  filename: File name to create on disk.
+  limitsize: When TRUE (the default), ggsave() will not save images larger than 50x50 inches, to prevent the common error of specifying dimensions in pixels.
+  path: 'Path of the directory to save plot to: path and filename are combined to create the fully qualified file name.'
+  plot: Plot to save, defaults to last plot displayed.
+  scale: Multiplicative scaling factor.
+  units: 'One of the following units in which the width and height arguments are expressed: "in", "cm", "mm" or "px".'
+  width, height: Plot size in units expressed by the units argument.
+---
+kind: function
+name: autoplot
+exported: true
+signature: autoplot(object, ...)
+arguments:
+  '...': other arguments passed to specific methods
+  object: an object, whose class will determine the behaviour of autoplot
+returns: a ggplot object
+---
+kind: function
+name: draw_key_point
+exported: true
+signature: draw_key_point(data, params, size)
+---
+kind: function
+name: draw_key_abline
+exported: true
+signature: draw_key_abline(data, params, size)
+---
+kind: function
+name: draw_key_rect
+exported: true
+signature: draw_key_rect(data, params, size)
+---
+kind: function
+name: draw_key_polygon
+exported: true
+signature: draw_key_polygon(data, params, size)
+---
+kind: function
+name: draw_key_blank
+exported: true
+signature: draw_key_blank(data, params, size)
+---
+kind: function
+name: draw_key_boxplot
+exported: true
+signature: draw_key_boxplot(data, params, size)
+---
+kind: function
+name: draw_key_crossbar
+exported: true
+signature: draw_key_crossbar(data, params, size)
+---
+kind: function
+name: draw_key_path
+exported: true
+signature: draw_key_path(data, params, size)
+---
+kind: function
+name: draw_key_vpath
+exported: true
+signature: draw_key_vpath(data, params, size)
+---
+kind: function
+name: draw_key_dotplot
+exported: true
+signature: draw_key_dotplot(data, params, size)
+---
+kind: function
+name: draw_key_linerange
+exported: true
+signature: draw_key_linerange(data, params, size)
+---
+kind: function
+name: draw_key_pointrange
+exported: true
+signature: draw_key_pointrange(data, params, size)
+---
+kind: function
+name: draw_key_smooth
+exported: true
+signature: draw_key_smooth(data, params, size)
+---
+kind: function
+name: draw_key_text
+exported: true
+signature: draw_key_text(data, params, size)
+---
+kind: function
+name: draw_key_label
+exported: true
+signature: draw_key_label(data, params, size)
+---
+kind: function
+name: draw_key_vline
+exported: true
+signature: draw_key_vline(data, params, size)
+---
+kind: function
+name: draw_key_timeseries
+exported: true
+signature: draw_key_timeseries(data, params, size)
+---
+kind: function
+name: coord_flip
+exported: true
+signature: coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = "on")
+arguments:
+  clip: Should drawing be clipped to the extent of the plot panel?
+  expand: If TRUE, the default, adds a small expansion factor to the limits to ensure that data and axes don't overlap.
+  xlim, ylim: Limits for the x and y axes.
+---
+kind: function
+name: stat_spoke
+exported: true
+signature: stat_spoke(...)
+---
+kind: function
+name: gg_par
+exported: true
+signature: gg_par(..., stroke = NULL, pointsize = NULL)
+arguments:
+  '...': Named arguments passed on to gpar().
+  pointsize: Size for points.
+  stroke: Linewidth for points.
+returns: An object of class 'gpar'.
+---
+kind: function
+name: qplot
+exported: true
+signature: qplot(x, y, ..., data, facets = NULL, margins = FALSE,geom = "auto", xlim = c(NA, NA),ylim = c(NA, NA), log = "", main = NULL,xlab = NULL, ylab = NULL,asp = NA, stat = deprecated(), position = deprecated())
+arguments:
+  asp: The y/x aspect ratio
+  data: Data frame to use (optional).
+  facets: faceting formula to use.
+  geom: Character vector specifying geom(s) to draw.
+  log: Which variables to log transform ("x", "y", or "xy")
+  main, xlab, ylab: Character vector (or expression) giving plot title, x axis label, and y axis label respectively.
+  margins: 'See facet_grid(): display marginal facets?'
+  stat, position: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]'
+  x, y, ...: Aesthetics passed into each layer
+  xlim, ylim: X and y axis limits
+---
+kind: function
+name: guides
+exported: true
+signature: guides(...)
+arguments:
+  '...': List of scale name-guide pairs.
+returns: A list containing the mapping between scale and guide.
+---
+kind: function
+name: is_guides
+exported: true
+signature: is_guides(x) inherits(x, "Guides")
+---
+kind: function
+name: get_guide_data
+exported: true
+signature: get_guide_data(plot = get_last_plot(), aesthetic, panel = 1L)
+arguments:
+  aesthetic: A string that describes a single aesthetic for which to extract guide information.
+  panel: An integer giving a panel number for which to return position guide information.
+  plot: A ggplot or ggplot_build object.
+returns: 'One of the following: A data.frame representing the guide key, when the guide is unique for the aesthetic.'
+---
+kind: function
+name: geom_map
+exported: true
+signature: geom_map(mapping = NULL, data = NULL,stat = "identity",...,map,na.rm = FALSE,show.legend = NA,inherit.aes = TRUE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  data: The data to be displayed in this layer.
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  map: Data frame that contains the map coordinates.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  show.legend: logical.
+  stat: The statistical transformation to use on the data for this layer.
+---
+kind: function
+name: guide_coloursteps
+exported: true
+signature: guide_coloursteps(title = waiver(),theme = NULL,alpha = NA,angle = NULL,even.steps  = TRUE,show.limits = NULL,direction = NULL,position = NULL,reverse = FALSE,order = 0,available_aes = c("colour", "color", "fill"),...)
+arguments:
+  '...': ignored.
+  alpha: A numeric between 0 and 1 setting the colour transparency of the bar.
+  angle: Overrules the theme settings to automatically apply appropriate hjust and vjust for angled legend text.
+  available_aes: A vector of character strings listing the aesthetics for which a colourbar can be drawn.
+  direction: A character string indicating the direction of the guide.
+  even.steps: Should the rendered size of the bins be equal, or should they be proportional to their length in the data space?
+  order: positive integer less than 99 that specifies the order of this guide among multiple guides.
+  position: A character string indicating where the legend should be placed relative to the plot panels.
+  reverse: logical.
+  show.limits: Logical.
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+  title: A character string or expression indicating a title of guide.
+returns: A guide object
+---
+kind: function
+name: geom_freqpoly
+exported: true
+signature: geom_freqpoly(mapping = NULL, data = NULL,stat = "bin", position = "identity",...,na.rm = FALSE,show.legend = NA,inherit.aes = TRUE)
+---
+kind: function
+name: scale_colour_continuous
+exported: true
+signature: scale_colour_continuous(..., palette = NULL, aesthetics = "colour",guide = "colourbar", na.value = "grey50",type = getOption("ggplot2.continuous.colour"))
+arguments:
+  '...': Arguments passed on to \link[=continuous_scale]{continuous_scale}, \link[=binned_scale]{binned_scale} The name of the scale.
+  aesthetics: The names of the aesthetics that this scale works with.
+  guide: A function used to create a guide or its name.
+  na.value: Missing values will be replaced with this value.
+  palette: 'One of the following: NULL for the default palette stored in the theme.'
+  type: 'htmllifecycle-superseded.svgoptions: alt=''[Superseded]''[Superseded] The preferred mechanism for setting the default palette is by using the theme.'
+---
+kind: function
+name: scale_fill_continuous
+exported: true
+signature: scale_fill_continuous(..., palette = NULL, aesthetics = "fill", guide = "colourbar",na.value = "grey50",type = getOption("ggplot2.continuous.fill"))
+---
+kind: function
+name: scale_colour_binned
+exported: true
+signature: scale_colour_binned(..., palette = NULL, aesthetics = "colour", guide = "coloursteps",na.value = "grey50",type = getOption("ggplot2.binned.colour"))
+---
+kind: function
+name: scale_fill_binned
+exported: true
+signature: scale_fill_binned(..., palette = NULL, aesthetics = "fill", guide = "coloursteps",na.value = "grey50",type = getOption("ggplot2.binned.fill"))
+---
+kind: function
+name: scale_colour_discrete
+exported: true
+signature: scale_colour_discrete(..., palette = NULL, aesthetics = "colour", na.value = "grey50",type = getOption("ggplot2.discrete.colour"))
+arguments:
+  '...': 'Arguments passed on to \link[=discrete_scale]{discrete_scale} One of: NULL for no breaks waiver() for the default breaks (the scale limits) A character vector of breaks A function that takes the limits as input and returns breaks as output.'
+  aesthetics: The names of the aesthetics that this scale works with.
+  na.value: If na.translate = TRUE, what aesthetic value should the missing values be displayed as?
+  palette: 'One of the following: NULL for the default palette stored in the theme.'
+  type: 'htmllifecycle-superseded.svgoptions: alt=''[Superseded]''[Superseded] The preferred mechanism for setting the default palette is by using the theme.'
+---
+kind: function
+name: scale_fill_discrete
+exported: true
+signature: scale_fill_discrete(..., palette = NULL, aesthetics = "fill", na.value = "grey50",type = getOption("ggplot2.discrete.fill"))
+---
+kind: function
+name: map_data
+exported: true
+signature: map_data(map, region = ".", exact = FALSE, ...)
+arguments:
+  '...': all other arguments passed on to \link[maps:map]{maps::map()}
+  exact: should the region be treated as a regular expression (FALSE) or as a fixed string (TRUE).
+  map: name of map provided by the maps package.
+  region: name(s) of subregion(s) to include.
+---
+kind: function
+name: resolution
+exported: true
+signature: resolution(x, zero = TRUE, discrete = FALSE)
+arguments:
+  discrete: should vectors mapped with a discrete scale be treated as having a resolution of 1?
+  x: numeric vector
+  zero: should a zero value be automatically included in the computation of resolution
+---
+kind: function
+name: new_guide
+exported: true
+signature: new_guide(..., available_aes = "any", super)
+arguments:
+  '...': Named arguments that match the parameters of super$params or the theme elements in super$elements.
+  available_aes: A vector of character strings listing the aesthetics for which the guide can be drawn.
+  super: The super class to use for the constructed guide.
+returns: A Guide ggproto object.
+---
+kind: function
+name: is_guide
+exported: true
+signature: is_guide(x) inherits(x, "Guide")
+---
+kind: function
+name: coord_polar
+exported: true
+signature: coord_polar(theta = "x", start = 0, direction = 1, clip = "on")
+---
+kind: function
+name: aes
+exported: true
+signature: aes(x, y, ...)
+arguments:
+  x, y, ...: <\link[rlang:topic-data-mask]{data-masking}> List of name-value pairs in the form aesthetic = variable describing which variables in the layer data should be mapped to which aesthetics used by the paired geom/stat.
+returns: An S7 object representing a list with class mapping.
+---
+kind: function
+name: aes
+exported: true
+signature: aes(x, y, ...)
+arguments:
+  x, y, ...: <\link[rlang:topic-data-mask]{data-masking}> List of name-value pairs in the form aesthetic = variable describing which variables in the layer data should be mapped to which aesthetics used by the paired geom/stat.
+returns: An S7 object representing a list with class mapping.
+---
+kind: function
+name: is_mapping
+exported: true
+signature: is_mapping(x) S7::S7_inherits(x, class_mapping)
+---
+kind: function
+name: standardise_aes_names
+exported: true
+signature: standardise_aes_names(x)
+arguments:
+  x: Character vector of aesthetics names, such as c("colour", "size", "shape").
+returns: Character vector of standardised names.
+---
+kind: function
+name: aes_
+exported: true
+signature: aes_(x, y, ...)
+arguments:
+  x, y, ...: List of name value pairs.
+---
+kind: function
+name: aes_string
+exported: true
+signature: aes_string(x, y, ...)
+---
+kind: function
+name: aes_all
+exported: true
+signature: aes_all(vars)
+arguments:
+  vars: vector of variable names
+---
+kind: function
+name: aes_auto
+exported: true
+signature: aes_auto(data = NULL, ...)
+arguments:
+  '...': aesthetics that need to be explicitly mapped.
+  data: data.frame or names of variables
+---
+kind: function
+name: scale_colour_steps
+exported: true
+signature: scale_colour_steps(name = waiver(), ..., low = "#132B43",high = "#56B1F7", space = "Lab",na.value = "grey50", guide = "coloursteps",aesthetics = "colour")
+---
+kind: function
+name: scale_colour_steps2
+exported: true
+signature: scale_colour_steps2(name = waiver(), ..., low = muted("red"),mid = "white", high = muted("blue"),midpoint = 0, space = "Lab", na.value = "grey50",transform = "identity", guide = "coloursteps",aesthetics = "colour")
+---
+kind: function
+name: scale_colour_stepsn
+exported: true
+signature: scale_colour_stepsn(name = waiver(), ..., colours, values = NULL,space = "Lab", na.value = "grey50",guide = "coloursteps", aesthetics = "colour",colors)
+---
+kind: function
+name: scale_fill_steps
+exported: true
+signature: scale_fill_steps(name = waiver(), ..., low = "#132B43",high = "#56B1F7", space = "Lab",na.value = "grey50", guide = "coloursteps",aesthetics = "fill")
+---
+kind: function
+name: scale_fill_steps2
+exported: true
+signature: scale_fill_steps2(name = waiver(), ..., low = muted("red"),mid = "white", high = muted("blue"),midpoint = 0, space = "Lab", na.value = "grey50",transform = "identity", guide = "coloursteps",aesthetics = "fill")
+---
+kind: function
+name: scale_fill_stepsn
+exported: true
+signature: scale_fill_stepsn(name = waiver(), ..., colours, values = NULL,space = "Lab", na.value = "grey50",guide = "coloursteps", aesthetics = "fill",colors)
+---
+kind: function
+name: stat_summary2d
+exported: true
+signature: stat_summary2d(...)
+---
+kind: function
+name: geom_smooth
+exported: true
+signature: geom_smooth(mapping = NULL, data = NULL,stat = "smooth", position = "identity",...,method = NULL,formula = NULL,se = TRUE,na.rm = FALSE,orientation = NA,show.legend = NA,inherit.aes = TRUE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  data: The data to be displayed in this layer.
+  formula: Formula to use in smoothing function, eg.
+  fullrange: If TRUE, the smoothing line gets expanded to the range of the plot, potentially beyond the data.
+  geom, stat: Use to override the default connection between geom_smooth() and stat_smooth().
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  level: Level of confidence band to use (0.95 by default).
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  method: Smoothing method (function) to use, accepts either NULL or a character vector, e.g.
+  method.args: List of additional arguments passed on to the modelling function defined by method.
+  n: Number of points at which to evaluate smoother.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  orientation: The orientation of the layer.
+  position: A position adjustment to use on the data for this layer.
+  se: Display confidence band around smooth?
+  show.legend: logical.
+  span: Controls the amount of smoothing for the default loess smoother.
+  xseq: A numeric vector of values at which the smoother is evaluated.
+---
+kind: function
+name: annotation_map
+exported: true
+signature: annotation_map(map, ...)
+arguments:
+  '...': Other arguments used to modify visual parameters, such as colour or fill.
+  map: Data frame representing a map.
+---
+kind: function
+name: guide_axis_stack
+exported: true
+signature: guide_axis_stack(first = "axis", ..., title = waiver(), theme = NULL,spacing = NULL, order = 0, position = waiver())
+arguments:
+  '...': Additional guides to stack given in the same manner as first.
+  first: 'A position guide given as one of the following: A string, for example "axis".'
+  order: A positive integer of length 1 that specifies the order of this guide among multiple guides.
+  position: 'Where this guide should be drawn: one of top, bottom, left, or right.'
+  spacing: A \link[=unit]{unit()} objects that determines how far separate guides are spaced apart.
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+  title: A character string or expression indicating a title of guide.
+---
+kind: function
+name: facet_null
+exported: true
+signature: facet_null(shrink = TRUE)
+arguments:
+  shrink: If TRUE, will shrink scales to fit output of statistics, not raw data.
+---
+kind: function
+name: map_data
+exported: true
+signature: map_data(data, layout, params)
+arguments:
+  '...': all other arguments passed on to \link[maps:map]{maps::map()}
+  exact: should the region be treated as a regular expression (FALSE) or as a fixed string (TRUE).
+  map: name of map provided by the maps package.
+  region: name(s) of subregion(s) to include.
+---
+kind: function
+name: scale_x_date
+exported: true
+signature: scale_x_date(name = waiver(),breaks = waiver(),date_breaks = waiver(),labels = waiver(),date_labels = waiver(),minor_breaks = waiver(),date_minor_breaks = waiver(),limits = NULL,expand = waiver(),oob = censor,guide = waiver(),position = "bottom",sec.axis = waiver())
+---
+kind: function
+name: scale_y_date
+exported: true
+signature: scale_y_date(name = waiver(),breaks = waiver(),date_breaks = waiver(),labels = waiver(),date_labels = waiver(),minor_breaks = waiver(),date_minor_breaks = waiver(),limits = NULL,expand = waiver(),oob = censor,guide = waiver(),position = "left",sec.axis = waiver())
+---
+kind: function
+name: scale_x_datetime
+exported: true
+signature: scale_x_datetime(name = waiver(),breaks = waiver(),date_breaks = waiver(),labels = waiver(),date_labels = waiver(),minor_breaks = waiver(),date_minor_breaks = waiver(),timezone = NULL,limits = NULL,expand = waiver(),oob = censor,guide = waiver(),position = "bottom",sec.axis = waiver())
+---
+kind: function
+name: scale_y_datetime
+exported: true
+signature: scale_y_datetime(name = waiver(),breaks = waiver(),date_breaks = waiver(),labels = waiver(),date_labels = waiver(),minor_breaks = waiver(),date_minor_breaks = waiver(),timezone = NULL,limits = NULL,expand = waiver(),oob = censor,guide = waiver(),position = "left",sec.axis = waiver())
+---
+kind: function
+name: scale_x_time
+exported: true
+signature: scale_x_time(name = waiver(),breaks = waiver(),date_breaks = waiver(),minor_breaks = waiver(),date_minor_breaks = waiver(),labels = waiver(),date_labels = waiver(),limits = NULL,expand = waiver(),oob = censor,na.value = NA_real_,guide = waiver(),position = "bottom",sec.axis = waiver())
+---
+kind: function
+name: scale_y_time
+exported: true
+signature: scale_y_time(name = waiver(),breaks = waiver(),date_breaks = waiver(),minor_breaks = waiver(),date_minor_breaks = waiver(),labels = waiver(),date_labels = waiver(),limits = NULL,expand = waiver(),oob = censor,na.value = NA_real_,guide = waiver(),position = "left",sec.axis = waiver())
+---
+kind: function
+name: datetime_scale
+exported: true
+signature: datetime_scale(aesthetics, transform, trans = deprecated(),palette, breaks = pretty_breaks(), minor_breaks = waiver(),labels = waiver(), date_breaks = waiver(),date_labels = waiver(),date_minor_breaks = waiver(), timezone = NULL,guide = "legend", call = caller_call(), ...)
+arguments:
+  '...': 'Arguments passed on to \link[=continuous_scale]{continuous_scale} htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] The name of the scale that should be used for error messages associated with this scale.'
+  aesthetics: The names of the aesthetics that this scale works with.
+  breaks: 'One of: NULL for no breaks waiver() for the breaks specified by date_breaks A Date/POSIXct vector...'
+  call: The call used to construct the scale for reporting messages.
+  date_breaks: A string giving the distance between breaks like "2 weeks", or "10 years".
+  date_labels: A string giving the formatting specification for the labels.
+  date_minor_breaks: A string giving the distance between minor breaks like "2 weeks", or "10 years".
+  guide: A function used to create a guide or its name.
+  labels: One of the options below.
+  minor_breaks: 'One of: NULL for no breaks waiver() for the breaks specified by date_minor_breaks A Date/POSIXct...'
+  palette: A palette function that when called with a numeric vector with values between 0 and 1 returns the corresponding output values (e.g., \link[scales:pal_area]{scales::pal_area()}).
+  timezone: The timezone to use for display on the axes.
+  trans: For date/time scales, the name of a date/time transformation or the object itself.
+  transform: For continuous scales, the name of a transformation object or the object itself.
+---
+kind: function
+name: coord_map
+exported: true
+signature: coord_map(projection="mercator", ..., parameters = NULL, orientation = NULL, xlim = NULL, ylim = NULL, clip = "on")
+arguments:
+  '..., parameters': Other arguments passed on to \link[mapproj:mapproject]{mapproj::mapproject()}.
+  clip: Should drawing be clipped to the extent of the plot panel?
+  expand: If TRUE, the default, adds a small expansion factor to the limits to ensure that data and axes don't overlap.
+  orientation: projection orientation, which defaults to c(90, 0, mean(range(x))).
+  projection: projection to use, see \link[mapproj:mapproject]{mapproj::mapproject()} for list
+  xlim, ylim: Manually specific x/y limits (in degrees of longitude/latitude)
+---
+kind: function
+name: scale_colour_gradient
+exported: true
+signature: scale_colour_gradient(name = waiver(), ..., low = "#132B43",high = "#56B1F7", space = "Lab",na.value = "grey50",guide = "colourbar", aesthetics = "colour")
+---
+kind: function
+name: scale_fill_gradient
+exported: true
+signature: scale_fill_gradient(name = waiver(), ..., low = "#132B43",high = "#56B1F7", space = "Lab",na.value = "grey50", guide = "colourbar",aesthetics = "fill")
+---
+kind: function
+name: scale_colour_gradient2
+exported: true
+signature: scale_colour_gradient2(name = waiver(), ..., low = muted("red"),mid = "white", high = muted("blue"),midpoint = 0, space = "Lab", na.value = "grey50",transform = "identity", guide = "colourbar",aesthetics = "colour")
+---
+kind: function
+name: scale_fill_gradient2
+exported: true
+signature: scale_fill_gradient2(name = waiver(), ..., low = muted("red"),mid = "white", high = muted("blue"),midpoint = 0, space = "Lab", na.value = "grey50",transform = "identity", guide = "colourbar",aesthetics = "fill")
+---
+kind: function
+name: scale_colour_gradientn
+exported: true
+signature: scale_colour_gradientn(name = waiver(), ..., colours, values = NULL,space = "Lab", na.value = "grey50",guide = "colourbar", aesthetics = "colour",colors)
+---
+kind: function
+name: scale_fill_gradientn
+exported: true
+signature: scale_fill_gradientn(name = waiver(), ..., colours, values = NULL,space = "Lab", na.value = "grey50",guide = "colourbar", aesthetics = "fill",colors)
+---
+kind: function
+name: coord_radial
+exported: true
+signature: coord_radial(theta = "x",start = 0, end = NULL,thetalim = NULL, rlim = NULL, expand = TRUE,direction = deprecated(),clip = "off",r.axis.inside = NULL,rotate.angle = FALSE,inner.radius = 0,reverse = "none",r_axis_inside = deprecated(),rotate_angle = deprecated())
+arguments:
+  clip: Should drawing be clipped to the extent of the plot panel?
+  direction: 1, clockwise; -1, anticlockwise
+  end: Position from 12 o'clock in radians where plot ends, to allow for partial polar coordinates.
+  expand: If TRUE, the default, adds a small expansion factor to the limits to prevent overlap between data and axes.
+  inner.radius: A numeric between 0 and 1 setting the size of a inner radius hole.
+  r.axis.inside: 'One of the following: NULL (default) places the axis next to the panel if start and end arguments form a full circle and inside the panel otherwise.'
+  r_axis_inside, rotate_angle: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]'
+  reverse: A string giving which directions to reverse.
+  rotate.angle: If TRUE, transforms the angle aesthetic in data in accordance with the computed theta position.
+  start: Offset of starting point from 12 o'clock in radians.
+  theta: variable to map angle to (x or y)
+  thetalim, rlim: Limits for the theta and r axes.
+---
+kind: function
+name: guide_colourbar
+exported: true
+signature: guide_colourbar(title = waiver(),theme = NULL,nbin = NULL,display = "raster",raster = deprecated(),alpha = NA,draw.ulim = TRUE,draw.llim = TRUE,angle = NULL,position = NULL,direction = NULL,reverse = FALSE,order = 0,available_aes = c("colour", "color", "fill"),...)
+arguments:
+  '...': ignored.
+  alpha: A numeric between 0 and 1 setting the colour transparency of the bar.
+  angle: Overrules the theme settings to automatically apply appropriate hjust and vjust for angled legend text.
+  available_aes: A vector of character strings listing the aesthetics for which a colourbar can be drawn.
+  direction: A character string indicating the direction of the guide.
+  display: A string indicating a method to display the colourbar.
+  draw.llim: A logical specifying if the lower limit tick marks should be visible.
+  draw.ulim: A logical specifying if the upper limit tick marks should be visible.
+  nbin: A numeric specifying the number of bins for drawing the colourbar.
+  order: positive integer less than 99 that specifies the order of this guide among multiple guides.
+  position: A character string indicating where the legend should be placed relative to the plot panels.
+  raster: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] A logical.'
+  reverse: logical.
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+  title: A character string or expression indicating a title of guide.
+returns: A guide object
+---
+kind: function
+name: label_value
+exported: true
+signature: label_value(labels, multi_line = TRUE)
+---
+kind: function
+name: label_both
+exported: true
+signature: 'label_both(labels, multi_line = TRUE, sep = ": ")'
+---
+kind: function
+name: label_context
+exported: true
+signature: 'label_context(labels, multi_line = TRUE, sep = ": ")'
+---
+kind: function
+name: label_parsed
+exported: true
+signature: label_parsed(labels, multi_line = TRUE)
+---
+kind: function
+name: label_bquote
+exported: true
+signature: label_bquote(rows = NULL, cols = NULL,default)
+arguments:
+  cols: Backquoted labelling expression for columns.
+  default: Unused, kept for compatibility.
+  rows: Backquoted labelling expression for rows.
+---
+kind: function
+name: label_wrap_gen
+exported: true
+signature: label_wrap_gen(width = 25, multi_line = TRUE)
+---
+kind: function
+name: as_labeller
+exported: true
+signature: as_labeller(x, default = label_value, multi_line = TRUE)
+arguments:
+  default: Default labeller to process the labels produced by lookup tables or modified by non-labeller functions.
+  multi_line: Whether to display the labels of multiple factors on separate lines.
+  x: Object to coerce to a labeller function.
+---
+kind: function
+name: labeller
+exported: true
+signature: labeller(..., .rows = NULL, .cols = NULL,keep.as.numeric = deprecated(), .multi_line = TRUE,.default = label_value)
+arguments:
+  '...': Named arguments of the form variable = labeller.
+  .default: Default labeller for variables not specified.
+  .multi_line: Whether to display the labels of multiple factors on separate lines.
+  .rows, .cols: Labeller for a whole margin (either the rows or the columns).
+  keep.as.numeric: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] All supplied labellers and on-labeller functions should be able to work with character labels.'
+returns: A labeller function to supply to \link[=facet_grid]{facet_grid()} or \link[=facet_wrap]{facet_wrap()} for the argument labeller.
+---
+kind: function
+name: geom_crossbar
+exported: true
+signature: geom_crossbar(mapping = NULL, data = NULL,stat = "identity", position = "identity",...,middle.colour     = NULL,middle.color      = NULL,middle.linetype   = NULL,middle.linewidth  = NULL,box.colour        = NULL,box.color         = NULL,box.linetype      = NULL,box.linewidth     = NULL,fatten = deprecated(),na.rm = FALSE,orientation = NA,show.legend = NA,inherit.aes = TRUE)
+---
+kind: function
+name: continuous_scale
+exported: true
+signature: continuous_scale(aesthetics, scale_name = deprecated(), palette, name = waiver(),breaks = waiver(), minor_breaks = waiver(), n.breaks = NULL,labels = waiver(), limits = NULL, rescaler = rescale,oob = censor, expand = waiver(), na.value = NA,transform = "identity", trans = deprecated(),guide = "legend", position = "left",fallback.palette = NULL,call = caller_call(),super = ScaleContinuous)
+arguments:
+  aesthetics: The names of the aesthetics that this scale works with.
+  breaks: 'One of: NULL for no breaks waiver() for the default breaks computed by the [scales:new_transform]transformation object A numeric vector of positions A function that takes the limits as input and returns breaks as output (e.g., a function returned by \link[scales:breaks_extended]{scales::extended_breaks()}).'
+  call: The call used to construct the scale for reporting messages.
+  expand: For position scales, a vector of range expansion constants used to add some padding around the data to ensure that they are placed some distance away from the axes.
+  fallback.palette: Function to use when palette = NULL and the palette is not represented in the theme.
+  guide: A function used to create a guide or its name.
+  labels: One of the options below.
+  limits: 'One of: NULL to use the default scale range A numeric vector of length two providing limits of the scale.'
+  minor_breaks: 'One of: NULL for no minor breaks waiver() for the default breaks (none for discrete, one minor break between each major break for continuous) A numeric vector of positions A function that given the limits returns a vector of minor breaks.'
+  n.breaks: An integer guiding the number of major breaks.
+  na.value: Missing values will be replaced with this value.
+  name: The name of the scale.
+  oob: 'One of: Function that handles limits outside of the scale limits (out of bounds).'
+  palette: A palette function that when called with a numeric vector with values between 0 and 1 returns the corresponding output values (e.g., \link[scales:pal_area]{scales::pal_area()}).
+  position: For position scales, The position of the axis.
+  rescaler: A function used to scale the input values to the range [0, 1].
+  scale_name: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] The name of the scale that should be used for error messages associated with this scale.'
+  super: The super class to use for the constructed scale
+  trans: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] Deprecated in favour of transform.'
+  transform: For continuous scales, the name of a transformation object or the object itself.
+---
+kind: function
+name: discrete_scale
+exported: true
+signature: discrete_scale(aesthetics, scale_name = deprecated(), palette, name = waiver(),breaks = waiver(), minor_breaks = waiver(),labels = waiver(), limits = NULL, expand = waiver(),na.translate = TRUE, na.value = NA, drop = TRUE,guide = "legend", position = "left",fallback.palette = NULL,call = caller_call(),super = ScaleDiscrete)
+arguments:
+  aesthetics: The names of the aesthetics that this scale works with.
+  breaks: 'One of: NULL for no breaks waiver() for the default breaks (the scale limits) A character vector of breaks A function that takes the limits as input and returns breaks as output.'
+  call: The call used to construct the scale for reporting messages.
+  drop: Should unused factor levels be omitted from the scale?
+  expand: For position scales, a vector of range expansion constants used to add some padding around the data to ensure that they are placed some distance away from the axes.
+  fallback.palette: Function to use when palette = NULL and the palette is not represented in the theme.
+  guide: A function used to create a guide or its name.
+  labels: One of the options below.
+  limits: 'One of: NULL to use the default scale values A character vector that defines possible values of the scale and their order A function that accepts the existing (automatic) values and returns new ones.'
+  minor_breaks: 'One of: NULL for no minor breaks waiver() for the default breaks (none for discrete, one minor break between each major break for continuous) A numeric vector of positions A function that given the limits returns a vector of minor breaks.'
+  na.translate: Unlike continuous scales, discrete scales can easily show missing values, and do so by default.
+  na.value: If na.translate = TRUE, what aesthetic value should the missing values be displayed as?
+  name: The name of the scale.
+  palette: A palette function that when called with a single integer argument (the number of levels in the scale) returns the values that they should take (e.g., \link[scales:pal_hue]{scales::pal_hue()}).
+  position: For position scales, The position of the axis.
+  scale_name: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] The name of the scale that should be used for error messages associated with this scale.'
+  super: The super class to use for the constructed scale
+---
+kind: function
+name: binned_scale
+exported: true
+signature: binned_scale(aesthetics, scale_name = deprecated(), palette, name = waiver(),breaks = waiver(), labels = waiver(), limits = NULL,rescaler = rescale, oob = squish, expand = waiver(),na.value = NA_real_, n.breaks = NULL, nice.breaks = TRUE,right = TRUE, transform = "identity",trans = deprecated(), show.limits = FALSE,guide = "bins", position = "left",fallback.palette = NULL,call = caller_call(),super = ScaleBinned)
+arguments:
+  aesthetics: The names of the aesthetics that this scale works with.
+  breaks: 'One of: NULL for no breaks waiver() for the default breaks computed by the [scales:new_transform]transformation object A numeric vector of positions A function that takes the limits as input and returns breaks as output (e.g., a function returned by \link[scales:breaks_extended]{scales::extended_breaks()}).'
+  call: The call used to construct the scale for reporting messages.
+  expand: For position scales, a vector of range expansion constants used to add some padding around the data to ensure that they are placed some distance away from the axes.
+  fallback.palette: Function to use when palette = NULL and the palette is not represented in the theme.
+  guide: A function used to create a guide or its name.
+  labels: One of the options below.
+  limits: 'One of: NULL to use the default scale range A numeric vector of length two providing limits of the scale.'
+  n.breaks: The number of break points to create if breaks are not given directly.
+  na.value: Missing values will be replaced with this value.
+  name: The name of the scale.
+  nice.breaks: Logical.
+  oob: 'One of: Function that handles limits outside of the scale limits (out of bounds).'
+  palette: A palette function that when called with a numeric vector with values between 0 and 1 returns the corresponding output values (e.g., \link[scales:pal_area]{scales::pal_area()}).
+  position: For position scales, The position of the axis.
+  rescaler: A function used to scale the input values to the range [0, 1].
+  right: Should the intervals be closed on the right (TRUE, default) or should the intervals be closed on the left (FALSE)?
+  scale_name: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] The name of the scale that should be used for error messages associated with this scale.'
+  show.limits: should the limits of the scale appear as ticks
+  super: The super class to use for the constructed scale
+  trans: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] Deprecated in favour of transform.'
+  transform: For continuous scales, the name of a transformation object or the object itself.
+---
+kind: function
+name: is_scale
+exported: true
+signature: is_scale(x) inherits(x, "Scale")
+---
+kind: function
+name: alpha
+exported: true
+signature: alpha(n) seq(0.1, 1, length.out = n)
+---
+kind: function
+name: scale_colour_ordinal
+exported: true
+signature: scale_colour_ordinal(..., type = getOption("ggplot2.ordinal.colour", getOption("ggplot2.ordinal.fill")))
+---
+kind: function
+name: scale_colour_datetime
+exported: true
+signature: scale_colour_datetime(name = waiver(), ...,low = "#132B43",high = "#56B1F7",space = "Lab",na.value = "grey50",guide = "colourbar",aesthetics = "colour")
+---
+kind: function
+name: scale_colour_date
+exported: true
+signature: scale_colour_date(name = waiver(),...,low = "#132B43",high = "#56B1F7",space = "Lab",na.value = "grey50",guide = "colourbar",aesthetics = "colour")
+---
+kind: function
+name: scale_fill_ordinal
+exported: true
+signature: scale_fill_ordinal(..., type = getOption("ggplot2.ordinal.fill", getOption("ggplot2.ordinal.colour")))
+---
+kind: function
+name: scale_fill_datetime
+exported: true
+signature: scale_fill_datetime(name = waiver(), ...,low = "#132B43",high = "#56B1F7",space = "Lab",na.value = "grey50",guide = "colourbar",aesthetics = "fill")
+---
+kind: function
+name: scale_fill_date
+exported: true
+signature: scale_fill_date(name = waiver(), ...,low = "#132B43",high = "#56B1F7",space = "Lab",na.value = "grey50",guide = "colourbar",aesthetics = "fill")
+---
+kind: function
+name: scale_colour_manual
+exported: true
+signature: scale_colour_manual(..., values, aesthetics = "colour", breaks = waiver(), na.value = "grey50")
+---
+kind: function
+name: scale_fill_manual
+exported: true
+signature: scale_fill_manual(..., values, aesthetics = "fill", breaks = waiver(), na.value = "grey50")
+---
+kind: function
+name: scale_size_manual
+exported: true
+signature: scale_size_manual(..., values, breaks = waiver(), na.value = NA, aesthetics = "size")
+---
+kind: function
+name: scale_shape_manual
+exported: true
+signature: scale_shape_manual(..., values, breaks = waiver(), na.value = NA, aesthetics = "shape")
+---
+kind: function
+name: scale_linetype_manual
+exported: true
+signature: scale_linetype_manual(..., values, breaks = waiver(), na.value = NA, aesthetics = "linetype")
+---
+kind: function
+name: scale_linewidth_manual
+exported: true
+signature: scale_linewidth_manual(..., values, breaks = waiver(), na.value = NA, aesthetics = "linewidth")
+---
+kind: function
+name: scale_alpha_manual
+exported: true
+signature: scale_alpha_manual(..., values, breaks = waiver(), na.value = NA, aesthetics = "alpha")
+---
+kind: function
+name: scale_discrete_manual
+exported: true
+signature: scale_discrete_manual(aesthetics, ..., values, breaks = waiver())
+---
+kind: function
+name: layer_sf
+exported: true
+signature: layer_sf(geom = NULL, stat = NULL,data = NULL, mapping = NULL,position = NULL, params = list(),inherit.aes = TRUE, check.aes = TRUE, check.param = TRUE,show.legend = NA)
+arguments:
+  check.aes, check.param: If TRUE, the default, will check that supplied parameters and aesthetics are understood by the geom or stat.
+  data: The data to be displayed in this layer.
+  geom: The geometric object to use to display the data for this layer.
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  params: Additional parameters to the geom and stat.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+  stat: The statistical transformation to use on the data for this layer.
+---
+kind: function
+name: get_theme
+exported: true
+signature: get_theme()
+arguments:
+  '...': named list of theme settings
+  e1, e2: Theme and element to combine
+  new: new theme (a list of theme elements).
+returns: set_theme(), update_theme(), and replace_theme() invisibly return the previous theme so you can easily save it, then later restore it.
+---
+kind: function
+name: set_theme
+exported: true
+signature: set_theme(new = NULL)
+---
+kind: function
+name: update_theme
+exported: true
+signature: update_theme(...)
+---
+kind: function
+name: replace_theme
+exported: true
+signature: replace_theme(...)
+---
+kind: function
+name: '"%+replace%"'
+exported: true
+signature: '"%+replace%"(e1, e2)'
+---
+kind: function
+name: scale_x_binned
+exported: true
+signature: scale_x_binned(name = waiver(), n.breaks = 10, nice.breaks = TRUE,breaks = waiver(), labels = waiver(), limits = NULL,expand = waiver(), oob = squish, na.value = NA_real_,right = TRUE, show.limits = FALSE, transform = "identity",trans = deprecated(),guide = waiver(), position = "bottom")
+---
+kind: function
+name: scale_y_binned
+exported: true
+signature: scale_y_binned(name = waiver(), n.breaks = 10, nice.breaks = TRUE,breaks = waiver(), labels = waiver(), limits = NULL,expand = waiver(), oob = squish, na.value = NA_real_,right = TRUE, show.limits = FALSE, transform = "identity",trans = deprecated(),guide = waiver(), position = "left")
+---
+kind: function
+name: fortify
+exported: true
+signature: fortify(model, data, ...)
+arguments:
+  '...': Arguments passed to methods.
+  data: original dataset, if needed
+  model: model or other R object to convert to data frame
+---
+kind: function
+name: guide_custom
+exported: true
+signature: guide_custom(grob, width = grobWidth(grob), height = grobHeight(grob),title = NULL, theme = NULL,position = NULL, order = 0)
+arguments:
+  grob: A grob to display.
+  order: positive integer less than 99 that specifies the order of this guide among multiple guides.
+  position: A character string indicating where the legend should be placed relative to the plot panels.
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+  title: A character string or expression indicating the title of guide.
+  width, height: The allocated width and height to display the grob, given in \link[grid:unit]{grid::unit()}s.
+---
+kind: function
+name: position_jitterdodge
+exported: true
+signature: position_jitterdodge(jitter.width = NULL, jitter.height = 0,dodge.width = 0.75, reverse = FALSE,seed = NA)
+arguments:
+  dodge.width: the amount to dodge in the x direction.
+  jitter.height: degree of jitter in y direction.
+  jitter.width: degree of jitter in x direction.
+  reverse: If TRUE, will reverse the default stacking order.
+  seed: A random seed to make the jitter reproducible.
+---
+kind: function
+name: geom_vline
+exported: true
+signature: geom_vline(mapping = NULL, data = NULL,stat = "identity", position = "identity",...,xintercept,na.rm = FALSE,show.legend = NA,inherit.aes = FALSE)
+---
+kind: function
+name: map_data
+exported: true
+signature: map_data(data, layout, params)
+arguments:
+  '...': all other arguments passed on to \link[maps:map]{maps::map()}
+  exact: should the region be treated as a regular expression (FALSE) or as a fixed string (TRUE).
+  map: name of map provided by the maps package.
+  region: name(s) of subregion(s) to include.
+---
+kind: function
+name: vars
+exported: true
+signature: vars()
+arguments:
+  '...': <\link[rlang:topic-data-mask]{data-masking}> Variables or expressions automatically quoted.
+---
+kind: function
+name: vars
+exported: true
+signature: vars(...)
+arguments:
+  '...': <\link[rlang:topic-data-mask]{data-masking}> Variables or expressions automatically quoted.
+---
+kind: function
+name: is_facet
+exported: true
+signature: is_facet(x) inherits(x, "Facet")
+---
+kind: function
+name: is.facet
+exported: true
+signature: is.facet(x)
+---
+kind: function
+name: get_strip_labels
+exported: true
+signature: get_strip_labels(plot = get_last_plot())
+arguments:
+  plot: A ggplot or build ggplot object.
+returns: NULL if there are no labels, otherwise a list of data.frames containing the labels.
+---
+kind: function
+name: max_height
+exported: true
+signature: max_height(grobs, value_only = FALSE)
+arguments:
+  grobs: A list of grobs
+  value_only: Should the return value be a simple numeric vector giving the maximum in cm
+returns: The largest value.
+---
+kind: function
+name: max_width
+exported: true
+signature: max_width(grobs, value_only = FALSE)
+---
+kind: function
+name: find_panel
+exported: true
+signature: find_panel(table)
+arguments:
+  table: A gtable
+returns: A data.frame with some or all of the columns t(op), r(ight), b(ottom), and l(eft)
+---
+kind: function
+name: panel_cols
+exported: true
+signature: panel_cols(table)
+---
+kind: function
+name: panel_rows
+exported: true
+signature: panel_rows(table)
+---
+kind: function
+name: combine_vars
+exported: true
+signature: combine_vars(data, env = emptyenv(), vars = NULL, drop = TRUE)
+purpose: Take input data and define a mapping between faceting variables and ROW, COL and PANEL keys
+arguments:
+  data: A list of data.frames, the first being the plot data and the subsequent individual layer data
+  drop: should missing combinations/levels be dropped
+  env: The environment the vars should be evaluated in
+  vars: A list of quoted symbols matching columns in data
+returns: A data.frame with columns for PANEL, ROW, COL, and faceting vars
+---
+kind: function
+name: render_axes
+exported: true
+signature: render_axes(x = NULL, y = NULL, coord, theme, transpose = FALSE)
+arguments:
+  coord: A Coord object
+  theme: A theme object
+  transpose: Should the output be transposed?
+  x, y: A list of ranges as available to the draw_panel method in Facet subclasses.
+returns: A list with the element "x" and "y" each containing axis specifications for the ranges passed in.
+---
+kind: function
+name: render_strips
+exported: true
+signature: render_strips(x = NULL, y = NULL, labeller = identity, theme)
+arguments:
+  labeller: A labeller function
+  theme: a theme object
+  x, y: A data.frame with a column for each variable and a row for each combination to draw
+returns: A list with an "x" and a "y" element, each containing a "top" and "bottom" or "left" and "right" element respectively.
+---
+kind: function
+name: guide_axis_logticks
+exported: true
+signature: guide_axis_logticks(long  = 2.25,mid   = 1.5,short = 0.75,prescale.base = NULL,negative.small = NULL,short.theme = element_line(),expanded = TRUE,cap = "none",theme = NULL,prescale_base = deprecated(),negative_small = deprecated(),short_theme = deprecated(),...)
+arguments:
+  '...': Arguments passed on to \link[=guide_axis]{guide_axis} silently remove overlapping labels, (recursively) prioritizing the first, last, and middle labels.
+  cap: A character to cut the axis line back to the last breaks.
+  expanded: Whether the ticks should cover the range after scale expansion (TRUE, default), or be restricted to the scale limits (FALSE).
+  long, mid, short: A \link[grid:unit]{grid::unit()} object or \link[=rel]{rel()} object setting the (relative) length of the long, middle and short ticks.
+  negative.small: When the scale limits include 0 or negative numbers, what should be the smallest absolute value that is marked with a tick?
+  prescale.base: Base of logarithm used to transform data manually.
+  prescale_base, negative_small, short_theme: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]'
+  short.theme: A theme [=element_line]element for customising the display of the shortest ticks.
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+---
+kind: function
+name: add_gg
+exported: true
+signature: add_gg(e1, e2)
+---
+kind: function
+name: '"%+%"'
+exported: true
+signature: '"%+%"(e1, e2)'
+---
+kind: function
+name: ggplot_add
+exported: true
+signature: ggplot_add(object, plot, ...)
+---
+kind: function
+name: cut_interval
+exported: true
+signature: cut_interval(x, n = NULL, length = NULL, ...)
+arguments:
+  '...': Arguments passed on to \link[base:cut]{base::cut.default} either a numeric vector of two or more unique cut points or a single number (greater than or equal to 2) giving the number of intervals into which x is to be cut.
+  center, boundary: Specify either the position of edge or the center of a bin.
+  closed: One of "right" or "left" indicating whether right or left edges of bins are included in the bin.
+  length: length of each interval
+  n: number of intervals to create, OR
+  width: The bin width.
+  x: numeric vector
+---
+kind: function
+name: cut_number
+exported: true
+signature: cut_number(x, n = NULL, ...)
+---
+kind: function
+name: cut_width
+exported: true
+signature: cut_width(x, width, center = NULL, boundary = NULL, closed = "right", ...)
+---
+kind: function
+name: set_last_plot
+exported: true
+signature: set_last_plot(value) .store$set(value)
+---
+kind: function
+name: get_last_plot
+exported: true
+signature: get_last_plot() .store$get()
+---
+kind: function
+name: annotate
+exported: true
+signature: annotate(geom, x = NULL, y = NULL, xmin = NULL, xmax = NULL,ymin = NULL, ymax = NULL, xend = NULL, yend = NULL, ...,na.rm = FALSE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  geom: name of geom to use for annotation
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  x, y, xmin, ymin, xmax, ymax, xend, yend: positioning aesthetics - you must specify at least one of these.
+---
+kind: function
+name: vars
+exported: true
+signature: vars(...)
+arguments:
+  '...': <\link[rlang:topic-data-mask]{data-masking}> Variables or expressions automatically quoted.
+---
+kind: function
+name: position_dodge2
+exported: true
+signature: position_dodge2(width = NULL, preserve = "total",padding = 0.1, reverse = FALSE)
+---
+kind: function
+name: theme_sub_axis
+exported: true
+signature: theme_sub_axis(..., title, text, ticks, ticks.length, line, minor.ticks.length)
+---
+kind: function
+name: theme_sub_axis_x
+exported: true
+signature: theme_sub_axis_x(..., title, text, ticks, ticks.length, line, minor.ticks.length)
+---
+kind: function
+name: theme_sub_axis_y
+exported: true
+signature: theme_sub_axis_y(..., title, text, ticks, ticks.length, line, minor.ticks.length)
+---
+kind: function
+name: theme_sub_axis_bottom
+exported: true
+signature: theme_sub_axis_bottom(..., title, text, ticks, ticks.length, line, minor.ticks, minor.ticks.length)
+---
+kind: function
+name: theme_sub_axis_top
+exported: true
+signature: theme_sub_axis_top(..., title, text, ticks, ticks.length, line, minor.ticks, minor.ticks.length)
+---
+kind: function
+name: theme_sub_axis_left
+exported: true
+signature: theme_sub_axis_left(..., title, text, ticks, ticks.length, line, minor.ticks, minor.ticks.length)
+---
+kind: function
+name: theme_sub_axis_right
+exported: true
+signature: theme_sub_axis_right(..., title, text, ticks, ticks.length, line, minor.ticks, minor.ticks.length)
+---
+kind: function
+name: theme_sub_legend
+exported: true
+signature: theme_sub_legend(...,# Text stufftext, text.position, title, title.position,# Drawn elementsbackground, frame, ticks, ticks.length, axis.line,# Spacingsspacing, spacing.x, spacing.y,   margin,# Seyskey, key.size, key.height, key.width, key.spacing, key.spacing.x,key.spacing.y, key.justification,# Settingsbyrow, position, direction, location, position.inside,# Justificationjustification, justification.top, justification.bottom, justification.left,justification.right, justification.inside,# Boxbox, box.just, box.margin, box.background, box.spacing)
+---
+kind: function
+name: theme_sub_panel
+exported: true
+signature: theme_sub_panel(..., background, border,widths, heights, spacing, spacing.x, spacing.y,grid, grid.major, grid.minor, grid.major.x,grid.major.y, grid.minor.x, grid.minor.y, ontop)
+---
+kind: function
+name: theme_sub_plot
+exported: true
+signature: theme_sub_plot(..., background, title, title.position, subtitle, caption,caption.position, tag, tag.position, tag.location,margin)
+---
+kind: function
+name: theme_sub_strip
+exported: true
+signature: theme_sub_strip(..., background, background.x, background.y, clip,placement, text, text.x, text.x.bottom, text.x.top,text.y, text.y.left, text.y.right,switch.pad.grid, switch.pad.wrap)
+---
+kind: function
+name: scale_x_discrete
+exported: true
+signature: scale_x_discrete(name = waiver(), ..., palette = seq_len,expand = waiver(), guide = waiver(),position = "bottom", sec.axis = waiver(),continuous.limits = NULL)
+---
+kind: function
+name: scale_y_discrete
+exported: true
+signature: scale_y_discrete(name = waiver(), ..., palette = seq_len,expand = waiver(), guide = waiver(),position = "left", sec.axis = waiver(),continuous.limits = NULL)
+---
+kind: function
+name: annotation_borders
+exported: true
+signature: annotation_borders(database = "world", regions = ".", fill = NA,colour = "grey50", xlim = NULL, ylim = NULL, ...)
+arguments:
+  '...': Arguments passed on to \link[=geom_polygon]{geom_polygon} Line end style (round, butt, square).
+  colour: border colour
+  database: map data, see \link[maps:map]{maps::map()} for details
+  fill: fill colour
+  regions: map region
+  xlim, ylim: latitudinal and longitudinal ranges for extracting map polygons, see \link[maps:map]{maps::map()} for details.
+---
+kind: function
+name: borders
+exported: true
+signature: borders(...)
+---
+kind: function
+name: scale_type
+exported: true
+signature: scale_type(x) UseMethod("scale_type")
+arguments:
+  x: A vector
+returns: A character vector of scale types.
+---
+kind: function
+name: sec_axis
+exported: true
+signature: sec_axis(transform = NULL,name = waiver(), breaks = waiver(), labels = waiver(),guide = waiver(), trans = deprecated())
+arguments:
+  breaks: 'One of: NULL for no breaks waiver() for the default breaks computed by the transformation object A...'
+  guide: A position guide that will be used to render the axis on the plot.
+  labels: 'One of: NULL for no labels waiver() for the default labels computed by the transformation object A...'
+  name: The name of the secondary axis
+  trans: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]'
+  transform: A formula or function of a strictly monotonic transformation
+---
+kind: function
+name: dup_axis
+exported: true
+signature: dup_axis(transform = identity, name = derive(), breaks = derive(),labels = derive(), guide = derive(), trans = deprecated())
+---
+kind: function
+name: derive
+exported: true
+signature: derive()
+---
+kind: function
+name: is_position
+exported: true
+signature: is_position(x) inherits(x, "Position")
+---
+kind: function
+name: transform_position
+exported: true
+signature: transform_position(df, trans_x = NULL, trans_y = NULL, ...)
+arguments:
+  '...': Additional arguments passed to trans_x and trans_y.
+  trans_x, trans_y: Transformation functions for x and y aesthetics.
+---
+kind: function
+name: scale_size_continuous
+exported: true
+signature: scale_size_continuous(name = waiver(), breaks = waiver(), labels = waiver(),limits = NULL, range = NULL,transform = "identity",trans = deprecated(),guide = "legend",aesthetics = "size")
+---
+kind: function
+name: scale_radius
+exported: true
+signature: scale_radius(name = waiver(), breaks = waiver(), labels = waiver(),limits = NULL, range = c(1, 6),transform = "identity", trans = deprecated(),guide = "legend", aesthetics = "size")
+---
+kind: function
+name: scale_size_binned
+exported: true
+signature: scale_size_binned(name = waiver(), breaks = waiver(), labels = waiver(),limits = NULL, range = NULL, n.breaks = NULL,nice.breaks = TRUE, transform = "identity",trans = deprecated(), guide = "bins",aesthetics = "size")
+---
+kind: function
+name: scale_size_discrete
+exported: true
+signature: scale_size_discrete(...)
+---
+kind: function
+name: scale_size_ordinal
+exported: true
+signature: scale_size_ordinal(name = waiver(), ..., range = NULL, aesthetics = "size")
+---
+kind: function
+name: scale_size_area
+exported: true
+signature: scale_size_area(name = waiver(), ..., max_size = 6, aesthetics = "size")
+---
+kind: function
+name: scale_size_binned_area
+exported: true
+signature: scale_size_binned_area(name = waiver(), ..., max_size = 6, aesthetics = "size")
+---
+kind: function
+name: scale_size_datetime
+exported: true
+signature: scale_size_datetime(name = waiver(), ..., range = NULL, aesthetics = "size")
+---
+kind: function
+name: scale_size_date
+exported: true
+signature: scale_size_date(name = waiver(), ..., range = NULL, aesthetics = "size")
+---
+kind: function
+name: sf_transform_xy
+exported: true
+signature: sf_transform_xy(data, target_crs, source_crs, authority_compliant = FALSE)
+arguments:
+  authority_compliant: logical; TRUE means handle axis order authority compliant (e.g.
+  data: Data frame or list containing numerical columns x and y.
+  target_crs, source_crs: Target and source coordinate reference systems.
+returns: A copy of the input data with x and y replaced by transformed values.
+---
+kind: function
+name: coord_sf
+exported: true
+signature: coord_sf(xlim = NULL, ylim = NULL, expand = TRUE,crs = NULL, default_crs = NULL,datum = sf::st_crs(4326),label_graticule = waiver(),label_axes = waiver(), lims_method = "cross",ndiscr = 100, default = FALSE, clip = "on",reverse = "none")
+---
+kind: function
+name: is_stat
+exported: true
+signature: is_stat(x) inherits(x, "Stat")
+---
+kind: function
+name: geom_blank
+exported: true
+signature: geom_blank(mapping = NULL, data = NULL,stat = "identity", position = "identity",...,show.legend = NA,inherit.aes = TRUE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  data: The data to be displayed in this layer.
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  position: A position adjustment to use on the data for this layer.
+  show.legend: logical.
+  stat: The statistical transformation to use on the data for this layer.
+---
+kind: function
+name: guide_bins
+exported: true
+signature: guide_bins(# titletitle = waiver(),theme = NULL,# generalangle        = NULL,position     = NULL,direction    = NULL,override.aes = list(),reverse      = FALSE,order        = 0,show.limits  = NULL,...)
+arguments:
+  '...': ignored.
+  angle: Overrules the theme settings to automatically apply appropriate hjust and vjust for angled legend text.
+  direction: A character string indicating the direction of the guide.
+  order: positive integer less than 99 that specifies the order of this guide among multiple guides.
+  override.aes: A list specifying aesthetic parameters of legend key.
+  position: A character string indicating where the legend should be placed relative to the plot panels.
+  reverse: logical.
+  show.limits: Logical.
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+  title: A character string or expression indicating a title of guide.
+returns: A guide object
+---
+kind: function
+name: scale_colour_grey
+exported: true
+signature: scale_colour_grey(name = waiver(), ..., start = 0.2, end = 0.8,na.value = "red", aesthetics = "colour")
+---
+kind: function
+name: scale_fill_grey
+exported: true
+signature: scale_fill_grey(name = waiver(), ..., start = 0.2, end = 0.8,na.value = "red", aesthetics = "fill")
+---
+kind: function
+name: expansion
+exported: true
+signature: expansion(mult = 0, add = 0)
+arguments:
+  add: vector of additive range expansion constants.
+  mult: vector of multiplicative range expansion factors.
+---
+kind: function
+name: expand_scale
+exported: true
+signature: expand_scale(mult = 0, add = 0)
+---
+kind: function
+name: ggplot_build
+exported: true
+signature: ggplot_build(plot, ...)
+arguments:
+  '...': Not currently in use.
+  i: An integer.
+  j: An integer.
+  plot: ggplot object
+---
+kind: function
+name: get_layer_data
+exported: true
+signature: get_layer_data(plot = get_last_plot(), i = 1L)
+---
+kind: function
+name: get_panel_scales
+exported: true
+signature: get_panel_scales(plot = get_last_plot(), i = 1L, j = 1L)
+---
+kind: function
+name: get_layer_grob
+exported: true
+signature: get_layer_grob(plot = get_last_plot(), i = 1L)
+---
+kind: function
+name: ggplot_gtable
+exported: true
+signature: ggplot_gtable(data)
+arguments:
+  data: plot data generated by \link[=ggplot_build]{ggplot_build()}
+returns: a gtable object
+---
+kind: function
+name: ggplotGrob
+exported: true
+signature: ggplotGrob(x)
+arguments:
+  x: ggplot2 object
+---
+kind: function
+name: geom_hline
+exported: true
+signature: geom_hline(mapping = NULL, data = NULL,stat = "identity", position = "identity",...,yintercept,na.rm = FALSE,show.legend = NA,inherit.aes = FALSE)
+---
+kind: function
+name: summarise_layout
+exported: true
+signature: summarise_layout(p)
+---
+kind: function
+name: summarise_coord
+exported: true
+signature: summarise_coord(p)
+---
+kind: function
+name: summarise_layers
+exported: true
+signature: summarise_layers(p)
+---
+kind: function
+name: guide_none
+exported: true
+signature: guide_none(title = waiver(), position = waiver())
+arguments:
+  position: 'Where this guide should be drawn: one of top, bottom, left, or right.'
+  title: A character string or expression indicating a title of guide.
+---
+kind: function
+name: position_jitter
+exported: true
+signature: position_jitter(width = NULL, height = NULL, seed = NA)
+arguments:
+  seed: A random seed to make the jitter reproducible.
+  width, height: Amount of vertical and horizontal jitter.
+---
+kind: function
+name: position_identity
+exported: true
+signature: position_identity()
+---
+kind: function
+name: geom_violin
+exported: true
+signature: geom_violin(mapping = NULL, data = NULL,stat = "ydensity", position = "dodge",...,trim = TRUE,bounds = c(-Inf, Inf),quantile.colour = NULL,quantile.color = NULL,quantile.linetype = 0L,quantile.linewidth = NULL,draw_quantiles = deprecated(),scale = "area",na.rm = FALSE,orientation = NA,show.legend = NA,inherit.aes = TRUE)
+arguments:
+  '...': Other arguments passed on to \link[=layer]{layer()}'s params argument.
+  adjust: A multiplicate bandwidth adjustment.
+  bounds: Known lower and upper bounds for estimated data.
+  bw: The smoothing bandwidth to be used.
+  data: The data to be displayed in this layer.
+  draw_quantiles: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] Previous specification of drawing quantiles.'
+  drop: Whether to discard groups with less than 2 observations (TRUE, default) or keep such groups for position adjustment purposes (FALSE).
+  geom, stat: Use to override the default connection between geom_violin() and stat_ydensity().
+  inherit.aes: If FALSE, overrides the default aesthetics, rather than combining with them.
+  kernel: Kernel.
+  mapping: Set of aesthetic mappings created by \link[=aes]{aes()}.
+  na.rm: If FALSE, the default, missing values are removed with a warning.
+  orientation: The orientation of the layer.
+  position: A position adjustment to use on the data for this layer.
+  quantile.colour, quantile.color, quantile.linewidth, quantile.linetype: Default aesthetics for the quantile lines.
+  quantiles: A numeric vector with numbers between 0 and 1 to indicate quantiles marked by the quantile computed variable.
+  scale: if "area" (default), all violins have the same area (before trimming the tails).
+  show.legend: logical.
+  trim: If TRUE (default), trim the tails of the violins to the range of the data.
+---
+kind: function
+name: theme_grey
+exported: true
+signature: theme_grey(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = "white", accent = "#3366FF")
+---
+kind: function
+name: theme_bw
+exported: true
+signature: theme_bw(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = "white", accent = "#3366FF")
+---
+kind: function
+name: theme_linedraw
+exported: true
+signature: theme_linedraw(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = "white", accent = "#3366FF")
+---
+kind: function
+name: theme_light
+exported: true
+signature: theme_light(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = "white", accent = "#3366FF")
+---
+kind: function
+name: theme_dark
+exported: true
+signature: theme_dark(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = "white", accent = "#3366FF")
+---
+kind: function
+name: theme_minimal
+exported: true
+signature: theme_minimal(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = "white", accent = "#3366FF")
+---
+kind: function
+name: theme_classic
+exported: true
+signature: theme_classic(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = "white", accent = "#3366FF")
+---
+kind: function
+name: theme_void
+exported: true
+signature: theme_void(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = alpha(ink, 0), accent = "#3366FF")
+---
+kind: function
+name: theme_test
+exported: true
+signature: theme_test(base_size = 11, base_family = "",header_family = NULL,base_line_size = base_size / 22,base_rect_size = base_size / 22,ink = "black", paper = "white", accent = "#3366FF")
+---
+kind: function
+name: ggproto
+exported: true
+signature: ggproto(`_class` = NULL, `_inherit` = NULL, ...)
+arguments:
+  '...': A list of named members in the ggproto object.
+  _class: Class name to assign to the object.
+  _inherit: ggproto object to inherit from.
+  parent, self: Access parent class parent of object self.
+---
+kind: function
+name: ggproto_parent
+exported: true
+signature: ggproto_parent(parent, self)
+---
+kind: function
+name: is_ggproto
+exported: true
+signature: is_ggproto(x) inherits(x, "ggproto")
+---
+kind: function
+name: is.ggproto
+exported: true
+signature: is.ggproto(x)
+---
+kind: function
+name: facet_grid
+exported: true
+signature: facet_grid(rows = NULL, cols = NULL, scales = "fixed",space = "fixed", shrink = TRUE,labeller = "label_value", as.table = TRUE,switch = NULL, drop = TRUE, margins = FALSE,axes = "margins", axis.labels = "all",facets = deprecated())
+arguments:
+  as.table: If TRUE, the default, the facets are laid out like a table with highest values at the bottom-right.
+  axes: Determines which axes will be drawn.
+  axis.labels: Determines whether to draw labels for interior axes when the axes argument is not "margins".
+  drop: If TRUE, the default, all factor levels not used in the data will automatically be dropped.
+  facets: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated] Please use rows and cols instead.'
+  labeller: A function that takes one data frame of labels and returns a list or data frame of character vectors.
+  margins: Either a logical value or a character vector.
+  rows, cols: A set of variables or expressions quoted by \link[=vars]{vars()} and defining faceting groups on the rows or columns dimension.
+  scales: Are scales shared across all facets (the default, "fixed"), or do they vary across rows ("free_x"), columns ("free_y"), or both rows and columns ("free")?
+  shrink: If TRUE, will shrink scales to fit output of statistics, not raw data.
+  space: If "fixed", the default, all panels have the same size.
+  switch: By default, the labels are displayed on the top and right of the plot.
+---
+kind: function
+name: vars
+exported: true
+signature: vars(self)
+arguments:
+  '...': <\link[rlang:topic-data-mask]{data-masking}> Variables or expressions automatically quoted.
+---
+kind: function
+name: check_device
+exported: true
+signature: check_device(feature, action = "warn", op = NULL, maybe = FALSE,call = caller_env())
+arguments:
+  action: A string for what action to take.
+  call: The execution environment of a currently running function, e.g.
+  feature: A string naming a graphics device feature.
+  maybe: A logical of length 1 determining what the return value should be in case the device capabilities cannot be assessed.
+  op: A string for a specific operation to test for when feature is either "blending" or "compositing".
+returns: TRUE when the feature is thought to be supported and FALSE otherwise.
+---
+kind: function
+name: coord_cartesian
+exported: true
+signature: coord_cartesian(xlim = NULL, ylim = NULL, expand = TRUE,default = FALSE, clip = "on", reverse = "none",ratio = NULL)
+arguments:
+  clip: Should drawing be clipped to the extent of the plot panel?
+  default: Is this the default coordinate system?
+  expand: If TRUE, the default, adds a small expansion factor to the limits to ensure that data and axes don't overlap.
+  ratio: aspect ratio, expressed as y / x.
+  reverse: A string giving which directions to reverse.
+  xlim, ylim: Limits for the x and y axes.
+---
+kind: function
+name: guide_axis
+exported: true
+signature: guide_axis(title = waiver(), theme = NULL, check.overlap = FALSE,angle = waiver(), n.dodge = 1, minor.ticks = FALSE,cap = "none", order = 0, position = waiver())
+arguments:
+  angle: Compared to setting the angle in \link[=theme]{theme()} / \link[=element_text]{element_text()}, this also uses some heuristics to automatically pick the hjust and vjust that you probably want.
+  cap: A character to cut the axis line back to the last breaks.
+  check.overlap: silently remove overlapping labels, (recursively) prioritizing the first, last, and middle labels.
+  minor.ticks: Whether to draw the minor ticks (TRUE) or not draw minor ticks (FALSE, default).
+  n.dodge: The number of rows (for vertical axes) or columns (for horizontal axes) that should be used to render the labels.
+  order: A positive integer of length 1 that specifies the order of this guide among multiple guides.
+  position: 'Where this guide should be drawn: one of top, bottom, left, or right.'
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+  title: A character string or expression indicating a title of guide.
+---
+kind: function
+name: scale_colour_viridis_d
+exported: true
+signature: scale_colour_viridis_d(name = waiver(), ..., alpha = 1, begin = 0,end = 1, direction = 1, option = "D",aesthetics = "colour")
+---
+kind: function
+name: scale_fill_viridis_d
+exported: true
+signature: scale_fill_viridis_d(name = waiver(), ..., alpha = 1, begin = 0,end = 1, direction = 1, option = "D",aesthetics = "fill")
+---
+kind: function
+name: scale_colour_viridis_c
+exported: true
+signature: scale_colour_viridis_c(name = waiver(), ..., alpha = 1, begin = 0,end = 1, direction = 1, option = "D",values = NULL, space = "Lab",na.value = "grey50", guide = "colourbar",aesthetics = "colour")
+---
+kind: function
+name: scale_fill_viridis_c
+exported: true
+signature: scale_fill_viridis_c(name = waiver(), ..., alpha = 1, begin = 0,end = 1, direction = 1, option = "D",values = NULL, space = "Lab",na.value = "grey50", guide = "colourbar",aesthetics = "fill")
+---
+kind: function
+name: scale_colour_viridis_b
+exported: true
+signature: scale_colour_viridis_b(name = waiver(), ..., alpha = 1, begin = 0,end = 1, direction = 1, option = "D",values = NULL, space = "Lab",na.value = "grey50", guide = "coloursteps",aesthetics = "colour")
+---
+kind: function
+name: scale_fill_viridis_b
+exported: true
+signature: scale_fill_viridis_b(name = waiver(), ..., alpha = 1, begin = 0,end = 1, direction = 1, option = "D",values = NULL, space = "Lab",na.value = "grey50", guide = "coloursteps",aesthetics = "fill")
+---
+kind: function
+name: update_labels
+exported: true
+signature: update_labels(p, labels)
+arguments:
+  labels: named list of new labels
+  p: plot to modify
+---
+kind: function
+name: labs
+exported: true
+signature: labs(..., title = waiver(), subtitle = waiver(),caption = waiver(), tag = waiver(), dictionary = waiver(),alt = waiver(), alt_insight = waiver())
+arguments:
+  '...': New name-value pairs.
+  alt, alt_insight: Text used for the generation of alt-text for the plot.
+  caption: The text for the caption which will be displayed in the bottom-right of the plot by default.
+  dictionary: A named character vector to serve as dictionary.
+  label: The title of the respective axis (for xlab() or ylab()) or of the plot (for ggtitle()).
+  plot: A ggplot object
+  subtitle: The text for the subtitle for the plot which will be displayed below the title.
+  tag: The text for the tag label which will be displayed at the top-left of the plot by default.
+  title: The text for the title.
+---
+kind: function
+name: xlab
+exported: true
+signature: xlab(label)
+---
+kind: function
+name: ylab
+exported: true
+signature: ylab(label)
+---
+kind: function
+name: ggtitle
+exported: true
+signature: ggtitle(label, subtitle = waiver())
+---
+kind: function
+name: get_labs
+exported: true
+signature: get_labs(plot = get_last_plot())
+---
+kind: function
+name: guide_legend
+exported: true
+signature: guide_legend(# Titletitle = waiver(),# Themetheme = NULL,# Generalposition     = NULL,direction    = NULL,override.aes = list(),nrow         = NULL,ncol         = NULL,reverse      = FALSE,order        = 0,...)
+arguments:
+  '...': ignored.
+  direction: A character string indicating the direction of the guide.
+  nrow, ncol: The desired number of rows and column of legends respectively.
+  order: positive integer less than 99 that specifies the order of this guide among multiple guides.
+  override.aes: A list specifying aesthetic parameters of legend key.
+  position: A character string indicating where the legend should be placed relative to the plot panels.
+  reverse: logical.
+  theme: A \link[=theme]{theme} object to style the guide individually or differently from the plot's theme settings.
+  title: A character string or expression indicating a title of guide.
+---
+kind: function
+name: annotation_logticks
+exported: true
+signature: annotation_logticks(base = 10, sides = "bl", outside = FALSE, scaled = TRUE,short = unit(0.1, "cm"), mid = unit(0.2, "cm"), long = unit(0.3, "cm"),colour = "black", linewidth = 0.5, linetype = 1, alpha = 1, color = NULL, ...,size = deprecated())
+arguments:
+  '...': Other parameters passed on to the layer
+  alpha: The transparency of the tick marks.
+  base: the base of the log (default 10)
+  color: An alias for colour.
+  colour: Colour of the tick marks.
+  linetype: Linetype of tick marks (solid, dashed, etc.)
+  linewidth: Thickness of tick marks, in mm.
+  long: a \link[grid:unit]{grid::unit()} object specifying the length of the long tick marks.
+  mid: a \link[grid:unit]{grid::unit()} object specifying the length of the middle tick marks.
+  outside: logical that controls whether to move the log ticks outside of the plot area.
+  scaled: is the data already log-scaled?
+  short: a \link[grid:unit]{grid::unit()} object specifying the length of the short tick marks
+  sides: a string that controls which sides of the plot the log ticks appear on.
+  size: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]'
+---
+kind: function
+name: scale_linewidth_continuous
+exported: true
+signature: scale_linewidth_continuous(name = waiver(), breaks = waiver(),labels = waiver(), limits = NULL,range = NULL, transform = "identity",trans = deprecated(),guide = "legend",aesthetics = "linewidth")
+---
+kind: function
+name: scale_linewidth_binned
+exported: true
+signature: scale_linewidth_binned(name = waiver(), breaks = waiver(), labels = waiver(),limits = NULL, range = NULL, n.breaks = NULL,nice.breaks = TRUE, transform = "identity",trans = deprecated(), guide = "bins", aesthetics = "linewidth")
+---
+kind: function
+name: scale_linewidth_discrete
+exported: true
+signature: scale_linewidth_discrete(...)
+---
+kind: function
+name: scale_linewidth_ordinal
+exported: true
+signature: scale_linewidth_ordinal(name = waiver(), ..., range = NULL, aesthetics = "linewidth")
+---
+kind: function
+name: scale_linewidth_datetime
+exported: true
+signature: scale_linewidth_datetime(name = waiver(), ..., range = NULL, aesthetics = "linewidth")
+---
+kind: function
+name: scale_linewidth_date
+exported: true
+signature: scale_linewidth_date(name = waiver(), ..., range = NULL, aesthetics = "linewidth")
+---
+kind: function
+name: fill_alpha
+exported: true
+signature: fill_alpha(fill, alpha)
+arguments:
+  alpha: A transparency value between 0 (transparent) and 1 (opaque), parallel to fill.
+  fill: A fill colour given as a character or integer vector, or as a (list of) <GridPattern> object(s).
+returns: A character vector of colours, or list of <GridPattern> objects.
+---
+kind: function
+name: pattern_alpha
+exported: true
+signature: pattern_alpha(x, alpha)
+arguments:
+  alpha: A numeric vector between 0 and 1.
+  x: Object to be interpreted as pattern.
+returns: x with modified transparency

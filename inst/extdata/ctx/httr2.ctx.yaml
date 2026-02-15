@@ -1,0 +1,1192 @@
+Fetching R package: httr2
+  → Downloading from CRAN...
+  → Version: 1.2.2
+  → Parsing source...
+---
+kind: context_header
+llm_instructions: This is an LLM-optimized API specification for the R package 'httr2'. Use this context to write correct code using httr2 functions. Each 'function' record describes a public function with its signature, arguments, and purpose. The 'package' record contains metadata. All listed functions are part of the public API.
+---
+kind: package
+schema_version: '1.1'
+name: httr2
+version: 1.2.2
+language: R
+description: Perform HTTP Requests and Process the Responses
+---
+kind: function
+name: req_error
+exported: true
+signature: req_error(req, is_error = NULL, body = NULL)
+arguments:
+  body: A callback function that takes a single argument (the response) and returns a character vector of additional information to include in the body of the error.
+  is_error: A predicate function that takes a single argument (the response) and returns TRUE or FALSE indicating whether or not an R error should be signalled.
+  req: A httr2 request object.
+returns: A modified HTTP request.
+---
+kind: function
+name: req_retry
+exported: true
+signature: req_retry(req,max_tries = NULL,max_seconds = NULL,retry_on_failure = FALSE,is_transient = NULL,backoff = NULL,after = NULL,failure_threshold = Inf,failure_timeout = 30,failure_realm = NULL)
+arguments:
+  after: A function that takes a single argument (the response) and returns either a number of seconds to wait or NA.
+  backoff: A function that takes a single argument (the number of failed attempts so far) and returns the number of seconds to wait.
+  failure_threshold, failure_timeout, failure_realm: Set failure_threshold to activate "circuit breaking" where if a request continues to fail after failure_threshold times, cause the request to error until a timeout of failure_timeout seconds has elapsed.
+  is_transient: A predicate function that takes a single argument (the response) and returns TRUE or FALSE specifying whether or not the response represents a transient error.
+  max_tries, max_seconds: Cap the maximum number of attempts (max_tries), the total elapsed time from the first request (max_seconds), or both.
+  req: A httr2 request object.
+  retry_on_failure: Treat low-level failures as if they are transient errors that can be retried.
+returns: A modified HTTP request.
+---
+kind: function
+name: req_throttle
+exported: true
+signature: req_throttle(req, rate, capacity, fill_time_s = 60, realm = NULL)
+arguments:
+  capacity: The size of the bucket, i.e.
+  fill_time_s: Time in seconds to fill the capacity.
+  rate: For backwards compatibility, you can still specify the rate, which is converted to capacity by multiplying by fill_time_s.
+  realm: A string that uniquely identifies the throttle pool to use (throttling limits always apply per pool).
+  req: A httr2 request object.
+returns: A modified HTTP request.
+---
+kind: function
+name: throttle_status
+exported: true
+signature: throttle_status()
+returns: 'A data frame with three columns: The realm.'
+---
+kind: function
+name: req_oauth_bearer_jwt
+exported: true
+signature: req_oauth_bearer_jwt(req,client,claim,signature = "jwt_encode_sig",signature_params = list(),scope = NULL,token_params = list())
+arguments:
+  claim: A list of claims.
+  client: An \link[=oauth_client]{oauth_client()}.
+  req: A httr2 request object.
+  scope: Scopes to be requested from the resource owner.
+  signature: Function use to sign claim, e.g.
+  signature_params: Additional arguments passed to signature, e.g.
+  token_params: List containing additional parameters passed to the token_url.
+returns: req_oauth_bearer_jwt() returns a modified HTTP request that will use OAuth; oauth_flow_bearer_jwt() returns an oauth_token.
+---
+kind: function
+name: oauth_flow_bearer_jwt
+exported: true
+signature: oauth_flow_bearer_jwt(client,claim,signature = "jwt_encode_sig",signature_params = list(),scope = NULL,token_params = list())
+---
+kind: function
+name: response
+exported: true
+signature: response(status_code = 200,url = "https://example.com",method = "GET",headers = list(),body = raw(),timing = NULL)
+arguments:
+  body: The response body.
+  headers: HTTP headers.
+  method: HTTP method used to retrieve the response.
+  status_code: HTTP status code.
+  timing: A named numeric vector giving the time taken by various components.
+  url: URL response came from; might not be the same as the URL in the request if there were any redirects.
+returns: 'An HTTP response: an S3 list with class httr2_response.'
+---
+kind: function
+name: response_json
+exported: true
+signature: response_json(status_code = 200,url = "https://example.com",method = "GET",headers = list(),body = list())
+---
+kind: function
+name: new_response
+exported: true
+signature: new_response(method,url,status_code,headers,body,timing = NULL,request = NULL,error_call = caller_env())
+arguments:
+  body: The body of the response.
+  error_call: Environment (on call stack) used in error messages.
+  headers: HTTP headers.
+  method: HTTP method used to retrieve the response.
+  request: The request used to generate this response.
+  status_code: HTTP status code.
+  timing: A named numeric vector giving the time taken by various components.
+  url: URL response came from; might not be the same as the URL in the request if there were any redirects.
+returns: 'An HTTP response: an S3 list with class httr2_response.'
+---
+kind: function
+name: resp_raw
+exported: true
+signature: resp_raw(resp)
+arguments:
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+returns: resp (invisibly).
+---
+kind: function
+name: req_verbose
+exported: true
+signature: req_verbose(req,header_req = TRUE,header_resp = TRUE,body_req = FALSE,body_resp = FALSE,info = FALSE,redact_headers = TRUE)
+arguments:
+  body_req, body_resp: Should request/response bodies?
+  header_req, header_resp: Show request/response headers?
+  info: Show informational text from curl?
+  redact_headers: Redact confidential data in the headers?
+  req: A httr2 request object.
+returns: A modified HTTP request.
+---
+kind: function
+name: req_oauth_auth_code
+exported: true
+signature: req_oauth_auth_code(req,client,auth_url,scope = NULL,pkce = TRUE,auth_params = list(),token_params = list(),redirect_uri = oauth_redirect_uri(),cache_disk = FALSE,cache_key = NULL)
+arguments:
+  auth_params: A list containing additional parameters passed to \link[=oauth_flow_auth_code_url]{oauth_flow_auth_code_url()}.
+  auth_url: Authorization url; you'll need to discover this by reading the documentation.
+  cache_disk: Should the access token be cached on disk?
+  cache_key: If you want to cache multiple tokens per app, use this key to disambiguate them.
+  client: An \link[=oauth_client]{oauth_client()}.
+  pkce: Use "Proof Key for Code Exchange"?
+  redirect_uri: URL to redirect back to after authorization is complete.
+  req: A httr2 request object.
+  scope: Scopes to be requested from the resource owner.
+  token_params: List containing additional parameters passed to the token_url.
+returns: req_oauth_auth_code() returns a modified HTTP request that will use OAuth; oauth_flow_auth_code() returns an oauth_token.
+---
+kind: function
+name: oauth_flow_auth_code
+exported: true
+signature: oauth_flow_auth_code(client,auth_url,scope = NULL,pkce = TRUE,auth_params = list(),token_params = list(),redirect_uri = oauth_redirect_uri())
+---
+kind: function
+name: oauth_redirect_uri
+exported: true
+signature: oauth_redirect_uri()
+---
+kind: function
+name: oauth_flow_auth_code_url
+exported: true
+signature: oauth_flow_auth_code_url(client,auth_url,redirect_uri = NULL,scope = NULL,state = NULL,auth_params = list())
+arguments:
+  query: List of query parameters returned by oauth_flow_auth_code_listen().
+  state: Random state generated by oauth_flow_auth_code().
+---
+kind: function
+name: oauth_flow_auth_code_listen
+exported: true
+signature: oauth_flow_auth_code_listen(redirect_uri = "http://localhost:1410")
+---
+kind: function
+name: oauth_flow_auth_code_parse
+exported: true
+signature: oauth_flow_auth_code_parse(query, state)
+---
+kind: function
+name: oauth_flow_auth_code_pkce
+exported: true
+signature: oauth_flow_auth_code_pkce()
+---
+kind: function
+name: resps_successes
+exported: true
+signature: resps_successes(resps)
+arguments:
+  resp_data: A function that takes a response (resp) and returns the data found inside that response as a vector or data frame.
+  resps: A list of responses (possibly including errors).
+---
+kind: function
+name: resps_failures
+exported: true
+signature: resps_failures(resps)
+---
+kind: function
+name: resps_ok
+exported: true
+signature: resps_ok(resps)
+---
+kind: function
+name: resps_requests
+exported: true
+signature: resps_requests(resps)
+---
+kind: function
+name: resps_data
+exported: true
+signature: resps_data(resps, resp_data)
+---
+kind: function
+name: is_online
+exported: true
+signature: is_online()
+---
+kind: function
+name: req_template
+exported: true
+signature: req_template(req, template, ..., .env = parent.frame())
+arguments:
+  '...': Template variables.
+  .env: Environment in which to look for template variables not found in ....
+  req: A httr2 request object.
+  template: A template string which consists of a optional HTTP method and a path containing variables labelled like either :foo or {foo}.
+returns: A modified HTTP request.
+---
+kind: function
+name: oauth_client
+exported: true
+signature: oauth_client(id,token_url,secret = NULL,key = NULL,auth = c("body", "header", "jwt_sig"),auth_params = list(),name = hash(id))
+arguments:
+  auth: Authentication mechanism used by the client to prove itself to the API.
+  auth_params: Additional parameters passed to the function specified by auth.
+  id: Client identifier.
+  key: Client key.
+  name: Optional name for the client.
+  secret: Client secret.
+  token_url: Url to retrieve an access token.
+returns: 'An OAuth client: An S3 list with class httr2_oauth_client.'
+---
+kind: function
+name: oauth_client_req_auth
+exported: true
+signature: oauth_client_req_auth(req, client)
+arguments:
+  claim: Claim set produced by \link[=jwt_claim]{jwt_claim()}.
+  client: An oauth_client.
+  header: A named list giving additional fields to include in the JWT header.
+  req: A httr2 request object.
+  size: Size, in bits, of sha2 signature, i.e.
+returns: A modified HTTP request.
+---
+kind: function
+name: oauth_client_req_auth_header
+exported: true
+signature: oauth_client_req_auth_header(req, client)
+---
+kind: function
+name: oauth_client_req_auth_body
+exported: true
+signature: oauth_client_req_auth_body(req, client)
+---
+kind: function
+name: oauth_client_req_auth_jwt_sig
+exported: true
+signature: oauth_client_req_auth_jwt_sig(req,client,claim,size = 256,header = list())
+---
+kind: function
+name: req_auth_aws_v4
+exported: true
+signature: req_auth_aws_v4(req,aws_access_key_id,aws_secret_access_key,aws_session_token = NULL,aws_service = NULL,aws_region = NULL)
+arguments:
+  aws_access_key_id, aws_secret_access_key: AWS key and secret.
+  aws_service, aws_region: The AWS service and region to use for the request.
+  aws_session_token: AWS session token, if required.
+  req: A httr2 request object.
+---
+kind: function
+name: with_verbosity
+exported: true
+signature: with_verbosity(code, verbosity = 1)
+arguments:
+  code: Code to execture
+  env: Environment to use for scoping changes.
+  verbosity: How much information to print?
+returns: with_verbosity() returns the result of evaluating code.
+---
+kind: function
+name: local_verbosity
+exported: true
+signature: local_verbosity(verbosity, env = caller_env())
+---
+kind: function
+name: request
+exported: true
+signature: request(base_url)
+arguments:
+  base_url: Base URL for request.
+returns: 'An HTTP request: an S3 list with class httr2_request.'
+---
+kind: function
+name: req_options
+exported: true
+signature: req_options(.req, ...)
+arguments:
+  '...': <\link[rlang:dyn-dots]{dynamic-dots}> Name-value pairs.
+  .req: A request.
+returns: A modified HTTP request.
+---
+kind: function
+name: req_user_agent
+exported: true
+signature: req_user_agent(req, string = NULL)
+arguments:
+  req: A httr2 request object.
+  string: String to be sent in the User-Agent header.
+returns: A modified HTTP request.
+---
+kind: function
+name: req_timeout
+exported: true
+signature: req_timeout(req, seconds)
+arguments:
+  req: A httr2 request object.
+  seconds: Maximum number of seconds to wait
+returns: A modified HTTP request.
+---
+kind: function
+name: req_proxy
+exported: true
+signature: req_proxy(req,url,port = NULL,username = NULL,password = NULL,auth = "basic")
+arguments:
+  auth: Type of HTTP authentication to use.
+  req: A httr2 request object.
+  url, port: Location of proxy.
+  username, password: Login details for proxy, if needed.
+---
+kind: function
+name: req_headers
+exported: true
+signature: req_headers(.req, ..., .redact = NULL)
+arguments:
+  '...': <\link[rlang:dyn-dots]{dynamic-dots}> Name-value pairs of headers and their values.
+  .redact: A character vector of headers to redact.
+  .req: A request.
+returns: A modified HTTP request.
+---
+kind: function
+name: req_headers_redacted
+exported: true
+signature: req_headers_redacted(.req, ...)
+---
+kind: function
+name: req_get_headers
+exported: true
+signature: req_get_headers(req, redacted = c("drop", "redact", "reveal"))
+arguments:
+  redacted: What to do with redacted headers?
+  req: A httr2 request object.
+returns: A named list.
+---
+kind: function
+name: req_oauth_token_exchange
+exported: true
+signature: req_oauth_token_exchange(req,client,subject_token,subject_token_type,resource = NULL,audience = NULL,scope = NULL,requested_token_type = NULL,actor_token = NULL,actor_token_type = NULL,token_params = list())
+arguments:
+  actor_token: An optional security token that represents the client, rather than the identity behind the subject token.
+  actor_token_type: When actor_token is not NULL, this must be the URI that describes the type of the security token being requested.
+  audience: The logical name that identifies the resource that the client is trying to access, if applicable.
+  client: An \link[=oauth_client]{oauth_client()}.
+  req: A httr2 request object.
+  requested_token_type: An optional URI that describes the type of the security token being requested.
+  resource: The URI that identifies the resource that the client is trying to access, if applicable.
+  scope: Scopes to be requested from the resource owner.
+  subject_token: The security token to exchange.
+  subject_token_type: A URI that describes the type of the security token.
+  token_params: List containing additional parameters passed to the token_url.
+returns: req_oauth_token_exchange() returns a modified HTTP request that will exchange one security token for another; oauth_flow_token_exchange() returns the resulting oauth_token directly.
+---
+kind: function
+name: oauth_flow_token_exchange
+exported: true
+signature: oauth_flow_token_exchange(client,subject_token,subject_token_type,resource = NULL,audience = NULL,scope = NULL,requested_token_type = NULL,actor_token = NULL,actor_token_type = NULL,token_params = list())
+---
+kind: function
+name: jwt_claim
+exported: true
+signature: jwt_claim(iss = NULL,sub = NULL,aud = NULL,exp = unix_time() + 5L * 60L,nbf = unix_time(),iat = unix_time(),jti = NULL,...)
+arguments:
+  '...': Any additional claims to include in the claim set.
+  aud: Audience claim.
+  claim: Claim set produced by \link[=jwt_claim]{jwt_claim()}.
+  exp: Expiration claim.
+  header: A named list giving additional fields to include in the JWT header.
+  iat: Issued at claim.
+  iss: Issuer claim.
+  jti: JWT ID claim.
+  key: RSA or EC private key either specified as a path to a file, a connection, or a string (PEM/SSH format), or a raw vector (DER format).
+  nbf: Not before claim.
+  secret: String or raw vector with a secret passphrase.
+  size: Size, in bits, of sha2 signature, i.e.
+  sub: Subject claim.
+returns: An S3 list with class jwt_claim.
+---
+kind: function
+name: jwt_encode_sig
+exported: true
+signature: jwt_encode_sig(claim, key, size = 256, header = list())
+---
+kind: function
+name: jwt_encode_hmac
+exported: true
+signature: jwt_encode_hmac(claim, secret, size = 256, header = list())
+---
+kind: function
+name: example_url
+exported: true
+signature: example_url(path = "/")
+---
+kind: function
+name: example_github_client
+exported: true
+signature: example_github_client()
+---
+kind: function
+name: resp_check_content_type
+exported: true
+signature: resp_check_content_type(resp,valid_types = NULL,valid_suffix = NULL,check_type = TRUE,call = caller_env())
+arguments:
+  call: The execution environment of a currently running function, e.g.
+  check_type: Should the type actually be checked?
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+  valid_suffix: A string given an "structured media type" suffix.
+  valid_types: A character vector of valid MIME types.
+returns: Called for its side-effect; erroring if the response does not have the expected content type.
+---
+kind: function
+name: req_oauth_client_credentials
+exported: true
+signature: req_oauth_client_credentials(req,client,scope = NULL,token_params = list())
+arguments:
+  client: An \link[=oauth_client]{oauth_client()}.
+  req: A httr2 request object.
+  scope: Scopes to be requested from the resource owner.
+  token_params: List containing additional parameters passed to the token_url.
+returns: req_oauth_client_credentials() returns a modified HTTP request that will use OAuth; oauth_flow_client_credentials() returns an oauth_token.
+---
+kind: function
+name: oauth_flow_client_credentials
+exported: true
+signature: oauth_flow_client_credentials(client,scope = NULL,token_params = list())
+---
+kind: function
+name: resp_headers
+exported: true
+signature: resp_headers(resp, filter = NULL)
+arguments:
+  default: Default value to use if header doesn't exist.
+  filter: A regular expression used to filter the header names.
+  header: Header name (case insensitive)
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+returns: resp_headers() returns a list.
+---
+kind: function
+name: resp_header
+exported: true
+signature: resp_header(resp, header, default = NULL)
+---
+kind: function
+name: resp_header_exists
+exported: true
+signature: resp_header_exists(resp, header)
+---
+kind: function
+name: resp_date
+exported: true
+signature: resp_date(resp)
+arguments:
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+returns: A POSIXct date-time.
+---
+kind: function
+name: resp_content_type
+exported: true
+signature: resp_content_type(resp)
+arguments:
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+returns: A string.
+---
+kind: function
+name: resp_encoding
+exported: true
+signature: resp_encoding(resp)
+---
+kind: function
+name: resp_retry_after
+exported: true
+signature: resp_retry_after(resp)
+arguments:
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+returns: Scalar double giving the number of seconds to wait before retrying a request.
+---
+kind: function
+name: resp_link_url
+exported: true
+signature: resp_link_url(resp, rel)
+arguments:
+  rel: The "link relation type" value for which to retrieve a URL.
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+returns: Either a string providing a URL, if the specified rel exists, or NULL if not.
+---
+kind: function
+name: with_mocked_responses
+exported: true
+signature: with_mocked_responses(mock, code)
+arguments:
+  code: Code to execute in the temporary environment.
+  env: Environment to use for scoping changes.
+  mock: A function, a list, or NULL.
+returns: with_mocked_responses() returns the result of evaluating code.
+---
+kind: function
+name: local_mocked_responses
+exported: true
+signature: local_mocked_responses(mock, env = caller_env())
+---
+kind: function
+name: resp_stream_aws
+exported: true
+signature: resp_stream_aws(resp, max_size = Inf)
+---
+kind: function
+name: req_cache
+exported: true
+signature: req_cache(req,path,use_on_error = FALSE,debug = getOption("httr2_cache_debug", FALSE),max_age = Inf,max_n = Inf,max_size = 1024^3)
+arguments:
+  debug: When TRUE will emit useful messages telling you about cache hits and misses.
+  max_n, max_age, max_size: 'Automatically prune the cache by specifying one or more of: max_age: to delete files older than this number of seconds.'
+  path: Path to cache directory.
+  req: A httr2 request object.
+  use_on_error: If the request errors, and there's a cache response, should req_perform() return that instead of generating an error?
+returns: A modified HTTP request.
+---
+kind: function
+name: last_response
+exported: true
+signature: last_response()
+arguments:
+  pretty: Should the JSON be pretty-printed?
+returns: last_request() and last_response() return an HTTP request or response respectively.
+---
+kind: function
+name: last_request
+exported: true
+signature: last_request()
+---
+kind: function
+name: last_request_json
+exported: true
+signature: last_request_json(pretty = TRUE)
+---
+kind: function
+name: last_response_json
+exported: true
+signature: last_response_json(pretty = TRUE)
+---
+kind: function
+name: req_dry_run
+exported: true
+signature: req_dry_run(req,quiet = FALSE,redact_headers = TRUE,testing_headers = is_testing(),pretty_json = getOption("httr2_pretty_json", TRUE))
+arguments:
+  pretty_json: If TRUE, automatically prettify JSON bodies.
+  quiet: If TRUE doesn't print anything.
+  redact_headers: Redact confidential data in the headers?
+  req: A httr2 request object.
+  testing_headers: If TRUE, removes headers that httr2 would otherwise be automatically added, which are likely to change across test runs.
+returns: Invisibly, a list containing information about the request, including method, path, and headers.
+---
+kind: function
+name: req_url
+exported: true
+signature: req_url(req, url)
+arguments:
+  '...': 'For req_url_query(): <\link[rlang:dyn-dots]{dynamic-dots}> Name-value pairs that define query parameters.'
+  .multi: 'Controls what happens when a value is a vector: "error", the default, throws an error.'
+  .space: How should spaces in query params be escaped?
+  req, .req: A httr2 request object.
+  url: A new URL; either an absolute URL for req_url() or a relative URL for req_url_relative().
+returns: A modified HTTP request.
+---
+kind: function
+name: req_url_relative
+exported: true
+signature: req_url_relative(req, url)
+---
+kind: function
+name: req_url_query
+exported: true
+signature: req_url_query(.req,...,.multi = c("error", "comma", "pipe", "explode"),.space = c("percent", "form"))
+---
+kind: function
+name: req_url_path
+exported: true
+signature: req_url_path(req, ...)
+---
+kind: function
+name: req_url_path_append
+exported: true
+signature: req_url_path_append(req, ...)
+---
+kind: function
+name: req_get_url
+exported: true
+signature: req_get_url(req)
+arguments:
+  req: A httr2 request object.
+returns: A character string.
+---
+kind: function
+name: req_oauth_device
+exported: true
+signature: req_oauth_device(req,client,auth_url,scope = NULL,open_browser = is_interactive(),auth_params = list(),token_params = list(),cache_disk = FALSE,cache_key = NULL)
+arguments:
+  auth_params: A list containing additional parameters passed to \link[=oauth_flow_auth_code_url]{oauth_flow_auth_code_url()}.
+  auth_url: Authorization url; you'll need to discover this by reading the documentation.
+  cache_disk: Should the access token be cached on disk?
+  cache_key: If you want to cache multiple tokens per app, use this key to disambiguate them.
+  client: An \link[=oauth_client]{oauth_client()}.
+  open_browser: If TRUE (the default in interactive sessions), the device verification URL will be opened in the user's browser.
+  pkce: Use "Proof Key for Code Exchange"?
+  req: A httr2 request object.
+  scope: Scopes to be requested from the resource owner.
+  token_params: List containing additional parameters passed to the token_url.
+returns: req_oauth_device() returns a modified HTTP request that will use OAuth; oauth_flow_device() returns an oauth_token.
+---
+kind: function
+name: oauth_flow_device
+exported: true
+signature: oauth_flow_device(client,auth_url,pkce = FALSE,scope = NULL,open_browser = is_interactive(),auth_params = list(),token_params = list())
+---
+kind: function
+name: req_perform_parallel
+exported: true
+signature: req_perform_parallel(reqs,paths = NULL,on_error = c("stop", "return", "continue"),progress = TRUE,max_active = 10,mock = getOption("httr2_mock", NULL))
+arguments:
+  max_active: Maximum number of concurrent requests.
+  mock: A mocking function.
+  on_error: What should happen if one of the requests fails?
+  paths: An optional character vector of paths, if you want to download the response bodies to disk.
+  progress: Display a progress bar for the status of all requests?
+  reqs: A list of requests.
+returns: A list, the same length as reqs, containing responses and possibly error objects, if on_error is "return" or "continue" and one of the responses errors.
+---
+kind: function
+name: req_body_raw
+exported: true
+signature: req_body_raw(req, body, type = "")
+---
+kind: function
+name: req_body_file
+exported: true
+signature: req_body_file(req, path, type = "")
+---
+kind: function
+name: req_body_json
+exported: true
+signature: req_body_json(req,data,auto_unbox = TRUE,digits = 22,null = "null",type = "application/json",...)
+---
+kind: function
+name: req_body_json_modify
+exported: true
+signature: req_body_json_modify(req, ...)
+---
+kind: function
+name: req_body_form
+exported: true
+signature: req_body_form(.req,...,.multi = c("error", "comma", "pipe", "explode"))
+---
+kind: function
+name: req_body_multipart
+exported: true
+signature: req_body_multipart(.req, ...)
+---
+kind: function
+name: req_get_body_type
+exported: true
+signature: req_get_body_type(req)
+arguments:
+  obfuscated: Form and JSON bodies can contain obfuscated values.
+  req: A httr2 request object.
+---
+kind: function
+name: req_get_body
+exported: true
+signature: req_get_body(req, obfuscated = c("remove", "redact", "reveal"))
+---
+kind: function
+name: oauth_token
+exported: true
+signature: oauth_token(access_token,token_type = "bearer",expires_in = NULL,refresh_token = NULL,...,.date = Sys.time())
+arguments:
+  '...': Additional components returned by the endpoint
+  .date: Date the request was made; used to convert the relative expires_in to an absolute expires_at.
+  access_token: The access token used to authenticate request
+  expires_in: Number of seconds until token expires.
+  refresh_token: Optional refresh token; if supplied, this can be used to cheaply get a new access token when this one expires.
+  token_type: Type of token; only "bearer" is currently supported.
+returns: 'An OAuth token: an S3 list with class httr2_token.'
+---
+kind: function
+name: url_parse
+exported: true
+signature: url_parse(url, base_url = NULL)
+arguments:
+  base_url: Use this as a parent, if url is a relative URL.
+  url: A string containing the URL to parse.
+returns: 'An S3 object of class httr2_url with the following components: scheme, hostname, username, password, port, path, query, and fragment.'
+---
+kind: function
+name: url_modify
+exported: true
+signature: url_modify(url,scheme = as_is,hostname = as_is,username = as_is,password = as_is,port = as_is,path = as_is,query = as_is,fragment = as_is)
+arguments:
+  '...': <\link[rlang:dyn-dots]{dynamic-dots}> Name-value pairs that define query parameters.
+  .multi: 'Controls what happens when a value is a vector: "error", the default, throws an error.'
+  .space: How should spaces in query params be escaped?
+  fragment: 'The fragment, e.g., #section-1.'
+  hostname: The hostname, e.g., www.google.com or posit.co.
+  path: The path, e.g., /search.
+  port: An integer port number.
+  query: Either a query string or a named list of query components.
+  relative_url: A relative URL to append to the base URL.
+  scheme: The scheme, typically either http or https.
+  url, .url: A string or [=url_parse]parsed URL.
+  username, password: Username and password to embed in the URL.
+returns: An object of the same type as url.
+---
+kind: function
+name: url_modify_relative
+exported: true
+signature: url_modify_relative(url, relative_url)
+---
+kind: function
+name: url_modify_query
+exported: true
+signature: url_modify_query(.url,...,.multi = c("error", "comma", "pipe", "explode"),.space = c("percent", "form"))
+---
+kind: function
+name: url_build
+exported: true
+signature: url_build(url)
+arguments:
+  url: An URL object created by url_parse.
+---
+kind: function
+name: url_query_parse
+exported: true
+signature: url_query_parse(query)
+arguments:
+  .multi: 'Controls what happens when a value is a vector: "error", the default, throws an error.'
+  query: A string, when parsing; a named list when building.
+---
+kind: function
+name: url_query_build
+exported: true
+signature: url_query_build(query,.multi = c("error", "comma", "pipe", "explode"))
+---
+kind: function
+name: req_perform
+exported: true
+signature: req_perform(req,path = NULL,verbosity = NULL,mock = getOption("httr2_mock", NULL),error_call = current_env())
+arguments:
+  error_call: The execution environment of a currently running function, e.g.
+  mock: A mocking function.
+  path: Optionally, path to save body of the response.
+  req: A httr2 request object.
+  verbosity: How much information to print?
+returns: If the HTTP request succeeds, and the status code is ok (e.g.
+---
+kind: function
+name: req_cookie_preserve
+exported: true
+signature: req_cookie_preserve(req, path)
+arguments:
+  '...': <\link[rlang:dyn-dots]{dynamic-dots}> Name-value pairs that define query parameters.
+  path: A path to a file where cookies will be read from before and updated after the request.
+  req: A httr2 request object.
+---
+kind: function
+name: req_cookies_set
+exported: true
+signature: req_cookies_set(req, ...)
+---
+kind: function
+name: resp_request
+exported: true
+signature: resp_request(resp)
+arguments:
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+---
+kind: function
+name: req_oauth_refresh
+exported: true
+signature: req_oauth_refresh(req,client,refresh_token = Sys.getenv("HTTR2_REFRESH_TOKEN"),scope = NULL,token_params = list())
+arguments:
+  client: An \link[=oauth_client]{oauth_client()}.
+  refresh_token: A refresh token.
+  req: A httr2 request object.
+  scope: Scopes to be requested from the resource owner.
+  token_params: List containing additional parameters passed to the token_url.
+returns: req_oauth_refresh() returns a modified HTTP request that will use OAuth; oauth_flow_refresh() returns an oauth_token.
+---
+kind: function
+name: oauth_flow_refresh
+exported: true
+signature: oauth_flow_refresh(client,refresh_token = Sys.getenv("HTTR2_REFRESH_TOKEN"),scope = NULL,token_params = list())
+---
+kind: function
+name: req_auth_basic
+exported: true
+signature: req_auth_basic(req, username, password = NULL)
+arguments:
+  password: Password.
+  req: A httr2 request object.
+  username: User name.
+returns: A modified HTTP request.
+---
+kind: function
+name: req_auth_bearer_token
+exported: true
+signature: req_auth_bearer_token(req, token)
+arguments:
+  req: A httr2 request object.
+  token: A bearer token
+returns: A modified HTTP request.
+---
+kind: function
+name: req_perform_connection
+exported: true
+signature: req_perform_connection(req,blocking = TRUE,verbosity = NULL,mock = getOption("httr2_mock", NULL))
+arguments:
+  blocking: When retrieving data, should the connection block and wait for the desired information or immediately return what it has (possibly nothing)?
+  mock: A mocking function.
+  req: A httr2 request object.
+  verbosity: How much information to print?
+---
+kind: function
+name: req_perform_stream
+exported: true
+signature: req_perform_stream(req,callback,timeout_sec = Inf,buffer_kb = 64,round = c("byte", "line"))
+arguments:
+  buffer_kb: Buffer size, in kilobytes.
+  callback: A single argument callback function.
+  req: A httr2 request object.
+  round: How should the raw vector sent to callback be rounded?
+  timeout_sec: Number of seconds to process stream for.
+returns: An HTTP response.
+---
+kind: function
+name: resp_url
+exported: true
+signature: resp_url(resp)
+arguments:
+  default: Default value to use if query parameter doesn't exist.
+  name: Query parameter name.
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+---
+kind: function
+name: resp_url_path
+exported: true
+signature: resp_url_path(resp)
+---
+kind: function
+name: resp_url_query
+exported: true
+signature: resp_url_query(resp, name, default = NULL)
+---
+kind: function
+name: resp_url_queries
+exported: true
+signature: resp_url_queries(resp)
+---
+kind: function
+name: curl_translate
+exported: true
+signature: curl_translate(cmd, simplify_headers = TRUE)
+arguments:
+  cmd: Call to curl.
+  simplify_headers: Remove typically unimportant headers included when copying a curl command from the browser.
+returns: A string containing the translated httr2 code.
+---
+kind: function
+name: curl_help
+exported: true
+signature: curl_help()
+---
+kind: function
+name: resp_status
+exported: true
+signature: resp_status(resp)
+arguments:
+  error_call: The execution environment of a currently running function, e.g.
+  info: A character vector of additional information to include in the error message.
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+returns: resp_status() returns a scalar integer resp_status_desc() returns a string resp_is_error() returns TRUE or FALSE resp_check_status() invisibly returns the response if it's ok; otherwise it throws an error with class httr2_http_\{status\}.
+---
+kind: function
+name: resp_status_desc
+exported: true
+signature: resp_status_desc(resp)
+---
+kind: function
+name: resp_is_error
+exported: true
+signature: resp_is_error(resp)
+---
+kind: function
+name: resp_check_status
+exported: true
+signature: resp_check_status(resp, info = NULL, error_call = caller_env())
+---
+kind: function
+name: secret_make_key
+exported: true
+signature: secret_make_key()
+---
+kind: function
+name: secret_encrypt
+exported: true
+signature: secret_encrypt(x, key)
+---
+kind: function
+name: secret_decrypt
+exported: true
+signature: secret_decrypt(encrypted, key)
+---
+kind: function
+name: secret_write_rds
+exported: true
+signature: secret_write_rds(x, path, key)
+---
+kind: function
+name: secret_read_rds
+exported: true
+signature: secret_read_rds(path, key)
+---
+kind: function
+name: secret_decrypt_file
+exported: true
+signature: secret_decrypt_file(path, key, envir = parent.frame())
+---
+kind: function
+name: secret_encrypt_file
+exported: true
+signature: secret_encrypt_file(path, key)
+---
+kind: function
+name: secret_has_key
+exported: true
+signature: secret_has_key(key)
+---
+kind: function
+name: obfuscate
+exported: true
+signature: obfuscate(x)
+arguments:
+  x: A string to obfuscate, or mark as obfuscated.
+returns: obfuscate() prints the obfuscated() call to include in your code.
+---
+kind: function
+name: obfuscated
+exported: true
+signature: obfuscated(x)
+---
+kind: function
+name: resp_timing
+exported: true
+signature: resp_timing(resp)
+arguments:
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+returns: Named numeric vector of timing information.
+---
+kind: function
+name: iterate_with_offset
+exported: true
+signature: iterate_with_offset(param_name,start = 1,offset = 1,resp_pages = NULL,resp_complete = NULL)
+arguments:
+  offset: Offset for each page.
+  param_name: Name of query parameter.
+  rel: The "link relation type" to use to retrieve the next page.
+  resp_complete: A callback function that takes a response (resp) and returns TRUE if there are no further pages.
+  resp_pages: A callback function that takes a response (resp) and returns the total number of pages, or NULL if unknown.
+  resp_param_value: A callback function that takes a response (resp) and returns the next cursor value.
+  start: Starting value.
+---
+kind: function
+name: iterate_with_cursor
+exported: true
+signature: iterate_with_cursor(param_name, resp_param_value)
+---
+kind: function
+name: iterate_with_link_url
+exported: true
+signature: iterate_with_link_url(rel = "next")
+---
+kind: function
+name: signal_total_pages
+exported: true
+signature: signal_total_pages(n)
+arguments:
+  n: Total number of pages.
+---
+kind: function
+name: req_perform_promise
+exported: true
+signature: req_perform_promise(req,path = NULL,pool = NULL,verbosity = NULL,mock = getOption("httr2_mock", NULL))
+arguments:
+  mock: A mocking function.
+  path: Optionally, path to save body of the response.
+  pool: A pool created by \link[curl:multi]{curl::new_pool()}.
+  req: A httr2 request object.
+  verbosity: How much information to print?
+returns: a \link[promises:promise]{promises::promise()} object which resolves to a response if successful or rejects on the same errors thrown by \link[=req_perform]{req_perform()}.
+---
+kind: function
+name: resp_body_raw
+exported: true
+signature: resp_body_raw(resp)
+arguments:
+  '...': Other arguments passed on to \link[jsonlite:fromJSON]{jsonlite::fromJSON()} and \link[xml2:read_xml]{xml2::read_xml()} respectively.
+  check_type: Check that response has expected content type?
+  encoding: Character encoding of the body text.
+  resp: A httr2 response object, created by \link[=req_perform]{req_perform()}.
+  simplifyVector: Should JSON arrays containing only primitives (i.e.
+returns: resp_body_raw() returns a raw vector.
+---
+kind: function
+name: resp_has_body
+exported: true
+signature: resp_has_body(resp)
+---
+kind: function
+name: resp_body_string
+exported: true
+signature: resp_body_string(resp, encoding = NULL)
+---
+kind: function
+name: resp_body_json
+exported: true
+signature: resp_body_json(resp,check_type = TRUE,simplifyVector = FALSE,...)
+---
+kind: function
+name: resp_body_html
+exported: true
+signature: resp_body_html(resp, check_type = TRUE, ...)
+---
+kind: function
+name: resp_body_xml
+exported: true
+signature: resp_body_xml(resp, check_type = TRUE, ...)
+---
+kind: function
+name: req_method
+exported: true
+signature: req_method(req, method)
+arguments:
+  method: Custom HTTP method
+  req: A httr2 request object.
+returns: A modified HTTP request.
+---
+kind: function
+name: req_get_method
+exported: true
+signature: req_get_method(req)
+arguments:
+  req: A httr2 request object.
+---
+kind: function
+name: req_progress
+exported: true
+signature: req_progress(req, type = c("down", "up"))
+arguments:
+  req: A request.
+  type: 'Type of progress to display: either number of bytes uploaded or downloaded.'
+---
+kind: function
+name: req_oauth_password
+exported: true
+signature: req_oauth_password(req,client,username,password = NULL,scope = NULL,token_params = list(),cache_disk = FALSE,cache_key = username)
+arguments:
+  cache_disk: Should the access token be cached on disk?
+  cache_key: If you want to cache multiple tokens per app, use this key to disambiguate them.
+  client: An \link[=oauth_client]{oauth_client()}.
+  password: Password.
+  req: A httr2 request object.
+  scope: Scopes to be requested from the resource owner.
+  token_params: List containing additional parameters passed to the token_url.
+  username: User name.
+returns: req_oauth_password() returns a modified HTTP request that will use OAuth; oauth_flow_password() returns an oauth_token.
+---
+kind: function
+name: oauth_flow_password
+exported: true
+signature: oauth_flow_password(client,username,password = NULL,scope = NULL,token_params = list())
+---
+kind: function
+name: req_perform_sequential
+exported: true
+signature: req_perform_sequential(reqs,paths = NULL,on_error = c("stop", "return", "continue"),mock = getOption("httr2_mock", NULL),progress = TRUE)
+arguments:
+  mock: A mocking function.
+  on_error: What should happen if one of the requests fails?
+  paths: An optional character vector of paths, if you want to download the response bodies to disk.
+  progress: Display a progress bar for the status of all requests?
+  reqs: A list of requests.
+returns: A list, the same length as reqs, containing responses and possibly error objects, if on_error is "return" or "continue" and one of the responses errors.
+---
+kind: function
+name: req_perform_iterative
+exported: true
+signature: req_perform_iterative(req,next_req,path = NULL,max_reqs = 20,on_error = c("stop", "return"),mock = getOption("httr2_mock", NULL),progress = TRUE)
+arguments:
+  max_reqs: The maximum number of requests to perform.
+  mock: A mocking function.
+  next_req: A function that takes the previous response (resp) and request (req) and returns a request for the next page or NULL if the iteration should terminate.
+  on_error: What should happen if a request fails?
+  path: Optionally, path to save the body of request.
+  progress: Display a progress bar for the status of all requests?
+  req: The first request to perform.
+returns: A list, at most length max_reqs, containing responses and possibly one error object, if on_error is "return" and one of the requests errors.
+---
+kind: function
+name: resp_stream_raw
+exported: true
+signature: resp_stream_raw(resp, kb = 32)
+arguments:
+  '...': Not used; included for compatibility with generic.
+  kb: How many kilobytes (1024 bytes) of data to read.
+  lines: The maximum number of lines to return at once.
+  max_size: The maximum number of bytes to buffer; once this number of bytes has been exceeded without a line/event boundary, an error is thrown.
+  resp, con: A streaming response created by \link[=req_perform_connection]{req_perform_connection()}.
+  warn: 'Like \link[=readLines]{readLines()}: warn if the connection ends without a final EOL.'
+returns: 'resp_stream_raw(): a raw vector.'
+---
+kind: function
+name: resp_stream_lines
+exported: true
+signature: resp_stream_lines(resp, lines = 1, max_size = Inf, warn = TRUE)
+---
+kind: function
+name: resp_stream_sse
+exported: true
+signature: resp_stream_sse(resp, max_size = Inf)
+---
+kind: function
+name: resp_stream_is_complete
+exported: true
+signature: resp_stream_is_complete(resp)
+---
+kind: function
+name: req_oauth
+exported: true
+signature: req_oauth(req, flow, flow_params, cache)
+arguments:
+  cache: An object that controls how the token is cached.
+  flow: An oauth_flow_ function used to generate the access token.
+  flow_params: Parameters for the flow.
+  req: A httr2 request object.
+returns: An oauth_token.
+---
+kind: function
+name: oauth_token_cached
+exported: true
+signature: oauth_token_cached(client,flow,flow_params = list(),cache_disk = FALSE,cache_key = NULL,reauth = FALSE)
+arguments:
+  cache_disk: Should the access token be cached on disk?
+  cache_key: If you want to cache multiple tokens per app, use this key to disambiguate them.
+  client: An \link[=oauth_client]{oauth_client()}.
+  flow: An oauth_flow_ function used to generate the access token.
+  flow_params: Parameters for the flow.
+  reauth: Set to TRUE to force re-authentication via flow, regardless of whether or not token is expired.
+---
+kind: function
+name: oauth_cache_path
+exported: true
+signature: oauth_cache_path()
+---
+kind: function
+name: oauth_cache_clear
+exported: true
+signature: oauth_cache_clear(client, cache_disk = FALSE, cache_key = NULL)
+arguments:
+  cache_disk: Should the access token be cached on disk?
+  cache_key: If you want to cache multiple tokens per app, use this key to disambiguate them.
+  client: An \link[=oauth_client]{oauth_client()}.

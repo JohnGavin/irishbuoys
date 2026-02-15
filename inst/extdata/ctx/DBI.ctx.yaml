@@ -1,0 +1,86 @@
+Fetching R package: DBI
+  → Downloading from CRAN...
+  → Version: 1.2.3
+  → Parsing source...
+---
+kind: context_header
+llm_instructions: This is an LLM-optimized API specification for the R package 'DBI'. Use this context to write correct code using DBI functions. Each 'function' record describes a public function with its signature, arguments, and purpose. The 'package' record contains metadata. All listed functions are part of the public API.
+---
+kind: package
+schema_version: '1.1'
+name: DBI
+version: 1.2.3
+language: R
+description: R Database Interface
+---
+kind: function
+name: SQL
+exported: true
+signature: SQL(x, ..., names = NULL)
+arguments:
+  '...': Other arguments passed on to methods.
+  names: Names for the returned object, must have the same length as x.
+  x: A character vector to label as being escaped SQL.
+returns: An object of class SQL.
+---
+kind: function
+name: sqlAppendTableTemplate
+exported: true
+signature: sqlAppendTableTemplate(con, table, values, row.names = NA, prefix = "?", ..., pattern = "")
+---
+kind: function
+name: sqlCommentSpec
+exported: true
+signature: sqlCommentSpec(start, end, endRequired)
+---
+kind: function
+name: sqlQuoteSpec
+exported: true
+signature: sqlQuoteSpec(start, end, escape = "", doubleEscape = TRUE)
+---
+kind: function
+name: sqlParseVariablesImpl
+exported: true
+signature: sqlParseVariablesImpl(sql, quotes, comments)
+---
+kind: function
+name: make.db.names.default
+exported: true
+signature: make.db.names.default(snames, keywords = .SQL92Keywords,unique = TRUE, allow.keywords = TRUE)
+---
+kind: function
+name: isSQLKeyword.default
+exported: true
+signature: isSQLKeyword.default(name, keywords = .SQL92Keywords,case = c("lower", "upper", "any")[3])
+---
+kind: function
+name: dbGetDBIVersion
+exported: true
+signature: dbGetDBIVersion()
+---
+kind: function
+name: sqlRownamesToColumn
+exported: true
+signature: sqlRownamesToColumn(df, row.names = NA)
+---
+kind: function
+name: sqlColumnToRownames
+exported: true
+signature: sqlColumnToRownames(df, row.names = NA)
+---
+kind: function
+name: ANSI
+exported: true
+signature: ANSI()
+---
+kind: function
+name: dbBreak
+exported: true
+signature: dbBreak()
+---
+kind: function
+name: Id
+exported: true
+signature: Id(...)
+arguments:
+  '...': Components of the hierarchy, e.g.
