@@ -13,5 +13,7 @@ Data frame with station metadata
 Returns a data frame with information about all available weather buoy stations.
 }
 \examples{
+\dontrun{
 stations <- get_stations()
+}
 }
