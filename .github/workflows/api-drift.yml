@@ -1,0 +1,92 @@
+name: API Drift Detection
+
+on:
+  push:
+    paths:
+      - 'R/**/*.R'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+  pull_request:
+    paths:
+      - 'R/**/*.R'
+      - 'DESCRIPTION'
+      - 'NAMESPACE'
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  detect-api-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v27
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Setup Cachix (rstats-on-nix)
+        uses: cachix/cachix-action@v15
+        with:
+          name: rstats-on-nix
+
+      - name: Generate fresh package context
+        run: |
+          mkdir -p inst/extdata/ctx
+          nix run github:b-rodrigues/pkgctx -- r . --compact > inst/extdata/ctx/irishbuoys.ctx.yaml.new
+
+      - name: Check for API drift
+        id: drift
+        run: |
+          CONTEXT_FILE="inst/extdata/ctx/irishbuoys.ctx.yaml"
+          NEW_FILE="inst/extdata/ctx/irishbuoys.ctx.yaml.new"
+
+          if [ ! -f "$CONTEXT_FILE" ]; then
+            echo "::warning::No existing context file found. This is expected for first run."
+            echo "drift=new" >> $GITHUB_OUTPUT
+            mv "$NEW_FILE" "$CONTEXT_FILE"
+            exit 0
+          fi
+
+          # Compare files (ignore timestamps/headers)
+          if diff -q "$CONTEXT_FILE" "$NEW_FILE" > /dev/null 2>&1; then
+            echo "✅ No API drift detected"
+            echo "drift=none" >> $GITHUB_OUTPUT
+            rm "$NEW_FILE"
+          else
+            echo "⚠️ API drift detected!"
+            echo ""
+            echo "Changes:"
+            diff "$CONTEXT_FILE" "$NEW_FILE" || true
+            echo ""
+            echo "drift=detected" >> $GITHUB_OUTPUT
+
+            # Show summary of changes
+            echo "## API Changes Summary" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            diff "$CONTEXT_FILE" "$NEW_FILE" >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Update context file (on push to main)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && steps.drift.outputs.drift == 'detected'
+        run: |
+          mv inst/extdata/ctx/irishbuoys.ctx.yaml.new inst/extdata/ctx/irishbuoys.ctx.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add inst/extdata/ctx/irishbuoys.ctx.yaml
+          git commit -m "chore: Update package context (API drift detected)
+
+          Co-Authored-By: github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          git push
+
+      - name: Fail on PR with API drift (require acknowledgment)
+        if: github.event_name == 'pull_request' && steps.drift.outputs.drift == 'detected'
+        run: |
+          echo "::error::API drift detected! Please review the changes above."
+          echo ""
+          echo "If these changes are intentional:"
+          echo "1. Generate new context: nix run github:b-rodrigues/pkgctx -- r . --compact > inst/extdata/ctx/irishbuoys.ctx.yaml"
+          echo "2. Commit the updated context file"
+          echo "3. Push to update this PR"
+          exit 1

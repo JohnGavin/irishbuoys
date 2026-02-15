@@ -54,5 +54,6 @@ list(
   plan_dashboard_captions,
   plan_telemetry,
   plan_evidence,  # Claude session evidence and verification logs
-  plan_vignettes  # MANDATORY: All vignettes rendered via targets for reproducibility
+  plan_vignettes,  # MANDATORY: All vignettes rendered via targets for reproducibility
+  plan_pkgctx  # LLM context files via pkgctx (https://github.com/b-rodrigues/pkgctx)
 )
