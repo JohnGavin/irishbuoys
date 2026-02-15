@@ -4,6 +4,7 @@ format:
   dashboard:
     orientation: rows
     theme: cosmo
+    scrolling: true
 execute:
   echo: false
   warning: false
@@ -15,13 +16,36 @@ execute:
 
 # This vignette performs NO computation.
 # All data is loaded from pre-computed targets via tar_load().
+# MANDATORY: Uses FULL historical data (2019-2026), never sampled.
 library(targets)
 
 # Set targets store relative to vignette location
 targets::tar_config_set(store = "../_targets")
 
-# Load all telemetry targets
-# These are computed by plan_telemetry.R during tar_make()
+# Helper: Create informative "not available" message
+not_available_msg <- function(target_name) {
+  htmltools::div(
+    class = "alert alert-warning",
+    htmltools::h4("Data Not Available"),
+    htmltools::p(
+      "The ", htmltools::code(target_name), " target has not been built."
+    ),
+    htmltools::h5("How to fix:"),
+    htmltools::tags$ol(
+      htmltools::tags$li("Enter Nix shell: ", htmltools::code("./default.sh")),
+      htmltools::tags$li("Run pipeline: ", htmltools::code("targets::tar_make()")),
+      htmltools::tags$li("Refresh this page")
+    ),
+    htmltools::h5("Common issues:"),
+    htmltools::tags$ul(
+      htmltools::tags$li("Database not initialized: Run ", htmltools::code("initialize_database(start_date = '2019-01-01')")),
+      htmltools::tags$li("DuckDB lock: Close other R sessions accessing the database"),
+      htmltools::tags$li("Missing packages: Re-enter Nix shell")
+    )
+  )
+}
+
+# Load all telemetry targets with error handling
 tryCatch({
   tar_load(telemetry_summary)
   tar_load(telemetry_station_coverage)
@@ -44,11 +68,29 @@ tryCatch({
   tar_load(telemetry_target_metrics)
   tar_load(table_telemetry_target_metrics)
 
+  # Test statistics
+  tar_load(telemetry_test_stats)
+  tar_load(telemetry_test_summary)
+  tar_load(table_telemetry_test_stats)
+  tar_load(table_telemetry_test_summary)
+
+  # LLM Usage & Costs
+  tar_load(telemetry_llm_sessions)
+  tar_load(telemetry_llm_daily)
+  tar_load(telemetry_llm_summary)
+  tar_load(telemetry_llm_by_model)
+  tar_load(plot_telemetry_llm_cost_trend)
+  tar_load(plot_telemetry_llm_tokens)
+  tar_load(plot_telemetry_llm_by_model)
+  tar_load(table_telemetry_llm_summary)
+  tar_load(table_telemetry_llm_daily)
+  tar_load(table_telemetry_llm_by_model)
+
   # Plots
   tar_load(plot_telemetry_coverage_timeline)
   tar_load(plot_telemetry_qc_trends)
-  tar_load(plot_telemetry_commit_frequency)
   tar_load(plot_telemetry_rogue_frequency)
+  tar_load(plot_telemetry_commit_frequency)
 
   targets_loaded <- TRUE
 }, error = function(e) {
@@ -56,13 +98,13 @@ tryCatch({
 })
 ```
 
-# Overview
+# Overview {#overview}
 
 Project health and data pipeline metrics for the irishbuoys package.
 
-## Row {height=20%}
+## Key Metrics {height=20%}
 
-### Column
+### Total Observations {#total-obs}
 
 ::: {.valuebox title="Total Observations" icon="database"}
 ```{r}
@@ -70,12 +112,12 @@ Project health and data pipeline metrics for the irishbuoys package.
 if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
   cat(format(telemetry_summary$total_observations, big.mark = ","))
 } else {
-  cat("Run tar_make()")
+  cat("--")
 }
 ```
 :::
 
-### Column
+### Database Size {#db-size}
 
 ::: {.valuebox title="Database Size" icon="hdd"}
 ```{r}
@@ -83,12 +125,12 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
 if (exists("telemetry_summary") && !is.null(telemetry_summary$db_size_mb)) {
   cat(paste0(telemetry_summary$db_size_mb, " MB"))
 } else {
-  cat("N/A")
+  cat("--")
 }
 ```
 :::
 
-### Column
+### Active Stations {#active-stations}
 
 ::: {.valuebox title="Active Stations" icon="broadcast"}
 ```{r}
@@ -96,12 +138,12 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary$db_size_mb)) {
 if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
   cat(telemetry_summary$stations_active)
 } else {
-  cat("N/A")
+  cat("--")
 }
 ```
 :::
 
-### Column
+### Recent Commits {#recent-commits-count}
 
 ::: {.valuebox title="Commits (30d)" icon="git-branch"}
 ```{r}
@@ -109,145 +151,163 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
 if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
   cat(telemetry_summary$n_commits_30d)
 } else {
-  cat("N/A")
+  cat("--")
 }
 ```
 :::
 
-## Row
+## Status Summary {#status-summary}
 
-### Column
+### Last Updated {#last-updated}
 
-::: {.card title="Last Updated"}
+::: {.card title="Pipeline Status"}
 ```{r}
 #| output: asis
 if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
-  cat(format(telemetry_summary$generated_at, "%Y-%m-%d %H:%M UTC"))
+  cat("**Last updated:** ", format(telemetry_summary$generated_at, "%Y-%m-%d %H:%M UTC"), "\n\n")
+  cat("**Date range:** 2019-01-01 to ", format(Sys.Date()), " (full historical)\n\n")
+  cat("**Data source:** Irish Weather Buoy Network via ERDDAP")
 } else {
-  cat("Targets not built. Run tar_make() to generate telemetry data.")
+  cat("Targets pipeline has not been run.\n\n")
+  cat("**To initialize:**\n")
+  cat("1. `./default.sh` (enter Nix shell)\n")
+  cat("2. `initialize_database(start_date = '2019-01-01')` (download full history)\n")
+  cat("3. `targets::tar_make()` (build all targets)\n")
 }
 ```
 :::
 
-# Data Coverage
+# Data Coverage {#data-coverage}
 
-Station data availability and freshness metrics.
+Station data availability and freshness metrics across the full historical period (2019-present).
 
-## Row
+## Coverage Analysis {#coverage-analysis}
 
-### Column {.tabset}
+### Coverage Details {.tabset}
 
-#### Coverage Timeline
+#### Timeline {#coverage-timeline}
 
 ```{r}
 #| fig-height: 6
 if (exists("plot_telemetry_coverage_timeline") && !is.null(plot_telemetry_coverage_timeline)) {
   plot_telemetry_coverage_timeline
 } else {
-  htmltools::p("Plot not available. Run tar_make() to generate.")
+  not_available_msg("plot_telemetry_coverage_timeline")
 }
 ```
 
-#### Station Details
+#### By Station {#coverage-by-station}
 
 ```{r}
 if (exists("table_telemetry_station_coverage")) {
   table_telemetry_station_coverage
 } else {
-  htmltools::p("Table not available. Run tar_make() to generate.")
+  not_available_msg("table_telemetry_station_coverage")
 }
 ```
 
-#### Data Freshness
+#### Freshness {#coverage-freshness}
 
 ```{r}
 if (exists("table_telemetry_freshness")) {
   table_telemetry_freshness
 } else {
-  htmltools::p("Table not available. Run tar_make() to generate.")
+  not_available_msg("table_telemetry_freshness")
 }
 ```
 
-# Data Quality
+# Data Quality {#data-quality}
 
-QC flag trends and rogue wave detection metrics.
+QC flag trends and rogue wave detection metrics for the full historical period.
 
-## Row
+## Quality Metrics {#quality-metrics}
 
-### Column {width=50%}
+### QC Distribution {#qc-distribution width=50%}
 
-::: {.card title="QC Flag Distribution Over Time"}
+::: {.card title="QC Flag Trends (Monthly, 2019-Present)"}
+QC flags: 0=unknown, 1=good, 9=missing. Chart shows monthly distribution across full historical data, colored by season.
+
 ```{r}
 #| fig-height: 5
 if (exists("plot_telemetry_qc_trends") && !is.null(plot_telemetry_qc_trends)) {
   plot_telemetry_qc_trends
 } else {
-  htmltools::p("Plot not available. Run tar_make() to generate.")
+  not_available_msg("plot_telemetry_qc_trends")
 }
 ```
 :::
 
-### Column {width=50%}
+### Rogue Wave Events {#rogue-events width=50%}
 
-::: {.card title="Rogue Wave Event Frequency"}
+::: {.card title="Rogue Wave Frequency (Monthly)"}
+Rogue waves: Hmax > 2 × significant wave height. Shows monthly event counts across full historical period.
+
 ```{r}
 #| fig-height: 5
 if (exists("plot_telemetry_rogue_frequency") && !is.null(plot_telemetry_rogue_frequency)) {
   plot_telemetry_rogue_frequency
 } else {
-  htmltools::p("Plot not available. Run tar_make() to generate.")
+  not_available_msg("plot_telemetry_rogue_frequency")
 }
 ```
 :::
 
-# Database
+# Database {#database}
 
-Storage metrics and table information.
+Storage metrics and table information for the DuckDB database.
 
-## Row
+## Storage Details {#storage-details}
 
-### Column {.tabset}
+### Database Tables {.tabset}
 
-#### Tables
+#### Table Summary {#table-summary}
 
 ```{r}
 if (exists("table_telemetry_db_info")) {
   table_telemetry_db_info
 } else {
-  htmltools::p("Table not available. Run tar_make() to generate.")
+  not_available_msg("table_telemetry_db_info")
 }
 ```
-#### File Size
+
+#### Storage Size {#storage-size}
 
 ```{r}
 if (exists("telemetry_db_file_size") && nrow(telemetry_db_file_size) > 0) {
-  knitr::kable(telemetry_db_file_size, format = "html")
+  df <- telemetry_db_file_size
+  htmltools::div(
+    htmltools::h4("Database File: ", df$path),
+    htmltools::tags$ul(
+      htmltools::tags$li("Size: ", df$size_mb, " MB"),
+      htmltools::tags$li("Last modified: ", format(df$last_modified, "%Y-%m-%d %H:%M"))
+    )
+  )
 } else {
-  htmltools::p("Database file info not available.")
+  not_available_msg("telemetry_db_file_size")
 }
 ```
 
-# Pipeline
+# Pipeline {#pipeline}
 
-Targets pipeline status and timing metrics.
+Targets pipeline status, timing metrics, and execution history.
 
-## Row
+## Pipeline Status {#pipeline-status}
 
-### Column {width=40%}
+### Status Summary {#status-summary-pipeline width=40%}
 
-::: {.card title="Target Status Summary"}
+::: {.card title="Target Execution Status"}
 ```{r}
 if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$status_summary)) {
   knitr::kable(telemetry_pipeline_status$status_summary, format = "html")
 } else {
-  htmltools::p("Pipeline status not available.")
+  not_available_msg("telemetry_pipeline_status")
 }
 ```
 :::
 
-### Column {width=60%}
+### Timing Metrics {#timing-metrics width=60%}
 
-::: {.card title="Pipeline Timing"}
+::: {.card title="Pipeline Performance"}
 ```{r}
 if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$timing)) {
   timing <- telemetry_pipeline_status$timing
@@ -258,75 +318,336 @@ if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$ti
     htmltools::tags$li(paste("Last run:", format(timing$last_run, "%Y-%m-%d %H:%M")))
   )
 } else {
-  htmltools::p("Timing info not available.")
+  not_available_msg("telemetry_pipeline_status")
 }
 ```
 :::
 
-## Row
+## Targets by Plan {#targets-by-plan}
 
-### Column
+### Plan Metrics {#plan-metrics}
 
-::: {.card title="Target Metrics by Plan"}
-Count, size (MB), and timing (seconds) for each target, grouped by tar_plan.
-TOTAL row shows overall totals.
+::: {.card title="Target Counts, Size, and Timing by Pipeline Plan"}
+Each row shows a tar_plan (from R/tar_plans/plan_*.R) with aggregate metrics.
 
 ```{r}
 if (exists("table_telemetry_target_metrics")) {
   table_telemetry_target_metrics
 } else {
-  htmltools::p("Target metrics not available. Run tar_make() to generate.")
+  not_available_msg("table_telemetry_target_metrics")
 }
 ```
 :::
 
-# Git Activity
+# Git Activity {#git-activity}
 
-Repository commit history and activity.
+Repository commit history and development activity.
 
-## Row
+## Development Metrics {#dev-metrics}
 
-### Column {width=40%}
+### Commit Frequency {#commit-frequency width=40%}
 
-::: {.card title="Commit Frequency (Last 30 Days)"}
+::: {.card title="Commits per Day (Last 30 Days)"}
 ```{r}
 #| fig-height: 4
 if (exists("plot_telemetry_commit_frequency") && !is.null(plot_telemetry_commit_frequency)) {
   plot_telemetry_commit_frequency
 } else {
-  htmltools::p("Plot not available. Run tar_make() to generate.")
+  not_available_msg("plot_telemetry_commit_frequency")
 }
 ```
 :::
 
-### Column {width=60%}
+### Commit History {#commit-history width=60%}
 
 ::: {.card title="Recent Commits"}
 ```{r}
 if (exists("table_telemetry_commits")) {
   table_telemetry_commits
 } else {
-  htmltools::p("Table not available. Run tar_make() to generate.")
+  not_available_msg("table_telemetry_commits")
 }
 ```
 :::
 
-# Project
+# Project Files {#project-files}
 
 Project structure and file statistics.
 
-## Row
+## File Statistics {#file-stats}
 
-### Column
+### Files by Type {#files-by-type}
 
-::: {.card title="File Types"}
+::: {.card title="File Type Distribution"}
 ```{r}
 if (exists("table_telemetry_file_types")) {
   table_telemetry_file_types
 } else {
-  htmltools::p("Table not available. Run tar_make() to generate.")
+  not_available_msg("table_telemetry_file_types")
 }
 ```
+:::
+
+# LLM Usage & Costs {#llm-usage}
+
+Claude Code usage statistics for the irishbuoys project.
+
+## Usage Summary {#usage-summary}
+
+### Current Status {#usage-status}
+
+::: {.card title="LLM Usage Summary"}
+```{r}
+if (exists("table_telemetry_llm_summary") && !is.null(table_telemetry_llm_summary)) {
+  table_telemetry_llm_summary
+} else {
+  not_available_msg("table_telemetry_llm_summary")
+}
+```
+:::
+
+## Usage Details {#usage-details}
+
+### Usage Analytics {.tabset}
+
+#### Cost Trends {#cost-trends}
+
+::: {.card title="Daily LLM Costs"}
+Estimated daily costs based on Claude API pricing (Opus: $15/$75 per M tokens, Sonnet: $3/$15 per M tokens).
+
+```{r}
+#| fig-height: 5
+if (exists("plot_telemetry_llm_cost_trend") && !is.null(plot_telemetry_llm_cost_trend)) {
+  plot_telemetry_llm_cost_trend
+} else {
+  not_available_msg("plot_telemetry_llm_cost_trend")
+}
+```
+:::
+
+#### Token Usage {#token-usage}
+
+::: {.card title="Token Usage by Type"}
+Breakdown of input, output, and cache tokens. Cache tokens (creation and read) help reduce costs.
+
+```{r}
+#| fig-height: 5
+if (exists("plot_telemetry_llm_tokens") && !is.null(plot_telemetry_llm_tokens)) {
+  plot_telemetry_llm_tokens
+} else {
+  not_available_msg("plot_telemetry_llm_tokens")
+}
+```
+:::
+
+#### By Model {#by-model}
+
+::: {.card title="Cost by Model"}
+```{r}
+#| fig-height: 4
+if (exists("plot_telemetry_llm_by_model") && !is.null(plot_telemetry_llm_by_model)) {
+  plot_telemetry_llm_by_model
+} else {
+  not_available_msg("plot_telemetry_llm_by_model")
+}
+```
+
+```{r}
+if (exists("table_telemetry_llm_by_model") && !is.null(table_telemetry_llm_by_model)) {
+  table_telemetry_llm_by_model
+} else {
+  not_available_msg("table_telemetry_llm_by_model")
+}
+```
+:::
+
+#### Daily Log {#daily-log}
+
+::: {.card title="Daily Usage Log"}
+```{r}
+if (exists("table_telemetry_llm_daily") && !is.null(table_telemetry_llm_daily)) {
+  table_telemetry_llm_daily
+} else {
+  not_available_msg("table_telemetry_llm_daily")
+}
+```
+:::
+
+#### About Costs {#about-costs}
+
+::: {.card title="Cost Estimation Notes"}
+
+**How costs are calculated:**
+
+Costs are estimated using Claude API pricing (as of 2025):
+
+| Model | Input | Output | Cache Create | Cache Read |
+|-------|-------|--------|--------------|------------|
+| Opus 4.5 | $15/M | $75/M | $18.75/M | $1.875/M |
+| Sonnet 4 | $3/M | $15/M | $3.75/M | $0.375/M |
+| Haiku 3.5 | $0.80/M | $4/M | $1/M | $0.08/M |
+
+**Token types:**
+
+- **Input tokens**: Tokens in your prompts
+- **Output tokens**: Tokens in Claude's responses
+- **Cache creation**: First-time caching of context
+- **Cache read**: Reusing cached context (much cheaper)
+
+**Data source:**
+
+Usage data is extracted from Claude Code session files in `~/.claude/projects/`.
+:::
+
+# Tests {#tests}
+
+Unit test and quality assurance metrics for the irishbuoys package.
+
+## Test Summary {#test-summary}
+
+### Test Statistics {.tabset}
+
+#### By Category {#test-by-category}
+
+::: {.card title="Test Summary by Type"}
+Aggregated counts of tests, expectations, and snapshot tests grouped by test category.
+
+```{r}
+if (exists("table_telemetry_test_summary")) {
+  table_telemetry_test_summary
+} else {
+  not_available_msg("table_telemetry_test_summary")
+}
+```
+:::
+
+#### By File {#test-by-file}
+
+::: {.card title="Individual Test Files"}
+```{r}
+if (exists("table_telemetry_test_stats")) {
+  table_telemetry_test_stats
+} else {
+  not_available_msg("table_telemetry_test_stats")
+}
+```
+:::
+
+#### Test Types {#test-types}
+
+::: {.card title="About Test Categories"}
+
+**Test categories used:**
+
+- **Unit Tests**: Standard test_that() blocks testing individual functions
+- **Adversarial/Edge Cases**: Tests for NULL, NA, empty inputs, boundary conditions
+- **Defensive/Null Guards**: Tests verifying cli::cli_abort() on invalid inputs
+- **Contains Snapshots**: Files with expect_snapshot() calls
+- **Snapshot Tests**: Files primarily focused on snapshot testing
+- **Integration Tests**: End-to-end tests spanning multiple components
+
+**What we test:**
+
+1. **Input validation**: All exported functions reject NULL/invalid inputs with clear errors
+2. **Physical bounds**: Wave heights 0-30m, wind 0-100 m/s, pressure 900-1100 hPa
+3. **Data integrity**: QC flags, station IDs, time ranges
+4. **Rogue wave detection**: Hmax > 2 × Hs criterion
+5. **Database operations**: Connection, query, incremental updates
+:::
+
+# Validation: Analysis Data {#validation-analysis}
+
+Pointblank validation report for the main analysis dataset.
+
+## Analysis Data Validation {#analysis-validation}
+
+### Analysis Validation Details {.tabset}
+
+#### Report {#analysis-report}
+
+```{r}
+report_path <- "../docs/articles/validation_analysis_data.html"
+if (file.exists(report_path)) {
+  htmltools::tags$iframe(
+    src = "validation_analysis_data.html",
+    width = "100%",
+    height = "800px",
+    style = "border: 1px solid #ccc; border-radius: 4px;"
+  )
+} else {
+  not_available_msg("validation_analysis_data.html")
+}
+```
+
+#### Notes {#analysis-notes}
+
+::: {.card title="About This Validation"}
+
+**What is pointblank?**
+
+[pointblank](https://rstudio.github.io/pointblank/) is an R package for data validation. It creates agents that interrogate data frames and report on validation failures.
+
+**Validation checks performed:**
+
+- **Row count**: Minimum 100 observations required
+- **Required columns**: `station_id`, `time`, `wave_height` must exist
+- **Station IDs**: Must be valid (M1-M6, FS1)
+- **Wave height**: Physical bounds 0-30 meters
+- **Wind speed**: Physical bounds 0-100 m/s
+- **Atmospheric pressure**: Physical bounds 900-1100 hPa
+- **Time**: Not in the future
+
+**How to regenerate:**
+
+```r
+targets::tar_make(names = "validation_reports")
+```
+:::
+
+# Validation: Rogue Waves {#validation-rogue}
+
+Pointblank validation report for detected rogue wave events.
+
+## Rogue Wave Validation {#rogue-validation}
+
+### Rogue Validation Details {.tabset}
+
+#### Report {#rogue-report}
+
+```{r}
+report_path <- "../docs/articles/validation_rogue_events.html"
+if (file.exists(report_path)) {
+  htmltools::tags$iframe(
+    src = "validation_rogue_events.html",
+    width = "100%",
+    height = "800px",
+    style = "border: 1px solid #ccc; border-radius: 4px;"
+  )
+} else {
+  not_available_msg("validation_rogue_events.html")
+}
+```
+
+#### Notes {#rogue-notes}
+
+::: {.card title="About Rogue Wave Validation"}
+
+**What are rogue waves?**
+
+Rogue waves are unusually large waves defined by `Hmax > 2 × Hs` where:
+- **Hmax**: Maximum individual wave height
+- **Hs**: Significant wave height (mean of highest 1/3 of waves)
+
+**Validation checks performed:**
+
+- **Row count**: At least 1 rogue event expected
+- **Required columns**: `station_id`, `time`, `wave_height`, `hmax`, `rogue_ratio`
+- **Rogue ratio**: Must be > 2.0 (by definition)
+- **Wave relationship**: `hmax > wave_height` must hold
+
+**Reference:**
+
+See `?detect_rogue_waves` for the detection algorithm.
 :::
 
 ---
@@ -334,5 +655,6 @@ if (exists("table_telemetry_file_types")) {
 ```{r}
 #| echo: false
 cat("*Generated:", format(Sys.time(), "%Y-%m-%d %H:%M UTC"), "*\n")
-cat("*All data loaded from pre-computed targets via tar_load()*")
+cat("*All data loaded from pre-computed targets via tar_load()*\n")
+cat("*Data range: Full historical (2019-present), NO sampling*")
 ```

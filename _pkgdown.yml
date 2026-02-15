@@ -48,24 +48,26 @@ articles:
   - title: Dashboards
     navbar: Dashboards
     contents:
-      - dashboard_static
+      - title: "Irish Buoys Dashboard"
+        href: articles/dashboard_static.html
   - title: Analysis
     navbar: Analysis
     contents:
-      - wave_analysis
+      - title: "Wave Analysis"
+        href: articles/wave_analysis.html
   - title: Monitoring
     navbar: Monitoring
     desc: "Pipeline telemetry and debugging tools"
     contents:
-      - telemetry
-      - debug
+      - title: "Telemetry"
+        href: articles/telemetry.html
   - title: Validation
     navbar: ~
     desc: "Data validation reports generated with pointblank"
     contents:
-      - title: validation_analysis_data
+      - title: "Validation: Analysis Data"
         href: articles/validation_analysis_data.html
-      - title: validation_rogue_events
+      - title: "Validation: Rogue Waves"
         href: articles/validation_rogue_events.html
   # Note: validation reports are pre-generated HTML from pointblank, not Quarto.
   # Generate with: irishbuoys::generate_validation_reports()
