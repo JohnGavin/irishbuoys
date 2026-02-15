@@ -1,0 +1,539 @@
+Fetching R package: tidyr
+  → Downloading from CRAN...
+  → Version: 1.3.2
+  → Parsing source...
+---
+kind: context_header
+llm_instructions: This is an LLM-optimized API specification for the R package 'tidyr'. Use this context to write correct code using tidyr functions. Each 'function' record describes a public function with its signature, arguments, and purpose. The 'package' record contains metadata. All listed functions are part of the public API.
+---
+kind: package
+schema_version: '1.1'
+name: tidyr
+version: 1.3.2
+language: R
+description: Tidy Messy Data
+---
+kind: function
+name: fill
+exported: true
+signature: fill(data,...,.by = NULL,.direction = c("down", "up", "downup", "updown"))
+arguments:
+  '...': <\link[=tidyr_tidy_select]{tidy-select}> Columns to fill.
+  .by: 'htmllifecycle-experimental.svgoptions: alt=''[Experimental]''[Experimental] <\link[dplyr:dplyr_tidy_select]{tidy-select}> Optionally, a selection of columns to group by for just this operation, functioning as an alternative to \link[dplyr:group_by]{group_by()}.'
+  .direction: Direction in which to fill missing values.
+  data: A data frame.
+---
+kind: function
+name: pack
+exported: true
+signature: pack(.data, ..., .names_sep = NULL, .error_call = current_env())
+arguments:
+  '...': For pack(), <\link[=tidyr_tidy_select]{tidy-select}> columns to pack, specified using name-variable pairs of the form new_col = c(col1, col2, col3).
+  cols: <\link[=tidyr_tidy_select]{tidy-select}> Columns to unpack.
+  data, .data: A data frame.
+  error_call, .error_call: The execution environment of a currently running function, e.g.
+  names_repair: Used to check that output data frame has valid names.
+  names_sep, .names_sep: If NULL, the default, the names will be left as is.
+---
+kind: function
+name: unpack
+exported: true
+signature: unpack(data,cols,...,names_sep = NULL,names_repair = "check_unique",error_call = current_env())
+---
+kind: function
+name: spread
+exported: true
+signature: spread(data,key,value,fill = NA,convert = FALSE,drop = TRUE,sep = NULL)
+arguments:
+  convert: If TRUE, \link[=type.convert]{type.convert()} with asis = TRUE will be run on each of the new columns.
+  data: A data frame.
+  drop: If FALSE, will keep factor levels that don't appear in the data, filling in missing combinations with fill.
+  fill: If set, missing values will be replaced with this value.
+  key, value: <\link[=tidyr_tidy_select]{tidy-select}> Columns to use for key and value.
+  sep: If NULL, the column names will be taken from the values of key variable.
+---
+kind: function
+name: complete
+exported: true
+signature: complete(data, ..., fill = list(), explicit = TRUE)
+arguments:
+  '...': <\link[=tidyr_data_masking]{data-masking}> Specification of columns to expand or complete.
+  data: A data frame.
+  explicit: Should both implicit (newly created) and explicit (pre-existing) missing values be filled by fill?
+  fill: A named list that for each variable supplies a single value to use instead of NA for missing combinations.
+---
+kind: function
+name: drop_na
+exported: true
+signature: drop_na(data, ...)
+arguments:
+  '...': <\link[=tidyr_tidy_select]{tidy-select}> Columns to inspect for missing values.
+  data: A data frame.
+---
+kind: function
+name: tidyr_legacy
+exported: true
+signature: tidyr_legacy(nms, prefix = "V", sep = "")
+arguments:
+  nms: Character vector of names
+  prefix: prefix Prefix to use for unnamed column
+  sep: Separator to use between name and unique suffix
+---
+kind: function
+name: nest_legacy
+exported: true
+signature: nest_legacy(data, ..., .key = "data")
+arguments:
+  '...': Specification of columns to unnest.
+  .drop: Should additional list columns be dropped?
+  .id: Data frame identifier - if supplied, will create a new column with name .id, giving a unique identifier.
+  .key: The name of the new column, as a string or symbol.
+  .preserve: Optionally, list-columns to preserve in the output.
+  .sep: If non-NULL, the names of unnested data frame columns will combine the name of the original list-col with the names from the nested data frame, separated by .sep.
+  data: A data frame.
+---
+kind: function
+name: unnest_legacy
+exported: true
+signature: unnest_legacy(data,...,.drop = NA,.id = NULL,.sep = NULL,.preserve = NULL)
+---
+kind: function
+name: pivot_longer
+exported: true
+signature: pivot_longer(data,cols,...,cols_vary = "fastest",names_to = "name",names_prefix = NULL,names_sep = NULL,names_pattern = NULL,names_ptypes = NULL,names_transform = NULL,names_repair = "check_unique",values_to = "value",values_drop_na = FALSE,values_ptypes = NULL,values_transform = NULL)
+arguments:
+  '...': Additional arguments passed on to methods.
+  cols: <\link[=tidyr_tidy_select]{tidy-select}> Columns to pivot into longer format.
+  cols_vary: When pivoting cols into longer format, how should the output rows be arranged relative to their original row number?
+  data: A data frame to pivot.
+  names_prefix: A regular expression used to remove matching text from the start of each variable name.
+  names_ptypes, values_ptypes: Optionally, a list of column name-prototype pairs.
+  names_repair: What happens if the output has invalid column names?
+  names_sep, names_pattern: If names_to contains multiple values, these arguments control how the column name is broken up.
+  names_to: A character vector specifying the new column or columns to create from the information stored in the column names of data specified by cols.
+  names_transform, values_transform: Optionally, a list of column name-function pairs.
+  values_drop_na: If TRUE, will drop rows that contain only NAs in the values_to column.
+  values_to: A string specifying the name of the column to create from the data stored in cell values.
+---
+kind: function
+name: pivot_longer_spec
+exported: true
+signature: pivot_longer_spec(data,spec,...,cols_vary = "fastest",names_repair = "check_unique",values_drop_na = FALSE,values_ptypes = NULL,values_transform = NULL,error_call = current_env())
+arguments:
+  '...': These dots are for future extensions and must be empty.
+  cols: <\link[=tidyr_tidy_select]{tidy-select}> Columns to pivot into longer format.
+  cols_vary: When pivoting cols into longer format, how should the output rows be arranged relative to their original row number?
+  data: A data frame to pivot.
+  error_call: The execution environment of a currently running function, e.g.
+  names_prefix: A regular expression used to remove matching text from the start of each variable name.
+  names_ptypes, values_ptypes: Optionally, a list of column name-prototype pairs.
+  names_repair: What happens if the output has invalid column names?
+  names_sep, names_pattern: If names_to contains multiple values, these arguments control how the column name is broken up.
+  names_to: A character vector specifying the new column or columns to create from the information stored in the column names of data specified by cols.
+  names_transform, values_transform: Optionally, a list of column name-function pairs.
+  spec: A specification data frame.
+  values_drop_na: If TRUE, will drop rows that contain only NAs in the values_to column.
+  values_to: A string specifying the name of the column to create from the data stored in cell values.
+---
+kind: function
+name: build_longer_spec
+exported: true
+signature: build_longer_spec(data,cols,...,names_to = "name",values_to = "value",names_prefix = NULL,names_sep = NULL,names_pattern = NULL,names_ptypes = NULL,names_transform = NULL,error_call = current_env())
+---
+kind: function
+name: pivot_wider
+exported: true
+signature: pivot_wider(data,...,id_cols = NULL,id_expand = FALSE,names_from = name,names_prefix = "",names_sep = "_",names_glue = NULL,names_sort = FALSE,names_vary = "fastest",names_expand = FALSE,names_repair = "check_unique",values_from = value,values_fill = NULL,values_fn = NULL,unused_fn = NULL)
+arguments:
+  '...': Additional arguments passed on to methods.
+  data: A data frame to pivot.
+  id_cols: <\link[=tidyr_tidy_select]{tidy-select}> A set of columns that uniquely identify each observation.
+  id_expand: Should the values in the id_cols columns be expanded by \link[=expand]{expand()} before pivoting?
+  names_expand: Should the values in the names_from columns be expanded by \link[=expand]{expand()} before pivoting?
+  names_from, values_from: <\link[=tidyr_tidy_select]{tidy-select}> A pair of arguments describing which column (or columns) to get the name of the output column (names_from), and which column (or columns) to get the cell values from (values_from).
+  names_glue: Instead of names_sep and names_prefix, you can supply a glue specification that uses the names_from columns (and special .value) to create custom column names.
+  names_prefix: String added to the start of every variable name.
+  names_repair: What happens if the output has invalid column names?
+  names_sep: If names_from or values_from contains multiple variables, this will be used to join their values together into a single string to use as a column name.
+  names_sort: Should the column names be sorted?
+  names_vary: When names_from identifies a column (or columns) with multiple unique values, and multiple values_from columns are provided, in what order should the resulting column names be combined?
+  unused_fn: Optionally, a function applied to summarize the values from the unused columns (i.e.
+  values_fill: Optionally, a (scalar) value that specifies what each value should be filled in with when missing.
+  values_fn: Optionally, a function applied to the value in each cell in the output.
+---
+kind: function
+name: pivot_wider_spec
+exported: true
+signature: pivot_wider_spec(data,spec,...,names_repair = "check_unique",id_cols = NULL,id_expand = FALSE,values_fill = NULL,values_fn = NULL,unused_fn = NULL,error_call = current_env())
+arguments:
+  '...': These dots are for future extensions and must be empty.
+  data: A data frame to pivot.
+  error_call: The execution environment of a currently running function, e.g.
+  id_cols: <\link[=tidyr_tidy_select]{tidy-select}> A set of columns that uniquely identifies each observation.
+  id_expand: Should the values in the id_cols columns be expanded by \link[=expand]{expand()} before pivoting?
+  names_expand: Should the values in the names_from columns be expanded by \link[=expand]{expand()} before pivoting?
+  names_from, values_from: <\link[=tidyr_tidy_select]{tidy-select}> A pair of arguments describing which column (or columns) to get the name of the output column (names_from), and which column (or columns) to get the cell values from (values_from).
+  names_glue: Instead of names_sep and names_prefix, you can supply a glue specification that uses the names_from columns (and special .value) to create custom column names.
+  names_prefix: String added to the start of every variable name.
+  names_repair: What happens if the output has invalid column names?
+  names_sep: If names_from or values_from contains multiple variables, this will be used to join their values together into a single string to use as a column name.
+  names_sort: Should the column names be sorted?
+  names_vary: When names_from identifies a column (or columns) with multiple unique values, and multiple values_from columns are provided, in what order should the resulting column names be combined?
+  spec: A specification data frame.
+  unused_fn: Optionally, a function applied to summarize the values from the unused columns (i.e.
+  values_fill: Optionally, a (scalar) value that specifies what each value should be filled in with when missing.
+  values_fn: Optionally, a function applied to the value in each cell in the output.
+---
+kind: function
+name: build_wider_spec
+exported: true
+signature: build_wider_spec(data,...,names_from = name,values_from = value,names_prefix = "",names_sep = "_",names_glue = NULL,names_sort = FALSE,names_vary = "fastest",names_expand = FALSE,error_call = current_env())
+---
+kind: function
+name: replace_na
+exported: true
+signature: replace_na(data, replace, ...)
+arguments:
+  '...': Additional arguments for methods.
+  data: A data frame or vector.
+  replace: If data is a data frame, replace takes a named list of values, with one value for each column that has missing values to be replaced.
+returns: replace_na() returns an object with the same type as data.
+---
+kind: function
+name: full_seq
+exported: true
+signature: full_seq(x, period, tol = 1e-6)
+arguments:
+  period: Gap between each observation.
+  tol: Numerical tolerance for checking periodicity.
+  x: A numeric vector.
+---
+kind: function
+name: unnest_auto
+exported: true
+signature: unnest_auto(data, col)
+arguments:
+  col: <\link[=tidyr_tidy_select]{tidy-select}> List-column to unnest.
+  data: A data frame.
+---
+kind: function
+name: hoist
+exported: true
+signature: hoist(.data,.col,...,.remove = TRUE,.simplify = TRUE,.ptype = NULL,.transform = NULL)
+arguments:
+  '...': <\link[rlang:dyn-dots]{dynamic-dots}> Components of .col to turn into columns in the form col_name = "pluck_specification".
+  .col: <\link[=tidyr_tidy_select]{tidy-select}> List-column to extract components from.
+  .data: A data frame.
+  .ptype: Optionally, a named list of prototypes declaring the desired output type of each component.
+  .remove: If TRUE, the default, will remove extracted components from .col.
+  .simplify: If TRUE, will attempt to simplify lists of length-1 vectors to an atomic vector.
+  .transform: Optionally, a named list of transformation functions applied to each component.
+---
+kind: function
+name: separate_rows
+exported: true
+signature: separate_rows(data, ..., sep = "[^[:alnum:].]+", convert = FALSE)
+arguments:
+  '...': <\link[=tidyr_tidy_select]{tidy-select}> Columns to separate across multiple rows
+  convert: If TRUE will automatically run \link[=type.convert]{type.convert()} on the key column.
+  data: A data frame.
+  sep: Separator delimiting collapsed values.
+---
+kind: function
+name: gather
+exported: true
+signature: gather(data,key = "key",value = "value",...,na.rm = FALSE,convert = FALSE,factor_key = FALSE)
+arguments:
+  '...': A selection of columns.
+  convert: If TRUE will automatically run \link[=type.convert]{type.convert()} on the key column.
+  data: A data frame.
+  factor_key: If FALSE, the default, the key values will be stored as a character vector.
+  key, value: Names of new key and value columns, as strings or symbols.
+  na.rm: If TRUE, will remove rows from output where the value column is NA.
+---
+kind: function
+name: separate_wider_delim
+exported: true
+signature: separate_wider_delim(data,cols,delim,...,names = NULL,names_sep = NULL,names_repair = "check_unique",too_few = c("error", "debug", "align_start", "align_end"),too_many = c("error", "debug", "drop", "merge"),cols_remove = TRUE)
+arguments:
+  '...': These dots are for future extensions and must be empty.
+  cols: <\link[=tidyr_tidy_select]{tidy-select}> Columns to separate.
+  cols_remove: Should the input cols be removed from the output?
+  data: A data frame.
+  delim: For separate_wider_delim(), a string giving the delimiter between values.
+  names: For separate_wider_delim(), a character vector of output column names.
+  names_repair: Used to check that output data frame has valid names.
+  names_sep: If supplied, output names will be composed of the input column name followed by the separator followed by the new column name.
+  patterns: A named character vector where the names become column names and the values are regular expressions that match the contents of the vector.
+  too_few: What should happen if a value separates into too few pieces?
+  too_many: What should happen if a value separates into too many pieces?
+  widths: A named numeric vector where the names become column names, and the values specify the column width.
+returns: A data frame based on data.
+---
+kind: function
+name: separate_wider_position
+exported: true
+signature: separate_wider_position(data,cols,widths,...,names_sep = NULL,names_repair = "check_unique",too_few = c("error", "debug", "align_start"),too_many = c("error", "debug", "drop"),cols_remove = TRUE)
+---
+kind: function
+name: separate_wider_regex
+exported: true
+signature: separate_wider_regex(data,cols,patterns,...,names_sep = NULL,names_repair = "check_unique",too_few = c("error", "debug", "align_start"),cols_remove = TRUE)
+---
+kind: function
+name: unnest
+exported: true
+signature: unnest(data,cols,...,keep_empty = FALSE,ptype = NULL,names_sep = NULL,names_repair = "check_unique",.drop = deprecated(),.id = deprecated(),.sep = deprecated(),.preserve = deprecated())
+arguments:
+  '...': 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]: previously you could write df |> unnest(x, y, z).'
+  .drop, .preserve: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]: all list-columns are now preserved; If there are any that you don''t want in the output use select() to remove them prior to unnesting.'
+  .id: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]: convert df |> unnest(x, .id = "id") to df |> mutate(id = names(x)) |> unnest(x)).'
+  .sep: 'htmllifecycle-deprecated.svgoptions: alt=''[Deprecated]''[Deprecated]: use names_sep instead.'
+  cols: <\link[=tidyr_tidy_select]{tidy-select}> List-columns to unnest.
+  data: A data frame.
+  keep_empty: By default, you get one row of output for each element of the list that you are unchopping/unnesting.
+  names_repair: Used to check that output data frame has valid names.
+  names_sep: If NULL, the default, the outer names will come from the inner names.
+  ptype: Optionally, a named list of column name-prototype pairs to coerce cols to, overriding the default that will be guessed from combining the individual values.
+---
+kind: function
+name: expand
+exported: true
+signature: expand(data, ..., .name_repair = "check_unique")
+arguments:
+  '...': <\link[=tidyr_data_masking]{data-masking}> Specification of columns to expand or complete.
+  .name_repair: One of "check_unique", "unique", "universal", "minimal", "unique_quiet", or "universal_quiet".
+  data: A data frame.
+---
+kind: function
+name: crossing
+exported: true
+signature: crossing(..., .name_repair = "check_unique")
+---
+kind: function
+name: nesting
+exported: true
+signature: nesting(..., .name_repair = "check_unique")
+---
+kind: function
+name: expand_grid
+exported: true
+signature: expand_grid(..., .name_repair = "check_unique", .vary = "slowest")
+arguments:
+  '...': Name-value pairs.
+  .name_repair: One of "check_unique", "unique", "universal", "minimal", "unique_quiet", or "universal_quiet".
+  .vary: 'One of: "slowest" to vary the first column slowest.'
+returns: A tibble with one column for each input in ....
+---
+kind: function
+name: chop
+exported: true
+signature: chop(data, cols, ..., error_call = current_env())
+arguments:
+  '...': These dots are for future extensions and must be empty.
+  cols: <\link[=tidyr_tidy_select]{tidy-select}> Columns to chop or unchop.
+  data: A data frame.
+  error_call: The execution environment of a currently running function, e.g.
+  keep_empty: By default, you get one row of output for each element of the list that you are unchopping/unnesting.
+  ptype: Optionally, a named list of column name-prototype pairs to coerce cols to, overriding the default that will be guessed from combining the individual values.
+---
+kind: function
+name: unchop
+exported: true
+signature: unchop(data,cols,...,keep_empty = FALSE,ptype = NULL,error_call = current_env())
+---
+kind: function
+name: unnest_wider
+exported: true
+signature: unnest_wider(data,col,names_sep = NULL,simplify = TRUE,strict = FALSE,names_repair = "check_unique",ptype = NULL,transform = NULL)
+arguments:
+  col: <\link[=tidyr_tidy_select]{tidy-select}> List-column(s) to unnest.
+  data: A data frame.
+  names_repair: Used to check that output data frame has valid names.
+  names_sep: If NULL, the default, the names will be left as is.
+  ptype: Optionally, a named list of prototypes declaring the desired output type of each component.
+  simplify: If TRUE, will attempt to simplify lists of length-1 vectors to an atomic vector.
+  strict: A single logical specifying whether or not to apply strict vctrs typing rules.
+  transform: Optionally, a named list of transformation functions applied to each component.
+---
+kind: function
+name: check_pivot_spec
+exported: true
+signature: check_pivot_spec(spec, call = caller_env())
+arguments:
+  spec: A specification data frame.
+---
+kind: function
+name: uncount
+exported: true
+signature: uncount(data, weights, ..., .remove = TRUE, .id = NULL)
+arguments:
+  '...': Additional arguments passed on to methods.
+  .id: Supply a string to create a new variable which gives a unique identifier for each created row.
+  .remove: If TRUE, and weights is the name of a column in data, then this column is removed.
+  data: A data frame, tibble, or grouped tibble.
+  weights: A vector of weights.
+---
+kind: function
+name: extract
+exported: true
+signature: extract(data,col,into,regex = "([[:alnum:]]+)",remove = TRUE,convert = FALSE,...)
+purpose: Extract a character column into multiple columns using regular expression groups
+arguments:
+  '...': Additional arguments passed on to methods.
+  col: <\link[=tidyr_tidy_select]{tidy-select}> Column to expand.
+  convert: If TRUE, will run \link[=type.convert]{type.convert()} with as.is = TRUE on new columns.
+  data: A data frame.
+  into: Names of new variables to create as character vector.
+  regex: A string representing a regular expression used to extract the desired values.
+  remove: If TRUE, remove input column from output data frame.
+---
+kind: function
+name: extract_numeric
+exported: true
+signature: extract_numeric(x)
+arguments:
+  x: A character vector (or a factor).
+---
+kind: function
+name: separate_longer_delim
+exported: true
+signature: separate_longer_delim(data, cols, delim, ...)
+arguments:
+  '...': These dots are for future extensions and must be empty.
+  cols: <\link[=tidyr_tidy_select]{tidy-select}> Columns to separate.
+  data: A data frame.
+  delim: For separate_longer_delim(), a string giving the delimiter between values.
+  keep_empty: By default, you'll get ceiling(nchar(x) / width) rows for each observation.
+  width: For separate_longer_position(), an integer giving the number of characters to split by.
+returns: A data frame based on data.
+---
+kind: function
+name: separate_longer_position
+exported: true
+signature: separate_longer_position(data,cols,width,...,keep_empty = FALSE)
+---
+kind: function
+name: unnest_longer
+exported: true
+signature: unnest_longer(data,col,values_to = NULL,indices_to = NULL,indices_include = NULL,keep_empty = FALSE,names_repair = "check_unique",simplify = TRUE,ptype = NULL,transform = NULL)
+arguments:
+  col: <\link[=tidyr_tidy_select]{tidy-select}> List-column(s) to unnest.
+  data: A data frame.
+  indices_include: A single logical value specifying whether or not to add an index column.
+  indices_to: A string giving the column name (or names) to store the inner names or positions (if not named) of the values.
+  keep_empty: By default, you get one row of output for each element of the list that you are unchopping/unnesting.
+  names_repair: Used to check that output data frame has valid names.
+  ptype: Optionally, a named list of prototypes declaring the desired output type of each component.
+  simplify: If TRUE, will attempt to simplify lists of length-1 vectors to an atomic vector.
+  transform: Optionally, a named list of transformation functions applied to each component.
+  values_to: A string giving the column name (or names) to store the unnested values in.
+---
+kind: function
+name: nest
+exported: true
+signature: nest(.data, ..., .by = NULL, .key = NULL, .names_sep = NULL)
+arguments:
+  '...': <\link[=tidyr_tidy_select]{tidy-select}> Columns to nest; these will appear in the inner data frames.
+  .by: <\link[=tidyr_tidy_select]{tidy-select}> Columns to nest by; these will remain in the outer data frame.
+  .data: A data frame.
+  .key: The name of the resulting nested column.
+  .names_sep: If NULL, the default, the inner names will come from the former outer names.
+---
+kind: function
+name: unite
+exported: true
+signature: unite(data, col, ..., sep = "_", remove = TRUE, na.rm = FALSE)
+arguments:
+  '...': <\link[=tidyr_tidy_select]{tidy-select}> Columns to unite
+  col: The name of the new column, as a string or symbol.
+  data: A data frame.
+  na.rm: If TRUE, missing values will be removed prior to uniting each value.
+  remove: If TRUE, remove input columns from output data frame.
+  sep: Separator to use between values.
+---
+kind: function
+name: separate
+exported: true
+signature: separate(data,col,into,sep = "[^[:alnum:]]+",remove = TRUE,convert = FALSE,extra = "warn",fill = "warn",...)
+purpose: Separate a character column into multiple columns with a regular expression or numeric locations
+arguments:
+  '...': Additional arguments passed on to methods.
+  col: <\link[=tidyr_tidy_select]{tidy-select}> Column to expand.
+  convert: If TRUE, will run \link[=type.convert]{type.convert()} with as.is = TRUE on new columns.
+  data: A data frame.
+  extra: If sep is a character vector, this controls what happens when there are too many pieces.
+  fill: If sep is a character vector, this controls what happens when there are not enough pieces.
+  into: Names of new variables to create as character vector.
+  remove: If TRUE, remove input column from output data frame.
+  sep: Separator between columns.
+---
+kind: function
+name: complete_
+exported: true
+signature: complete_(data, cols, fill = list(), ...)
+---
+kind: function
+name: drop_na_
+exported: true
+signature: drop_na_(data, vars)
+---
+kind: function
+name: expand_
+exported: true
+signature: expand_(data, dots, ...)
+---
+kind: function
+name: crossing_
+exported: true
+signature: crossing_(x)
+---
+kind: function
+name: nesting_
+exported: true
+signature: nesting_(x)
+---
+kind: function
+name: extract_
+exported: true
+signature: extract_(data,col,into,regex = "([[:alnum:]]+)",remove = TRUE,convert = FALSE,...)
+---
+kind: function
+name: fill_
+exported: true
+signature: fill_(data, fill_cols, .direction = c("down", "up"))
+---
+kind: function
+name: gather_
+exported: true
+signature: gather_(data,key_col,value_col,gather_cols,na.rm = FALSE,convert = FALSE,factor_key = FALSE)
+---
+kind: function
+name: nest_
+exported: true
+signature: nest_(...)
+---
+kind: function
+name: separate_rows_
+exported: true
+signature: separate_rows_(data,cols,sep = "[^[:alnum:].]+",convert = FALSE)
+---
+kind: function
+name: separate_
+exported: true
+signature: separate_(data,col,into,sep = "[^[:alnum:]]+",remove = TRUE,convert = FALSE,extra = "warn",fill = "warn",...)
+---
+kind: function
+name: spread_
+exported: true
+signature: spread_(data,key_col,value_col,fill = NA,convert = FALSE,drop = TRUE,sep = NULL)
+---
+kind: function
+name: unite_
+exported: true
+signature: unite_(data, col, from, sep = "_", remove = TRUE)
+---
+kind: function
+name: unnest_
+exported: true
+signature: unnest_(...)

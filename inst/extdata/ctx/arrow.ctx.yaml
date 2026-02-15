@@ -1,0 +1,1179 @@
+Fetching R package: arrow
+  → Downloading from CRAN...
+  → Version: 23.0.0.1
+  → Parsing source...
+---
+kind: context_header
+llm_instructions: This is an LLM-optimized API specification for the R package 'arrow'. Use this context to write correct code using arrow functions. Each 'function' record describes a public function with its signature, arguments, and purpose. The 'package' record contains metadata. All listed functions are part of the public API.
+---
+kind: package
+schema_version: '1.1'
+name: arrow
+version: 23.0.0.1
+language: R
+description: Integration to 'Apache' 'Arrow'
+---
+kind: function
+name: to_duckdb
+exported: true
+signature: to_duckdb(.data,con = arrow_duck_connection(),table_name = unique_arrow_tablename(),auto_disconnect = TRUE)
+arguments:
+  .data: the Arrow object (e.g.
+  auto_disconnect: should the table be automatically cleaned up when the resulting object is removed (and garbage collected)?
+  con: a DuckDB connection to use (default will create one and store it in options("arrow_duck_con"))
+  table_name: a name to use in DuckDB for this object.
+returns: A tbl of the new table in DuckDB
+---
+kind: function
+name: to_arrow
+exported: true
+signature: to_arrow(.data)
+arguments:
+  .data: the object to be converted
+returns: A RecordBatchReader.
+---
+kind: function
+name: hive_partition
+exported: true
+signature: hive_partition(..., null_fallback = NULL, segment_encoding = "uri")
+arguments:
+  '...': named list of [=data-type]data types, passed to \link[=schema]{schema()}
+  null_fallback: character to be used in place of missing values (NA or NULL) in partition columns.
+  segment_encoding: Decode partition segments after splitting paths.
+returns: A [=Partitioning]HivePartitioning, or a HivePartitioningFactory if calling hive_partition() with no arguments.
+---
+kind: function
+name: read_parquet
+exported: true
+signature: 'read_parquet(file,col_select = NULL,as_data_frame = TRUE,# TODO: for consistency with other readers/writers,# these properties should be enumerated as args here,# and ParquetArrowReaderProperties$create() should# accept them, as with ParquetWriterProperties.# Assembling `props` yourself is something you do with# ParquetFileReader but not here.props = ParquetArrowReaderProperties$create(),mmap = TRUE,...)'
+arguments:
+  '...': Additional arguments passed to ParquetFileReader$create()
+  as_data_frame: Should the function return a tibble (default) or an Arrow Table?
+  col_select: A character vector of column names to keep, as in the "select" argument to data.table::fread(), or a [tidyselect:eval_select]tidy selection specification of columns, as used in dplyr::select().
+  file: A character file name or URI, connection, raw vector, an Arrow input stream, or a FileSystem with path (SubTreeFileSystem).
+  mmap: Use TRUE to use memory mapping where possible
+  props: ParquetArrowReaderProperties
+returns: A tibble if as_data_frame is TRUE (the default), or an Arrow Table otherwise.
+---
+kind: function
+name: write_parquet
+exported: true
+signature: write_parquet(x,sink,chunk_size = NULL,# writer propertiesversion = "2.4",compression = default_parquet_compression(),compression_level = NULL,use_dictionary = NULL,write_statistics = NULL,data_page_size = NULL,# arrow writer propertiesuse_deprecated_int96_timestamps = FALSE,coerce_timestamps = NULL,allow_truncated_timestamps = FALSE)
+arguments:
+  allow_truncated_timestamps: 'logical: Allow loss of data when coercing timestamps to a particular resolution.'
+  chunk_size: how many rows of data to write to disk at once.
+  coerce_timestamps: Cast timestamps a particular resolution.
+  compression: compression algorithm.
+  compression_level: compression level.
+  data_page_size: Set a target threshold for the approximate encoded size of data pages within a column chunk (in bytes).
+  sink: A string file path, connection, URI, or OutputStream, or path in a file system (SubTreeFileSystem)
+  use_deprecated_int96_timestamps: 'logical: write timestamps to INT96 Parquet format, which has been deprecated?'
+  use_dictionary: 'logical: use dictionary encoding?'
+  version: 'parquet version: "1.0", "2.4" (default), "2.6", or "latest" (currently equivalent to 2.6).'
+  write_statistics: 'logical: include statistics?'
+  x: data.frame, RecordBatch, or Table
+returns: the input x invisibly.
+---
+kind: function
+name: write_feather
+exported: true
+signature: write_feather(x,sink,version = 2,chunk_size = 65536L,compression = c("default", "lz4", "lz4_frame", "uncompressed", "zstd"),compression_level = NULL)
+arguments:
+  chunk_size: For V2 files, the number of rows that each chunk of data should have in the file.
+  compression: Name of compression codec to use, if any.
+  compression_level: If compression is "zstd", you may specify an integer compression level.
+  sink: A string file path, connection, URI, or OutputStream, or path in a file system (SubTreeFileSystem)
+  version: integer Feather file version, Version 1 or Version 2.
+  x: data.frame, RecordBatch, or Table
+returns: The input x, invisibly.
+---
+kind: function
+name: write_ipc_file
+exported: true
+signature: write_ipc_file(x,sink,chunk_size = 65536L,compression = c("default", "lz4", "lz4_frame", "uncompressed", "zstd"),compression_level = NULL)
+---
+kind: function
+name: read_feather
+exported: true
+signature: read_feather(file, col_select = NULL, as_data_frame = TRUE, mmap = TRUE)
+arguments:
+  as_data_frame: Should the function return a tibble (default) or an Arrow Table?
+  col_select: A character vector of column names to keep, as in the "select" argument to data.table::fread(), or a [tidyselect:eval_select]tidy selection specification of columns, as used in dplyr::select().
+  file: A character file name or URI, connection, raw vector, an Arrow input stream, or a FileSystem with path (SubTreeFileSystem).
+  mmap: 'Logical: whether to memory-map the file (default TRUE)'
+returns: A tibble if as_data_frame is TRUE (the default), or an Arrow Table otherwise
+---
+kind: function
+name: schema
+exported: true
+signature: schema() ipc___feather___Reader__schema(self)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: show_exec_plan
+exported: true
+signature: show_exec_plan(x)
+arguments:
+  x: an arrow_dplyr_query to print the ExecPlan for.
+returns: x, invisibly.
+---
+kind: function
+name: type
+exported: true
+signature: type(type)
+---
+kind: function
+name: s3_bucket
+exported: true
+signature: s3_bucket(bucket, ...)
+arguments:
+  '...': Additional connection options, passed to S3FileSystem$create()
+  bucket: string S3 bucket name or path
+returns: A SubTreeFileSystem containing an S3FileSystem and the bucket's relative path.
+---
+kind: function
+name: gs_bucket
+exported: true
+signature: gs_bucket(bucket, ...)
+arguments:
+  '...': Additional connection options, passed to GcsFileSystem$create()
+  bucket: string GCS bucket name or path
+returns: A SubTreeFileSystem containing an GcsFileSystem and the bucket's relative path.
+---
+kind: function
+name: copy_files
+exported: true
+signature: copy_files(from, to, chunk_size = 1024L * 1024L)
+arguments:
+  chunk_size: The maximum size of block to read before flushing to the destination file.
+  from: A string path to a local directory or file, a URI, or a SubTreeFileSystem.
+  to: A string path to a local directory or file, a URI, or a SubTreeFileSystem.
+returns: 'Nothing: called for side effects in the file system'
+---
+kind: function
+name: read_delim_arrow
+exported: true
+signature: read_delim_arrow(file,delim = ",",quote = '"',escape_double = TRUE,escape_backslash = FALSE,schema = NULL,col_names = TRUE,col_types = NULL,col_select = NULL,na = c("", "NA"),quoted_na = TRUE,skip_empty_rows = TRUE,skip = 0L,parse_options = NULL,convert_options = NULL,read_options = NULL,as_data_frame = TRUE,timestamp_parsers = NULL,decimal_point = ".")
+arguments:
+  as_data_frame: Should the function return a tibble (default) or an Arrow Table?
+  col_names: If TRUE, the first row of the input will be used as the column names and will not be included in the data frame.
+  col_select: A character vector of column names to keep, as in the "select" argument to data.table::fread(), or a [tidyselect:eval_select]tidy selection specification of columns, as used in dplyr::select().
+  col_types: A compact string representation of the column types, an Arrow Schema, or NULL (the default) to infer types from the data.
+  convert_options: see [=csv_convert_options]CSV conversion options
+  decimal_point: Character to use for decimal point in floating point numbers.
+  delim: Single character used to separate fields within a record.
+  escape_backslash: Does the file use backslashes to escape special characters?
+  escape_double: Does the file escape quotes by doubling them?
+  file: A character file name or URI, connection, literal data (either a single string or a raw vector), an Arrow input stream, or a FileSystem with path (SubTreeFileSystem).
+  na: A character vector of strings to interpret as missing values.
+  parse_options: see [=csv_parse_options]CSV parsing options.
+  quote: Single character used to quote strings.
+  quoted_na: Should missing values inside quotes be treated as missing values (the default) or strings.
+  read_options: see [=csv_read_options]CSV reading options
+  schema: Schema that describes the table.
+  skip: Number of lines to skip before reading data.
+  skip_empty_rows: Should blank rows be ignored altogether?
+  timestamp_parsers: User-defined timestamp parsers.
+returns: A tibble, or a Table if as_data_frame = FALSE.
+---
+kind: function
+name: read_csv_arrow
+exported: true
+signature: read_csv_arrow(file,quote = '"',escape_double = TRUE,escape_backslash = FALSE,schema = NULL,col_names = TRUE,col_types = NULL,col_select = NULL,na = c("", "NA"),quoted_na = TRUE,skip_empty_rows = TRUE,skip = 0L,parse_options = NULL,convert_options = NULL,read_options = NULL,as_data_frame = TRUE,timestamp_parsers = NULL)
+---
+kind: function
+name: read_csv2_arrow
+exported: true
+signature: read_csv2_arrow(file,quote = '"',escape_double = TRUE,escape_backslash = FALSE,schema = NULL,col_names = TRUE,col_types = NULL,col_select = NULL,na = c("", "NA"),quoted_na = TRUE,skip_empty_rows = TRUE,skip = 0L,parse_options = NULL,convert_options = NULL,read_options = NULL,as_data_frame = TRUE,timestamp_parsers = NULL)
+---
+kind: function
+name: read_tsv_arrow
+exported: true
+signature: read_tsv_arrow(file,quote = '"',escape_double = TRUE,escape_backslash = FALSE,schema = NULL,col_names = TRUE,col_types = NULL,col_select = NULL,na = c("", "NA"),quoted_na = TRUE,skip_empty_rows = TRUE,skip = 0L,parse_options = NULL,convert_options = NULL,read_options = NULL,as_data_frame = TRUE,timestamp_parsers = NULL)
+---
+kind: function
+name: csv_read_options
+exported: true
+signature: csv_read_options(use_threads = option_use_threads(),block_size = 1048576L,skip_rows = 0L,column_names = character(0),autogenerate_column_names = FALSE,encoding = "UTF-8",skip_rows_after_names = 0L)
+arguments:
+  autogenerate_column_names: 'Logical: generate column names instead of using the first non-skipped row (the default)?'
+  block_size: Block size we request from the IO layer; also determines the size of chunks when use_threads is TRUE.
+  column_names: Character vector to supply column names.
+  encoding: The file encoding.
+  skip_rows: Number of lines to skip before reading data (default 0).
+  skip_rows_after_names: Number of lines to skip after the column names (default 0).
+  use_threads: Whether to use the global CPU thread pool
+---
+kind: function
+name: csv_write_options
+exported: true
+signature: csv_write_options(include_header = TRUE,batch_size = 1024L,null_string = "",delimiter = ",",eol = "\n",quoting_style = c("Needed", "AllValid", "None"))
+arguments:
+  batch_size: Maximum number of rows processed at a time.
+  delimiter: Field delimiter
+  eol: The end of line character to use for ending rows
+  include_header: Whether to write an initial header line with column names
+  null_string: The string to be written for null values.
+  quoting_style: How to handle quotes.
+---
+kind: function
+name: csv_parse_options
+exported: true
+signature: csv_parse_options(delimiter = ",",quoting = TRUE,quote_char = '"',double_quote = TRUE,escaping = FALSE,escape_char = "\\",newlines_in_values = FALSE,ignore_empty_lines = TRUE)
+arguments:
+  delimiter: Field delimiting character
+  double_quote: 'Logical: are quotes inside values double-quoted?'
+  escape_char: Escaping character, if escaping is TRUE
+  escaping: 'Logical: whether escaping is used'
+  ignore_empty_lines: 'Logical: should empty lines be ignored (default) or generate a row of missing values (if FALSE)?'
+  newlines_in_values: 'Logical: are values allowed to contain CR (0x0d) and LF (0x0a) characters?'
+  quote_char: Quoting character, if quoting is TRUE
+  quoting: 'Logical: are strings quoted?'
+---
+kind: function
+name: csv_convert_options
+exported: true
+signature: csv_convert_options(check_utf8 = TRUE,null_values = c("", "NA"),true_values = c("T", "true", "TRUE"),false_values = c("F", "false", "FALSE"),strings_can_be_null = FALSE,col_types = NULL,auto_dict_encode = FALSE,auto_dict_max_cardinality = 50L,include_columns = character(),include_missing_columns = FALSE,timestamp_parsers = NULL,decimal_point = ".")
+arguments:
+  auto_dict_encode: 'Logical: Whether to try to automatically dictionary-encode string / binary data (think stringsAsFactors).'
+  auto_dict_max_cardinality: If auto_dict_encode, string/binary columns are dictionary-encoded up to this number of unique values (default 50), after which it switches to regular encoding.
+  check_utf8: 'Logical: check UTF8 validity of string columns?'
+  col_types: A Schema or NULL to infer types
+  decimal_point: Character to use for decimal point in floating point numbers.
+  false_values: Character vector of recognized spellings for FALSE values
+  include_columns: If non-empty, indicates the names of columns from the CSV file that should be actually read and converted (in the vector's order).
+  include_missing_columns: 'Logical: if include_columns is provided, should columns named in it but not found in the data be included as a column of type null()?'
+  null_values: Character vector of recognized spellings for null values.
+  strings_can_be_null: 'Logical: can string / binary columns have null values?'
+  timestamp_parsers: User-defined timestamp parsers.
+  true_values: Character vector of recognized spellings for TRUE values
+---
+kind: function
+name: write_csv_arrow
+exported: true
+signature: write_csv_arrow(x,sink,file = NULL,include_header = TRUE,col_names = NULL,batch_size = 1024L,na = "",write_options = NULL,...)
+arguments:
+  '...': additional parameters
+  batch_size: Maximum number of rows processed at a time.
+  col_names: identical to include_header.
+  file: file name.
+  include_header: Whether to write an initial header line with column names
+  na: value to write for NA values.
+  sink: A string file path, connection, URI, or OutputStream, or path in a file system (SubTreeFileSystem)
+  write_options: see [=csv_write_options]CSV write options
+  x: data.frame, RecordBatch, or Table
+returns: The input x, invisibly.
+---
+kind: function
+name: schema
+exported: true
+signature: schema() RecordBatch__schema(self)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: as_record_batch
+exported: true
+signature: as_record_batch(x, ..., schema = NULL)
+arguments:
+  '...': Passed to S3 methods
+  schema: a Schema, or NULL (the default) to infer the schema from the data in ....
+  x: An object to convert to an Arrow RecordBatch
+returns: A RecordBatch
+---
+kind: function
+name: infer_type
+exported: true
+signature: infer_type(x, ...) UseMethod("infer_type")
+arguments:
+  '...': Passed to S3 methods
+  x: an R object (usually a vector) to be converted to an Array or ChunkedArray.
+returns: An arrow [=data-type]data type
+---
+kind: function
+name: type
+exported: true
+signature: type(x)
+---
+kind: function
+name: int8
+exported: true
+signature: int8() Int8__initialize()
+---
+kind: function
+name: int16
+exported: true
+signature: int16() Int16__initialize()
+---
+kind: function
+name: int32
+exported: true
+signature: int32() Int32__initialize()
+---
+kind: function
+name: int64
+exported: true
+signature: int64() Int64__initialize()
+---
+kind: function
+name: uint8
+exported: true
+signature: uint8() UInt8__initialize()
+---
+kind: function
+name: uint16
+exported: true
+signature: uint16() UInt16__initialize()
+---
+kind: function
+name: uint32
+exported: true
+signature: uint32() UInt32__initialize()
+---
+kind: function
+name: uint64
+exported: true
+signature: uint64() UInt64__initialize()
+---
+kind: function
+name: float16
+exported: true
+signature: float16() Float16__initialize()
+---
+kind: function
+name: float32
+exported: true
+signature: float32() Float32__initialize()
+---
+kind: function
+name: float64
+exported: true
+signature: float64() Float64__initialize()
+---
+kind: function
+name: boolean
+exported: true
+signature: boolean() Boolean__initialize()
+---
+kind: function
+name: utf8
+exported: true
+signature: utf8() Utf8__initialize()
+---
+kind: function
+name: large_utf8
+exported: true
+signature: large_utf8() LargeUtf8__initialize()
+---
+kind: function
+name: binary
+exported: true
+signature: binary() Binary__initialize()
+---
+kind: function
+name: large_binary
+exported: true
+signature: large_binary() LargeBinary__initialize()
+---
+kind: function
+name: fixed_size_binary
+exported: true
+signature: fixed_size_binary(byte_width) FixedSizeBinary__initialize(byte_width)
+---
+kind: function
+name: date32
+exported: true
+signature: date32() Date32__initialize()
+---
+kind: function
+name: date64
+exported: true
+signature: date64() Date64__initialize()
+---
+kind: function
+name: time32
+exported: true
+signature: time32(unit = c("ms", "s"))
+---
+kind: function
+name: time64
+exported: true
+signature: time64(unit = c("ns", "us"))
+---
+kind: function
+name: duration
+exported: true
+signature: duration(unit = c("s", "ms", "us", "ns"))
+---
+kind: function
+name: 'null'
+exported: true
+signature: null() Null__initialize()
+---
+kind: function
+name: timestamp
+exported: true
+signature: timestamp(unit = c("s", "ms", "us", "ns"), timezone = "")
+---
+kind: function
+name: decimal
+exported: true
+signature: decimal(precision, scale)
+---
+kind: function
+name: decimal32
+exported: true
+signature: decimal32(precision, scale)
+---
+kind: function
+name: decimal64
+exported: true
+signature: decimal64(precision, scale)
+---
+kind: function
+name: decimal128
+exported: true
+signature: decimal128(precision, scale)
+---
+kind: function
+name: decimal256
+exported: true
+signature: decimal256(precision, scale)
+---
+kind: function
+name: list_of
+exported: true
+signature: list_of(type) list__(type)
+---
+kind: function
+name: large_list_of
+exported: true
+signature: large_list_of(type) large_list__(type)
+---
+kind: function
+name: fixed_size_list_of
+exported: true
+signature: fixed_size_list_of(type, list_size) fixed_size_list__(type, list_size)
+---
+kind: function
+name: map_of
+exported: true
+signature: map_of(key_type, item_type, .keys_sorted = FALSE) map__(key_type, item_type, .keys_sorted)
+---
+kind: function
+name: as_data_type
+exported: true
+signature: as_data_type(x, ...)
+arguments:
+  '...': Passed to S3 methods.
+  x: An object to convert to an Arrow [=data-type]DataType
+returns: A [=data-type]DataType object.
+---
+kind: function
+name: schema
+exported: true
+signature: schema() dataset___Scanner__schema(self)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: map_batches
+exported: true
+signature: map_batches(X, FUN, ..., .schema = NULL, .lazy = TRUE, .data.frame = NULL)
+arguments:
+  '...': Additional arguments passed to FUN
+  .data.frame: Deprecated argument, ignored
+  .lazy: Use TRUE to evaluate FUN lazily as batches are read from the result; use FALSE to evaluate FUN on all batches before returning the reader.
+  .schema: An optional \link[=schema]{schema()}.
+  FUN: A function or purrr-style lambda expression to apply to each batch.
+  X: A Dataset or arrow_dplyr_query object, as returned by the dplyr methods on Dataset.
+returns: An arrow_dplyr_query.
+---
+kind: function
+name: FragmentScanOptions
+exported: true
+signature: FragmentScanOptions(options)
+---
+kind: function
+name: schema
+exported: true
+signature: schema() dataset___ScannerBuilder__schema(self)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: cpu_count
+exported: true
+signature: cpu_count()
+arguments:
+  num_threads: 'integer: New number of threads for thread pool'
+---
+kind: function
+name: set_cpu_count
+exported: true
+signature: set_cpu_count(num_threads)
+---
+kind: function
+name: io_thread_count
+exported: true
+signature: io_thread_count()
+arguments:
+  num_threads: 'integer: New number of threads for thread pool.'
+---
+kind: function
+name: set_io_thread_count
+exported: true
+signature: set_io_thread_count(num_threads)
+---
+kind: function
+name: load_flight_server
+exported: true
+signature: load_flight_server(name, path = system.file(package = "arrow"))
+arguments:
+  name: string Python module name
+  path: file system path where the Python module is found.
+---
+kind: function
+name: flight_connect
+exported: true
+signature: flight_connect(host = "localhost", port, scheme = "grpc+tcp")
+arguments:
+  host: string hostname to connect to
+  port: integer port to connect on
+  scheme: URL scheme, default is "grpc+tcp"
+returns: A pyarrow.flight.
+---
+kind: function
+name: flight_disconnect
+exported: true
+signature: flight_disconnect(client)
+arguments:
+  client: The client to disconnect
+---
+kind: function
+name: flight_put
+exported: true
+signature: flight_put(client, data, path, overwrite = TRUE, max_chunksize = NULL)
+arguments:
+  client: pyarrow.flight.
+  data: data.frame, RecordBatch, or Table to upload
+  max_chunksize: 'integer: Maximum number of rows for RecordBatch chunks when a data.frame is sent.'
+  overwrite: 'logical: if path exists on client already, should we replace it with the contents of data?'
+  path: string identifier to store the data under
+returns: client, invisibly.
+---
+kind: function
+name: flight_get
+exported: true
+signature: flight_get(client, path)
+arguments:
+  client: pyarrow.flight.
+  path: string identifier under which data is stored
+returns: A Table
+---
+kind: function
+name: list_flights
+exported: true
+signature: list_flights(client)
+arguments:
+  client: pyarrow.flight.
+  path: string identifier under which data is stored
+returns: list_flights() returns a character vector of paths.
+---
+kind: function
+name: flight_path_exists
+exported: true
+signature: flight_path_exists(client, path)
+---
+kind: function
+name: arrow_info
+exported: true
+signature: arrow_info()
+returns: arrow_info() returns a list including version information, boolean "capabilities", and statistics from Arrow's memory allocator, and also Arrow's run-time information.
+---
+kind: function
+name: arrow_available
+exported: true
+signature: arrow_available()
+---
+kind: function
+name: arrow_with_acero
+exported: true
+signature: arrow_with_acero()
+---
+kind: function
+name: arrow_with_dataset
+exported: true
+signature: arrow_with_dataset()
+---
+kind: function
+name: arrow_with_substrait
+exported: true
+signature: arrow_with_substrait()
+---
+kind: function
+name: arrow_with_parquet
+exported: true
+signature: arrow_with_parquet()
+---
+kind: function
+name: arrow_with_s3
+exported: true
+signature: arrow_with_s3()
+---
+kind: function
+name: arrow_with_gcs
+exported: true
+signature: arrow_with_gcs()
+---
+kind: function
+name: arrow_with_json
+exported: true
+signature: arrow_with_json()
+---
+kind: function
+name: type
+exported: true
+signature: type()
+---
+kind: function
+name: call_function
+exported: true
+signature: call_function(function_name, ..., args = list(...), options = empty_named_list())
+arguments:
+  '...': Function arguments, which may include Array, ChunkedArray, Scalar, RecordBatch, or Table.
+  args: list arguments as an alternative to specifying in ...
+  function_name: string Arrow compute function name
+  options: named list of C++ function options.
+returns: An Array, ChunkedArray, Scalar, RecordBatch, or Table, whatever the compute function results in.
+---
+kind: function
+name: list_compute_functions
+exported: true
+signature: list_compute_functions(pattern = NULL, ...)
+arguments:
+  '...': Additional parameters passed to grep()
+  pattern: Optional regular expression to filter the function list
+returns: A character vector of available Arrow C++ function names
+---
+kind: function
+name: match_arrow
+exported: true
+signature: match_arrow(x, table, ...)
+arguments:
+  '...': additional arguments, ignored
+  table: Scalar, Array, ChunkedArray`, or R vector lookup table.
+  x: Scalar, Array or ChunkedArray
+returns: match_arrow() returns an int32-type Arrow object of the same length and type as x with the (0-based) indexes into table.
+---
+kind: function
+name: is_in
+exported: true
+signature: is_in(x, table, ...)
+---
+kind: function
+name: value_counts
+exported: true
+signature: value_counts(x)
+arguments:
+  x: Array or ChunkedArray
+returns: A StructArray containing "values" (same type as x) and "counts" Int64.
+---
+kind: function
+name: cast_options
+exported: true
+signature: cast_options(safe = TRUE, ...)
+arguments:
+  '...': additional cast options, such as allow_int_overflow, allow_time_truncate, and allow_float_truncate,...
+  safe: 'logical: enforce safe conversion?'
+returns: A list
+---
+kind: function
+name: codec_is_available
+exported: true
+signature: codec_is_available(type)
+arguments:
+  type: A string, one of "uncompressed", "snappy", "gzip", "brotli", "zstd", "lz4", "lzo", or "bz2", case-insensitive.
+returns: 'Logical: is type available?'
+---
+kind: function
+name: type
+exported: true
+signature: type() Scalar__type(self)
+---
+kind: function
+name: field
+exported: true
+signature: field(i) StructScalar__field(self, i)
+---
+kind: function
+name: field
+exported: true
+signature: field(i) Schema__field(self, i)
+---
+kind: function
+name: schema
+exported: true
+signature: schema(...)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: infer_schema
+exported: true
+signature: infer_schema(x)
+arguments:
+  x: An object which has a schema, e.g.
+---
+kind: function
+name: read_schema
+exported: true
+signature: read_schema(stream, ...)
+arguments:
+  '...': currently ignored
+  stream: a Message, InputStream, or Buffer
+returns: A Schema
+---
+kind: function
+name: unify_schemas
+exported: true
+signature: unify_schemas(..., schemas = list(...))
+arguments:
+  '...': Schemas to unify
+  schemas: Alternatively, a list of schemas
+returns: A Schema with the union of fields contained in the inputs, or NULL if any of schemas is NULL
+---
+kind: function
+name: as_schema
+exported: true
+signature: as_schema(x, ...)
+arguments:
+  '...': Passed to S3 methods.
+  x: An object to convert to a \link[=schema]{schema()}
+returns: A Schema object.
+---
+kind: function
+name: type
+exported: true
+signature: type() ArrayData__get_type(self)
+---
+kind: function
+name: type
+exported: true
+signature: type() ipc___Message__type(self)
+---
+kind: function
+name: read_message
+exported: true
+signature: read_message(stream)
+arguments:
+  stream: an InputStream
+---
+kind: function
+name: read_json_arrow
+exported: true
+signature: read_json_arrow(file, col_select = NULL, as_data_frame = TRUE, schema = NULL, ...)
+arguments:
+  '...': Additional options passed to JsonTableReader$create()
+  as_data_frame: Should the function return a tibble (default) or an Arrow Table?
+  col_select: A character vector of column names to keep, as in the "select" argument to data.table::fread(), or a [tidyselect:eval_select]tidy selection specification of columns, as used in dplyr::select().
+  file: A character file name or URI, connection, literal data (either a single string or a raw vector), an Arrow input stream, or a FileSystem with path (SubTreeFileSystem).
+  schema: Schema that describes the table.
+returns: A tibble, or a Table if as_data_frame = FALSE.
+---
+kind: function
+name: type
+exported: true
+signature: type(schema = self$schema)
+---
+kind: function
+name: open_dataset
+exported: true
+signature: open_dataset(sources,schema = NULL,partitioning = hive_partition(),hive_style = NA,unify_schemas = NULL,format = c("parquet", "arrow", "ipc", "feather", "csv", "tsv", "text", "json"),factory_options = list(),...)
+arguments:
+  '...': additional arguments passed to dataset_factory() when sources is a directory path/URI or vector of file paths/URIs, otherwise ignored.
+  factory_options: 'list of optional FileSystemFactoryOptions: partition_base_dir: string path segment prefix to ignore when discovering partition information with DirectoryPartitioning.'
+  format: A FileFormat object, or a string identifier of the format of the files in x.
+  hive_style: 'Logical: should partitioning be interpreted as Hive-style?'
+  partitioning: 'When sources is a directory path/URI, one of: a Schema, in which case the file paths relative to sources will be parsed, and path segments will be matched with the schema fields.'
+  schema: Schema for the Dataset.
+  sources: 'One of: a string path or URI to a directory containing data files a FileSystem that references a directory containing data files (such as what is returned by \link[=s3_bucket]{s3_bucket()}) a string path or URI to a single file a character vector of paths or URIs to individual data files a list of Dataset objects as created by this function a list of DatasetFactory objects as created by \link[=dataset_factory]{dataset_factory()}.'
+  unify_schemas: 'logical: should all data fragments (files, Datasets) be scanned in order to create a unified schema from them?'
+returns: A Dataset R6 object.
+---
+kind: function
+name: open_delim_dataset
+exported: true
+signature: open_delim_dataset(sources,schema = NULL,partitioning = hive_partition(),hive_style = NA,unify_schemas = NULL,factory_options = list(),delim = ",",quote = "\"",escape_double = TRUE,escape_backslash = FALSE,col_names = TRUE,col_types = NULL,na = c("", "NA"),skip_empty_rows = TRUE,skip = 0L,convert_options = NULL,read_options = NULL,timestamp_parsers = NULL,quoted_na = TRUE,parse_options = NULL)
+arguments:
+  col_names: If TRUE, the first row of the input will be used as the column names and will not be included in the data frame.
+  col_types: A compact string representation of the column types, an Arrow Schema, or NULL (the default) to infer types from the data.
+  convert_options: see [=csv_convert_options]CSV conversion options
+  delim: Single character used to separate fields within a record.
+  escape_backslash: Does the file use backslashes to escape special characters?
+  escape_double: Does the file escape quotes by doubling them?
+  factory_options: 'list of optional FileSystemFactoryOptions: partition_base_dir: string path segment prefix to ignore when discovering partition information with DirectoryPartitioning.'
+  hive_style: 'Logical: should partitioning be interpreted as Hive-style?'
+  na: A character vector of strings to interpret as missing values.
+  parse_options: see [=csv_parse_options]CSV parsing options.
+  partitioning: 'When sources is a directory path/URI, one of: a Schema, in which case the file paths relative to sources will be parsed, and path segments will be matched with the schema fields.'
+  quote: Single character used to quote strings.
+  quoted_na: Should missing values inside quotes be treated as missing values (the default) or strings.
+  read_options: see [=csv_read_options]CSV reading options
+  schema: Schema for the Dataset.
+  skip: Number of lines to skip before reading data.
+  skip_empty_rows: Should blank rows be ignored altogether?
+  sources: 'One of: a string path or URI to a directory containing data files a FileSystem that references a directory containing data files (such as what is returned by \link[=s3_bucket]{s3_bucket()}) a string path or URI to a single file a character vector of paths or URIs to individual data files a list of Dataset objects as created by this function a list of DatasetFactory objects as created by \link[=dataset_factory]{dataset_factory()}.'
+  timestamp_parsers: User-defined timestamp parsers.
+  unify_schemas: 'logical: should all data fragments (files, Datasets) be scanned in order to create a unified schema from them?'
+---
+kind: function
+name: open_csv_dataset
+exported: true
+signature: open_csv_dataset(sources,schema = NULL,partitioning = hive_partition(),hive_style = NA,unify_schemas = NULL,factory_options = list(),quote = "\"",escape_double = TRUE,escape_backslash = FALSE,col_names = TRUE,col_types = NULL,na = c("", "NA"),skip_empty_rows = TRUE,skip = 0L,convert_options = NULL,read_options = NULL,timestamp_parsers = NULL,quoted_na = TRUE,parse_options = NULL)
+---
+kind: function
+name: open_tsv_dataset
+exported: true
+signature: open_tsv_dataset(sources,schema = NULL,partitioning = hive_partition(),hive_style = NA,unify_schemas = NULL,factory_options = list(),quote = "\"",escape_double = TRUE,escape_backslash = FALSE,col_names = TRUE,col_types = NULL,na = c("", "NA"),skip_empty_rows = TRUE,skip = 0L,convert_options = NULL,read_options = NULL,timestamp_parsers = NULL,quoted_na = TRUE,parse_options = NULL)
+---
+kind: function
+name: schema
+exported: true
+signature: schema(schema)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: type
+exported: true
+signature: type() dataset___Dataset__type_name(self)
+---
+kind: function
+name: install_arrow
+exported: true
+signature: install_arrow(nightly = FALSE,binary = Sys.getenv("LIBARROW_BINARY", TRUE),use_system = Sys.getenv("ARROW_USE_PKG_CONFIG", FALSE),minimal = Sys.getenv("LIBARROW_MINIMAL", FALSE),verbose = Sys.getenv("ARROW_R_DEV", FALSE),repos = getOption("repos"),...)
+arguments:
+  '...': Additional arguments passed to install.packages()
+  binary: On Linux, value to set for the environment variable LIBARROW_BINARY, which governs how C++ binaries are used, if at all.
+  minimal: 'logical: If building from source, should we build without optional dependencies (compression libraries, for example)?'
+  nightly: 'logical: Should we install a development version of the package, or should we install from CRAN (the default).'
+  repos: character vector of base URLs of the repositories to install from (passed to install.packages())
+  use_system: 'logical: Should we use pkg-config to look for Arrow system packages?'
+  verbose: 'logical: Print more debugging output when installing?'
+---
+kind: function
+name: create_package_with_all_dependencies
+exported: true
+signature: create_package_with_all_dependencies(dest_file = NULL, source_file = NULL)
+arguments:
+  dest_file: File path for the new tar.gz package.
+  source_file: File path for the input tar.gz package.
+returns: The full path to dest_file, invisibly This function is used for setting up an offline build.
+---
+kind: function
+name: new_extension_type
+exported: true
+signature: new_extension_type(storage_type, extension_name, extension_metadata = raw(), type_class = ExtensionType)
+arguments:
+  extension_metadata: A \link[=raw]{raw()} or \link[=character]{character()} vector containing the serialized version of the type.
+  extension_name: The extension name.
+  extension_type: An ExtensionType instance.
+  storage_array: An Array object of the underlying storage.
+  storage_type: The [=data-type]data type of the underlying storage array.
+  type_class: An [R6:R6Class]R6::R6Class whose $new() class method will be used to construct a new instance of the type.
+returns: new_extension_type() returns an ExtensionType instance according to the type_class specified.
+---
+kind: function
+name: new_extension_array
+exported: true
+signature: new_extension_array(storage_array, extension_type)
+---
+kind: function
+name: register_extension_type
+exported: true
+signature: register_extension_type(extension_type)
+---
+kind: function
+name: reregister_extension_type
+exported: true
+signature: reregister_extension_type(extension_type)
+---
+kind: function
+name: unregister_extension_type
+exported: true
+signature: unregister_extension_type(extension_name)
+---
+kind: function
+name: vctrs_extension_array
+exported: true
+signature: vctrs_extension_array(x, ptype = vctrs::vec_ptype(x), storage_type = NULL)
+arguments:
+  ptype: A \link[vctrs:vec_ptype]{vctrs::vec_ptype()}, which is usually a zero-length version of the object with the appropriate attributes set.
+  storage_type: The [=data-type]data type of the underlying storage array.
+  x: A vctr (i.e., \link[vctrs:vec_assert]{vctrs::vec_is()} returns TRUE).
+returns: vctrs_extension_array() returns an ExtensionArray instance with a vctrs_extension_type().
+---
+kind: function
+name: vctrs_extension_type
+exported: true
+signature: vctrs_extension_type(x, storage_type = infer_type(vctrs::vec_data(x)))
+---
+kind: function
+name: field
+exported: true
+signature: field(i) Table__field(self, i)
+---
+kind: function
+name: schema
+exported: true
+signature: schema() Table__schema(self)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: concat_tables
+exported: true
+signature: concat_tables(..., unify_schemas = TRUE)
+arguments:
+  '...': One or more Table or RecordBatch objects.
+  unify_schemas: If TRUE, the schemas of the tables will be first unified with fields of the same name being merged, then each table will be promoted to the unified schema before being concatenated.
+---
+kind: function
+name: as_arrow_table
+exported: true
+signature: as_arrow_table(x, ..., schema = NULL)
+arguments:
+  '...': Passed to S3 methods
+  schema: a Schema, or NULL (the default) to infer the schema from the data in ....
+  x: An object to convert to an Arrow Table
+returns: A Table
+---
+kind: function
+name: type
+exported: true
+signature: type() dataset___FileFormat__type_name(self)
+---
+kind: function
+name: type
+exported: true
+signature: type() dataset___FragmentScanOptions__type_name(self)
+---
+kind: function
+name: type
+exported: true
+signature: type() dataset___FileWriteOptions__type_name(self)
+---
+kind: function
+name: type
+exported: true
+signature: type() ChunkedArray__type(self)
+---
+kind: function
+name: as_chunked_array
+exported: true
+signature: as_chunked_array(x, ..., type = NULL)
+arguments:
+  '...': Passed to S3 methods
+  type: A [=data-type]type for the final Array.
+  x: An object to convert to an Arrow Chunked Array
+returns: A ChunkedArray.
+---
+kind: function
+name: write_ipc_stream
+exported: true
+signature: write_ipc_stream(x, sink, ...)
+arguments:
+  '...': extra parameters passed to write_feather().
+  sink: A string file path, connection, URI, or OutputStream, or path in a file system (SubTreeFileSystem)
+  x: data.frame, RecordBatch, or Table
+returns: x, invisibly.
+---
+kind: function
+name: write_to_raw
+exported: true
+signature: write_to_raw(x, format = c("stream", "file"))
+arguments:
+  format: one of c("stream", "file"), indicating the IPC format to use
+  x: data.frame, RecordBatch, or Table
+returns: A raw vector containing the bytes of the IPC serialized data.
+---
+kind: function
+name: read_ipc_stream
+exported: true
+signature: read_ipc_stream(file, as_data_frame = TRUE, ...)
+arguments:
+  '...': extra parameters passed to read_feather().
+  as_data_frame: Should the function return a tibble (default) or an Arrow Table?
+  file: A character file name or URI, connection, raw vector, an Arrow input stream, or a FileSystem with path (SubTreeFileSystem).
+returns: A tibble if as_data_frame is TRUE (the default), or an Arrow Table otherwise
+---
+kind: function
+name: default_memory_pool
+exported: true
+signature: default_memory_pool()
+returns: the default MemoryPool
+---
+kind: function
+name: type
+exported: true
+signature: type() Array__type(self)
+---
+kind: function
+name: as_arrow_array
+exported: true
+signature: as_arrow_array(x, ..., type = NULL)
+arguments:
+  '...': Passed to S3 methods
+  type: A [=data-type]type for the final Array.
+  x: An object to convert to an Arrow Array
+returns: An Array with type type.
+---
+kind: function
+name: concat_arrays
+exported: true
+signature: concat_arrays(..., type = NULL)
+arguments:
+  '...': zero or more Array objects to concatenate
+  type: An optional type describing the desired type for the final Array.
+returns: A single Array
+---
+kind: function
+name: dictionary
+exported: true
+signature: dictionary() DictionaryArray__dictionary(self)
+arguments:
+  index_type: A DataType for the indices (default \link[=int32]{int32()})
+  ordered: Is this an ordered dictionary (default FALSE)?
+  value_type: A DataType for the values (default \link[=utf8]{utf8()})
+returns: A DictionaryType
+---
+kind: function
+name: field
+exported: true
+signature: field(i) StructArray__field(self, i)
+---
+kind: function
+name: mmap_create
+exported: true
+signature: mmap_create(path, size)
+arguments:
+  path: file path
+  size: size in bytes
+returns: a [=MemoryMappedFile]arrow::io::MemoryMappedFile
+---
+kind: function
+name: mmap_open
+exported: true
+signature: mmap_open(path, mode = c("read", "write", "readwrite"))
+arguments:
+  mode: file mode (read/write/readwrite)
+  path: file path
+---
+kind: function
+name: install_pyarrow
+exported: true
+signature: install_pyarrow(envname = NULL, nightly = FALSE, ...)
+arguments:
+  '...': additional arguments passed to reticulate::py_install().
+  envname: The name or full path of the Python environment to install into.
+  nightly: 'logical: Should we install a development version of the package?'
+---
+kind: function
+name: register_scalar_function
+exported: true
+signature: register_scalar_function(name, fun, in_type, out_type, auto_convert = FALSE)
+arguments:
+  auto_convert: Use TRUE to convert inputs before passing to fun and construct an Array of the correct type from the output.
+  fun: An R function or rlang-style lambda expression.
+  in_type: A DataType of the input type or a \link[=schema]{schema()} for functions with more than one argument.
+  name: The function name to be used in the dplyr bindings
+  out_type: A DataType of the output type or a function accepting a single argument (types), which is a list() of DataTypes.
+returns: NULL, invisibly
+---
+kind: function
+name: schema
+exported: true
+signature: schema() RecordBatchReader__schema(self)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: schema
+exported: true
+signature: schema() ipc___RecordBatchFileReader__schema(self)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: as_record_batch_reader
+exported: true
+signature: as_record_batch_reader(x, ...)
+arguments:
+  '...': Passed to S3 methods
+  schema: The \link[=schema]{schema()} that must match the schema returned by each call to x when x is a function.
+  x: An object to convert to a RecordBatchReader
+returns: A RecordBatchReader
+---
+kind: function
+name: schema
+exported: true
+signature: schema() ExecNode_output_schema(self)
+arguments:
+  '...': '[=field]fields, field name/[=data-type]data type pairs (or a list of), or object from which to...'
+---
+kind: function
+name: write_dataset
+exported: true
+signature: write_dataset(dataset,path,format = c("parquet", "feather", "arrow", "ipc", "csv", "tsv", "txt", "text"),partitioning = dplyr::group_vars(dataset),basename_template = paste0("part-{i}.", as.character(format)),hive_style = TRUE,existing_data_behavior = c("overwrite", "error", "delete_matching"),max_partitions = 1024L,max_open_files = 900L,max_rows_per_file = 0L,min_rows_per_group = 0L,max_rows_per_group = bitwShiftL(1, 20),create_directory = TRUE,...)
+arguments:
+  '...': additional format-specific arguments.
+  basename_template: string template for the names of files to be written.
+  create_directory: whether to create the directories written into.
+  dataset: Dataset, RecordBatch, Table, arrow_dplyr_query, or data.frame.
+  existing_data_behavior: The behavior to use when there is already data in the destination directory.
+  format: a string identifier of the file format.
+  hive_style: 'logical: write partition segments as Hive-style (key1=value1/key2=value2/file.ext) or as just bare values.'
+  max_open_files: maximum number of files that can be left opened during a write operation.
+  max_partitions: maximum number of partitions any batch may be written into.
+  max_rows_per_file: maximum number of rows per file.
+  max_rows_per_group: maximum rows allowed in a single group and when this number of rows is exceeded, it is split and the next set of rows is written to the next group.
+  min_rows_per_group: write the row groups to the disk when this number of rows have accumulated.
+  partitioning: Partitioning or a character vector of columns to use as partition keys (to be written as path segments).
+  path: string path, URI, or SubTreeFileSystem referencing a directory to write to (directory will be...
+returns: The input dataset, invisibly
+---
+kind: function
+name: write_delim_dataset
+exported: true
+signature: write_delim_dataset(dataset,path,partitioning = dplyr::group_vars(dataset),basename_template = "part-{i}.txt",hive_style = TRUE,existing_data_behavior = c("overwrite", "error", "delete_matching"),max_partitions = 1024L,max_open_files = 900L,max_rows_per_file = 0L,min_rows_per_group = 0L,max_rows_per_group = bitwShiftL(1, 20),col_names = TRUE,batch_size = 1024L,delim = ",",na = "",eol = "\n",quote = c("needed", "all", "none"))
+arguments:
+  basename_template: string template for the names of files to be written.
+  batch_size: Maximum number of rows processed at a time.
+  col_names: Whether to write an initial header line with column names.
+  dataset: Dataset, RecordBatch, Table, arrow_dplyr_query, or data.frame.
+  delim: Delimiter used to separate values.
+  eol: the end of line character to use for ending rows.
+  existing_data_behavior: The behavior to use when there is already data in the destination directory.
+  hive_style: 'logical: write partition segments as Hive-style (key1=value1/key2=value2/file.ext) or as just bare values.'
+  max_open_files: maximum number of files that can be left opened during a write operation.
+  max_partitions: maximum number of partitions any batch may be written into.
+  max_rows_per_file: maximum number of rows per file.
+  max_rows_per_group: maximum rows allowed in a single group and when this number of rows is exceeded, it is split and the next set of rows is written to the next group.
+  min_rows_per_group: write the row groups to the disk when this number of rows have accumulated.
+  na: a character vector of strings to interpret as missing values.
+  partitioning: Partitioning or a character vector of columns to use as partition keys (to be written as path segments).
+  path: string path, URI, or SubTreeFileSystem referencing a directory to write to (directory will be...
+  quote: How to handle fields which contain characters that need to be quoted.
+returns: The input dataset, invisibly.
+---
+kind: function
+name: write_csv_dataset
+exported: true
+signature: write_csv_dataset(dataset,path,partitioning = dplyr::group_vars(dataset),basename_template = "part-{i}.csv",hive_style = TRUE,existing_data_behavior = c("overwrite", "error", "delete_matching"),max_partitions = 1024L,max_open_files = 900L,max_rows_per_file = 0L,min_rows_per_group = 0L,max_rows_per_group = bitwShiftL(1, 20),col_names = TRUE,batch_size = 1024L,delim = ",",na = "",eol = "\n",quote = c("needed", "all", "none"))
+---
+kind: function
+name: write_tsv_dataset
+exported: true
+signature: write_tsv_dataset(dataset,path,partitioning = dplyr::group_vars(dataset),basename_template = "part-{i}.tsv",hive_style = TRUE,existing_data_behavior = c("overwrite", "error", "delete_matching"),max_partitions = 1024L,max_open_files = 900L,max_rows_per_file = 0L,min_rows_per_group = 0L,max_rows_per_group = bitwShiftL(1, 20),col_names = TRUE,batch_size = 1024L,na = "",eol = "\n",quote = c("needed", "all", "none"))

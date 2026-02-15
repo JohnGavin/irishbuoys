@@ -1,0 +1,759 @@
+Fetching R package: .
+  → Using local path: /Users/johngavin/docs_gh/proj/data/weather/irish_buoy_network/irishbuoys...
+  → Version: 0.1.0
+  → Parsing source...
+---
+kind: context_header
+llm_instructions: This is an LLM-optimized API specification for the R package 'irishbuoys'. Use this context to write correct code using irishbuoys functions. Each 'function' record describes a public function with its signature, arguments, and purpose. The 'package' record contains metadata. All listed functions are part of the public API.
+---
+kind: package
+schema_version: '1.1'
+name: irishbuoys
+version: 0.1.0
+language: R
+description: Analyze Irish Weather Buoy Network Data
+---
+kind: function
+name: get_station_info
+exported: true
+signature: get_station_info()
+returns: 'Data frame with columns: station_id, location, lat, lon, depth_m, distance_km'
+---
+kind: function
+name: haversine_distance
+exported: true
+signature: haversine_distance(lat1, lon1, lat2, lon2)
+arguments:
+  lat1, lon1: Coordinates of first point (degrees)
+  lat2, lon2: Coordinates of second point (degrees)
+returns: Distance in kilometers
+---
+kind: function
+name: station_distance_matrix
+exported: true
+signature: station_distance_matrix(station_info = NULL)
+arguments:
+  station_info: Data frame from get_station_info() or NULL to use default
+returns: Named matrix of distances in km
+---
+kind: function
+name: cross_correlation_stations
+exported: true
+signature: cross_correlation_stations(data,station1,station2,variable = "wave_height",max_lag = 48)
+arguments:
+  data: 'Data frame with columns: time, station_id, and the variable'
+  max_lag: 'Maximum lag in hours to test (default: 48)'
+  station1, station2: Station IDs to compare
+  variable: 'Variable to analyze (default: "wave_height")'
+returns: 'List with: ccf: cross-correlation values at each lag optimal_lag: lag (hours) with maximum...'
+---
+kind: function
+name: analyze_station_pairs
+exported: true
+signature: analyze_station_pairs(data,variable = "wave_height",max_lag = 48)
+arguments:
+  data: 'Data frame with columns: time, station_id, and the variable'
+  max_lag: 'Maximum lag in hours (default: 48)'
+  variable: 'Variable to analyze (default: "wave_height")'
+returns: 'Data frame with one row per station pair containing: station1, station2: station pair distance_km:...'
+---
+kind: function
+name: predict_station_lagged
+exported: true
+signature: predict_station_lagged(data,predictor_station,target_station,variable = "wave_height",lag_hours = NULL)
+arguments:
+  data: 'Data frame with columns: time, station_id, and the variable'
+  lag_hours: Lag in hours (positive = predictor leads target)
+  predictor_station: Station to use as predictor (e.g., "M6")
+  target_station: Station to predict (e.g., "M2")
+  variable: 'Variable to predict (default: "wave_height")'
+returns: 'List with: model: lm object r_squared: R-squared of prediction rmse: Root mean squared error...'
+---
+kind: function
+name: fit_bivariate_copula
+exported: true
+signature: fit_bivariate_copula(data,station1,station2,variable = "wave_height",copula_family = "gumbel")
+arguments:
+  copula_family: 'Copula family: "gaussian", "t", "clayton", "gumbel", "frank"'
+  data: 'Data frame with columns: time, station_id, and the variable'
+  station1, station2: Station IDs to analyze
+  variable: 'Variable to analyze (default: "wave_height")'
+returns: 'List with: copula: fitted copula object parameters: copula parameters tau: Kendall''s tau (rank...'
+---
+kind: function
+name: analyze_joint_extremes
+exported: true
+signature: analyze_joint_extremes(data,variable = "wave_height",threshold_quantile = 0.95)
+arguments:
+  data: 'Data frame with columns: time, station_id, and the variable'
+  threshold_quantile: 'Quantile threshold for "extreme" (default: 0.95)'
+  variable: 'Variable to analyze (default: "wave_height")'
+returns: 'List with: joint_extreme_counts: matrix of joint extreme event counts conditional_probs: P(station...'
+---
+kind: function
+name: joint_analysis_summary
+exported: true
+signature: joint_analysis_summary(data, variable = "wave_height")
+arguments:
+  data: Data frame with buoy data
+  variable: 'Variable to analyze (default: "wave_height")'
+returns: List containing all joint analysis results
+---
+kind: function
+name: init_parquet_storage
+exported: true
+signature: init_parquet_storage(data_path = "inst/extdata/parquet",db_path = "inst/extdata/metadata.duckdb")
+arguments:
+  data_path: Base path for Parquet files
+  db_path: Optional path for metadata database
+---
+kind: function
+name: save_to_parquet
+exported: true
+signature: save_to_parquet(data,data_path = "inst/extdata/parquet",partition_by = "year_month",compression = "zstd")
+arguments:
+  compression: 'Compression algorithm: "snappy", "gzip", "zstd", "lz4"'
+  data: Data frame to save
+  data_path: Base path for Parquet files
+  partition_by: 'How to partition: "year_month", "station", or "both"'
+---
+kind: function
+name: query_parquet
+exported: true
+signature: query_parquet(query = NULL,data_path = "inst/extdata/parquet/by_year_month",stations = NULL,date_range = NULL)
+arguments:
+  data_path: Path to Parquet files
+  date_range: Date range as c(start_date, end_date)
+  query: SQL query or NULL for interactive connection
+  stations: Filter for specific stations
+---
+kind: function
+name: incremental_update_parquet
+exported: true
+signature: incremental_update_parquet(new_data,data_path = "inst/extdata/parquet")
+arguments:
+  data_path: Base path for Parquet files
+  new_data: New data to append
+---
+kind: function
+name: analyze_parquet_storage
+exported: true
+signature: analyze_parquet_storage(data_path = "inst/extdata/parquet")
+arguments:
+  data_path: Base path for Parquet files
+---
+kind: function
+name: convert_duckdb_to_parquet
+exported: true
+signature: convert_duckdb_to_parquet(db_path = "inst/extdata/irish_buoys.duckdb",data_path = "inst/extdata/parquet")
+arguments:
+  data_path: Output path for Parquet files
+  db_path: Path to existing DuckDB database
+---
+kind: function
+name: download_buoy_data
+exported: true
+signature: download_buoy_data(start_date = Sys.Date() - 30,end_date = Sys.Date(),stations = NULL,variables = NULL,format = "csv")
+arguments:
+  end_date: 'Character or Date, end of date range (default: today)'
+  format: 'Character, output format: "csv", "json", or "tsv" (default: "csv")'
+  start_date: 'Character or Date, start of date range (default: 30 days ago)'
+  stations: 'Character vector of station IDs (default: all stations)'
+  variables: 'Character vector of variable names (default: all variables)'
+returns: Data frame containing the requested buoy data
+---
+kind: function
+name: get_latest_timestamp
+exported: true
+signature: get_latest_timestamp(station = NULL)
+arguments:
+  station: Optional station ID to check specific buoy
+returns: POSIXct timestamp of most recent data
+---
+kind: function
+name: get_stations
+exported: true
+signature: get_stations()
+returns: Data frame with station metadata
+---
+kind: function
+name: create_plot_rogue_all
+exported: true
+signature: create_plot_rogue_all(rogue_events)
+arguments:
+  rogue_events: Data frame of rogue wave events
+returns: plotly object
+---
+kind: function
+name: create_plot_rogue_by_station
+exported: true
+signature: create_plot_rogue_by_station(rogue_events, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  rogue_events: Data frame of rogue wave events
+returns: plotly object
+---
+kind: function
+name: create_plot_wind_beaufort
+exported: true
+signature: create_plot_wind_beaufort(rogue_conditions, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  rogue_conditions: Data frame with rogue wave conditions
+returns: plotly object
+---
+kind: function
+name: create_plot_week_of_year
+exported: true
+signature: create_plot_week_of_year(rogue_conditions, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  rogue_conditions: Data frame with rogue wave conditions
+returns: plotly object
+---
+kind: function
+name: create_plot_time_of_day
+exported: true
+signature: create_plot_time_of_day(rogue_conditions, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  rogue_conditions: Data frame with rogue wave conditions
+returns: plotly object
+---
+kind: function
+name: create_plot_monthly_wave
+exported: true
+signature: create_plot_monthly_wave(seasonal_means_wave, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  seasonal_means_wave: Seasonal means from calculate_seasonal_means
+returns: plotly object
+---
+kind: function
+name: create_plot_monthly_wind
+exported: true
+signature: create_plot_monthly_wind(seasonal_means_wind, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  seasonal_means_wind: Seasonal means from calculate_seasonal_means
+returns: plotly object
+---
+kind: function
+name: create_plot_annual_trends
+exported: true
+signature: create_plot_annual_trends(annual_trends, date_caption = NULL)
+arguments:
+  annual_trends: Annual trends from calculate_annual_trends
+  date_caption: Date range caption
+returns: plotly object
+---
+kind: function
+name: create_plot_return_levels
+exported: true
+signature: create_plot_return_levels(return_levels, variable = "wave", date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  return_levels: Return levels data frame
+  variable: Variable name for title ("wave", "wind", or "hmax")
+returns: plotly object
+---
+kind: function
+name: create_plot_gust_by_category
+exported: true
+signature: create_plot_gust_by_category(gust_analysis, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  gust_analysis: Gust factor analysis results
+returns: plotly object
+---
+kind: function
+name: create_plot_rogue_gusts
+exported: true
+signature: create_plot_rogue_gusts(gust_analysis)
+arguments:
+  gust_analysis: Gust factor analysis results
+returns: plotly object
+---
+kind: function
+name: create_plot_stl
+exported: true
+signature: create_plot_stl(wave_stl, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  wave_stl: STL decomposition from calculate_wave_seasonality
+returns: ggplot2 object
+---
+kind: function
+name: create_plot_rogue_gusts_all
+exported: true
+signature: create_plot_rogue_gusts_all(rogue_gust_events)
+arguments:
+  rogue_gust_events: Data frame of rogue gust events
+returns: plotly object
+---
+kind: function
+name: create_plot_rogue_gusts_by_station
+exported: true
+signature: create_plot_rogue_gusts_by_station(rogue_gust_events, date_caption = NULL)
+arguments:
+  date_caption: Date range caption
+  rogue_gust_events: Data frame of rogue gust events
+returns: plotly object
+---
+kind: function
+name: create_plot_gusts_vs_waves
+exported: true
+signature: create_plot_gusts_vs_waves(analysis_data)
+arguments:
+  analysis_data: Full analysis data with both ratios computed
+returns: plotly object
+---
+kind: function
+name: irishbuoys_layout
+exported: true
+signature: irishbuoys_layout(p, title = NULL, ...)
+arguments:
+  '...': Additional arguments passed to plotly::layout()
+  p: A plotly object
+  title: Optional title string
+returns: A styled plotly object
+---
+kind: function
+name: irishbuoys_ggplotly
+exported: true
+signature: irishbuoys_ggplotly(gg, title = NULL, ...)
+arguments:
+  '...': Additional arguments passed to plotly::ggplotly()
+  gg: A ggplot2 object
+  title: Optional title to override ggplot title
+returns: A styled plotly object
+---
+kind: function
+name: generate_weekly_summary
+exported: true
+signature: generate_weekly_summary(db_path = "inst/extdata/irish_buoys.duckdb",lookback_days = 7,qc_filter = NULL)
+arguments:
+  db_path: Path to DuckDB database
+  lookback_days: 'Number of days to analyze (default: 7)'
+  qc_filter: 'QC flag filter: 1 = good only, 0 = include unverified, NULL = no filter'
+returns: List containing summary statistics and comparisons
+---
+kind: function
+name: create_email_summary
+exported: true
+signature: create_email_summary(summary)
+arguments:
+  summary: Summary object from generate_weekly_summary()
+returns: blastula email object
+---
+kind: function
+name: generate_and_send_summary
+exported: true
+signature: generate_and_send_summary(recipient = Sys.getenv("EMAIL_TO"),sender = Sys.getenv("EMAIL_FROM"))
+arguments:
+  recipient: Email recipient (default from EMAIL_TO env var)
+  sender: Email sender (default from EMAIL_FROM env var)
+---
+kind: function
+name: detect_rogue_waves
+exported: true
+signature: detect_rogue_waves(con,threshold = 2.0,min_wave_height = 2.0,start_date = NULL,end_date = NULL,stations = NULL)
+arguments:
+  con: DBI connection to DuckDB database
+  end_date: Optional end date filter
+  min_wave_height: 'Minimum significant wave height to consider (default: 2m)'
+  start_date: Optional start date filter
+  stations: Optional vector of station IDs to filter
+  threshold: 'Hmax/WaveHeight ratio threshold (default: 2.0)'
+returns: Data frame of rogue wave events with associated conditions
+---
+kind: function
+name: analyze_rogue_statistics
+exported: true
+signature: analyze_rogue_statistics(con,threshold = 2.0,min_wave_height = 2.0)
+arguments:
+  con: DBI connection to DuckDB database
+  min_wave_height: 'Minimum significant wave height (default: 2m)'
+  threshold: 'Hmax/WaveHeight ratio threshold (default: 2.0)'
+returns: List containing rogue wave statistics by station and overall
+---
+kind: function
+name: calculate_wave_steepness
+exported: true
+signature: calculate_wave_steepness(wave_height, wave_period)
+arguments:
+  wave_height: Significant wave height in meters
+  wave_period: Wave period in seconds
+returns: Wave steepness (dimensionless)
+---
+kind: function
+name: add_wave_metrics
+exported: true
+signature: add_wave_metrics(data, rogue_threshold = 2.0)
+arguments:
+  data: Data frame with wave_height, hmax, and wave_period columns
+  rogue_threshold: 'Threshold for rogue wave classification (default: 2.0)'
+returns: 'Data frame with additional columns: rogue_ratio, is_rogue, steepness, danger_level'
+---
+kind: function
+name: rogue_wave_report
+exported: true
+signature: rogue_wave_report(con, days = 30)
+arguments:
+  con: DBI connection to DuckDB database
+  days: 'Number of days to analyze (default: 30)'
+returns: Character string with formatted report
+---
+kind: function
+name: wave_glossary
+exported: true
+signature: wave_glossary()
+returns: 'Data frame with columns: acronym, term, definition, unit'
+---
+kind: function
+name: explain_hs_formula
+exported: true
+signature: explain_hs_formula()
+returns: Character string with explanation
+---
+kind: function
+name: explain_measurement_period
+exported: true
+signature: explain_measurement_period()
+returns: Character string with explanation
+---
+kind: function
+name: explain_hourly_averaging
+exported: true
+signature: explain_hourly_averaging()
+returns: Character string with explanation
+---
+kind: function
+name: calculate_hs_from_elevation
+exported: true
+signature: calculate_hs_from_elevation(elevations)
+arguments:
+  elevations: Numeric vector of surface elevation measurements (m)
+returns: Significant wave height in meters
+---
+kind: function
+name: calculate_rms_wave_height
+exported: true
+signature: calculate_rms_wave_height(wave_heights)
+arguments:
+  wave_heights: Numeric vector of individual wave heights (m)
+returns: RMS wave height in meters
+---
+kind: function
+name: hs_from_rms
+exported: true
+signature: hs_from_rms(h_rms)
+arguments:
+  h_rms: RMS wave height in meters
+returns: Significant wave height in meters
+---
+kind: function
+name: explain_wave_height_measurement
+exported: true
+signature: explain_wave_height_measurement()
+returns: Character string with explanation
+---
+kind: function
+name: wave_science_documentation
+exported: true
+signature: wave_science_documentation()
+returns: Character string with markdown-formatted documentation
+---
+kind: function
+name: decompose_stl
+exported: true
+signature: decompose_stl(data,variable = "wave_height",time_col = "time",frequency = "daily")
+arguments:
+  data: Data frame with time and value columns
+  frequency: 'Seasonal frequency (default: "daily" = 24 hours)'
+  time_col: 'Name of the time column (default: "time")'
+  variable: 'Name of the variable to decompose (default: "wave_height")'
+returns: 'List with: decomposition: stl object components: data frame with time, seasonal, trend, remainder...'
+---
+kind: function
+name: calculate_seasonal_means
+exported: true
+signature: calculate_seasonal_means(data,variable = "wave_height",time_col = "time")
+arguments:
+  data: Data frame with time and value columns
+  time_col: 'Name of the time column (default: "time")'
+  variable: 'Name of the variable (default: "wave_height")'
+returns: 'List with: monthly: mean values by month seasonal: mean values by season (DJF, MAM, JJA, SON)'
+---
+kind: function
+name: calculate_annual_trends
+exported: true
+signature: calculate_annual_trends(data,variable = "wave_height",time_col = "time")
+arguments:
+  data: Data frame with time and value columns
+  time_col: 'Name of the time column (default: "time")'
+  variable: 'Name of the variable (default: "wave_height")'
+returns: 'List with: annual_stats: annual mean, max, etc.'
+---
+kind: function
+name: detect_anomalies
+exported: true
+signature: detect_anomalies(data,variable = "wave_height",time_col = "time",threshold = 3)
+arguments:
+  data: Data frame with time and value columns
+  threshold: 'Number of standard deviations for anomaly detection (default: 3)'
+  time_col: 'Name of the time column (default: "time")'
+  variable: 'Name of the variable (default: "wave_height")'
+returns: 'List with: anomalies: data frame of anomalous observations seasonal_norms: monthly mean and sd used...'
+---
+kind: function
+name: trend_summary_report
+exported: true
+signature: trend_summary_report(seasonal_means,annual_trends,anomalies = NULL)
+arguments:
+  annual_trends: Result from calculate_annual_trends
+  anomalies: Result from detect_anomalies (optional)
+  seasonal_means: Result from calculate_seasonal_means
+returns: Character string with formatted report
+---
+kind: function
+name: validate_buoy_data
+exported: true
+signature: validate_buoy_data(data,target_name = "analysis_data",min_rows = 100,report_path = NULL)
+arguments:
+  data: A data frame or tibble to validate
+  min_rows: 'Minimum expected rows (default: 100)'
+  report_path: Optional path to save HTML validation report
+  target_name: 'Name of the target for error messages (default: "analysis_data")'
+returns: The original data if validation passes, otherwise aborts with error
+---
+kind: function
+name: validate_rogue_events
+exported: true
+signature: validate_rogue_events(data,target_name = "rogue_wave_events",min_rows = 1,report_path = NULL)
+arguments:
+  data: A data frame of rogue wave events
+  min_rows: 'Minimum expected rows (default: 1)'
+  report_path: Optional path to save HTML validation report
+  target_name: Name of the target for error messages
+returns: The original data if validation passes
+---
+kind: function
+name: generate_validation_reports
+exported: true
+signature: generate_validation_reports(analysis_data,rogue_events,output_dir = "docs/articles")
+arguments:
+  analysis_data: The analysis_data tibble to validate
+  output_dir: 'Directory to save reports (default: "docs/articles")'
+  rogue_events: The rogue_wave_events tibble to validate
+returns: A list with paths to generated reports
+---
+kind: function
+name: create_validation_summary
+exported: true
+signature: create_validation_summary(...)
+arguments:
+  '...': Named validation agents from interrogate()
+returns: A tibble summarizing validation results
+---
+kind: function
+name: connect_duckdb
+exported: true
+signature: connect_duckdb(db_path = "inst/extdata/irish_buoys.duckdb",create_new = FALSE)
+arguments:
+  create_new: 'Logical, whether to create new database (default: FALSE)'
+  db_path: 'Character, path to database file (default: "inst/extdata/irish_buoys.duckdb")'
+returns: DBI connection object to the DuckDB database
+---
+kind: function
+name: buoy_tbl
+exported: true
+signature: buoy_tbl(con, table_name = "buoy_data")
+arguments:
+  con: DBI connection to DuckDB database
+  table_name: 'Name of the table (default: "buoy_data")'
+returns: A lazy tibble (tbl_dbi) for use with dplyr verbs
+---
+kind: function
+name: create_buoy_schema
+exported: true
+signature: create_buoy_schema(con)
+arguments:
+  con: DBI connection object
+returns: Invisible NULL
+---
+kind: function
+name: load_to_duckdb
+exported: true
+signature: load_to_duckdb(data, con, update_metadata = TRUE)
+arguments:
+  con: DBI connection object
+  data: Data frame containing buoy data
+  update_metadata: 'Logical, whether to update station metadata (default: TRUE)'
+returns: Number of rows inserted
+---
+kind: function
+name: query_buoy_data
+exported: true
+signature: query_buoy_data(con,stations = NULL,start_date = NULL,end_date = NULL,variables = NULL,qc_filter = TRUE,sql_query = NULL)
+arguments:
+  con: DBI connection object
+  end_date: End date for query
+  qc_filter: 'Logical, filter for good quality data only (default: TRUE)'
+  sql_query: Optional custom SQL query (bypasses dplyr)
+  start_date: Start date for query
+  stations: 'Character vector of station IDs (default: all)'
+  variables: Character vector of variables to return
+returns: Data frame with query results
+---
+kind: function
+name: get_data_dictionary
+exported: true
+signature: get_data_dictionary()
+returns: 'A data frame containing the complete data dictionary with columns: variable: Variable name as used...'
+---
+kind: function
+name: get_variable_docs
+exported: true
+signature: get_variable_docs(variable = NULL)
+arguments:
+  variable: Character string specifying the variable name
+returns: List containing detailed documentation
+---
+kind: function
+name: prepare_wave_features
+exported: true
+signature: prepare_wave_features(data, lags = 1:3)
+arguments:
+  data: Data frame with buoy observations
+  lags: 'Integer vector of lag periods in hours (default: 1:3)'
+returns: Data frame with additional lagged and derived features
+---
+kind: function
+name: train_wave_model
+exported: true
+signature: train_wave_model(data,target = "wave_height",predictors = NULL,train_fraction = 0.7,seed = 42,...)
+arguments:
+  '...': Additional arguments passed to ranger::ranger
+  data: Data frame with prepared features (from prepare_wave_features)
+  predictors: 'Character vector of predictor names (default: NULL uses standard set)'
+  seed: 'Random seed for reproducibility (default: 42)'
+  target: 'Target variable name (default: "wave_height")'
+  train_fraction: 'Fraction of data for training (default: 0.7)'
+returns: List with model, train/test indices, and feature importance
+---
+kind: function
+name: evaluate_wave_model
+exported: true
+signature: evaluate_wave_model(model_result, data, target = "wave_height")
+arguments:
+  data: Full prepared data frame
+  model_result: Result from train_wave_model
+  target: 'Target variable name (default: "wave_height")'
+returns: Data frame with performance metrics
+---
+kind: function
+name: predict_wave_height
+exported: true
+signature: predict_wave_height(model_result, new_data)
+arguments:
+  model_result: Result from train_wave_model
+  new_data: Data frame with predictor values
+returns: Numeric vector of predicted wave heights
+---
+kind: function
+name: wave_model_report
+exported: true
+signature: wave_model_report(model_result, eval_result)
+arguments:
+  eval_result: Result from evaluate_wave_model
+  model_result: Result from train_wave_model
+returns: Character string with formatted report
+---
+kind: function
+name: incremental_update
+exported: true
+signature: incremental_update(db_path = "inst/extdata/irish_buoys.duckdb",lookback_hours = 48)
+arguments:
+  db_path: Path to DuckDB database file
+  lookback_hours: 'Number of hours to look back for safety (default: 48) This ensures we don''t miss data due to delays...'
+returns: List with update statistics
+---
+kind: function
+name: initialize_database
+exported: true
+signature: initialize_database(db_path = "inst/extdata/irish_buoys.duckdb",start_date = Sys.Date() - 365,end_date = Sys.Date(),chunk_days = 365)
+arguments:
+  chunk_days: 'Number of days to download at once (default: 30)'
+  db_path: Path to DuckDB database file
+  end_date: 'End date for historical data (default: today)'
+  start_date: 'Start date for historical data (default: 1 year ago)'
+returns: Total number of records loaded
+---
+kind: function
+name: get_database_stats
+exported: true
+signature: get_database_stats(db_path = "inst/extdata/irish_buoys.duckdb")
+arguments:
+  db_path: Path to DuckDB database file
+returns: List with database statistics
+---
+kind: function
+name: fit_gev_annual_maxima
+exported: true
+signature: fit_gev_annual_maxima(data,variable = "wave_height",time_col = "time",min_years = 5)
+arguments:
+  data: 'Data frame with columns: time, value (the variable to analyze)'
+  min_years: 'Minimum years of data required (default: 5)'
+  time_col: 'Name of the time column (default: "time")'
+  variable: 'Name of the variable column (default: "wave_height")'
+returns: 'List with: fit: extRemes fevd object annual_maxima: data frame of annual maxima parameters: GEV...'
+---
+kind: function
+name: fit_gpd_threshold
+exported: true
+signature: fit_gpd_threshold(data,variable = "wave_height",threshold = NULL,decluster = TRUE,decluster_hours = 48)
+arguments:
+  data: Data frame with the variable to analyze
+  decluster: 'Logical, whether to decluster exceedances (default: TRUE)'
+  decluster_hours: 'Minimum hours between independent exceedances (default: 48)'
+  threshold: 'Threshold value (default: NULL, uses 95th percentile)'
+  variable: 'Name of the variable column (default: "wave_height")'
+returns: 'List with: fit: extRemes fevd object exceedances: data frame of exceedances threshold: threshold...'
+---
+kind: function
+name: calculate_return_levels
+exported: true
+signature: calculate_return_levels(fit,return_periods = c(10, 50, 100),conf_level = 0.95)
+arguments:
+  conf_level: 'Confidence level for intervals (default: 0.95)'
+  fit: Result from fit_gev_annual_maxima or fit_gpd_threshold
+  return_periods: 'Numeric vector of return periods in years (default: c(10, 50, 100))'
+returns: 'Data frame with: return_period: return period in years return_level: estimated return level lower:...'
+---
+kind: function
+name: create_return_level_plot_data
+exported: true
+signature: create_return_level_plot_data(fit,max_return_period = 200,n_points = 100)
+arguments:
+  fit: Result from fit_gev_annual_maxima or fit_gpd_threshold
+  max_return_period: 'Maximum return period to plot (default: 200)'
+  n_points: 'Number of points for the curve (default: 100)'
+returns: Data frame suitable for plotting
+---
+kind: function
+name: analyze_gust_factor
+exported: true
+signature: analyze_gust_factor(data, min_wind_speed = 5)
+arguments:
+  data: Data frame with gust and wind_speed columns
+  min_wind_speed: 'Minimum sustained wind speed to consider (default: 5 m/s)'
+returns: 'List with: summary: summary statistics of gust factor extreme_gusts: observations with high gust...'
+---
+kind: function
+name: compare_rogue_wave_gust
+exported: true
+signature: compare_rogue_wave_gust(data)
+arguments:
+  data: Data frame with wave_height, hmax, wind_speed, gust columns
+returns: Data frame comparing occurrence rates

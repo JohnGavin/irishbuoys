@@ -1,0 +1,2081 @@
+Fetching R package: targets
+  → Downloading from CRAN...
+  → Version: 1.12.0
+  → Parsing source...
+---
+kind: context_header
+llm_instructions: This is an LLM-optimized API specification for the R package 'targets'. Use this context to write correct code using targets functions. Each 'function' record describes a public function with its signature, arguments, and purpose. The 'package' record contains metadata. All listed functions are part of the public API.
+---
+kind: package
+schema_version: '1.1'
+name: targets
+version: 1.12.0
+language: R
+description: Dynamic Function-Oriented 'Make'-Like Declarative Pipelines
+---
+kind: function
+name: use_targets
+exported: true
+signature: use_targets(script = targets::tar_config_get("script"),open = interactive(),overwrite = FALSE,scheduler = NULL,job_name = NULL)
+arguments:
+  job_name: Deprecated in targets version 1.5.0.9001 (2024-02-12).
+  open: Logical of length 1, whether to open the file for editing in the RStudio IDE.
+  overwrite: Logical of length 1, TRUE to overwrite the the target script file, FALSE otherwise.
+  scheduler: Deprecated in targets version 1.5.0.9001 (2024-02-12).
+  script: Character of length 1, where to write the target script file.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_cue
+exported: true
+signature: tar_cue(mode = c("thorough", "always", "never"),command = TRUE,depend = TRUE,format = TRUE,repository = TRUE,iteration = TRUE,file = TRUE,seed = TRUE)
+arguments:
+  command: Logical, whether to rerun the target if command changed since last time.
+  depend: Logical, whether to rerun the target if the value of one of the dependencies changed.
+  file: Logical, whether to rerun the target if the file(s) with the return value changed or at least one is missing.
+  format: Logical, whether to rerun the target if the user-specified storage format changed.
+  iteration: Logical, whether to rerun the target if the user-specified iteration method changed.
+  mode: Cue mode.
+  repository: Logical, whether to rerun the target if the user-specified storage repository changed.
+  seed: Logical, whether to rerun the target if pseudo-random number generator seed either changed or is NA.
+---
+kind: function
+name: tar_objects
+exported: true
+signature: tar_objects(names = NULL,cloud = TRUE,store = targets::tar_config_get("store"))
+arguments:
+  cloud: Logical of length 1, whether to include cloud targets in the output (e.g.
+  names: Names of targets to select.
+  store: Character of length 1, path to the targets data store.
+returns: Character vector of targets saved to _targets/objects/.
+---
+kind: function
+name: tar_pattern
+exported: true
+signature: tar_pattern(pattern, ..., seed = 0L)
+arguments:
+  '...': Named integers, each of length 1.
+  pattern: Function call with the pattern specification.
+  seed: Integer of length 1, random number generator seed to emulate the pattern reproducibly.
+returns: A tibble showing the kinds of dynamic branches that \link[=tar_target]{tar_target()} would create in a real pipeline with the given pattern.
+---
+kind: function
+name: tar_watch
+exported: true
+signature: tar_watch(seconds = 10,seconds_min = 1,seconds_max = 60,seconds_step = 1,targets_only = FALSE,exclude = ".Random.seed",outdated = FALSE,label = NULL,level_separation = 150,degree_from = 1L,degree_to = 1L,config = Sys.getenv("TAR_CONFIG", "_targets.yaml"),project = Sys.getenv("TAR_PROJECT", "main"),height = "650px",display = "summary",displays = c("summary", "branches", "progress", "graph", "about"),background = TRUE,browse = TRUE,host = getOption("shiny.host", "127.0.0.1"),port = getOption("shiny.port", targets::tar_random_port()),verbose = TRUE,supervise = TRUE,poll_connection = TRUE,stdout = "|",stderr = "|",title = "",theme = bslib::bs_theme(),spinner = TRUE)
+arguments:
+  background: Logical, whether to run the app in a background process so you can still use the R console while the app is running.
+  browse: Whether to open the app in a browser when the app is ready.
+  config: Character of length 1, file path of the YAML configuration file with targets project settings.
+  degree_from: Integer of length 1.
+  degree_to: Integer of length 1.
+  display: Character of length 1, which display to show first.
+  displays: Character vector of choices for the display.
+  exclude: Character vector of nodes to omit from the graph.
+  height: Character of length 1, height of the visNetwork widget and branches table.
+  host: Character of length 1, IPv4 address to listen on.
+  label: Label argument to \link[=tar_visnetwork]{tar_visnetwork()}.
+  level_separation: Numeric of length 1, levelSeparation argument of visNetwork::visHierarchicalLayout().
+  outdated: Logical, whether to show colors to distinguish outdated targets from up-to-date targets.
+  poll_connection: Whether to have a control connection to the process.
+  port: Positive integer of length 1, TCP port to listen on.
+  project: Character of length 1, name of the current targets project.
+  seconds: Numeric of length 1, default number of seconds between refreshes of the graph.
+  seconds_max: Numeric of length 1, upper bound of seconds in the app controls.
+  seconds_min: Numeric of length 1, lower bound of seconds in the app controls.
+  seconds_step: Numeric of length 1, step size of seconds in the app controls.
+  spinner: TRUE to add a busy spinner, FALSE to omit.
+  stderr: The name of the file the standard error of the child R process will be written to.
+  stdout: The name of the file the standard output of the child R process will be written to.
+  supervise: Whether to register the process with a supervisor.
+  targets_only: Logical, whether to restrict the output to just targets (FALSE) or to also include global functions and objects.
+  theme: A call to \link[bslib:bs_theme]{bslib::bs_theme()} with the bslib theme.
+  title: Character of length 1, title of the UI.
+  verbose: whether to print a spinner and informative messages.
+returns: A handle to callr::r_bg() background process running the app.
+---
+kind: function
+name: tar_watch_app_ui
+exported: true
+signature: tar_watch_app_ui(seconds,seconds_min,seconds_max,seconds_step,targets_only,outdated,label,level_separation,degree_from,degree_to,height,display,displays,title,theme,spinner)
+arguments:
+  degree_from: Integer of length 1.
+  degree_to: Integer of length 1.
+  display: Character of length 1, which display to show first.
+  displays: Character vector of choices for the display.
+  height: Character of length 1, height of the visNetwork widget and branches table.
+  label: Label argument to \link[=tar_visnetwork]{tar_visnetwork()}.
+  level_separation: Numeric of length 1, levelSeparation argument of visNetwork::visHierarchicalLayout().
+  outdated: Logical, whether to show colors to distinguish outdated targets from up-to-date targets.
+  seconds: Numeric of length 1, default number of seconds between refreshes of the graph.
+  seconds_max: Numeric of length 1, upper bound of seconds in the app controls.
+  seconds_min: Numeric of length 1, lower bound of seconds in the app controls.
+  seconds_step: Numeric of length 1, step size of seconds in the app controls.
+  spinner: TRUE to add a busy spinner, FALSE to omit.
+  targets_only: Logical, whether to restrict the output to just targets (FALSE) or to also include global functions and objects.
+  theme: A call to \link[bslib:bs_theme]{bslib::bs_theme()} with the bslib theme.
+  title: Character of length 1, title of the UI.
+returns: A Shiny UI.
+---
+kind: function
+name: rstudio_addin_tar_target
+exported: true
+signature: rstudio_addin_tar_target(context = NULL)
+arguments:
+  context: RStudio API context from rstudioapi::getActiveDocumentContext().
+---
+kind: function
+name: tar_resources_crew
+exported: true
+signature: tar_resources_crew(controller = targets::tar_option_get("resources")$crew$controller,scale = NULL,seconds_timeout = targets::tar_option_get("resources")$crew$seconds_timeout)
+arguments:
+  controller: Character of length 1.
+  scale: Deprecated in targets version 1.3.0.9002 (2023-10-02).
+  seconds_timeout: Positive numeric of length 1, optional task timeout passed to the .timeout argument of mirai::mirai() (after converting to milliseconds).
+returns: Object of class "tar_resources_crew", to be supplied to the crew argument of tar_resources().
+---
+kind: function
+name: rstudio_addin_tar_glimpse
+exported: true
+signature: rstudio_addin_tar_glimpse()
+---
+kind: function
+name: tar_branch_names_raw
+exported: true
+signature: tar_branch_names_raw(name,index,store = targets::tar_config_get("store"))
+---
+kind: function
+name: tar_watch_server
+exported: true
+signature: tar_watch_server(id,height = "650px",exclude = ".Random.seed",config = Sys.getenv("TAR_CONFIG", "_targets.yaml"),project = Sys.getenv("TAR_PROJECT", "main"))
+arguments:
+  config: Character of length 1, file path of the YAML configuration file with targets project settings.
+  exclude: Character vector of nodes to omit from the graph.
+  height: Character of length 1, height of the visNetwork widget and branches table.
+  id: Character of length 1, ID corresponding to the UI function of the module.
+  project: Character of length 1, name of the current targets project.
+returns: A Shiny module server.
+---
+kind: function
+name: tar_interactive
+exported: true
+signature: tar_interactive(code)
+arguments:
+  code: R code to run if Target Markdown interactive mode is turned on.
+returns: If Target Markdown interactive mode is turned on, the function returns the result of running the code.
+---
+kind: function
+name: tar_deps_raw
+exported: true
+signature: tar_deps_raw(expr)
+---
+kind: function
+name: tar_config_unset
+exported: true
+signature: tar_config_unset(names = character(0),config = Sys.getenv("TAR_CONFIG", "_targets.yaml"),project = Sys.getenv("TAR_PROJECT", "main"))
+arguments:
+  config: Character of length 1, file path of the YAML configuration file with targets project settings.
+  names: Character vector of configuration settings to delete from the current project.
+  project: Character of length 1, name of the current targets project.
+returns: NULL (invisibly)
+---
+kind: function
+name: tar_config_yaml
+exported: true
+signature: tar_config_yaml(config = Sys.getenv("TAR_CONFIG", "_targets.yaml"))
+arguments:
+  config: Character of length 1, file path of the YAML configuration file with targets project settings.
+returns: Nested list of fields defined in _targets.yaml.
+---
+kind: function
+name: tar_unversion
+exported: true
+signature: tar_unversion(names = tidyselect::everything(),store = targets::tar_config_get("store"))
+arguments:
+  names: Tidyselect expression to identify the targets to drop version IDs.
+  store: Character of length 1, path to the targets data store.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_branch_index
+exported: true
+signature: tar_branch_index(names, store = targets::tar_config_get("store"))
+arguments:
+  names: Character vector of branch names.
+  store: Character of length 1, path to the targets data store.
+returns: A named integer vector of branch indexes.
+---
+kind: function
+name: tar_resources_custom_format
+exported: true
+signature: tar_resources_custom_format(envvars = targets::tar_option_get("resources")$custom_format$envvars)
+arguments:
+  envvars: Named character vector of environment variables.
+returns: Object of class "tar_resources_custom_format", to be supplied to the custom_format argument of tar_resources().
+---
+kind: function
+name: tar_callr_inner_try
+exported: true
+signature: tar_callr_inner_try(targets_function,targets_arguments,options,envir = NULL,parent,script,store,fun,pid_parent)
+purpose: Invoke a targets task from inside a callr function (without error handling).
+arguments:
+  envir: Name of the environment to run in.
+  fun: Character of length 1, name of the targets function being called.
+  options: Names of global options to temporarily set in the callr process.
+  parent: Parent environment of the call to tar_call_inner().
+  pid_parent: Integer of length 1, process ID of the calling process, e.g.
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+  targets_arguments: Named list of arguments of targets_function.
+  targets_function: A function from targets to call.
+returns: The output of a call to a targets function that uses callr for reproducibility.
+---
+kind: function
+name: tar_callr_args_default
+exported: true
+signature: tar_callr_args_default(callr_function, reporter = NULL)
+arguments:
+  callr_function: A function from the callr package that starts an external R process.
+  reporter: Character of length 1, choice of reporter for \link[=tar_make]{tar_make()} or a related function.
+returns: A list of arguments to callr_function.
+---
+kind: function
+name: callr_args_default
+exported: true
+signature: callr_args_default(callr_function, reporter = NULL)
+arguments:
+  callr_function: A function from the callr package that starts an external R process.
+  reporter: Character of length 1, choice of reporter for \link[=tar_make]{tar_make()} or a related function.
+returns: A list of arguments to callr_function.
+---
+kind: function
+name: tar_sitrep
+exported: true
+signature: tar_sitrep(names = NULL,fields = NULL,shortcut = targets::tar_config_get("shortcut"),reporter = targets::tar_config_get("reporter_outdated"),seconds_reporter = targets::tar_config_get("seconds_reporter_outdated"),callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function, reporter),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  fields: Optional, names of columns/fields to select.
+  names: Optional, names of the targets.
+  reporter: Character of length 1, name of the reporter to user.
+  script: Character of length 1, path to the target script file.
+  seconds_reporter: Deprecated on 2025-03-31 (targets version 1.10.1.9010).
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+returns: A data frame with one row per target/object and one column per cue.
+---
+kind: function
+name: tar_crew
+exported: true
+signature: tar_crew(store = targets::tar_config_get("store"))
+arguments:
+  store: Character of length 1, path to the targets data store.
+returns: 'A data frame one row per crew controller (potentially multiple rows if tar_option_get("controller") is a controller group) and the following columns: controller: name of the crew controller.'
+---
+kind: function
+name: tar_seed_create
+exported: true
+signature: tar_seed_create(name, global_seed = NULL)
+arguments:
+  global_seed: Integer of length 1, the overarching global pipeline seed which governs the seeds of all the targets.
+  name: Character of length 1, target name.
+returns: Integer of length 1, the target seed.
+---
+kind: function
+name: tar_definition
+exported: true
+signature: tar_definition(default = targets::tar_target_raw("target_name", quote(identity())))
+arguments:
+  default: Environment, value to return if tar_definition() is called on its own outside a targets pipeline.
+returns: If called from a running target, tar_definition() returns the target definition object of the currently running target.
+---
+kind: function
+name: tar_traceback
+exported: true
+signature: tar_traceback(name,envir = NULL,packages = NULL,source = NULL,characters = NULL,store = targets::tar_config_get("store"))
+arguments:
+  characters: Deprecated in targets 1.4.0 (2023-12-06).
+  envir: Deprecated in targets > 0.3.1 (2021-03-28).
+  name: Symbol, name of the target whose workspace to read.
+  packages: Logical, whether to load the required packages of the target.
+  source: 'Logical, whether to run the target script file (default: _targets.'
+  store: Character of length 1, path to the targets data store.
+returns: Character vector, the traceback of a failed target if it exists.
+---
+kind: function
+name: tar_path_script_support
+exported: true
+signature: tar_path_script_support()
+purpose: Directory path to the support scripts of the current target script
+returns: Character, directory path to the target script of the pipeline currently running.
+---
+kind: function
+name: tar_resources_aws
+exported: true
+signature: tar_resources_aws(bucket = targets::tar_option_get("resources")$aws$bucket,prefix = targets::tar_option_get("resources")$aws$prefix,region = targets::tar_option_get("resources")$aws$region,endpoint = targets::tar_option_get("resources")$aws$endpoint,s3_force_path_style = targets::tar_option_get("resources")$aws$s3_force_path_style,part_size = targets::tar_option_get("resources")$aws$part_size,page_size = targets::tar_option_get("resources")$aws$page_size,max_tries = targets::tar_option_get("resources")$aws$max_tries,seconds_timeout = targets::tar_option_get("resources")$aws$seconds_timeout,close_connection = targets::tar_option_get("resources")$aws$close_connection,verbose = targets::tar_option_get("resources")$aws$verbose,...) {if (is.null(prefix)) {tar_warn_prefix()
+arguments:
+  '...': Named arguments to functions in paws.storage::s3() to manage S3 storage.
+  bucket: Character of length 1, name of an existing bucket to upload and download the return values of the affected targets during the pipeline.
+  close_connection: Logical of length 1, whether to close HTTP connections immediately.
+  endpoint: Character of length 1, URL endpoint for S3 storage.
+  max_tries: Positive integer of length 1, maximum number of attempts to access a network resource on AWS.
+  page_size: Positive integer of length 1, number of items in each page for paginated HTTP requests such as listing objects.
+  part_size: Positive numeric of length 1, number of bytes for each part of a multipart upload.
+  prefix: Character of length 1, "directory path" in the bucket where your target definition object and metadata will go.
+  region: Character of length 1, AWS region containing the S3 bucket.
+  s3_force_path_style: Logical of length 1, whether to use path-style addressing for S3 requests.
+  seconds_timeout: Positive numeric of length 1, number of seconds until an HTTP connection times out.
+  verbose: Logical of length 1, whether to print console messages when running computationally expensive operations such as listing objects in a large bucket.
+returns: Object of class "tar_resources_aws", to be supplied to the aws argument of tar_resources().
+---
+kind: function
+name: tar_exist_progress
+exported: true
+signature: tar_exist_progress(store = targets::tar_config_get("store"))
+arguments:
+  store: Character of length 1, path to the targets data store.
+returns: Logical of length 1, whether the current project's metadata exists.
+---
+kind: function
+name: tar_make_future
+exported: true
+signature: tar_make_future(names = NULL,shortcut = targets::tar_config_get("shortcut"),reporter = targets::tar_config_get("reporter_make"),seconds_meta_append = targets::tar_config_get("seconds_meta_append"),seconds_meta_upload = targets::tar_config_get("seconds_meta_upload"),seconds_reporter = targets::tar_config_get("seconds_reporter"),seconds_interval = targets::tar_config_get("seconds_interval"),workers = targets::tar_config_get("workers"),callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function, reporter),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"),garbage_collection = NULL)
+purpose: Superseded.
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  garbage_collection: Deprecated.
+  names: Names of the targets to run or check.
+  reporter: Character of length 1, name of the reporter to user.
+  script: Character of length 1, path to the target script file.
+  seconds_interval: Deprecated on 2023-08-24 (targets version 1.2.2.9001).
+  seconds_meta_append: Positive numeric of length 1 with the minimum number of seconds between saves to the local metadata and progress files in the data store.
+  seconds_meta_upload: Positive numeric of length 1 with the minimum number of seconds between uploads of the metadata and progress data to the cloud (see https://books.ropensci.org/targets/cloud-storage.html).
+  seconds_reporter: Deprecated on 2025-03-31 (targets version 1.10.1.9010).
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+  workers: Positive integer, maximum number of transient future workers allowed to run at any given time.
+returns: NULL except if callr_function = callr::r_bg(), in which case a handle to the callr background process is returned.
+---
+kind: function
+name: tar_timestamp
+exported: true
+signature: tar_timestamp(name = NULL,format = NULL,tz = NULL,parse = NULL,store = targets::tar_config_get("store"))
+arguments:
+  format: Deprecated in targets version 0.6.0 (2021-07-21).
+  name: Name of the target.
+  parse: Deprecated in targets version 0.6.0 (2021-07-21).
+  store: Character string, directory path to the data store of the pipeline.
+  tz: Deprecated in targets version 0.6.0 (2021-07-21).
+returns: If the target is not recorded in the metadata or cannot be parsed correctly, then tar_timestamp() returns a POSIXct object at 1970-01-01 UTC.
+---
+kind: function
+name: tar_meta_download
+exported: true
+signature: tar_meta_download(meta = TRUE,progress = TRUE,process = TRUE,crew = TRUE,verbose = TRUE,strict = FALSE,script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  crew: Logical of length 1, whether to process the crew file at _targets/meta/crew.
+  meta: Logical of length 1, whether to process the main metadata file at _targets/meta/meta.
+  process: Logical of length 1, whether to process the process file at _targets/meta/process.
+  progress: Logical of length 1, whether to process the progress file at _targets/meta/progress.
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+  strict: Logical of length 1.
+  verbose: Logical of length 1, whether to print informative console messages.
+---
+kind: function
+name: tar_older
+exported: true
+signature: tar_older(time,names = NULL,inclusive = FALSE,store = targets::tar_config_get("store"))
+arguments:
+  inclusive: Logical of length 1, whether to include targets completed at exactly the time given.
+  names: Names of eligible targets.
+  store: Character of length 1, path to the targets data store.
+  time: A POSIXct object of length 1, time threshold.
+returns: A character vector of names of old targets with recorded timestamp metadata.
+---
+kind: function
+name: tar_repository_cas_local_gc
+exported: true
+signature: tar_repository_cas_local_gc(path = NULL,store = targets::tar_config_get("store"))
+arguments:
+  path: Character string, file path to the CAS repository where all the data object files will be stored.
+  store: Character of length 1, path to the targets data store.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_glimpse
+exported: true
+signature: tar_glimpse(targets_only = TRUE,names = NULL,shortcut = FALSE,allow = NULL,exclude = ".Random.seed",label = targets::tar_config_get("label"),label_width = targets::tar_config_get("label_width"),level_separation = targets::tar_config_get("level_separation"),degree_from = 1L,degree_to = 1L,zoom_speed = 1,physics = FALSE,callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  allow: Optional, the set of allowable vertices in the graph.
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  degree_from: Integer of length 1.
+  degree_to: Integer of length 1.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  exclude: Optional, the set of exclude vertices from the graph.
+  label: Character vector of one or more aesthetics to add to the vertex labels.
+  label_width: Positive numeric of length 1, maximum width (in number of characters) of the node labels.
+  level_separation: Numeric of length 1, levelSeparation argument of visNetwork::visHierarchicalLayout().
+  names: Names of targets.
+  physics: Logical of length 1, whether to implement interactive physics in the graph, e.g.
+  script: Character of length 1, path to the target script file.
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+  targets_only: Logical, whether to restrict the output to just targets (FALSE) or to also include global functions and objects.
+  zoom_speed: Positive numeric of length 1, scaling factor on the zoom speed.
+returns: A visNetwork HTML widget object.
+---
+kind: function
+name: target_run_worker
+exported: true
+signature: target_run_worker(target,envir,path_store,fun,options,envvars)
+arguments:
+  envir: An environment or the string "globalenv".
+  envvars: Data frame of targets-specific environment variables from \link[=tar_envvars]{tar_envvars()}.
+  fun: Character of length 1, name of the user-side function called to run the pipeline.
+  options: List, exported from an object of class "tar_options".
+  path_store: Character of length 1, path to the data store.
+  target: A target definition object.
+---
+kind: function
+name: tar_validate
+exported: true
+signature: tar_validate(callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+returns: NULL except if callr_function = callr::r_bg(), in which case a handle to the callr background process is returned.
+---
+kind: function
+name: tar_exist_process
+exported: true
+signature: tar_exist_process(store = targets::tar_config_get("store"))
+arguments:
+  store: Character of length 1, path to the targets data store.
+returns: Logical of length 1, whether the current project's metadata exists.
+---
+kind: function
+name: tar_unblock_process
+exported: true
+signature: tar_unblock_process(store = targets::tar_config_get("store"))
+arguments:
+  store: Character string, path to the data store (usually "_targets").
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_engine_knitr
+exported: true
+signature: tar_engine_knitr(options)
+arguments:
+  options: A named list of knitr chunk options.
+returns: Character, output generated from knitr::engine_output().
+---
+kind: function
+name: tar_config_projects
+exported: true
+signature: tar_config_projects(config = Sys.getenv("TAR_CONFIG", "_targets.yaml"))
+arguments:
+  config: Character of length 1, file path of the YAML configuration file with targets project settings.
+returns: Character vector of names of projects defined in _targets.yaml.
+---
+kind: function
+name: tar_outdated
+exported: true
+signature: tar_outdated(names = NULL,shortcut = targets::tar_config_get("shortcut"),branches = FALSE,targets_only = TRUE,reporter = targets::tar_config_get("reporter_outdated"),seconds_reporter = targets::tar_config_get("seconds_reporter_outdated"),seconds_interval = targets::tar_config_get("seconds_interval"),callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function, reporter),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  branches: Logical of length 1, whether to include branch names.
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  names: Names of the targets.
+  reporter: Character of length 1, name of the reporter to user.
+  script: Character of length 1, path to the target script file.
+  seconds_interval: Deprecated on 2023-08-24 (targets version 1.2.2.9001).
+  seconds_reporter: Deprecated on 2025-03-31 (targets version 1.10.1.9010).
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+  targets_only: 'Logical of length 1, whether to just restrict to targets or to include functions and other global objects from the environment created by running the target script file (default: _targets.'
+returns: Names of the outdated targets.
+---
+kind: function
+name: tar_timestamp_raw
+exported: true
+signature: tar_timestamp_raw(name = NULL,format = NULL,tz = NULL,parse = NULL,store = targets::tar_config_get("store"))
+---
+kind: function
+name: tar_option_reset
+exported: true
+signature: tar_option_reset()
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_igraph
+exported: true
+signature: tar_igraph(targets_only = FALSE,callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"))
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  script: Character of length 1, path to the target script file.
+  targets_only: TRUE to restrict the output to just the actual targets in the pipeline, FALSE to include imported global functions and objects as well.
+returns: An igraph object with the dependency graph.
+---
+kind: function
+name: tar_started
+exported: true
+signature: tar_started(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: A character vector of dispatched targets.
+---
+kind: function
+name: tar_option_unset
+exported: true
+signature: tar_option_unset(options)
+arguments:
+  options: A character vector of options to reset.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_renv
+exported: true
+signature: tar_renv(extras = c("bslib","crew","gt","markdown","rstudioapi","shiny","shinybusy","shinyWidgets","visNetwork"),path = "_targets_packages.R",callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script")) {force(envir)tar_assert_chr(extras)tar_assert_chr(path)tar_assert_scalar(path)tar_assert_callr_function(callr_function)tar_assert_list(callr_arguments)callr_outer(targets_function = tar_renv_inner,targets_arguments = list(extras = extras, path = path),callr_function = callr_function,callr_arguments = callr_arguments,envir = envir,script = script,store = tar_config_get("store"),fun = "tar_renv")invisible()
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  extras: Character vector of additional packages to declare as project dependencies.
+  path: Character of length 1, path to the script file to populate with library() calls.
+  script: Character of length 1, path to the target script file.
+returns: Nothing, invisibly.
+---
+kind: function
+name: tar_resources_future
+exported: true
+signature: tar_resources_future(plan = NULL,resources = targets::tar_option_get("resources")$future$resources)
+arguments:
+  plan: A future::plan() object or NULL, a target-specific future plan.
+  resources: Named list, resources argument to future::future().
+returns: Object of class "tar_resources_future", to be supplied to the future argument of tar_resources().
+---
+kind: function
+name: tar_store
+exported: true
+signature: tar_store()
+returns: Character, file path to the data store of the pipeline currently running.
+---
+kind: function
+name: tar_format
+exported: true
+signature: tar_format(read = NULL,write = NULL,marshal = NULL,unmarshal = NULL,convert = NULL,copy = NULL,substitute = list(),repository = NULL)
+arguments:
+  convert: The convert argument is a function with a single argument named object.
+  copy: The copy argument is a function with a single function named object.
+  marshal: A function with a single argument named object.
+  read: A function with a single argument named path.
+  repository: Deprecated.
+  substitute: Named list of values to be inserted into the body of each custom function in place of symbols in the body.
+  unmarshal: A function with a single argument named object.
+  write: 'A function with two arguments: object and path, in that order.'
+returns: A character string of length 1 encoding the custom format.
+---
+kind: function
+name: tar_progress_summary
+exported: true
+signature: tar_progress_summary(fields = c("skipped","dispatched","completed","errored","canceled","since"),store = targets::tar_config_get("store")) {tar_assert_allow_meta("tar_progress_summary", store)tar_assert_scalar(store)tar_assert_chr(store)tar_assert_nzchar(store)time <- file.mtime(path_progress(path_store = store))progress <- progress_init(path_store = store)progress <- tibble::as_tibble(progress$database$read_condensed_data())
+arguments:
+  fields: Optional character vector of names of progress data columns to read.
+  store: Character of length 1, path to the targets data store.
+returns: A data frame with one row and the following optional columns that can be selected with fields.
+---
+kind: function
+name: tar_canceled
+exported: true
+signature: tar_canceled(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: A character vector of canceled targets.
+---
+kind: function
+name: tar_message_run
+exported: true
+signature: tar_message_run(...)
+---
+kind: function
+name: tar_throw_file
+exported: true
+signature: tar_throw_file(...)
+---
+kind: function
+name: tar_throw_run
+exported: true
+signature: tar_throw_run(..., class = character(0))
+---
+kind: function
+name: tar_throw_validate
+exported: true
+signature: tar_throw_validate(...)
+---
+kind: function
+name: tar_warn_deprecate
+exported: true
+signature: tar_warn_deprecate(...)
+---
+kind: function
+name: tar_warn_run
+exported: true
+signature: tar_warn_run(...)
+---
+kind: function
+name: tar_warn_validate
+exported: true
+signature: tar_warn_validate(...)
+---
+kind: function
+name: tar_message_validate
+exported: true
+signature: tar_message_validate(...)
+---
+kind: function
+name: tar_print
+exported: true
+signature: tar_print(...)
+---
+kind: function
+name: tar_error
+exported: true
+signature: tar_error(message, class)
+---
+kind: function
+name: tar_warning
+exported: true
+signature: tar_warning(message, class)
+---
+kind: function
+name: tar_message
+exported: true
+signature: tar_message(message, class)
+---
+kind: function
+name: tar_condition_traced
+exported: true
+signature: tar_condition_traced(condition, trace)
+arguments:
+  condition: An error condition object thrown by stop() or rlang::abort().
+  trace: A raw return value from .traceback().
+returns: Contain an error condition and formatted traceback.
+---
+kind: function
+name: tar_debug_instructions
+exported: true
+signature: tar_debug_instructions()
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_cancel
+exported: true
+signature: tar_cancel(condition = TRUE)
+arguments:
+  condition: Logical of length 1, whether to cancel the target.
+---
+kind: function
+name: use_targets_rmd
+exported: true
+signature: use_targets_rmd(path = "_targets.Rmd", open = interactive())
+arguments:
+  open: Logical, whether to open the file for editing in the RStudio IDE.
+  path: Character of length 1, output path of the Target Markdown report relative to the current active project.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_random_port
+exported: true
+signature: tar_random_port(lower = 49152L, upper = 65355L)
+arguments:
+  lower: Integer of length 1, lowest possible port.
+  upper: Integer of length 1, highest possible port.
+returns: A random port not likely to be used by another process.
+---
+kind: function
+name: tar_workspace
+exported: true
+signature: tar_workspace(name,envir = parent.frame(),packages = TRUE,source = TRUE,script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  envir: Environment in which to put the objects.
+  name: Symbol, name of the target whose workspace to read.
+  packages: Logical, whether to load the required packages of the target.
+  script: Character of length 1, path to the target script file.
+  source: Logical, whether to run _targets.
+  store: Character of length 1, path to the targets data store.
+returns: This function returns NULL, but it does load the target's required packages, as well as multiple objects into the environment (envir argument) in order to replicate the workspace where the error happened.
+---
+kind: function
+name: tar_target
+exported: true
+signature: tar_target(name,command,pattern = NULL,tidy_eval = targets::tar_option_get("tidy_eval"),packages = targets::tar_option_get("packages"),library = targets::tar_option_get("library"),format = targets::tar_option_get("format"),repository = targets::tar_option_get("repository"),iteration = targets::tar_option_get("iteration"),error = targets::tar_option_get("error"),memory = targets::tar_option_get("memory"),garbage_collection = isTRUE(targets::tar_option_get("garbage_collection")),deployment = targets::tar_option_get("deployment"),priority = targets::tar_option_get("priority"),resources = targets::tar_option_get("resources"),storage = targets::tar_option_get("storage"),retrieval = targets::tar_option_get("retrieval"),cue = targets::tar_option_get("cue"),description = targets::tar_option_get("description"))
+arguments:
+  command: R code to run the target.
+  cue: An optional object from tar_cue() to customize the rules that decide whether the target is up to date.
+  deployment: Character of length 1.
+  deps: Optional character vector of the adjacent upstream dependencies of the target, including targets and global objects.
+  description: Character of length 1, a custom free-form human-readable text description of the target.
+  error: Character of length 1, what to do if the target stops and throws an error.
+  format: Optional storage format for the target's return value.
+  garbage_collection: 'Logical: TRUE to run base::gc() just before the target runs, in whatever R process it is about to run (which could be a parallel worker).'
+  iteration: Character of length 1, name of the iteration mode of the target.
+  library: Character vector of library paths to try when loading packages.
+  memory: Character of length 1, memory strategy.
+  name: Symbol, name of the target.
+  packages: Character vector of packages to load right before the target runs or the output data is reloaded for downstream targets.
+  pattern: Code to define a dynamic branching branching for a target.
+  priority: Deprecated on 2025-04-08 (targets version 1.10.1.9013).
+  repository: Character of length 1, remote repository for target storage.
+  resources: Object returned by tar_resources() with optional settings for high-performance computing functionality, alternative data storage formats, and other optional capabilities of targets.
+  retrieval: Character string to control when the current target loads its dependencies into memory before running.
+  storage: Character string to control when the output of the target is saved to storage.
+  string: Optional string representation of the command.
+  tidy_eval: Logical, whether to enable tidy evaluation when interpreting command and pattern.
+returns: A target definition object.
+---
+kind: function
+name: tar_helper_raw
+exported: true
+signature: tar_helper_raw(path = NULL, code = NULL)
+---
+kind: function
+name: tar_bind
+exported: true
+signature: tar_bind(...)
+arguments:
+  '...': Pipeline objects or nested lists of pipeline objects.
+---
+kind: function
+name: tar_progress_branches
+exported: true
+signature: tar_progress_branches(names = NULL,fields = NULL,store = targets::tar_config_get("store"))
+arguments:
+  fields: Optional, names of progress data columns to read.
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: A data frame with one row per target per progress status and the following columns.
+---
+kind: function
+name: rstudio_addin_tar_visnetwork
+exported: true
+signature: rstudio_addin_tar_visnetwork()
+---
+kind: function
+name: tar_runtime_object
+exported: true
+signature: tar_runtime_object()
+returns: The internal tar_runtime object of class "tar_runtime".
+---
+kind: function
+name: tar_resources_url
+exported: true
+signature: tar_resources_url(handle = targets::tar_option_get("resources")$url$handle,max_tries = targets::tar_option_get("resources")$url$max_tries,seconds_interval = targets::tar_option_get("resources")$url$seconds_interval,seconds_timeout = targets::tar_option_get("resources")$url$seconds_interval)
+arguments:
+  handle: Object returned by curl::new_handle or NULL.
+  max_tries: Positive integer of length 1, maximum number of tries to access a URL.
+  seconds_interval: Nonnegative numeric of length 1, number of seconds to wait between individual retries while attempting to connect to the URL.
+  seconds_timeout: Nonnegative numeric of length 1, number of seconds to wait before timing out while trying to connect to the URL.
+returns: Object of class "tar_resources_url", to be supplied to the url argument of tar_resources().
+---
+kind: function
+name: tar_built
+exported: true
+signature: tar_built(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: A character vector of completed targets.
+---
+kind: function
+name: tar_group
+exported: true
+signature: tar_group(x)
+arguments:
+  x: Grouped data frame from dplyr::group_by()
+returns: A data frame with a special tar_group column that targets will use to find subsets of your data frame.
+---
+kind: function
+name: tar_errored
+exported: true
+signature: tar_errored(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: A character vector of errored targets.
+---
+kind: function
+name: tar_poll
+exported: true
+signature: tar_poll(interval = 1,timeout = Inf,fields = c("skipped","dispatched","completed","errored","canceled","since"),store = targets::tar_config_get("store")) {tar_assert_allow_meta("tar_poll", store)start <- time_seconds()if (!tar_exist_progress(store = store)) {cli::cli_alert(paste0("Waiting for progress data in ",file.path(store, "meta", "progress")))spinner <- cli::make_spinner()while (!tar_exist_progress(store = store) && tar_poll_go(start, timeout)) {Sys.sleep(interval)spinner$spin()}spinner$finish()
+arguments:
+  fields: Optional character vector of names of progress data columns to read.
+  interval: Number of seconds to wait between iterations of polling progress.
+  store: Character of length 1, path to the targets data store.
+  timeout: How many seconds to run before exiting.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_meta
+exported: true
+signature: tar_meta(names = NULL,fields = NULL,targets_only = FALSE,complete_only = FALSE,store = targets::tar_config_get("store"))
+arguments:
+  complete_only: Logical, whether to return only complete rows (no NA values).
+  fields: Optional, names of columns/fields to select.
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+  targets_only: Logical, whether to just show information about targets or also return metadata on functions and other global objects.
+returns: A data frame with one row per target/object and the selected fields.
+---
+kind: function
+name: tar_seed
+exported: true
+signature: tar_seed(default = 1L)
+arguments:
+  default: Integer, value to return if tar_seed_get() is called on its own outside a targets pipeline.
+returns: Integer of length 1.
+---
+kind: function
+name: rstudio_addin_tar_load
+exported: true
+signature: rstudio_addin_tar_load(context = NULL)
+arguments:
+  context: RStudio API context from rstudioapi::getActiveDocumentContext().
+---
+kind: function
+name: rstudio_addin_tar_progress
+exported: true
+signature: rstudio_addin_tar_progress()
+---
+kind: function
+name: tar_path_target
+exported: true
+signature: tar_path_target(name = NULL,default = NA_character_,create_dir = FALSE,store = targets::tar_config_get("store"))
+arguments:
+  create_dir: Logical of length 1, whether to create dirname(tar_path_target()) in tar_path_target() itself.
+  default: Character, value to return if tar_path_target() is called on its own outside a targets pipeline.
+  name: Symbol, name of a target.
+  store: Character of length 1, path to the data store if tar_path_target() is called outside a running pipeline.
+returns: Character string, the file path where the target currently running will be stored.
+---
+kind: function
+name: tar_meta_delete
+exported: true
+signature: tar_meta_delete(meta = TRUE,progress = TRUE,process = TRUE,crew = TRUE,verbose = TRUE,delete = "all",script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  crew: Logical of length 1, whether to process the crew file at _targets/meta/crew.
+  delete: Character of length 1, which location to delete the files.
+  meta: Logical of length 1, whether to process the main metadata file at _targets/meta/meta.
+  process: Logical of length 1, whether to process the process file at _targets/meta/process.
+  progress: Logical of length 1, whether to process the progress file at _targets/meta/progress.
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+  verbose: Logical of length 1, whether to print informative console messages.
+---
+kind: function
+name: tar_resources_qs
+exported: true
+signature: tar_resources_qs(compress_level = targets::tar_option_get("resources")$qs$compress_level,shuffle = targets::tar_option_get("resources")$qs$shuffle,nthreads = targets::tar_option_get("resources")$qs$nthreads,preset = NULL)
+arguments:
+  compress_level: Positive integer, compress_level argument of \link[qs2:qs_save]{qs2::qs_save()} to control the compression level.
+  nthreads: Positive integer, number of threads to use for functions in the qs2 package to save and read the data.
+  preset: Deprecated in targets version 1.8.0.9014 (2024-11-11) and not used.
+  shuffle: TRUE to use byte shuffling in \link[qs2:qs_save]{qs2::qs_save()} to improve compression at the cost of some computation time, FALSE to forgo byte shuffling.
+returns: Object of class "tar_resources_qs", to be supplied to the qs argument of tar_resources().
+---
+kind: function
+name: tar_active
+exported: true
+signature: tar_active()
+returns: Logical of length 1, TRUE if called in a target or _targets.
+---
+kind: function
+name: tar_toggle
+exported: true
+signature: tar_toggle(interactive, noninteractive)
+arguments:
+  interactive: R code to run if Target Markdown interactive mode is activated.
+  noninteractive: R code to run if Target Markdown interactive mode is not activated.
+returns: If Target Markdown interactive mode is not turned on, the function returns the result of running the code.
+---
+kind: function
+name: tar_reprex
+exported: true
+signature: tar_reprex(pipeline = tar_target(example_target, 1),run = tar_make(),...)
+arguments:
+  '...': Named arguments passed to reprex::reprex().
+  pipeline: R code for the target script file _targets.
+  run: R code to inspect and run the pipeline.
+returns: A character vector of rendered the reprex, invisibly.
+---
+kind: function
+name: tar_pipeline
+exported: true
+signature: tar_pipeline(...)
+arguments:
+  '...': Targets or lists of targets defined with \link[=tar_target]{tar_target()}.
+returns: A pipeline object.
+---
+kind: function
+name: tar_assert_chr
+exported: true
+signature: tar_assert_chr(x, msg = NULL)
+---
+kind: function
+name: tar_assert_dbl
+exported: true
+signature: tar_assert_dbl(x, msg = NULL)
+---
+kind: function
+name: tar_assert_df
+exported: true
+signature: tar_assert_df(x, msg = NULL)
+---
+kind: function
+name: tar_assert_equal_lengths
+exported: true
+signature: tar_assert_equal_lengths(x, msg = NULL)
+---
+kind: function
+name: tar_assert_envir
+exported: true
+signature: tar_assert_envir(x, msg = NULL)
+---
+kind: function
+name: tar_assert_expr
+exported: true
+signature: tar_assert_expr(x, msg = NULL)
+---
+kind: function
+name: tar_assert_flag
+exported: true
+signature: tar_assert_flag(x, choices, msg = NULL)
+---
+kind: function
+name: tar_assert_file
+exported: true
+signature: tar_assert_file(x)
+---
+kind: function
+name: tar_assert_finite
+exported: true
+signature: tar_assert_finite(x, msg = NULL)
+---
+kind: function
+name: tar_assert_function
+exported: true
+signature: tar_assert_function(x, msg = NULL)
+---
+kind: function
+name: tar_assert_function_arguments
+exported: true
+signature: tar_assert_function_arguments(x, args, msg = NULL)
+---
+kind: function
+name: tar_assert_ge
+exported: true
+signature: tar_assert_ge(x, threshold, msg = NULL)
+---
+kind: function
+name: tar_assert_identical
+exported: true
+signature: tar_assert_identical(x, y, msg = NULL)
+---
+kind: function
+name: tar_assert_in
+exported: true
+signature: tar_assert_in(x, choices, msg = NULL)
+---
+kind: function
+name: tar_assert_not_dirs
+exported: true
+signature: tar_assert_not_dirs(x, msg = NULL)
+---
+kind: function
+name: tar_assert_not_dir
+exported: true
+signature: tar_assert_not_dir(x, msg = NULL)
+---
+kind: function
+name: tar_assert_not_in
+exported: true
+signature: tar_assert_not_in(x, choices, msg = NULL)
+---
+kind: function
+name: tar_assert_inherits
+exported: true
+signature: tar_assert_inherits(x, class, msg = NULL)
+---
+kind: function
+name: tar_assert_int
+exported: true
+signature: tar_assert_int(x, msg = NULL)
+---
+kind: function
+name: tar_assert_internet
+exported: true
+signature: tar_assert_internet(msg = NULL)
+---
+kind: function
+name: tar_assert_lang
+exported: true
+signature: tar_assert_lang(x, msg = NULL)
+---
+kind: function
+name: tar_assert_le
+exported: true
+signature: tar_assert_le(x, threshold, msg = NULL)
+---
+kind: function
+name: tar_assert_list
+exported: true
+signature: tar_assert_list(x, msg = NULL)
+---
+kind: function
+name: tar_assert_lgl
+exported: true
+signature: tar_assert_lgl(x, msg = NULL)
+---
+kind: function
+name: tar_assert_name
+exported: true
+signature: tar_assert_name(x)
+---
+kind: function
+name: tar_assert_named
+exported: true
+signature: tar_assert_named(x, msg = NULL)
+---
+kind: function
+name: tar_assert_names
+exported: true
+signature: tar_assert_names(x, msg = NULL)
+---
+kind: function
+name: tar_assert_nonempty
+exported: true
+signature: tar_assert_nonempty(x, msg = NULL)
+---
+kind: function
+name: tar_assert_null
+exported: true
+signature: tar_assert_null(x, msg = NULL)
+---
+kind: function
+name: tar_assert_not_expr
+exported: true
+signature: tar_assert_not_expr(x, msg = NULL)
+---
+kind: function
+name: tar_assert_nzchar
+exported: true
+signature: tar_assert_nzchar(x, msg = NULL)
+---
+kind: function
+name: tar_assert_package
+exported: true
+signature: tar_assert_package(package, msg = NULL)
+---
+kind: function
+name: tar_assert_path
+exported: true
+signature: tar_assert_path(path, msg = NULL)
+---
+kind: function
+name: tar_assert_match
+exported: true
+signature: tar_assert_match(x, pattern, msg = NULL)
+---
+kind: function
+name: tar_assert_nonmissing
+exported: true
+signature: tar_assert_nonmissing(x, msg = NULL)
+---
+kind: function
+name: tar_assert_positive
+exported: true
+signature: tar_assert_positive(x, msg = NULL)
+---
+kind: function
+name: tar_assert_scalar
+exported: true
+signature: tar_assert_scalar(x, msg = NULL)
+---
+kind: function
+name: tar_assert_store
+exported: true
+signature: tar_assert_store(store)
+---
+kind: function
+name: tar_assert_target
+exported: true
+signature: tar_assert_target(x, msg = NULL)
+---
+kind: function
+name: tar_assert_target_list
+exported: true
+signature: tar_assert_target_list(x)
+---
+kind: function
+name: tar_assert_true
+exported: true
+signature: tar_assert_true(x, msg = NULL)
+---
+kind: function
+name: tar_assert_unique
+exported: true
+signature: tar_assert_unique(x, msg = NULL)
+---
+kind: function
+name: tar_assert_unique_targets
+exported: true
+signature: tar_assert_unique_targets(x)
+---
+kind: function
+name: tar_exist_meta
+exported: true
+signature: tar_exist_meta(store = targets::tar_config_get("store"))
+arguments:
+  store: Character of length 1, path to the targets data store.
+returns: Logical of length 1, whether the current project's metadata exists.
+---
+kind: function
+name: tar_exist_script
+exported: true
+signature: tar_exist_script(script = targets::tar_config_get("script"))
+arguments:
+  script: Character of length 1, path to the target script file.
+returns: Logical of length 1, whether the current project's metadata exists.
+---
+kind: function
+name: tar_unscript
+exported: true
+signature: tar_unscript(script = targets::tar_config_get("script"))
+arguments:
+  script: Character of length 1, path to the target script file.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_read
+exported: true
+signature: tar_read(name,branches = NULL,meta = targets::tar_meta(store = store,fields = -tidyselect::any_of("time")),store = targets::tar_config_get("store")) {tar_assert_allow_meta("tar_read", store)tar_assert_store(store = store)force(meta)
+arguments:
+  branches: Integer of indices of the branches to load if the target is a pattern.
+  meta: Data frame of metadata from \link[=tar_meta]{tar_meta()}.
+  name: Name of the target to read.
+  store: Character of length 1, path to the targets data store.
+returns: The target's return value from its file in _targets/objects/, or the paths to the custom files and directories if format = "file" was set.
+---
+kind: function
+name: tar_noninteractive
+exported: true
+signature: tar_noninteractive(code)
+arguments:
+  code: R code to run if Target Markdown interactive mode is not turned on.
+returns: If Target Markdown interactive mode is not turned on, the function returns the result of running the code.
+---
+kind: function
+name: tar_resources_network
+exported: true
+signature: tar_resources_network(max_tries = targets::tar_option_get("resources")$network$max_tries,seconds_interval = targets::tar_option_get("resources")$network$seconds_interval,seconds_timeout = targets::tar_option_get("resources")$network$seconds_timeout,verbose = targets::tar_option_get("resources")$network$verbose) {out <- resources_network_init(seconds_interval = seconds_interval %|||% 0.25,seconds_timeout = seconds_timeout %|||% 60,max_tries = max_tries %|||% 60L,verbose = verbose %|||% TRUE)resources_validate(out)
+arguments:
+  max_tries: Positive integer of length 1.
+  seconds_interval: Positive numeric of length 1, seconds between retries.
+  seconds_timeout: Positive numeric of length 1.
+  verbose: Logical of length 1, whether to print informative console messages.
+returns: Object of class "tar_resources_network", to be supplied to the network argument of tar_resources().
+---
+kind: function
+name: tar_branches
+exported: true
+signature: tar_branches(name,pattern = NULL,script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  name: Symbol, name of the target.
+  pattern: 'Language to define branching for a target (just like in \link[=tar_target]{tar_target()}) or NULL to get the pattern from the targets pipeline script specified in the script argument (default: _targets.'
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+returns: A tibble with one row per branch and one column for each target (including the branched-over...
+---
+kind: function
+name: tar_resources_fst
+exported: true
+signature: tar_resources_fst(compress = targets::tar_option_get("resources")$fst$compress)
+arguments:
+  compress: Numeric of length 1, compress argument of fst::write_fst().
+returns: Object of class "tar_resources_fst", to be supplied to the fst argument of tar_resources().
+---
+kind: function
+name: tar_github_actions
+exported: true
+signature: tar_github_actions(path = file.path(".github", "workflows", "targets.yaml"),ask = NULL)
+arguments:
+  ask: Logical, whether to ask before writing if the workflow file already exists.
+  path: Character of length 1, file path to write the GitHub Actions workflow file.
+returns: Nothing (invisibly).
+---
+kind: function
+name: tar_visnetwork
+exported: true
+signature: tar_visnetwork(targets_only = FALSE,names = NULL,shortcut = FALSE,allow = NULL,exclude = ".Random.seed",outdated = TRUE,label = targets::tar_config_get("label"),label_width = targets::tar_config_get("label_width"),level_separation = targets::tar_config_get("level_separation"),degree_from = 1L,degree_to = 1L,zoom_speed = 1,physics = FALSE,reporter = targets::tar_config_get("reporter_outdated"),seconds_reporter = targets::tar_config_get("seconds_reporter_outdated"),callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  allow: Optional, the set of allowable vertices in the graph.
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  degree_from: Integer of length 1.
+  degree_to: Integer of length 1.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  exclude: Optional, the set of exclude vertices from the graph.
+  label: Character vector of one or more aesthetics to add to the vertex labels.
+  label_width: Positive numeric of length 1, maximum width (in number of characters) of the node labels.
+  level_separation: Numeric of length 1, levelSeparation argument of visNetwork::visHierarchicalLayout().
+  names: Names of targets.
+  outdated: Logical, whether to show colors to distinguish outdated targets from up-to-date targets.
+  physics: Logical of length 1, whether to implement interactive physics in the graph, e.g.
+  reporter: Character of length 1, name of the reporter to user.
+  script: Character of length 1, path to the target script file.
+  seconds_reporter: Deprecated on 2025-03-31 (targets version 1.10.1.9010).
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+  targets_only: Logical, whether to restrict the output to just targets (FALSE) or to also include global functions and objects.
+  zoom_speed: Positive numeric of length 1, scaling factor on the zoom speed.
+returns: A visNetwork HTML widget object.
+---
+kind: function
+name: tar_make
+exported: true
+signature: tar_make(names = NULL,shortcut = targets::tar_config_get("shortcut"),reporter = targets::tar_config_get("reporter_make"),seconds_meta_append = targets::tar_config_get("seconds_meta_append"),seconds_meta_upload = targets::tar_config_get("seconds_meta_upload"),seconds_reporter = targets::tar_config_get("seconds_reporter"),seconds_interval = targets::tar_config_get("seconds_interval"),callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function, reporter),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"),garbage_collection = NULL,use_crew = targets::tar_config_get("use_crew"),terminate_controller = TRUE,as_job = targets::tar_config_get("as_job"))
+arguments:
+  as_job: TRUE to run as an RStudio IDE / Posit Workbench job, if running on RStudio IDE / Posit Workbench.
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  garbage_collection: Deprecated.
+  names: Names of the targets to run or check.
+  reporter: Character of length 1, name of the reporter to user.
+  script: Character of length 1, path to the target script file.
+  seconds_interval: Deprecated on 2023-08-24 (targets version 1.2.2.9001).
+  seconds_meta_append: Positive numeric of length 1 with the minimum number of seconds between saves to the local metadata and progress files in the data store.
+  seconds_meta_upload: Positive numeric of length 1 with the minimum number of seconds between uploads of the metadata and progress data to the cloud (see https://books.ropensci.org/targets/cloud-storage.html).
+  seconds_reporter: Deprecated on 2025-03-31 (targets version 1.10.1.9010).
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+  terminate_controller: Logical of length 1.
+  use_crew: Logical of length 1, whether to use crew if the controller option is set in tar_option_set() in the target script (_targets.
+returns: NULL except if callr_function = callr::r_bg(), in which case a handle to the callr background process is returned.
+---
+kind: function
+name: tar_resources_clustermq
+exported: true
+signature: tar_resources_clustermq(template = targets::tar_option_get("resources")$clustermq$template)
+arguments:
+  template: Named list, template argument to clustermq::workers().
+returns: Object of class "tar_resources_clustermq", to be supplied to the clustermq argument of tar_resources().
+---
+kind: function
+name: tar_branch_names
+exported: true
+signature: tar_branch_names(name,index,store = targets::tar_config_get("store"))
+arguments:
+  index: Integer vector of branch indexes.
+  name: Name of the dynamic branching target.
+  store: Character string, directory path to the targets data store of the pipeline.
+returns: A character vector of branch names.
+---
+kind: function
+name: tar_envir
+exported: true
+signature: tar_envir(default = parent.frame())
+arguments:
+  default: Environment, value to return if tar_envir() is called on its own outside a targets pipeline.
+returns: If called from a running target, tar_envir() returns the environment where the target runs its command.
+---
+kind: function
+name: tar_edit
+exported: true
+signature: tar_edit(script = targets::tar_config_get("script"))
+arguments:
+  script: Character of length 1, path to the target script file.
+---
+kind: function
+name: tar_dispatched
+exported: true
+signature: tar_dispatched(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: A character vector of dispatched targets.
+---
+kind: function
+name: tar_invalidate
+exported: true
+signature: tar_invalidate(names, store = targets::tar_config_get("store"))
+arguments:
+  names: Names of the targets to remove from the metadata list.
+  store: Character of length 1, path to the targets data store.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_manifest
+exported: true
+signature: tar_manifest(names = NULL,fields = tidyselect::any_of(c("name", "command", "pattern", "description")),drop_missing = TRUE,callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"))
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  drop_missing: Logical of length 1, whether to automatically omit empty columns and columns with all missing values.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  fields: Names of the fields, or columns, to show.
+  names: Names of the targets to show.
+  script: Character of length 1, path to the target script file.
+returns: A data frame of information about the targets in the pipeline.
+---
+kind: function
+name: tar_read_raw
+exported: true
+signature: tar_read_raw(name,branches = NULL,meta = targets::tar_meta(store = store,fields = -tidyselect::any_of("time")),store = targets::tar_config_get("store")) {tar_assert_allow_meta("tar_read_raw", store)tar_assert_store(store = store)force(meta)
+---
+kind: function
+name: tar_make_interactive
+exported: true
+signature: tar_make_interactive(code)
+arguments:
+  code: Character vector of lines of a _targets.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_mermaid
+exported: true
+signature: tar_mermaid(targets_only = FALSE,names = NULL,shortcut = FALSE,allow = NULL,exclude = ".Random.seed",outdated = TRUE,label = targets::tar_config_get("label"),label_width = targets::tar_config_get("label_width"),legend = TRUE,color = TRUE,reporter = targets::tar_config_get("reporter_outdated"),seconds_reporter = targets::tar_config_get("seconds_reporter_outdated"),callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  allow: Optional, the set of allowable vertices in the graph.
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  color: Logical of length 1, whether to color the graph vertices by status.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  exclude: Optional, the set of exclude vertices from the graph.
+  label: Character vector of one or more aesthetics to add to the vertex labels.
+  label_width: Positive numeric of length 1, maximum width (in number of characters) of the node labels.
+  legend: Logical of length 1, whether to display the legend.
+  names: Names of targets.
+  outdated: Logical, whether to show colors to distinguish outdated targets from up-to-date targets.
+  reporter: Character of length 1, name of the reporter to user.
+  script: Character of length 1, path to the target script file.
+  seconds_reporter: Deprecated on 2025-03-31 (targets version 1.10.1.9010).
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+  targets_only: Logical, whether to restrict the output to just targets (FALSE) or to also include global functions and objects.
+returns: A character vector of lines of code of the mermaid.js graph.
+---
+kind: function
+name: tar_option_with
+exported: true
+signature: tar_option_with(expression, ..., envir_with = parent.frame())
+arguments:
+  '...': Named arguments to \link[=tar_option_set]{tar_option_set()} to temporarily set for the duration of expression.
+  envir_with: Environment to evaluate expression.
+  expression: An R expression to run with the local option.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_make_clustermq
+exported: true
+signature: tar_make_clustermq(names = NULL,shortcut = targets::tar_config_get("shortcut"),reporter = targets::tar_config_get("reporter_make"),seconds_meta_append = targets::tar_config_get("seconds_meta_append"),seconds_meta_upload = targets::tar_config_get("seconds_meta_upload"),seconds_reporter = targets::tar_config_get("seconds_reporter"),seconds_interval = targets::tar_config_get("seconds_interval"),workers = targets::tar_config_get("workers"),log_worker = FALSE,callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function, reporter),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"),garbage_collection = NULL)
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  garbage_collection: Deprecated.
+  log_worker: Logical, whether to write a log file for each worker.
+  names: Names of the targets to run or check.
+  reporter: Character of length 1, name of the reporter to user.
+  script: Character of length 1, path to the target script file.
+  seconds_interval: Deprecated on 2023-08-24 (targets version 1.2.2.9001).
+  seconds_meta_append: Positive numeric of length 1 with the minimum number of seconds between saves to the local metadata and progress files in the data store.
+  seconds_meta_upload: Positive numeric of length 1 with the minimum number of seconds between uploads of the metadata and progress data to the cloud (see https://books.ropensci.org/targets/cloud-storage.html).
+  seconds_reporter: Deprecated on 2025-03-31 (targets version 1.10.1.9010).
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+  workers: Positive integer, number of persistent clustermq workers to create.
+returns: NULL except if callr_function = callr::r_bg(), in which case a handle to the callr background process is returned.
+---
+kind: function
+name: tar_path
+exported: true
+signature: tar_path(name = NULL,default = NA_character_,create_dir = FALSE,store = targets::tar_config_get("store"))
+arguments:
+  create_dir: Logical of length 1, whether to create dirname(tar_path()) in tar_path() itself.
+  default: Character, value to return if tar_path() is called on its own outside a targets pipeline.
+  name: Symbol, name of a target.
+  store: Character of length 1, path to the data store if tar_path() is called outside a running pipeline.
+returns: Character, file path of the return value of the target.
+---
+kind: function
+name: tar_option_export
+exported: true
+signature: tar_option_export()
+returns: A list of options from tar_option_set().
+---
+kind: function
+name: tar_config_set
+exported: true
+signature: tar_config_set(inherits = NULL,as_job = NULL,garbage_collection = NULL,label = NULL,label_width = NULL,level_separation = NULL,reporter_make = NULL,reporter_outdated = NULL,script = NULL,seconds_meta_append = NULL,seconds_meta_upload = NULL,seconds_reporter = NULL,seconds_reporter_outdated = NULL,seconds_interval = NULL,store = NULL,shortcut = NULL,use_crew = NULL,workers = NULL,config = Sys.getenv("TAR_CONFIG", "_targets.yaml"),project = Sys.getenv("TAR_PROJECT", "main"))
+arguments:
+  as_job: Logical of length 1, as_job argument of \link[=tar_make]{tar_make()}.
+  config: Character of length 1, file path of the YAML configuration file with targets project settings.
+  garbage_collection: Deprecated.
+  inherits: Character of length 1, name of the project from which the current project should inherit configuration settings.
+  label: Argument of \link[=tar_glimpse]{tar_glimpse()} and \link[=tar_visnetwork]{tar_visnetwork()} to control node labels.
+  label_width: Argument of \link[=tar_glimpse]{tar_glimpse()} and \link[=tar_visnetwork]{tar_visnetwork()} to control the maximum width (number of characters wide) of the node labels.
+  level_separation: Argument of \link[=tar_visnetwork]{tar_visnetwork()} and \link[=tar_glimpse]{tar_glimpse()} to control the space between hierarchical levels.
+  project: Character of length 1, name of the current targets project.
+  reporter_make: Character of length 1, reporter argument to \link[=tar_make]{tar_make()} and related functions that run the pipeline.
+  reporter_outdated: Character of length 1, reporter argument to \link[=tar_outdated]{tar_outdated()} and related functions that do not run the pipeline.
+  script: Character of length 1, path to the target script file that defines the pipeline (_targets.
+  seconds_interval: Deprecated on 2023-08-24 (targets version 1.2.2.9001).
+  seconds_meta_append: Argument of \link[=tar_make]{tar_make()}, \link[=tar_make_clustermq]{tar_make_clustermq()}, and \link[=tar_make_future]{tar_make_future()}.
+  seconds_meta_upload: Argument of \link[=tar_make]{tar_make()}, \link[=tar_make_clustermq]{tar_make_clustermq()}, and \link[=tar_make_future]{tar_make_future()}.
+  seconds_reporter: Deprecated in targets 1.10.1.9010 (2025-03-31).
+  seconds_reporter_outdated: Deprecated in targets 1.10.1.9010 (2025-03-31).
+  shortcut: logical of length 1, default shortcut argument to \link[=tar_make]{tar_make()} and related functions.
+  store: Character of length 1, path to the data store of the pipeline.
+  use_crew: Logical of length 1, whether to use crew in \link[=tar_make]{tar_make()} if the controller option is set in tar_option_set() in the target script (_targets.
+  workers: Positive numeric of length 1, workers argument of \link[=tar_make_clustermq]{tar_make_clustermq()} and related functions that run the pipeline with parallel computing among targets.
+returns: NULL (invisibly)
+---
+kind: function
+name: tar_progress
+exported: true
+signature: tar_progress(names = NULL,fields = "progress",store = targets::tar_config_get("store"))
+arguments:
+  fields: Optional, names of progress data columns to read.
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: 'A data frame with one row per target and the following columns: name: name of the target.'
+---
+kind: function
+name: tar_seed_set
+exported: true
+signature: tar_seed_set(seed)
+arguments:
+  seed: Integer of length 1, value of the seed to set with set.seed().
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_delete
+exported: true
+signature: tar_delete(names,cloud = TRUE,batch_size = 1000L,verbose = TRUE,store = targets::tar_config_get("store"))
+arguments:
+  batch_size: Positive integer between 1 and 1000, number of target definition objects to delete from the cloud with each HTTP API request.
+  cloud: Logical of length 1, whether to delete objects from the cloud if applicable (e.g.
+  names: Optional, names of the targets to delete.
+  store: Character of length 1, path to the targets data store.
+  verbose: Logical of length 1, whether to print console messages to show progress when deleting each batch of targets from each cloud bucket.
+---
+kind: function
+name: tar_name
+exported: true
+signature: tar_name(default = "target")
+arguments:
+  default: Character, value to return if tar_name() is called on its own outside a targets pipeline.
+returns: Character of length 1.
+---
+kind: function
+name: tar_envvars
+exported: true
+signature: tar_envvars(unset = "")
+arguments:
+  unset: Character of length 1, value to return for any environment variable that is not set.
+returns: A data frame with one row per environment variable and columns with the name and current value of each.
+---
+kind: function
+name: tar_deduplicate
+exported: true
+signature: tar_deduplicate(meta = TRUE,progress = TRUE,store = targets::tar_config_get("store"))
+arguments:
+  meta: Logical, whether to deduplicate the meta database file at _targets/meta/meta.
+  progress: Logical, whether to deduplicate the progress database file at _targets/meta/progress.
+  store: Character of length 1, path to the targets data store.
+returns: Nothing.
+---
+kind: function
+name: tar_workspaces
+exported: true
+signature: tar_workspaces(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional tidyselect selector to return a tactical subset of workspace names.
+  store: Character of length 1, path to the targets data store.
+returns: Character vector of available workspaces to load with \link[=tar_workspace]{tar_workspace()}.
+---
+kind: function
+name: tar_described_as
+exported: true
+signature: tar_described_as(described_as = NULL,tidyselect = TRUE,callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"))
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  described_as: A tidyselect expression to select targets based on their descriptions.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  script: Character of length 1, path to the target script file.
+  tidyselect: If TRUE, return a call to tidyselect::all_of() identifying the selected targets, which can then be supplied to any tidyselect-compatible namesargument of downstream functions like [tar_make()] and [tar_manifest()].
+returns: If tidyselect is TRUE, then \link[=tar_described_as]{tar_described_as()} returns a call to tidyselect::all_of() which can be supplied to the names argument of functions like \link[=tar_manifest]{tar_manifest()} and \link[=tar_make]{tar_make()}.
+---
+kind: function
+name: tar_seed_get
+exported: true
+signature: tar_seed_get(default = 1L)
+arguments:
+  default: Integer, value to return if tar_seed_get() is called on its own outside a targets pipeline.
+returns: Integer of length 1.
+---
+kind: function
+name: tar_source
+exported: true
+signature: tar_source(files = "R",envir = targets::tar_option_get("envir"),change_directory = FALSE)
+arguments:
+  change_directory: Logical, whether to temporarily change the working directory to the directory of each R script before running it.
+  envir: Environment to run the scripts.
+  files: Character vector of file and directory paths to look for R scripts to run.
+returns: NULL (invisibly)
+---
+kind: function
+name: tar_config_get
+exported: true
+signature: tar_config_get(name,config = Sys.getenv("TAR_CONFIG", "_targets.yaml"),project = Sys.getenv("TAR_PROJECT", "main"))
+arguments:
+  config: Character of length 1, file path of the YAML configuration file with targets project settings.
+  name: Character of length 1, name of the specific configuration setting to retrieve.
+  project: Character of length 1, name of the current targets project.
+returns: 'The value of the configuration setting from the YAML configuration file (default: _targets.yaml) or the default value if the setting is not available.'
+---
+kind: function
+name: tar_load_globals
+exported: true
+signature: tar_load_globals(envir = parent.frame(),script = targets::tar_config_get("script"))
+arguments:
+  envir: 'Environment to source the target script (default: _targets.'
+  script: Character of length 1, path to the target script file that defines the pipeline (_targets.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_path_store
+exported: true
+signature: tar_path_store()
+returns: Character, file path to the data store of the pipeline currently running.
+---
+kind: function
+name: tar_repository_cas_local
+exported: true
+signature: tar_repository_cas_local(path = NULL,consistent = FALSE)
+purpose: Local content-addressable storage (CAS) repository (an experimental feature).
+arguments:
+  consistent: Logical.
+  path: Character string, file path to the CAS repository where all the data object files will be stored.
+returns: A character string from \link[=tar_repository_cas]{tar_repository_cas()} which may be passed to the repository argument of \link[=tar_target]{tar_target()} or \link[=tar_option_set]{tar_option_set()} to use a local CAS system.
+---
+kind: function
+name: tar_cas_u
+exported: true
+signature: tar_cas_u(cas, key, path)
+arguments:
+  cas: File path to the CAS repository.
+  key: Key of the object in the CAS system.
+  path: Staging path of the file.
+returns: Called for its side effects.
+---
+kind: function
+name: tar_cas_d
+exported: true
+signature: tar_cas_d(cas, key, path)
+arguments:
+  cas: File path to the CAS repository.
+  key: Key of the object in the CAS system.
+  path: Staging path of the file.
+returns: Called for its side effects.
+---
+kind: function
+name: tar_cas_e
+exported: true
+signature: tar_cas_e(cas, key)
+arguments:
+  cas: File path to the CAS repository.
+  key: Key of the object in the CAS system.
+returns: Character vector of keys (metadata hashes) found in the CAS system.
+---
+kind: function
+name: tar_cas_l
+exported: true
+signature: tar_cas_l(cas, keys)
+arguments:
+  cas: File path to the CAS repository.
+  keys: Character vector of keys in the metadata hashes (tar_meta()$data).
+returns: Character vector of keys (metadata hashes) found in the CAS system.
+---
+kind: function
+name: tar_repository_cas
+exported: true
+signature: tar_repository_cas(upload,download,exists = NULL,list = NULL,consistent = FALSE,substitute = base::list())
+purpose: Define a custom content-addressable storage (CAS) repository (an experimental feature).
+arguments:
+  consistent: Logical.
+  download: A function with arguments key and path, in that order.
+  exists: A function with a single argument key, where key is a single character string (length(key) is 1) to identify a single object in the CAS system.
+  list: Either NULL or an optional function with a single argument named keys.
+  substitute: Named list of values to be inserted into the body of each custom function in place of symbols in the body.
+  upload: A function with arguments key and path, in that order.
+---
+kind: function
+name: tar_dir
+exported: true
+signature: tar_dir(code)
+arguments:
+  code: User-defined code.
+returns: Return value of the user-defined code.
+---
+kind: function
+name: tar_skipped
+exported: true
+signature: tar_skipped(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: A character vector of skipped targets.
+---
+kind: function
+name: tar_script
+exported: true
+signature: tar_script(code = NULL,library_targets = TRUE,ask = NULL,script = targets::tar_config_get("script"))
+arguments:
+  ask: Logical, whether to ask before writing if the target script file already exists.
+  code: R code to write to the target script file.
+  library_targets: logical, whether to write a library(targets) line at the top of the target script file automatically (recommended).
+  script: Character of length 1, where to write the target script file.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_prune
+exported: true
+signature: tar_prune(cloud = TRUE,batch_size = 1000L,verbose = TRUE,callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  batch_size: Positive integer between 1 and 1000, number of target definition objects to delete from the cloud with each HTTP API request.
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  cloud: Logical of length 1, whether to delete objects from the cloud if applicable (e.g.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+  verbose: Logical of length 1, whether to print console messages to show progress when deleting each batch of targets from each cloud bucket.
+returns: NULL except if callr_function is callr::r_bg, in which case a handle to the callr background process is returned.
+---
+kind: function
+name: tar_prune_list
+exported: true
+signature: tar_prune_list(callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+returns: If callr_function is callr::r_bg, the return value is a handle to the callr background process is returned.
+---
+kind: function
+name: tar_test
+exported: true
+signature: tar_test(label, code)
+arguments:
+  code: User-defined code for the test.
+  label: Character of length 1, label for the test.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_random_port
+exported: true
+signature: tar_random_port(lower = 49152L, upper = 65355L)
+arguments:
+  lower: Integer of length 1, lowest possible port.
+  upper: Integer of length 1, highest possible port.
+returns: A random port not likely to be used by another process.
+---
+kind: function
+name: tar_resources_repository_cas
+exported: true
+signature: tar_resources_repository_cas(envvars = targets::tar_option_get("resources")$repository_cas$envvars)
+arguments:
+  envvars: Named character vector of environment variables.
+returns: Object of class "tar_resources_repository_cas", to be supplied to the repository_cas argument of tar_resources().
+---
+kind: function
+name: tar_completed
+exported: true
+signature: tar_completed(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional, names of the targets.
+  store: Character of length 1, path to the targets data store.
+returns: A character vector of completed targets.
+---
+kind: function
+name: tar_process
+exported: true
+signature: tar_process(names = NULL,store = targets::tar_config_get("store"))
+arguments:
+  names: Optional, names of the data points to return.
+  store: Character of length 1, path to the targets data store.
+returns: A data frame with metadata on the most recent main R process to orchestrate the targets of the current project.
+---
+kind: function
+name: tar_meta_upload
+exported: true
+signature: tar_meta_upload(meta = TRUE,progress = TRUE,process = TRUE,crew = TRUE,verbose = TRUE,strict = FALSE,script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  crew: Logical of length 1, whether to process the crew file at _targets/meta/crew.
+  meta: Logical of length 1, whether to process the main metadata file at _targets/meta/meta.
+  process: Logical of length 1, whether to process the process file at _targets/meta/process.
+  progress: Logical of length 1, whether to process the progress file at _targets/meta/progress.
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+  strict: Logical of length 1.
+  verbose: Logical of length 1, whether to print informative console messages.
+---
+kind: function
+name: rstudio_addin_tar_make_bg
+exported: true
+signature: rstudio_addin_tar_make_bg()
+---
+kind: function
+name: tar_watch_ui
+exported: true
+signature: tar_watch_ui(id,label = "tar_watch_label",seconds = 10,seconds_min = 1,seconds_max = 60,seconds_step = 1,targets_only = FALSE,outdated = FALSE,label_tar_visnetwork = NULL,level_separation = 150,degree_from = 1L,degree_to = 1L,height = "650px",display = "summary",displays = c("summary", "branches", "progress", "graph", "about"),title = "",theme = bslib::bs_theme(),spinner = FALSE)
+arguments:
+  degree_from: Integer of length 1.
+  degree_to: Integer of length 1.
+  display: Character of length 1, which display to show first.
+  displays: Character vector of choices for the display.
+  height: Character of length 1, height of the visNetwork widget and branches table.
+  id: Character of length 1, ID corresponding to the UI function of the module.
+  label: Label for the module.
+  label_tar_visnetwork: Character vector, label argument to \link[=tar_visnetwork]{tar_visnetwork()}.
+  level_separation: Numeric of length 1, levelSeparation argument of visNetwork::visHierarchicalLayout().
+  outdated: Logical, whether to show colors to distinguish outdated targets from up-to-date targets.
+  seconds: Numeric of length 1, default number of seconds between refreshes of the graph.
+  seconds_max: Numeric of length 1, upper bound of seconds in the app controls.
+  seconds_min: Numeric of length 1, lower bound of seconds in the app controls.
+  seconds_step: Numeric of length 1, step size of seconds in the app controls.
+  spinner: TRUE to add a busy spinner, FALSE to omit.
+  targets_only: Logical, whether to restrict the output to just targets (FALSE) or to also include global functions and objects.
+  theme: A call to \link[bslib:bs_theme]{bslib::bs_theme()} with the bslib theme.
+  title: Character of length 1, title of the UI.
+returns: A Shiny module UI.
+---
+kind: function
+name: tar_deps
+exported: true
+signature: tar_deps(expr)
+arguments:
+  expr: An R expression or function.
+returns: Character vector of the dependencies of a function or expression.
+---
+kind: function
+name: tar_load_everything
+exported: true
+signature: tar_load_everything(branches = NULL,meta = targets::tar_meta(store = store,fields = -tidyselect::any_of("time")),strict = TRUE,silent = FALSE,envir = parent.frame(),store = targets::tar_config_get("store")) {tar_assert_allow_meta("tar_load_everything", store)force(envir)tar_load(tidyselect::everything(),branches = branches,meta = meta,strict = strict,silent = silent,envir = envir,store = store)
+arguments:
+  branches: Integer of indices of the branches to load for any targets that are patterns.
+  envir: R environment in which to load target return values.
+  meta: Data frame of target metadata from \link[=tar_meta]{tar_meta()}.
+  silent: Logical of length 1.
+  store: Character of length 1, directory path to the data store of the pipeline.
+  strict: Logical of length 1, whether to error out if one of the selected targets is in the metadata but cannot be loaded.
+returns: Nothing.
+---
+kind: function
+name: tar_load
+exported: true
+signature: tar_load(names,branches = NULL,meta = targets::tar_meta(store = store,fields = -tidyselect::any_of("time")),strict = TRUE,silent = FALSE,envir = parent.frame(),store = targets::tar_config_get("store")) {tar_assert_allow_meta("tar_load", store)tar_assert_store(store = store)force(meta)
+arguments:
+  branches: Integer of indices of the branches to load for any targets that are patterns.
+  envir: R environment in which to load target return values.
+  meta: Data frame of target metadata from \link[=tar_meta]{tar_meta()}.
+  names: Names of the targets to load.
+  silent: Logical of length 1.
+  store: Character of length 1, directory path to the data store of the pipeline.
+  strict: Logical of length 1, whether to error out if one of the selected targets is in the metadata but cannot be loaded.
+returns: Nothing.
+---
+kind: function
+name: tar_target_raw
+exported: true
+signature: tar_target_raw(name,command,pattern = NULL,packages = targets::tar_option_get("packages"),library = targets::tar_option_get("library"),deps = NULL,string = NULL,format = targets::tar_option_get("format"),repository = targets::tar_option_get("repository"),iteration = targets::tar_option_get("iteration"),error = targets::tar_option_get("error"),memory = targets::tar_option_get("memory"),garbage_collection = isTRUE(targets::tar_option_get("garbage_collection")),deployment = targets::tar_option_get("deployment"),priority = targets::tar_option_get("priority"),resources = targets::tar_option_get("resources"),storage = targets::tar_option_get("storage"),retrieval = targets::tar_option_get("retrieval"),cue = targets::tar_option_get("cue"),description = targets::tar_option_get("description"))
+---
+kind: function
+name: tar_workspace_download
+exported: true
+signature: tar_workspace_download(name,script = targets::tar_config_get("script"),store = targets::tar_config_get("store"),verbose = TRUE)
+arguments:
+  name: Symbol, name of the target whose workspace to download.
+  script: Character string, file path to the _targets.
+  store: Character of length 1, path to the targets data store.
+  verbose: TRUE to print an informative message describing the download, FALSE to stay silent.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_format_get
+exported: true
+signature: tar_format_get()
+returns: A character string, storage format of the target currently running in the pipeline.
+---
+kind: function
+name: tar_deparse_language
+exported: true
+signature: tar_deparse_language(expr)
+---
+kind: function
+name: tar_deparse_safe
+exported: true
+signature: tar_deparse_safe(expr, collapse = "\n", backtick = TRUE)
+---
+kind: function
+name: tar_tidy_eval
+exported: true
+signature: tar_tidy_eval(expr, envir, tidy_eval)
+---
+kind: function
+name: tar_tidyselect_eval
+exported: true
+signature: tar_tidyselect_eval(names_quosure, choices, strict = TRUE)
+---
+kind: function
+name: tar_network
+exported: true
+signature: tar_network(targets_only = FALSE,names = NULL,shortcut = FALSE,allow = NULL,exclude = NULL,outdated = TRUE,reporter = targets::tar_config_get("reporter_outdated"),seconds_reporter = targets::tar_config_get("seconds_reporter_outdated"),callr_function = callr::r,callr_arguments = targets::tar_callr_args_default(callr_function, reporter),envir = parent.frame(),script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  allow: Optional, the set of allowable vertices in the graph.
+  callr_arguments: A list of arguments to callr_function.
+  callr_function: A function from callr to start a fresh clean R process to do the work.
+  envir: 'An environment, where to run the target R script (default: _targets.'
+  exclude: Optional, the set of exclude vertices from the graph.
+  names: Names of targets.
+  outdated: Logical, whether to show colors to distinguish outdated targets from up-to-date targets.
+  reporter: Character of length 1, name of the reporter to user.
+  script: Character of length 1, path to the target script file.
+  seconds_reporter: Deprecated on 2025-03-31 (targets version 1.10.1.9010).
+  shortcut: Logical of length 1, how to interpret the names argument.
+  store: Character of length 1, path to the targets data store.
+  targets_only: TRUE to restrict the output to just the actual targets in the pipeline, FALSE to include imported global functions and objects as well.
+returns: 'A list with two data frames: vertices and edges.'
+---
+kind: function
+name: tar_option_get
+exported: true
+signature: tar_option_get(name = NULL, option = NULL)
+arguments:
+  name: Character of length 1, name of an option to get.
+  option: Deprecated, use the name argument instead.
+returns: Value of a target option.
+---
+kind: function
+name: tar_exist_objects
+exported: true
+signature: tar_exist_objects(names,cloud = TRUE,store = targets::tar_config_get("store"))
+arguments:
+  cloud: Logical of length 1, whether to include cloud targets in the output (e.g.
+  names: Character vector of target names.
+  store: Character of length 1, path to the targets data store.
+returns: Logical of length length(names), whether each given target has an existing file in either _targets/objects/ or the cloud.
+---
+kind: function
+name: tar_resources
+exported: true
+signature: tar_resources(aws = tar_option_get("resources")$aws,clustermq = tar_option_get("resources")$clustermq,crew = tar_option_get("resources")$crew,custom_format = tar_option_get("resources")$custom_format,feather = tar_option_get("resources")$feather,fst = tar_option_get("resources")$fst,future = tar_option_get("resources")$future,gcp = tar_option_get("resources")$gcp,network = tar_option_get("resources")$network,parquet = tar_option_get("resources")$parquet,qs = tar_option_get("resources")$qs,repository_cas = tar_option_get("resources")$repository_cas,url = tar_option_get("resources")$url)
+arguments:
+  aws: Output of function tar_resources_aws().
+  clustermq: Output of function tar_resources_clustermq().
+  crew: Output of function \link[=tar_resources_crew]{tar_resources_crew()} with target-specific settings for integration with the crew R package.
+  custom_format: Output of function \link[=tar_resources_custom_format]{tar_resources_custom_format()} with configuration details for \link[=tar_format]{tar_format()} storage formats.
+  feather: Output of function \link[=tar_resources_feather]{tar_resources_feather()}.
+  fst: Output of function tar_resources_fst().
+  future: Output of function tar_resources_future().
+  gcp: Output of function tar_resources_gcp().
+  network: Output of function tar_resources_network().
+  parquet: Output of function tar_resources_parquet().
+  qs: Output of function tar_resources_qs().
+  repository_cas: Output of function \link[=tar_resources_repository_cas]{tar_resources_repository_cas()} with configuration details for \link[=tar_repository_cas]{tar_repository_cas()} storage repositories.
+  url: Output of function tar_resources_url().
+returns: A list of objects of class "tar_resources" with non-default settings of various optional backends for data storage and high-performance computing.
+---
+kind: function
+name: tar_call
+exported: true
+signature: tar_call()
+returns: Character of length 1, name of the currently running targets interface function.
+---
+kind: function
+name: tar_pid
+exported: true
+signature: tar_pid(store = targets::tar_config_get("store"))
+arguments:
+  store: Character of length 1, path to the targets data store.
+returns: Integer with the process ID (PID) of the most recent main R process to orchestrate the targets of the current project.
+---
+kind: function
+name: tar_path_script
+exported: true
+signature: tar_path_script()
+returns: Character, file path to the target script of the pipeline currently running.
+---
+kind: function
+name: tar_meta_sync
+exported: true
+signature: tar_meta_sync(meta = TRUE,progress = TRUE,process = TRUE,crew = TRUE,verbose = TRUE,prefer_local = TRUE,script = targets::tar_config_get("script"),store = targets::tar_config_get("store"))
+arguments:
+  crew: Logical of length 1, whether to process the crew file at _targets/meta/crew.
+  meta: Logical of length 1, whether to process the main metadata file at _targets/meta/meta.
+  prefer_local: Logical of length 1 to control which copy of each metadata file takes precedence if the local hash and cloud hash are different but the time stamps are the same.
+  process: Logical of length 1, whether to process the process file at _targets/meta/process.
+  progress: Logical of length 1, whether to process the progress file at _targets/meta/progress.
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+  verbose: Logical of length 1, whether to print informative console messages.
+---
+kind: function
+name: tar_resources_feather
+exported: true
+signature: tar_resources_feather(compression = targets::tar_option_get("resources")$feather$compression,compression_level = targets::tar_option_get("resources")$feather$compression_level) {compression <- compression %|||% "default"out <- resources_feather_init(compression = compression,compression_level = compression_level)
+arguments:
+  compression: Character of length 1, compression argument of arrow::write_feather().
+  compression_level: Numeric of length 1, compression_level argument of arrow::write_feather().
+returns: Object of class "tar_resources_feather", to be supplied to the feather argument of tar_resources().
+---
+kind: function
+name: tar_load_raw
+exported: true
+signature: tar_load_raw(names,branches = NULL,meta = targets::tar_meta(store = store,fields = -tidyselect::any_of("time")),strict = TRUE,silent = FALSE,envir = parent.frame(),store = targets::tar_config_get("store")) {tar_assert_allow_meta("tar_load_raw", store)tar_assert_store(store = store)force(meta)
+---
+kind: function
+name: tar_option_set
+exported: true
+signature: tar_option_set(tidy_eval = NULL,packages = NULL,imports = NULL,library = NULL,envir = NULL,format = NULL,repository = NULL,repository_meta = NULL,iteration = NULL,error = NULL,memory = NULL,garbage_collection = NULL,deployment = NULL,priority = NULL,backoff = NULL,resources = NULL,storage = NULL,retrieval = NULL,cue = NULL,description = NULL,debug = NULL,workspaces = NULL,workspace_on_error = NULL,seed = NULL,controller = NULL,trust_timestamps = NULL,trust_object_timestamps = NULL)
+arguments:
+  backoff: An object from \link[=tar_backoff]{tar_backoff()} configuring the exponential backoff algorithm of the pipeline.
+  controller: A controller or controller group object produced by the crew R package.
+  cue: An optional object from tar_cue() to customize the rules that decide whether the target is up to date.
+  debug: Character vector of names of targets to run in debug mode.
+  deployment: Character of length 1.
+  description: Character of length 1, a custom free-form human-readable text description of the target.
+  envir: Environment containing functions and global objects common to all targets in the pipeline.
+  error: Character of length 1, what to do if the target stops and throws an error.
+  format: Optional storage format for the target's return value.
+  garbage_collection: A non-negative integer.
+  imports: Character vector of package names.
+  iteration: Character of length 1, name of the iteration mode of the target.
+  library: Character vector of library paths to try when loading packages.
+  memory: Character of length 1, memory strategy.
+  packages: Character vector of packages to load right before the target runs or the output data is reloaded for downstream targets.
+  priority: Deprecated on 2025-04-08 (targets version 1.10.1.9013).
+  repository: Character of length 1, remote repository for target storage.
+  repository_meta: Character of length 1 with the same values as repository but excluding content-addressable storage ("aws", "gcp", "local").
+  resources: Object returned by tar_resources() with optional settings for high-performance computing functionality, alternative data storage formats, and other optional capabilities of targets.
+  retrieval: Character string to control when the current target loads its dependencies into memory before running.
+  seed: Integer of length 1, seed for generating target-specific pseudo-random number generator seeds.
+  storage: Character string to control when the output of the target is saved to storage.
+  tidy_eval: Logical, whether to enable tidy evaluation when interpreting command and pattern.
+  trust_object_timestamps: Deprecated.
+  trust_timestamps: Logical of length 1, whether to use file system modification timestamps to check whether the target output data files in are up to date.
+  workspace_on_error: Logical of length 1, whether to save a workspace file for each target that throws an error.
+  workspaces: Character vector of target names.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_newer
+exported: true
+signature: tar_newer(time,names = NULL,inclusive = FALSE,store = targets::tar_config_get("store"))
+arguments:
+  inclusive: Logical of length 1, whether to include targets completed at exactly the time given.
+  names: Names of eligible targets.
+  store: Character of length 1, path to the targets data store.
+  time: A POSIXct object of length 1, time threshold.
+returns: A character vector of names of old targets with recorded timestamp metadata.
+---
+kind: function
+name: tar_helper
+exported: true
+signature: tar_helper(path = NULL,code = NULL,tidy_eval = TRUE,envir = parent.frame())
+arguments:
+  code: Code to write to path.
+  envir: Environment for tidy evaluation.
+  path: Character of length 1, path to write (or overwrite) code.
+  tidy_eval: Logical, whether to use tidy evaluation on code.
+returns: NULL (invisibly)
+---
+kind: function
+name: tar_destroy
+exported: true
+signature: tar_destroy(destroy = c("all","cloud","local","meta","process","progress","objects","scratch","workspaces","user"),batch_size = 1000L,verbose = TRUE,ask = NULL,script = targets::tar_config_get("script"),store = targets::tar_config_get("store")) {tar_assert_allow_meta("tar_destroy", store)tar_assert_dbl(batch_size)tar_assert_scalar(batch_size)tar_assert_none_na(batch_size)tar_assert_ge(batch_size, 1L)tar_assert_le(batch_size, 1000L)tar_assert_lgl(verbose)tar_assert_scalar(verbose)tar_assert_none_na(verbose)if (!file.exists(store)) {return(invisible())
+arguments:
+  ask: Logical of length 1, whether to pause with a menu prompt before deleting files.
+  batch_size: Positive integer between 1 and 1000, number of target definition objects to delete from the cloud with each HTTP API request.
+  destroy: Character of length 1, what to destroy.
+  script: Character of length 1, path to the target script file.
+  store: Character of length 1, path to the targets data store.
+  verbose: Logical of length 1, whether to print console messages to show progress when deleting each batch of targets from each cloud bucket.
+returns: NULL (invisibly).
+---
+kind: function
+name: tar_resources_parquet
+exported: true
+signature: tar_resources_parquet(compression = targets::tar_option_get("resources")$parquet$compression,compression_level = targets::tar_option_get("resources")$parquet$compression_level) {compression <- compression %|||% "snappy"out <- resources_parquet_init(compression = compression,compression_level = compression_level)
+arguments:
+  compression: Character of length 1, compression argument of arrow::write_parquet().
+  compression_level: Numeric of length 1, compression_level argument of arrow::write_parquet().
+returns: Object of class "tar_resources_parquet", to be supplied to the parquet argument of tar_resources().
+---
+kind: function
+name: tar_backoff
+exported: true
+signature: tar_backoff(min = 0.001, max = 0.1, rate = 1.5)
+arguments:
+  max: Positive numeric of length 1, maximum polling interval in seconds.
+  min: Positive numeric of length 1, minimum polling interval in seconds.
+  rate: Positive numeric of length 1, greater than or equal to 1.
+---
+kind: function
+name: rstudio_addin_tar_outdated
+exported: true
+signature: rstudio_addin_tar_outdated()
+---
+kind: function
+name: tar_counter
+exported: true
+signature: tar_counter(names = NULL)
+arguments:
+  names: Character vector of names to set in the counter.
+---
+kind: function
+name: tar_resources_gcp
+exported: true
+signature: tar_resources_gcp(bucket = targets::tar_option_get("resources")$gcp$bucket,prefix = targets::tar_option_get("resources")$gcp$prefix,predefined_acl = targets::tar_option_get("resources")$gcp$predefined_acl,max_tries = targets::tar_option_get("resources")$gcp$max_tries,verbose = targets::tar_option_get("resources")$gcp$verbose)
+purpose: 'Target resources: Google Cloud Platform (GCP) Google Cloud Storage (GCS)'
+arguments:
+  bucket: Character of length 1, name of an existing bucket to upload and download the return values of the affected targets during the pipeline.
+  max_tries: Positive integer of length 1, number of tries accessing a network resource on GCP.
+  predefined_acl: Character of length 1, user access to the object.
+  prefix: Character of length 1, "directory path" in the bucket where your target definition object and metadata will go.
+  verbose: Logical of length 1, whether to print extra messages like progress bars during uploads and downloads.
+returns: Object of class "tar_resources_gcp", to be supplied to the gcp argument of tar_resources().
+---
+kind: function
+name: rstudio_addin_tar_read
+exported: true
+signature: rstudio_addin_tar_read(context = NULL)
+arguments:
+  context: RStudio API context from rstudioapi::getActiveDocumentContext().

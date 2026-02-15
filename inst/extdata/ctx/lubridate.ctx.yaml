@@ -1,0 +1,903 @@
+Fetching R package: lubridate
+  → Downloading from CRAN...
+  → Version: 1.9.5
+  → Parsing source...
+---
+kind: context_header
+llm_instructions: This is an LLM-optimized API specification for the R package 'lubridate'. Use this context to write correct code using lubridate functions. Each 'function' record describes a public function with its signature, arguments, and purpose. The 'package' record contains metadata. All listed functions are part of the public API.
+---
+kind: package
+schema_version: '1.1'
+name: lubridate
+version: 1.9.5
+language: R
+description: Make Dealing with Dates a Little Easier
+---
+kind: function
+name: duration
+exported: true
+signature: duration(num = NULL, units = "seconds", ...)
+arguments:
+  '...': a list of time units to be included in the duration and their amounts.
+  num: the number or a character vector of time units.
+  units: a character string that specifies the type of units that num refers to.
+  x: numeric value of the number of units to be contained in the duration.
+returns: a duration object
+---
+kind: function
+name: dseconds
+exported: true
+signature: dseconds(x = 1) new("Duration", x)
+---
+kind: function
+name: dminutes
+exported: true
+signature: dminutes(x = 1) new("Duration", x * 60)
+---
+kind: function
+name: dhours
+exported: true
+signature: dhours(x = 1) new("Duration", x * 3600)
+---
+kind: function
+name: ddays
+exported: true
+signature: ddays(x = 1) new("Duration", x * 86400)
+---
+kind: function
+name: dweeks
+exported: true
+signature: dweeks(x = 1) new("Duration", x * average_durations[["week"]])
+---
+kind: function
+name: dmonths
+exported: true
+signature: dmonths(x = 1) new("Duration", x * average_durations[["month"]])
+---
+kind: function
+name: dyears
+exported: true
+signature: dyears(x = 1) new("Duration", x * average_durations[["year"]])
+---
+kind: function
+name: dmilliseconds
+exported: true
+signature: dmilliseconds(x = 1) new("Duration", x / 1000)
+---
+kind: function
+name: dmicroseconds
+exported: true
+signature: dmicroseconds(x = 1) new("Duration", x / 1000 / 1000)
+---
+kind: function
+name: dnanoseconds
+exported: true
+signature: dnanoseconds(x = 1) new("Duration", x / 1000 / 1000 / 1000)
+---
+kind: function
+name: dpicoseconds
+exported: true
+signature: dpicoseconds(x = 1) new("Duration", x / 1000 / 1000 / 1000 / 1000)
+---
+kind: function
+name: is.duration
+exported: true
+signature: is.duration(x) is(x, "Duration")
+---
+kind: function
+name: with_tz
+exported: true
+signature: with_tz(time, tzone = "", ...)
+arguments:
+  '...': Parameters passed to other methods.
+  time: a POSIXct, POSIXlt, Date, chron date-time object or a data.frame object.
+  tzone: a character string containing the time zone to convert to.
+returns: a POSIXct object in the updated time zone
+---
+kind: function
+name: force_tz
+exported: true
+signature: force_tz(time, tzone = "", ...)
+arguments:
+  '...': Parameters passed to other methods.
+  roll: deprecated, same as roll_dst parameter.
+  roll_dst: is a string vector of length one or two.
+  time: a POSIXct, POSIXlt, Date, chron date-time object, or a data.frame object.
+  tzone: a character string containing the time zone to convert to.
+  tzone_out: timezone of the returned date-time vector (for force_tzs).
+  tzones: character vector of timezones to be "enforced" on time time stamps.
+returns: a POSIXct object in the updated time zone
+---
+kind: function
+name: force_tzs
+exported: true
+signature: force_tzs(time, tzones, tzone_out = "UTC", roll_dst = c("NA", "post"), roll = NULL)
+---
+kind: function
+name: local_time
+exported: true
+signature: local_time(dt, tz = NULL, units = "secs")
+arguments:
+  dt: a date-time object.
+  tz: a character vector of timezones for which to compute the local time.
+  units: passed directly to \link[=as.difftime]{as.difftime()}.
+---
+kind: function
+name: year
+exported: true
+signature: year(x)
+arguments:
+  value: a numeric object
+  x: a date-time object
+returns: the years element of x as a decimal number
+---
+kind: function
+name: isoyear
+exported: true
+signature: isoyear(x)
+---
+kind: function
+name: epiyear
+exported: true
+signature: epiyear(x)
+---
+kind: function
+name: pretty_dates
+exported: true
+signature: pretty_dates(x, n, ...)
+arguments:
+  '...': additional arguments to pass to function
+  n: integer value of the desired number of breaks
+  x: a vector of POSIXct, POSIXlt, Date, or chron date-time objects
+returns: a vector of date-times that can be used as axis tick marks or bin breaks
+---
+kind: function
+name: make_difftime
+exported: true
+signature: make_difftime(num = NULL, units = "auto", ...)
+arguments:
+  '...': a list of time units to be included in the difftime and their amounts.
+  num: Optional number of seconds
+  units: a character vector that lists the type of units to use for the display of the return value (see examples).
+returns: a difftime object
+---
+kind: function
+name: is.difftime
+exported: true
+signature: is.difftime(x) is(x, "difftime")
+arguments:
+  x: an R object
+returns: TRUE if x is a difftime object, FALSE otherwise.
+---
+kind: function
+name: am
+exported: true
+signature: am(x) hour(x)
+arguments:
+  x: a date-time object
+returns: TRUE or FALSE depending on whether x occurs in the am or pm
+---
+kind: function
+name: pm
+exported: true
+signature: pm(x) !am(x)
+---
+kind: function
+name: week
+exported: true
+signature: week(x)
+arguments:
+  value: a numeric object
+  x: a date-time object.
+returns: the weeks element of x as an integer number
+---
+kind: function
+name: '"week<-"'
+exported: true
+signature: '"week<-"(x, value)'
+---
+kind: function
+name: isoweek
+exported: true
+signature: isoweek(x)
+---
+kind: function
+name: epiweek
+exported: true
+signature: epiweek(x)
+---
+kind: function
+name: tz
+exported: true
+signature: tz(x)
+arguments:
+  value: New value of time zone.
+  x: A date-time vector, usually of class POSIXct or POSIXlt.
+returns: A character vector of length 1.
+---
+kind: function
+name: '"tz<-"'
+exported: true
+signature: '"tz<-"(x, value)'
+---
+kind: function
+name: reclass_date
+exported: true
+signature: reclass_date(new, orig) UseMethod("reclass_date", orig)
+---
+kind: function
+name: reclass_timespan
+exported: true
+signature: reclass_timespan(new, orig) standardGeneric("reclass_timespan")
+---
+kind: function
+name: as.interval
+exported: true
+signature: as.interval(x, start, ...) standardGeneric("as.interval")
+arguments:
+  '...': additional arguments to pass to as.interval
+  start: a POSIXt or Date object that describes when the interval begins
+  x: a duration, difftime, period, or numeric object that describes the length of the interval
+returns: an interval object
+---
+kind: function
+name: month
+exported: true
+signature: month(x, label = FALSE, abbr = TRUE, locale = Sys.getlocale("LC_TIME"))
+arguments:
+  abbr: logical.
+  label: logical.
+  locale: for month, locale to use for month names.
+  value: a numeric object
+  x: a date-time object
+returns: 'If label = FALSE: month as number (1-12, 1 = January, 12 = December), otherwise as an ordered factor.'
+---
+kind: function
+name: days_in_month
+exported: true
+signature: days_in_month(x)
+arguments:
+  x: a date-time object
+returns: An integer of the number of days in the month component of the date-time object.
+---
+kind: function
+name: ymd
+exported: true
+signature: ymd(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"), truncated = 0)
+arguments:
+  '...': a character or numeric vector of suspected dates
+  locale: locale to be used, see locales.
+  quiet: logical.
+  truncated: integer.
+  tz: Time zone indicator.
+returns: a vector of class POSIXct if tz argument is non-NULL or Date if tz is NULL (default)
+---
+kind: function
+name: ydm
+exported: true
+signature: ydm(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: mdy
+exported: true
+signature: mdy(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: myd
+exported: true
+signature: myd(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: dmy
+exported: true
+signature: dmy(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: dym
+exported: true
+signature: dym(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: yq
+exported: true
+signature: yq(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"))
+---
+kind: function
+name: ym
+exported: true
+signature: ym(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"))
+---
+kind: function
+name: my
+exported: true
+signature: my(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"))
+---
+kind: function
+name: ymd_hms
+exported: true
+signature: ymd_hms(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+purpose: Parse date-times with year, month, and day, hour, minute, and second components.
+arguments:
+  '...': a character vector of dates in year, month, day, hour, minute, second format
+  locale: locale to be used, see locales.
+  quiet: logical.
+  truncated: integer, indicating how many formats can be missing.
+  tz: a character string that specifies which time zone to parse the date with.
+returns: a vector of POSIXct date-time objects
+---
+kind: function
+name: ymd_hm
+exported: true
+signature: ymd_hm(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: ymd_h
+exported: true
+signature: ymd_h(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: dmy_hms
+exported: true
+signature: dmy_hms(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: dmy_hm
+exported: true
+signature: dmy_hm(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: dmy_h
+exported: true
+signature: dmy_h(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: mdy_hms
+exported: true
+signature: mdy_hms(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: mdy_hm
+exported: true
+signature: mdy_hm(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: mdy_h
+exported: true
+signature: mdy_h(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: ydm_hms
+exported: true
+signature: ydm_hms(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: ydm_hm
+exported: true
+signature: ydm_hm(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: ydm_h
+exported: true
+signature: ydm_h(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)
+---
+kind: function
+name: ms
+exported: true
+signature: ms(..., quiet = FALSE, roll = FALSE)
+---
+kind: function
+name: hm
+exported: true
+signature: hm(..., quiet = FALSE, roll = FALSE)
+---
+kind: function
+name: hms
+exported: true
+signature: hms(..., quiet = FALSE, roll = FALSE)
+arguments:
+  '...': a character vector of hour minute second triples
+  quiet: logical.
+  roll: logical.
+returns: a vector of period objects
+---
+kind: function
+name: parse_date_time
+exported: true
+signature: parse_date_time(x, orders, tz = "UTC", truncated = 0, quiet = FALSE,locale = Sys.getlocale("LC_TIME"), select_formats = .select_formats,exact = FALSE, train = TRUE, drop = FALSE)
+arguments:
+  cutoff_2000: integer.
+  drop: logical, default FALSE.
+  exact: logical.
+  format: a vector of formats.
+  locale: locale to be used, see locales.
+  lt: logical.
+  orders: a character vector of date-time formats.
+  quiet: logical.
+  select_formats: A function to select actual formats for parsing from a set of formats which matched a training subset of x.
+  train: logical, default TRUE.
+  truncated: integer, number of formats that can be missing.
+  tz: a character string that specifies the time zone with which to parse the dates
+  x: a character or numeric vector of dates
+returns: a vector of POSIXct date-time objects
+---
+kind: function
+name: parse_date_time2
+exported: true
+signature: parse_date_time2(x, orders, tz = "UTC", exact = FALSE, lt = FALSE, cutoff_2000 = 68L)
+---
+kind: function
+name: fast_strptime
+exported: true
+signature: fast_strptime(x, format, tz = "UTC", lt = TRUE, cutoff_2000 = 68L)
+---
+kind: function
+name: round_date
+exported: true
+signature: round_date(x, unit = "second", week_start = getOption("lubridate.week.start", 7))
+arguments:
+  change_on_boundary: if this is NULL (the default), instants on the boundary remain unchanged, but Date objects are rounded up to the next boundary.
+  unit: a string, Period object or a date-time object.
+  week_start: week start day (Default is 7, Sunday.
+  x: a vector of date-time objects
+returns: When unit is a string, return a Date object if x is a Date and unit is larger or equal than "day", otherwise a POSIXct object.
+---
+kind: function
+name: floor_date
+exported: true
+signature: floor_date(x, unit = "seconds",week_start = getOption("lubridate.week.start", 7))
+---
+kind: function
+name: ceiling_date
+exported: true
+signature: ceiling_date(x, unit = "seconds", change_on_boundary = NULL,week_start = getOption("lubridate.week.start", 7))
+---
+kind: function
+name: decimal_date
+exported: true
+signature: decimal_date(date)
+arguments:
+  date: a POSIXt or Date object
+returns: a numeric object where the date is expressed as a fraction of its year
+---
+kind: function
+name: date_decimal
+exported: true
+signature: date_decimal(decimal, tz = "UTC")
+arguments:
+  decimal: a numeric object
+  tz: the time zone required
+returns: a POSIXct object, whose year corresponds to the integer part of decimal.
+---
+kind: function
+name: '"%m+%"'
+exported: true
+signature: '"%m+%"(e1, e2) standardGeneric("%m+%")'
+---
+kind: function
+name: '"%m-%"'
+exported: true
+signature: '"%m-%"(e1, e2) standardGeneric("%m-%")'
+---
+kind: function
+name: add_with_rollback
+exported: true
+signature: add_with_rollback(e1, e2, roll_to_first = FALSE, preserve_hms = TRUE)
+---
+kind: function
+name: rollbackward
+exported: true
+signature: rollbackward(dates, roll_to_first = FALSE, preserve_hms = TRUE)
+arguments:
+  dates: A POSIXct, POSIXlt or Date class object.
+  preserve_hms: Retains the same hour, minute, and second information?
+  roll_to_first: Rollback to the first day of the month instead of the last day of the month
+returns: A date-time object of class POSIXlt, POSIXct or Date, whose day has been adjusted to the last day of the previous month, or to the first day of the month.
+---
+kind: function
+name: rollforward
+exported: true
+signature: rollforward(dates, roll_to_first = FALSE, preserve_hms = TRUE)
+---
+kind: function
+name: interval
+exported: true
+signature: interval(start = NULL, end = NULL, tzone = tz(start))
+arguments:
+  by: A period or duration object to shift by (for int_shift)
+  int: an interval object
+  int1: an Interval object (for int_overlaps(), int_aligns())
+  int2: an Interval object (for int_overlaps(), int_aligns())
+  start, end: POSIXt, Date or a character vectors.
+  times: A vector of POSIXct, POSIXlt or Date class date-times (for int_diff())
+  tzone: a recognized timezone to display the interval in
+  value: interval's start/end to be assigned to int
+  x: an R object
+returns: interval() -- 4classInterval object.
+---
+kind: function
+name: '"%--%"'
+exported: true
+signature: '"%--%"(start, end) interval(start, end)'
+---
+kind: function
+name: is.interval
+exported: true
+signature: is.interval(x) is(x, c("Interval"))
+---
+kind: function
+name: int_start
+exported: true
+signature: int_start(int)
+---
+kind: function
+name: '"int_start<-"'
+exported: true
+signature: '"int_start<-"(int, value)'
+---
+kind: function
+name: int_end
+exported: true
+signature: int_end(int)
+---
+kind: function
+name: '"int_end<-"'
+exported: true
+signature: '"int_end<-"(int, value)'
+---
+kind: function
+name: int_length
+exported: true
+signature: int_length(int)
+---
+kind: function
+name: int_flip
+exported: true
+signature: int_flip(int)
+---
+kind: function
+name: int_shift
+exported: true
+signature: int_shift(int, by)
+---
+kind: function
+name: int_overlaps
+exported: true
+signature: int_overlaps(int1, int2)
+---
+kind: function
+name: int_standardize
+exported: true
+signature: int_standardize(int)
+---
+kind: function
+name: int_aligns
+exported: true
+signature: int_aligns(int1, int2)
+---
+kind: function
+name: int_diff
+exported: true
+signature: int_diff(times)
+---
+kind: function
+name: leap_year
+exported: true
+signature: leap_year(date)
+arguments:
+  date: a date-time object or a year
+returns: TRUE if x is a leap year, FALSE otherwise
+---
+kind: function
+name: stamp
+exported: true
+signature: stamp(x, orders = lubridate_formats,locale = Sys.getlocale("LC_TIME"),quiet = FALSE, exact = FALSE)
+arguments:
+  exact: logical.
+  locale: locale in which x is encoded.
+  orders: orders are sequences of formatting characters which might be used for disambiguation.
+  quiet: whether to output informative messages.
+  x: a character vector of templates.
+returns: a function to be applied on a vector of dates
+---
+kind: function
+name: stamp_date
+exported: true
+signature: stamp_date(x, locale = Sys.getlocale("LC_TIME"), quiet = FALSE)
+---
+kind: function
+name: stamp_time
+exported: true
+signature: stamp_time(x, locale = Sys.getlocale("LC_TIME"), quiet = FALSE)
+---
+kind: function
+name: day
+exported: true
+signature: day(x)
+arguments:
+  abbr: logical.
+  label: logical.
+  locale: locale to use for day names.
+  value: (for wday<-) a numeric or a string giving the name of the day in the current locale or in English.
+  week_start: 'day on which week starts following ISO conventions: 1 means Monday and 7 means Sunday (default).'
+  x: a POSIXct, POSIXlt, Date, chron, yearmon, yearqtr, zoo, zooreg, timeDate, xts, its, ti, jul, timeSeries, or fts object.
+returns: wday() returns the day of the week as a decimal number or an ordered factor if label is TRUE.
+---
+kind: function
+name: wday
+exported: true
+signature: wday(x, label = FALSE, abbr = TRUE,week_start = getOption("lubridate.week.start", 7),locale = Sys.getlocale("LC_TIME"))
+---
+kind: function
+name: qday
+exported: true
+signature: qday(x)
+---
+kind: function
+name: yday
+exported: true
+signature: yday(x)
+---
+kind: function
+name: '"wday<-"'
+exported: true
+signature: '"wday<-"(x, week_start = getOption("lubridate.week.start", 7), value)'
+---
+kind: function
+name: '"yday<-"'
+exported: true
+signature: '"yday<-"(x, value)'
+---
+kind: function
+name: minute
+exported: true
+signature: minute(x)
+arguments:
+  value: numeric value to be assigned
+  x: a date-time object
+returns: the minutes element of x as a decimal number
+---
+kind: function
+name: is.instant
+exported: true
+signature: is.instant(x) inherits(x, c("POSIXt", "POSIXct", "POSIXlt", "Date"))
+arguments:
+  x: an R object
+returns: TRUE if x is a POSIXct, POSIXlt, or Date object, FALSE otherwise.
+---
+kind: function
+name: now
+exported: true
+signature: now(tzone = "")
+arguments:
+  tzone: a character vector specifying which time zone you would like the current time in.
+returns: now - the current datetime as a POSIXct object
+---
+kind: function
+name: today
+exported: true
+signature: today(tzone = "")
+---
+kind: function
+name: make_datetime
+exported: true
+signature: make_datetime(year = 1970L, month = 1L, day = 1L, hour = 0L, min = 0L, sec = 0, tz = "UTC")
+arguments:
+  day: numeric day
+  hour: numeric hour
+  min: numeric minute
+  month: numeric month
+  sec: numeric second
+  tz: time zone.
+  year: numeric year
+---
+kind: function
+name: make_date
+exported: true
+signature: make_date(year = 1970L, month = 1L, day = 1L)
+---
+kind: function
+name: cyclic_encoding
+exported: true
+signature: cyclic_encoding(x, periods, encoders = c("sin", "cos"),week_start = getOption("lubridate.week.start", 7))
+arguments:
+  encoders: names of functions to produce the encoding.
+  periods: a character vector of periods.
+  week_start: week start day (Default is 7, Sunday.
+  x: a date-time object
+returns: a numeric matrix with number of columns equal length(periods) * length(types).
+---
+kind: function
+name: dst
+exported: true
+signature: dst(x)
+arguments:
+  x: a date-time object
+returns: A logical.
+---
+kind: function
+name: is.Date
+exported: true
+signature: is.Date(x) is(x, "Date")
+---
+kind: function
+name: Date
+exported: true
+signature: Date(length = 0L)
+---
+kind: function
+name: guess_formats
+exported: true
+signature: guess_formats(x, orders, locale = Sys.getlocale("LC_TIME"),preproc_wday = TRUE, print_matches = FALSE)
+arguments:
+  locale: locale to use.
+  orders: format orders to look for.
+  preproc_wday: whether to preprocess weekday names.
+  print_matches: for development purposes mainly.
+  x: input vector of date-times.
+returns: a vector of matched formats
+---
+kind: function
+name: is.timespan
+exported: true
+signature: is.timespan(x) is(x, "Timespan")
+arguments:
+  x: an R object
+returns: TRUE if x is a period, interval, duration, or difftime object, FALSE otherwise.
+---
+kind: function
+name: is.POSIXt
+exported: true
+signature: is.POSIXt(x) inherits(x, "POSIXt")
+---
+kind: function
+name: is.POSIXlt
+exported: true
+signature: is.POSIXlt(x) inherits(x, "POSIXlt")
+---
+kind: function
+name: is.POSIXct
+exported: true
+signature: is.POSIXct(x) inherits(x, "POSIXct")
+---
+kind: function
+name: POSIXct
+exported: true
+signature: POSIXct(length = 0L, tz = "UTC")
+---
+kind: function
+name: hour
+exported: true
+signature: hour(x)
+arguments:
+  value: numeric value to be assigned to the hour component
+  x: a date-time object
+returns: the hours element of x as a decimal number
+---
+kind: function
+name: period
+exported: true
+signature: period(num = NULL, units = "second", ...)
+arguments:
+  '...': a list of time units to be included in the period and their amounts.
+  abbreviate: Ignored.
+  num: a numeric or character vector.
+  units: a character vector that lists the type of units to be used.
+  x: Any R object for is.periods and a numeric value of the number of units for elementary constructors.
+returns: a period object
+---
+kind: function
+name: is.period
+exported: true
+signature: is.period(x) is(x, "Period")
+---
+kind: function
+name: seconds
+exported: true
+signature: seconds(x = 1) period(second = x)
+---
+kind: function
+name: minutes
+exported: true
+signature: minutes(x = 1) period(minute = x)
+---
+kind: function
+name: hours
+exported: true
+signature: hours(x = 1) period(hour = x)
+---
+kind: function
+name: days
+exported: true
+signature: days(x = 1) period(day = x)
+---
+kind: function
+name: weeks
+exported: true
+signature: weeks(x = 1) period(week = x)
+---
+kind: function
+name: years
+exported: true
+signature: years(x = 1) period(year = x)
+---
+kind: function
+name: milliseconds
+exported: true
+signature: milliseconds(x = 1) seconds(x / 1000)
+---
+kind: function
+name: microseconds
+exported: true
+signature: microseconds(x = 1) seconds(x / 1000000)
+---
+kind: function
+name: nanoseconds
+exported: true
+signature: nanoseconds(x = 1) seconds(x / 1e9)
+---
+kind: function
+name: picoseconds
+exported: true
+signature: picoseconds(x = 1) seconds(x / 1e12)
+---
+kind: function
+name: period_to_seconds
+exported: true
+signature: period_to_seconds(x)
+arguments:
+  x: A numeric object.
+returns: A number (period) that roughly equates to the period (seconds) given.
+---
+kind: function
+name: seconds_to_period
+exported: true
+signature: seconds_to_period(x)
+---
+kind: function
+name: fit_to_timeline
+exported: true
+signature: fit_to_timeline(lt, class = "POSIXct", simple = FALSE)
+arguments:
+  class: a character string that describes what type of object to return, POSIXlt or POSIXct.
+  lt: a POSIXlt date-time object.
+  simple: if TRUE, lubridate makes no attempt to detect meaningless time-dates or to correct time zones.
+returns: a POSIXct or POSIXlt object that contains no illusory date-times
+---
+kind: function
+name: date
+exported: true
+signature: date(x)
+arguments:
+  value: an object for which the date() function is defined
+  x: a date-time object
+returns: the date of x as a Date
+---
+kind: function
+name: '"date<-"'
+exported: true
+signature: '"date<-"(x, value)'
+---
+kind: function
+name: second
+exported: true
+signature: second(x)
+arguments:
+  value: numeric value to be assigned
+  x: a date-time object
+returns: the seconds element of x as a decimal number
+---
+kind: function
+name: quarter
+exported: true
+signature: quarter(x, type = "quarter", fiscal_start = 1, with_year = identical(type, "year.quarter"))
+arguments:
+  fiscal_start: numeric indicating the starting month of a fiscal year.
+  type: the format to be returned for the quarter.
+  with_year: logical indicating whether or not to include the quarter or semester's year (deprecated; use the type parameter instead).
+  x: a date-time object of class POSIXct, POSIXlt, Date, chron, yearmon, yearqtr, zoo, zooreg, timeDate, xts, its, ti, jul, timeSeries, fts or anything else that can be converted with as.
+returns: numeric or a vector of class POSIXct if type argument is date_first or date_last.
+---
+kind: function
+name: semester
+exported: true
+signature: semester(x, with_year = FALSE)
