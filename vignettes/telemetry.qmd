@@ -298,7 +298,12 @@ Targets pipeline status, timing metrics, and execution history.
 ::: {.card title="Target Execution Status"}
 ```{r}
 if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$status_summary)) {
-  knitr::kable(telemetry_pipeline_status$status_summary, format = "html")
+  DT::datatable(telemetry_pipeline_status$status_summary,
+    extensions = "Buttons",
+    options = list(dom = "Bfrtip", buttons = c("csv", "excel", "print"),
+                   pageLength = 10, scrollX = TRUE),
+    rownames = FALSE, class = "display compact"
+  )
 } else {
   not_available_msg("telemetry_pipeline_status")
 }

@@ -5,16 +5,16 @@
 \title{Generate and Send Summary Email}
 \usage{
 generate_and_send_summary(
-  recipient = Sys.getenv("EMAIL_TO"),
-  sender = Sys.getenv("EMAIL_FROM")
+  recipient = Sys.getenv("GMAIL_USERNAME"),
+  sender = Sys.getenv("GMAIL_USERNAME")
 )
 }
 \arguments{
-\item{recipient}{Email recipient (default from EMAIL_TO env var)}
+\item{recipient}{Email recipient (default from GMAIL_USERNAME env var)}
 
-\item{sender}{Email sender (default from EMAIL_FROM env var)}
+\item{sender}{Email sender (default from GMAIL_USERNAME env var)}
 }
 \description{
 Main function to generate summary and send via email.
-Requires environment variables for SMTP configuration.
+Requires GMAIL_USERNAME and GMAIL_APP_PASSWORD environment variables.
 }

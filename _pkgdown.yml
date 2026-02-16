@@ -59,6 +59,9 @@ articles:
   - title: internal
     contents:
       - dashboard_shinylive
+# Note: dashboard_shinylive requires Quarto shinylive extension.
+# For local pkgdown builds, use pkgdown::build_home() + build_reference()
+# and skip build_articles() to avoid shinylive rendering failure.
 
 reference:
   - title: "Data Access"

@@ -25,6 +25,9 @@ jobs:
       # Note: nixpkgs date is pinned in default.nix (2026-01-22)
       # This ensures consistency between local dev and CI
       - name: Perform incremental data update
+        env:
+          GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
           nix-shell default.nix -A shell --run "Rscript -e '
             devtools::load_all()
@@ -35,6 +38,9 @@ jobs:
           '"
 
       - name: Run targets pipeline for wave analysis
+        env:
+          GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
           nix-shell default.nix -A shell --run "Rscript -e '
             targets::tar_make()

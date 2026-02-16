@@ -16,6 +16,7 @@ execute:
 # Debug page only needs targets data, not full package
 # Avoid pkgload::load_all() which can cause segfaults in some environments
 library(dplyr)
+library(DT)
 library(targets)
 
 # Set targets store to project root
@@ -118,9 +119,14 @@ if (!is.null(validation_paths)) {
     ),
     `Last Updated` = format(validation_paths$generated_time, "%Y-%m-%d %H:%M UTC")
   )
-  knitr::kable(summary_df)
+  DT::datatable(summary_df,
+    extensions = "Buttons",
+    options = list(dom = "Bfrtip", buttons = c("csv", "excel", "print"),
+                   pageLength = 10, scrollX = TRUE),
+    rownames = FALSE, class = "display compact"
+  )
 } else {
-  knitr::asis_output("Validation reports not yet generated. Run `tar_make()` to create them.")
+  htmltools::div(class = "alert alert-warning", "Validation reports not yet generated. Run `tar_make()` to create them.")
 }
 ```
 
@@ -147,12 +153,17 @@ tryCatch({
     progress |>
       dplyr::select(name, progress) |>
       dplyr::arrange(name) |>
-      knitr::kable(caption = "Target execution status")
+      DT::datatable(caption = "Target execution status",
+        extensions = "Buttons",
+        options = list(dom = "Bfrtip", buttons = c("csv", "excel", "print"),
+                       pageLength = 10, scrollX = TRUE),
+        rownames = FALSE, class = "display compact"
+      )
   } else {
-    knitr::asis_output("No targets have been run yet. Execute `tar_make()` to build the pipeline.")
+    htmltools::div(class = "alert alert-warning", "No targets have been run yet. Execute `tar_make()` to build the pipeline.")
   }
 }, error = function(e) {
-  knitr::asis_output(paste("Could not read pipeline status:", e$message))
+  htmltools::div(class = "alert alert-warning", paste("Could not read pipeline status:", e$message))
 })
 ```
 
@@ -167,12 +178,17 @@ tryCatch({
     tibble::tibble(
       `Outdated Target` = outdated
     ) |>
-      knitr::kable(caption = paste(length(outdated), "targets need rebuilding"))
+      DT::datatable(caption = paste(length(outdated), "targets need rebuilding"),
+        extensions = "Buttons",
+        options = list(dom = "Bfrtip", buttons = c("csv", "excel", "print"),
+                       pageLength = 10, scrollX = TRUE),
+        rownames = FALSE, class = "display compact"
+      )
   } else {
-    knitr::asis_output("All targets are up to date.")
+    htmltools::div(class = "alert alert-warning", "All targets are up to date.")
   }
 }, error = function(e) {
-  knitr::asis_output(paste("Could not check outdated targets:", e$message))
+  htmltools::div(class = "alert alert-warning", paste("Could not check outdated targets:", e$message))
 })
 ```
 
@@ -225,7 +241,12 @@ tibble::tibble(
   Package = names(pkg_versions),
   Version = pkg_versions
 ) |>
-  knitr::kable(caption = "Core package versions")
+  DT::datatable(caption = "Core package versions",
+    extensions = "Buttons",
+    options = list(dom = "Bfrtip", buttons = c("csv", "excel", "print"),
+                   pageLength = 10, scrollX = TRUE),
+    rownames = FALSE, class = "display compact"
+  )
 ```
 
 ---
