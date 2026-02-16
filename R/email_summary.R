@@ -2,11 +2,12 @@
 #'
 #' @description
 #' Compares recent data against historical averages to identify trends
-#' and anomalies.
+#' and anomalies. Optionally includes data ingestion statistics.
 #'
 #' @param db_path Path to DuckDB database
 #' @param lookback_days Number of days to analyze (default: 7)
 #' @param qc_filter QC flag filter: 1 = good only, 0 = include unverified, NULL = no filter
+#' @param update_result Optional result from incremental_update() containing ingestion stats
 #'
 #' @return List containing summary statistics and comparisons
 #'
@@ -14,7 +15,8 @@
 generate_weekly_summary <- function(
     db_path = "inst/extdata/irish_buoys.duckdb",
     lookback_days = 7,
-    qc_filter = NULL
+    qc_filter = NULL,
+    update_result = NULL
 ) {
 
   con <- connect_duckdb(db_path = db_path)
@@ -122,12 +124,35 @@ generate_weekly_summary <- function(
     ORDER BY time DESC
   "))
 
+  # Ingestion stats: new records per station this week
+  ingestion_stats <- DBI::dbGetQuery(con, glue::glue("
+    SELECT
+      station_id,
+      COUNT(*) as new_records,
+      MIN(time) as earliest,
+      MAX(time) as latest
+    FROM buoy_data
+    WHERE time >= '{start_date}'
+      AND time < '{current_date}'
+    GROUP BY station_id
+    ORDER BY station_id
+  "))
+
+  # Database totals
+  db_stats <- tryCatch(
+    get_database_stats(con),
+    error = function(e) NULL
+  )
+
   # Combine results
   summary <- list(
     current_week = current_week,
     previous_week = prev_week,
     historical = historical,
     extreme_events = extremes,
+    ingestion_stats = ingestion_stats,
+    db_stats = db_stats,
+    update_result = update_result,
     report_date = current_date,
     period = list(start = start_date, end = current_date - 1)
   )
@@ -193,11 +218,44 @@ create_email_summary <- function(summary) {
     )
   }), collapse = "")
 
+  # Format ingestion stats table
+  ingestion_text <- if (!is.null(summary$ingestion_stats) && nrow(summary$ingestion_stats) > 0) {
+    paste0(
+      "<h2>Data Ingestion This Week</h2>",
+      "<table border='1' style='border-collapse: collapse;'>",
+      "<tr><th>Station</th><th>New Records</th><th>Earliest</th><th>Latest</th></tr>",
+      paste(apply(summary$ingestion_stats, 1, function(row) {
+        paste0("<tr><td>", row["station_id"], "</td>",
+               "<td>", format(as.numeric(row["new_records"]), big.mark = ","), "</td>",
+               "<td>", row["earliest"], "</td>",
+               "<td>", row["latest"], "</td></tr>")
+      }), collapse = ""),
+      "</table>"
+    )
+  } else {
+    "<h2>Data Ingestion This Week</h2><p>No new records ingested.</p>"
+  }
+
+  # Format database totals
+  db_totals_text <- if (!is.null(summary$db_stats)) {
+    stats <- summary$db_stats
+    paste0(
+      "<p><strong>Dataset Totals:</strong> ",
+      format(stats$total_records, big.mark = ","), " records, ",
+      round(stats$db_size_mb, 1), " MB</p>"
+    )
+  } else {
+    ""
+  }
+
   # Create email body
   email_body <- paste0(
     "<h1>Irish Weather Buoy Network - Weekly Summary</h1>",
     "<p><strong>Report Period:</strong> ",
     summary$period$start, " to ", summary$period$end, "</p>",
+
+    ingestion_text,
+    db_totals_text,
 
     "<h2>This Week's Statistics</h2>",
     station_stats,
@@ -243,15 +301,15 @@ create_email_summary <- function(summary) {
 #'
 #' @description
 #' Main function to generate summary and send via email.
-#' Requires environment variables for SMTP configuration.
+#' Requires GMAIL_USERNAME and GMAIL_APP_PASSWORD environment variables.
 #'
-#' @param recipient Email recipient (default from EMAIL_TO env var)
-#' @param sender Email sender (default from EMAIL_FROM env var)
+#' @param recipient Email recipient (default from GMAIL_USERNAME env var)
+#' @param sender Email sender (default from GMAIL_USERNAME env var)
 #'
 #' @export
 generate_and_send_summary <- function(
-    recipient = Sys.getenv("EMAIL_TO"),
-    sender = Sys.getenv("EMAIL_FROM")
+    recipient = Sys.getenv("GMAIL_USERNAME"),
+    sender = Sys.getenv("GMAIL_USERNAME")
 ) {
 
   cli::cli_h1("Generating Weekly Summary")
@@ -268,16 +326,19 @@ generate_and_send_summary <- function(
     format(Sys.Date(), "%B %d, %Y")
   )
 
-  # Check if we have email credentials
-  if (nzchar(recipient) && nzchar(sender)) {
+  # Check if we have Gmail credentials
+  gmail_user <- Sys.getenv("GMAIL_USERNAME")
+  gmail_pass <- Sys.getenv("GMAIL_APP_PASSWORD")
+
+  if (nzchar(gmail_user) && nzchar(gmail_pass)) {
     cli::cli_alert_info("Sending email to {recipient}")
 
-    # Create SMTP credentials
-    creds <- blastula::creds(
-      host = Sys.getenv("EMAIL_SMTP_HOST", "smtp.gmail.com"),
-      port = as.numeric(Sys.getenv("EMAIL_SMTP_PORT", "587")),
-      user = Sys.getenv("EMAIL_SMTP_USER"),
-      pass = Sys.getenv("EMAIL_SMTP_PASS"),
+    # Create SMTP credentials for Gmail
+    creds <- blastula::creds_envvar(
+      user = gmail_user,
+      pass_envvar = "GMAIL_APP_PASSWORD",
+      host = "smtp.gmail.com",
+      port = 465,
       use_ssl = TRUE
     )
 
@@ -294,14 +355,14 @@ generate_and_send_summary <- function(
     }, error = function(e) {
       cli::cli_alert_danger("Failed to send email: {e$message}")
       # Save email to file as backup
-      html_file <- paste0("email_summary_", Sys.Date(), ".html")
+      html_file <- file.path(tempdir(), paste0("email_summary_", Sys.Date(), ".html"))
       writeLines(as.character(email), html_file)
       cli::cli_alert_info("Email saved to {html_file}")
     })
   } else {
-    cli::cli_alert_warning("Email credentials not configured")
+    cli::cli_alert_warning("Gmail credentials not configured (set GMAIL_USERNAME and GMAIL_APP_PASSWORD)")
     # Save to file instead
-    html_file <- paste0("email_summary_", Sys.Date(), ".html")
+    html_file <- file.path(tempdir(), paste0("email_summary_", Sys.Date(), ".html"))
     writeLines(as.character(email), html_file)
     cli::cli_alert_info("Summary saved to {html_file}")
   }

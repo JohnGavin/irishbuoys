@@ -245,7 +245,7 @@ if (!is.null(missing_data_grid)) {
     )
   create_dt(missing_summary, "Data availability by station (% of days with observations)")
 } else {
-  knitr::asis_output("Missing data grid not available. Run targets::tar_make()")
+  htmltools::div(class = "alert alert-warning", "Missing data grid not available. Run targets::tar_make()")
 }
 ```
 
@@ -486,7 +486,7 @@ if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
     mutate(across(where(is.numeric), ~round(., 2))) |>
     create_dt("Gust Factor Statistics (All Stations Combined)")
 } else {
-  knitr::asis_output("Gust analysis not available. Run targets::tar_make()")
+  htmltools::div(class = "alert alert-warning", "Gust analysis not available. Run targets::tar_make()")
 }
 ```
 
@@ -498,7 +498,7 @@ if (!is.null(gust_analysis) && "by_station" %in% names(gust_analysis) && !is.nul
     mutate(across(where(is.numeric), ~round(., 2))) |>
     create_dt("Gust Factor Statistics by Station. Stations with sufficient data for analysis.")
 } else {
-  knitr::asis_output("Station data not available")
+  htmltools::div(class = "alert alert-warning", "Station data not available")
 }
 ```
 
@@ -619,10 +619,10 @@ if (!is.null(gpd_wave_per_station)) {
   if (!is.null(gpd_df) && nrow(gpd_df) > 0) {
     create_dt(gpd_df, "GPD Wave Height Parameters (95% threshold, hourly data)")
   } else {
-    knitr::asis_output("GPD results not available")
+    htmltools::div(class = "alert alert-warning", "GPD results not available")
   }
 } else {
-  knitr::asis_output("GPD per-station data not available. Run targets::tar_make()")
+  htmltools::div(class = "alert alert-warning", "GPD per-station data not available. Run targets::tar_make()")
 }
 ```
 
@@ -707,7 +707,7 @@ if (!is.null(analysis_summary) && "gev_pooled_fits" %in% names(analysis_summary)
 
   create_dt(params_df, "GEV Parameter Estimates - Pooled (illustrative, n=8)")
 } else {
-  knitr::asis_output("GEV fit data not available")
+  htmltools::div(class = "alert alert-warning", "GEV fit data not available")
 }
 ```
 
@@ -746,9 +746,13 @@ if (!is.null(worked_signif_wave_example)) {
     tail(example$waves_table, 5)
   )
 
-  knitr::kable(waves_display,
+  DT::datatable(waves_display,
     caption = "Step 1: Buoy records ~100-300 individual waves during 17.5-min window. Shown: First and last 5 waves (sorted by height, tallest first)",
-    col.names = c("Rank", "Wave Height (m)", "In Top 1/3?")
+    colnames = c("Rank", "Wave Height (m)", "In Top 1/3?"),
+    extensions = "Buttons",
+    options = list(dom = "Bfrtip", buttons = c("csv", "excel", "print"),
+                   pageLength = 15, scrollX = TRUE),
+    rownames = FALSE, class = "display compact"
   )
 }
 ```
@@ -822,7 +826,7 @@ if (has_joint_data) {
 
   create_dt(dist_df, "Distances between stations (km). M6 is 320km offshore in deep Atlantic (3000m depth).")
 } else {
-  knitr::asis_output("Joint analysis data not available. Run targets::tar_make()")
+  htmltools::div(class = "alert alert-warning", "Joint analysis data not available. Run targets::tar_make()")
 }
 ```
 
