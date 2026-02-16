@@ -8,6 +8,13 @@
 \description{
 Provides tools to download, process, and analyze data from the Irish Weather Buoy Network. Includes functions for accessing real-time and historical data via the Marine Institute's ERDDAP server, storing data in DuckDB for efficient querying, and building predictive models for wave height and weather conditions.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://johngavin.github.io/irishbuoys/}
+}
+
+}
 \author{
 \strong{Maintainer}: John Gavin \email{john.b.gavin@gmail.com}
 
