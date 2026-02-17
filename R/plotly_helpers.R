@@ -2,8 +2,8 @@
 #'
 #' @description
 #' Applies consistent styling to all plotly plots in the irishbuoys package.
-#' Includes grey background, bottom-positioned horizontal legend, and
-#' white hoverlabels for readability.
+#' Includes gray 70 background (#B3B3B3), bottom-positioned horizontal legend,
+#' and white hoverlabels for readability.
 #'
 #' @param p A plotly object
 #' @param title Optional title string
@@ -23,32 +23,32 @@ irishbuoys_layout <- function(p, title = NULL, ...) {
   p |> plotly::layout(
     title = list(
       text = title,
-      font = list(size = 14, color = "white")
+      font = list(size = 14, color = "#1a1a1a")
     ),
-    plot_bgcolor = "black",
-    paper_bgcolor = "#1a1a1a",
+    plot_bgcolor = "#B3B3B3",
+    paper_bgcolor = "#B3B3B3",
     xaxis = list(
-      gridcolor = "white",
+      gridcolor = "#666666",
       gridwidth = 0.5,
-      zerolinecolor = "white",
-      tickfont = list(color = "white"),
-      titlefont = list(color = "white")
+      zerolinecolor = "#333333",
+      tickfont = list(color = "#1a1a1a"),
+      titlefont = list(color = "#1a1a1a")
     ),
     yaxis = list(
-      gridcolor = "white",
+      gridcolor = "#666666",
       gridwidth = 0.5,
-      zerolinecolor = "white",
-      tickfont = list(color = "white"),
-      titlefont = list(color = "white")
+      zerolinecolor = "#333333",
+      tickfont = list(color = "#1a1a1a"),
+      titlefont = list(color = "#1a1a1a")
     ),
     legend = list(
       orientation = "h",
       y = -0.15,
       x = 0.5,
       xanchor = "center",
-      font = list(color = "white", size = 12),
-      bgcolor = "#333333",
-      bordercolor = "#666666",
+      font = list(color = "#1a1a1a", size = 12),
+      bgcolor = "#D9D9D9",
+      bordercolor = "#999999",
       borderwidth = 1
     ),
     hoverlabel = list(
