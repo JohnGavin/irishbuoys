@@ -52,10 +52,9 @@ articles:
       - wave_analysis
   - title: Monitoring
     navbar: Monitoring
-    desc: "Pipeline telemetry and debugging tools"
+    desc: "Pipeline telemetry and monitoring"
     contents:
       - telemetry
-      - debug
   - title: internal
     contents:
       - dashboard_shinylive
