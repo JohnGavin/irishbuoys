@@ -664,7 +664,18 @@ create_plot_stl <- function(wave_stl, date_caption = NULL) {
       title = paste0("STL Decomposition",
                      if (!is.null(date_caption)) paste0(" (", date_caption, ")") else "")
     ) +
-    ggplot2::theme_minimal()
+    ggplot2::theme_minimal() +
+    ggplot2::theme(
+      panel.background = ggplot2::element_rect(fill = "#B3B3B3", color = NA),
+      plot.background = ggplot2::element_rect(fill = "#B3B3B3", color = NA),
+      strip.background = ggplot2::element_rect(fill = "#999999", color = NA),
+      strip.text = ggplot2::element_text(color = "#1a1a1a"),
+      panel.grid.major = ggplot2::element_line(color = "#666666", linewidth = 0.3),
+      panel.grid.minor = ggplot2::element_line(color = "#808080", linewidth = 0.1),
+      axis.text = ggplot2::element_text(color = "#1a1a1a"),
+      axis.title = ggplot2::element_text(color = "#1a1a1a"),
+      plot.title = ggplot2::element_text(color = "#1a1a1a")
+    )
 
   p
 }

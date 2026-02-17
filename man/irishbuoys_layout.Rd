@@ -18,8 +18,8 @@ A styled plotly object
 }
 \description{
 Applies consistent styling to all plotly plots in the irishbuoys package.
-Includes grey background, bottom-positioned horizontal legend, and
-white hoverlabels for readability.
+Includes gray 70 background (#B3B3B3), bottom-positioned horizontal legend,
+and white hoverlabels for readability.
 }
 \examples{
 \dontrun{
