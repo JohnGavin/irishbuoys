@@ -46,13 +46,9 @@ articles:
     navbar: Dashboards
     contents:
       - dashboard_static
-  - title: Analysis
-    navbar: Analysis
-    contents:
       - wave_analysis
-  - title: Monitoring
-    navbar: Monitoring
-    desc: "Pipeline telemetry and monitoring"
+  - title: Data Quality
+    navbar: Data Quality
     contents:
       - telemetry
   - title: internal
