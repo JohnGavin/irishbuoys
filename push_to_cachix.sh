@@ -4,8 +4,24 @@
 #
 # CRITICAL: Only the single project derivation is pushed. Standard R packages
 # (dplyr, arrow, duckdb, etc.) are ALREADY on rstats-on-nix and must NEVER
-# be pushed to johngavin. We use `echo $PATH | cachix push` (single path)
-# instead of `cachix push $PATH` (which pushes the entire closure/all deps).
+# be pushed to johngavin.
+#
+# METHOD: Before pushing, the script pre-checks that all R package
+# dependencies are ALREADY in the johngavin cache. If they are,
+# `cachix push` skips them and pushes only the new irishbuoys path
+# (1 path). If deps are NOT cached, the script ABORTS to prevent
+# pushing 30+ dependency packages.
+#
+# FIRST-TIME SETUP: If this is the first push ever (empty cache),
+# manually seed the cache once:
+#   RESULT=$(nix-build package.nix --no-out-link)
+#   echo "$RESULT" | cachix push johngavin
+# Then subsequent pushes via this script will push only 1 path.
+#
+# WARNING: Do NOT use `cachix push johngavin $PATH` or
+# `echo $PATH | cachix push johngavin` - BOTH push the entire closure
+# (all runtime dependencies), wasting cachix quota on packages that
+# are already available from rstats-on-nix.
 #
 # Step 5 of 9-step workflow. Builds from package.nix, pushes ONE derivation.
 #
@@ -77,7 +93,7 @@ main() {
   echo ""
 
   # STEP 1: Validate environment
-  log_step "Step 1/5: Validating environment..."
+  log_step "Step 1/4: Validating environment..."
 
   if [ ! -f "DESCRIPTION" ]; then
     log_error "DESCRIPTION not found. Run from irishbuoys package root."
@@ -104,7 +120,7 @@ main() {
   echo ""
 
   # STEP 2: Get package info
-  log_step "Step 2/5: Reading package information..."
+  log_step "Step 2/4: Reading package information..."
 
   PKG_NAME=$(grep "^Package:" DESCRIPTION | awk '{print $2}' | tr -d '\r' || echo "")
   PKG_VERSION=$(grep "^Version:" DESCRIPTION | awk '{print $2}' | tr -d '\r' || echo "")
@@ -118,45 +134,102 @@ main() {
   echo ""
 
   # STEP 3: Build package
-  log_step "Step 3/5: Building package with nix-build..."
+  log_step "Step 3/4: Building package with nix-build..."
   log_info "This may take a few minutes on first build..."
 
-  BUILD_LOG="/tmp/nix-build-${PKG_NAME}.log"
-  if ! nix-build package.nix --no-out-link > "$BUILD_LOG" 2>&1; then
+  RESULT=$(nix-build package.nix --no-out-link 2>&1 | tail -1)
+
+  if [ -z "$RESULT" ] || { [ ! -d "$RESULT" ] && [ ! -L "$RESULT" ]; }; then
     log_error "nix-build failed"
-    log_info "Build log: $BUILD_LOG"
     log_info "Check syntax: nix-instantiate --parse package.nix"
-    tail -20 "$BUILD_LOG"
     exit 3
   fi
 
-  RESULT=$(nix-build package.nix --no-out-link 2>&1)
   log_success "Built: $RESULT"
   echo ""
 
-  # STEP 4: Push ONLY this package to cachix (not dependencies!)
+  # STEP 4: Pre-check then push ONLY this package
   #
-  # CRITICAL: `cachix push johngavin $PATH` pushes the ENTIRE closure
-  # (all dependencies). That wastes quota pushing dplyr, arrow, etc.
-  # that are already on rstats-on-nix.
+  # `cachix push` ALWAYS pushes the full closure. There is no flag to
+  # prevent this. However, it SKIPS paths already present in the cache.
   #
-  # `echo $PATH | cachix push johngavin` pushes ONLY that single path.
+  # Strategy: Before pushing, verify that all R package dependencies
+  # are ALREADY in the johngavin cache (from a previous push or manual
+  # seed). If they are, `cachix push` will skip them and push only the
+  # new irishbuoys path (1 path). If deps are NOT cached, we ABORT
+  # to prevent pushing 30+ dependency packages.
   #
-  log_step "Step 4/5: Pushing ONLY $PKG_NAME to johngavin cachix..."
-  log_info "Single derivation only (dependencies are on rstats-on-nix)"
+  # First-time setup: If this is the first push ever, manually seed
+  # the cache once with: echo "$RESULT" | cachix push johngavin
+  # Subsequent pushes via this script will then push only 1 path.
+  #
+  log_step "Step 4/4: Pushing ONLY $PKG_NAME to johngavin cachix..."
 
-  if ! retry_command 3 5 "echo '$RESULT' | cachix push johngavin"; then
-    log_error "Failed to push to cachix after 3 attempts"
-    log_info "Check network connection"
-    log_info "Check cachix status: https://status.cachix.org/"
+  # Pre-check: verify R package deps are already cached on johngavin, rstats-on-nix,
+  # or cache.nixos.org. If a dep is on any of these, cachix push will skip it.
+  log_info "Pre-check: verifying dependencies are already cached..."
+  UNCACHED_DEPS=0
+  UNCACHED_LIST=""
+  for path in $(nix-store -qR "$RESULT" | grep -E "/nix/store/[a-z0-9]+-r-" | grep -v "r-${PKG_NAME}"); do
+    HASH=$(basename "$path" | cut -c1-32)
+    JG_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+      --max-time 5 "https://johngavin.cachix.org/${HASH}.narinfo" 2>/dev/null || echo "000")
+    RON_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+      --max-time 5 "https://rstats-on-nix.cachix.org/${HASH}.narinfo" 2>/dev/null || echo "000")
+    NIX_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+      --max-time 5 "https://cache.nixos.org/${HASH}.narinfo" 2>/dev/null || echo "000")
+    if [ "$JG_CODE" != "200" ] && [ "$RON_CODE" != "200" ] && [ "$NIX_CODE" != "200" ]; then
+      UNCACHED_DEPS=$((UNCACHED_DEPS + 1))
+      UNCACHED_LIST="${UNCACHED_LIST}  ${path}\n"
+    fi
+  done
+
+  if [ "$UNCACHED_DEPS" -gt 0 ]; then
+    log_error "ABORT: $UNCACHED_DEPS R package dependencies are NOT in johngavin cache."
+    log_error "Pushing would upload these dependencies (forbidden)."
+    echo -e "$UNCACHED_LIST" | head -10
+    echo ""
+    log_error "Fix: seed the cache once with the full closure:"
+    log_info "  echo '$RESULT' | cachix push johngavin"
+    log_info "Then re-run ./push_to_cachix.sh (subsequent pushes will be 1 path only)."
     exit 4
   fi
 
-  log_success "Pushed ONLY $PKG_NAME to johngavin cachix (1 path)"
+  DEP_COUNT=$(nix-store -qR "$RESULT" | grep -E "/nix/store/[a-z0-9]+-r-" | grep -cv "r-${PKG_NAME}" || echo 0)
+  log_success "All $DEP_COUNT R package deps already cached"
+  log_info "Pushing (only new paths will be uploaded)..."
+
+  PUSH_LOG="/tmp/cachix-push-${PKG_NAME}.log"
+
+  if ! retry_command 3 5 "echo '$RESULT' | cachix push johngavin > '$PUSH_LOG' 2>&1"; then
+    log_error "Failed to push to cachix after 3 attempts"
+    log_info "Check network: https://status.cachix.org/"
+    log_info "Push log: $PUSH_LOG"
+    exit 4
+  fi
+
+  # Post-check: verify push count
+  # Count only lines with /nix/store/ - the "Pushing N paths..." summary line is excluded
+  PUSHED_COUNT=$(grep -c "^Pushing /nix/store/" "$PUSH_LOG" 2>/dev/null || echo 0)
+
+  if [ "$PUSHED_COUNT" -gt 1 ]; then
+    log_error "ABORT: Pushed $PUSHED_COUNT paths (strict limit is 1)!"
+    log_error "The pre-check passed but cachix still pushed dependencies."
+    log_error "Paths pushed:"
+    grep "^Pushing /nix/store/" "$PUSH_LOG"
+    log_info "Push log preserved at: $PUSH_LOG"
+    exit 4
+  elif [ "$PUSHED_COUNT" -eq 1 ]; then
+    log_success "Pushed exactly 1 path (correct)"
+  else
+    log_info "Package already in cache (0 new paths pushed)"
+  fi
+
+  rm -f "$PUSH_LOG"
   echo ""
 
   # STEP 5: Pin package (only for release versions)
-  log_step "Step 5/5: Pinning $PKG_NAME v$PKG_VERSION..."
+  log_step "Step 4/4: Pinning $PKG_NAME v$PKG_VERSION..."
 
   if [[ "$PKG_VERSION" == *.9000 ]]; then
     log_warning "Development version detected (.9000 suffix)"
