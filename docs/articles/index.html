@@ -12,74 +12,66 @@ h2 { color: #2874a6; margin-top: 2em; }
 .vignette h3 a:hover { color: #3498db; }
 .selling-points { list-style: none; padding: 0; margin: 0.5em 0; }
 .selling-points li { padding: 0.3em 0; }
-.selling-points li::before { content: "✓ "; color: #27ae60; font-weight: bold; }
+.selling-points li::before { content: "- "; color: #27ae60; font-weight: bold; }
 .size { font-size: 0.85em; color: #7f8c8d; }
 a { color: #3498db; }
 .back { margin-top: 2em; padding-top: 1em; border-top: 1px solid #ddd; }
 </style>
 </head>
 <body>
-<h1>📊 Irish Weather Buoys - Vignettes</h1>
+<h1>irishbuoys - Articles</h1>
 
-<p>Interactive dashboards and analysis vignettes for the <a href="../index.html">irishbuoys</a> R package.
-All vignettes load pre-computed data from the <code>targets</code> pipeline for reproducibility.</p>
+<p>Dashboards and reports for the <a href="../index.html">irishbuoys</a> R package.
+All vignettes load pre-computed data from the <code>targets</code> pipeline.</p>
 
-<h2>🌊 Dashboards</h2>
+<h2>Dashboards</h2>
 
 <div class="vignette">
-  <h3><a href="dashboard_static.html">Irish Weather Buoy Explorer</a></h3>
+  <h3><a href="dashboard_static.html">Irish Buoys Explorer</a></h3>
   <ul class="selling-points">
     <li><strong>6 interactive pages</strong>: Max Wave, Signif Wave, Wind Speed, Wind vs Wave, Data, Reference</li>
-    <li><strong>Rogue wave detection</strong>: Automatic identification of waves where Max Wave / Signif Wave > 2.0</li>
-    <li><strong>Full historical data</strong>: Hourly observations from all 5 buoys (M2-M6), 2019-present</li>
+    <li><strong>Rogue wave detection</strong>: Hmax / Hs &gt; 2.0 criterion applied to all stations</li>
+    <li><strong>Full historical data</strong>: Hourly observations from 5 buoys (M2-M6), 2019-present</li>
   </ul>
-  <p class="size">~14 MB HTML (includes all interactive charts)</p>
 </div>
 
-<h2>📈 Analysis</h2>
-
 <div class="vignette">
-  <h3><a href="wave_analysis.html">Comprehensive Wave Analysis</a></h3>
+  <h3><a href="wave_analysis.html">Irish Buoys Analysis</a></h3>
   <ul class="selling-points">
     <li><strong>Extreme value analysis</strong>: GEV and GPD models with return levels (10, 25, 50, 100 years)</li>
-    <li><strong>Joint distribution analysis</strong>: Cross-correlations, M6 predictions, copula tail dependence</li>
-    <li><strong>Rogue wave science</strong>: Worked example of how Signif Wave is calculated from raw measurements</li>
-  </ul>
-  <p class="size">~21 MB HTML (includes all interactive charts)</p>
-</div>
-
-<h2>🔧 Technical</h2>
-
-<div class="vignette">
-  <h3><a href="telemetry.html">Pipeline Telemetry</a></h3>
-  <ul class="selling-points">
-    <li><strong>Data coverage metrics</strong>: Completeness by station and time period</li>
-    <li><strong>Pipeline performance</strong>: Target execution times and dependencies</li>
-    <li><strong>Git activity tracking</strong>: Commits, branches, and development metrics</li>
+    <li><strong>Rogue wave detection</strong>: Events, conditions, gust factor analysis</li>
+    <li><strong>Seasonal decomposition</strong>: STL trend and seasonal components</li>
   </ul>
 </div>
 
-<h2>✅ Data Quality (pointblank)</h2>
+<h2>Data Quality</h2>
 
 <div class="vignette">
-  <h3><a href="validation_analysis_data.html">Analysis Data Validation</a></h3>
+  <h3><a href="telemetry.html">Telemetry</a></h3>
   <ul class="selling-points">
-    <li><strong>Comprehensive checks</strong>: Column existence, value ranges, station IDs</li>
-    <li><strong>Physical bounds</strong>: Wave height 0-30m, wind speed 0-100 m/s</li>
-    <li><strong>Interactive report</strong>: pointblank interrogation with pass/fail details</li>
+    <li><strong>Data coverage</strong>: Station availability and freshness</li>
+    <li><strong>Pipeline metrics</strong>: Target execution status and timing</li>
+    <li><strong>Test and LLM usage</strong>: Test suite statistics and Claude Code costs</li>
   </ul>
 </div>
 
 <div class="vignette">
-  <h3><a href="validation_rogue_events.html">Rogue Wave Validation</a></h3>
+  <h3><a href="validation_analysis_data.html">analysis_data Validation</a></h3>
   <ul class="selling-points">
-    <li><strong>Event validation</strong>: Rogue wave ratio > 2.0, required columns</li>
-    <li><strong>Quality assurance</strong>: Ensures detected rogue waves meet criteria</li>
-    <li><strong>Interactive report</strong>: pointblank interrogation for rogue events</li>
+    <li><strong>pointblank report</strong>: Column existence, value ranges, station IDs</li>
+    <li><strong>Physical bounds</strong>: Wave height 0-30m, wind speed 0-100 m/s, pressure 900-1100 hPa</li>
   </ul>
 </div>
 
-<p class="back"><a href="../index.html">← Back to package documentation</a></p>
+<div class="vignette">
+  <h3><a href="validation_rogue_events.html">rogue_wave_events Validation</a></h3>
+  <ul class="selling-points">
+    <li><strong>pointblank report</strong>: Rogue ratio &gt; 2.0, required columns, hmax &gt; wave_height</li>
+    <li><strong>Event count</strong>: Validates detected rogue wave events</li>
+  </ul>
+</div>
+
+<p class="back"><a href="../index.html">&larr; Back to package documentation</a></p>
 
 </body>
 </html>
