@@ -75,7 +75,7 @@ plan_qa_gates <- list(
       pct <- covr::percent_coverage(cov)
 
       # File-level breakdown
-      file_cov <- as.data.frame(covr::tally_coverage(cov, by = "file"))
+      file_cov <- as.data.frame(covr::tally_coverage(cov, by = "line"))
 
       cli::cli_alert_info("Test coverage: {round(pct, 1)}%")
 
