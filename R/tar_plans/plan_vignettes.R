@@ -33,12 +33,6 @@ plan_vignettes <- list(
   tarchetypes::tar_quarto(
     vignette_telemetry,
     path = "vignettes/telemetry.qmd"
-  ),
-
-  # Debug - Debugging helper (minimal dependencies)
-  tarchetypes::tar_quarto(
-    vignette_debug,
-    path = "vignettes/debug.qmd"
   )
 
   # NOTE: dashboard_shinylive.qmd is NOT included as a target because:

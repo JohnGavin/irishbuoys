@@ -8,10 +8,15 @@ on:
 jobs:
   update-data:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Pull LFS objects
+        run: git lfs pull
 
       - name: Install Nix
         uses: cachix/install-nix-action@v27
@@ -37,30 +42,47 @@ jobs:
             cat(\"Records added:\", result\$records_added, \"\\n\")
           '"
 
-      - name: Run targets pipeline for wave analysis
+      - name: Run targets pipeline
         env:
           GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
           nix-shell default.nix -A shell --run "Rscript -e '
+            targets::tar_config_set(store = \"_targets\")
             targets::tar_make()
           '" || echo "Targets pipeline completed with warnings"
 
-      - name: Render wave analysis vignette
+      - name: Restore _targets/.gitignore after tar_make
+        run: git checkout -- _targets/.gitignore
+
+      - name: Render wave_analysis vignette
         run: |
           nix-shell default.nix -A shell --run "
-            cd vignettes && quarto render wave_analysis.qmd
-          "
-          cp docs/vignettes/wave_analysis.html docs/articles/ || true
-          cp -r docs/vignettes/wave_analysis_files docs/articles/ 2>/dev/null || true
+            cd vignettes && quarto render wave_analysis.qmd --output-dir ../docs/articles/
+          " || echo "wave_analysis render failed"
+
+      - name: Render telemetry vignette
+        run: |
+          nix-shell default.nix -A shell --run "
+            cd vignettes && quarto render telemetry.qmd --output-dir ../docs/articles/
+          " || echo "telemetry render failed"
+
+      - name: Render dashboard_static vignette
+        run: |
+          nix-shell default.nix -A shell --run "
+            cd vignettes && quarto render dashboard_static.qmd --output-dir ../docs/articles/
+          " || echo "dashboard_static render failed"
 
       - name: Commit updates
         if: success()
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add inst/extdata/ docs/articles/ docs/vignettes/ _targets/ || true
-          git diff --staged --quiet || git commit -m "🔄 Weekly update: data + wave analysis - $(date +'%Y-%m-%d')"
+          git lfs install
+          git add _targets/objects/ _targets/meta/meta _targets/.gitignore
+          git add inst/extdata/*.rds
+          git add docs/articles/ docs/vignettes/ || true
+          git diff --staged --quiet || git commit -m "Weekly update: data + vignettes - $(date +'%Y-%m-%d')"
           git push || true
 
       - name: Upload update log

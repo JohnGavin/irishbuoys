@@ -1,0 +1,10 @@
+# Git LFS tracking for large binary files (> 1 MB)
+
+# _targets/ large objects
+_targets/objects/dashboard_buoy_data filter=lfs diff=lfs merge=lfs -text
+_targets/objects/dashboard_timeseries filter=lfs diff=lfs merge=lfs -text
+
+# inst/extdata/ large RDS files
+inst/extdata/wave_analysis_summary.rds filter=lfs diff=lfs merge=lfs -text
+inst/extdata/dashboard_buoy_data.rds filter=lfs diff=lfs merge=lfs -text
+inst/extdata/seasonal_analysis.rds filter=lfs diff=lfs merge=lfs -text

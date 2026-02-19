@@ -1,0 +1,7 @@
+# Allow objects/ and meta/meta to be committed to git
+# Block only ephemeral runtime files
+meta/process
+meta/progress
+meta/crew
+workspaces/
+user/
