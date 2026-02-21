@@ -5,7 +5,7 @@ llm_instructions: This is an LLM-optimized API specification for the R package '
 kind: package
 schema_version: '1.1'
 name: irishbuoys
-version: 0.1.0
+version: 0.2.0
 language: R
 description: Analyze Irish Weather Buoy Network Data
 ---
@@ -327,11 +327,12 @@ returns: A styled plotly object
 kind: function
 name: generate_weekly_summary
 exported: true
-signature: generate_weekly_summary(db_path = "inst/extdata/irish_buoys.duckdb",lookback_days = 7,qc_filter = NULL)
+signature: generate_weekly_summary(db_path = "inst/extdata/irish_buoys.duckdb",lookback_days = 7,qc_filter = NULL,update_result = NULL)
 arguments:
   db_path: Path to DuckDB database
   lookback_days: 'Number of days to analyze (default: 7)'
   qc_filter: 'QC flag filter: 1 = good only, 0 = include unverified, NULL = no filter'
+  update_result: Optional result from incremental_update() containing ingestion stats
 returns: List containing summary statistics and comparisons
 ---
 kind: function
@@ -345,10 +346,10 @@ returns: blastula email object
 kind: function
 name: generate_and_send_summary
 exported: true
-signature: generate_and_send_summary(recipient = Sys.getenv("EMAIL_TO"),sender = Sys.getenv("EMAIL_FROM"))
+signature: generate_and_send_summary(recipient = Sys.getenv("GMAIL_USERNAME"),sender = Sys.getenv("GMAIL_USERNAME"))
 arguments:
-  recipient: Email recipient (default from EMAIL_TO env var)
-  sender: Email sender (default from EMAIL_FROM env var)
+  recipient: Email recipient (default from GMAIL_USERNAME env var)
+  sender: Email sender (default from GMAIL_USERNAME env var)
 ---
 kind: function
 name: detect_rogue_waves
