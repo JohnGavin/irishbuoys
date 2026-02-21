@@ -1,0 +1,147 @@
+# Tests for R/trend_analysis.R
+# Tests for functions that work with in-memory data frames
+
+test_that("calculate_seasonal_means works with synthetic data", {
+  set.seed(42)
+  # Generate 2 years of hourly data
+  times <- seq.POSIXt(
+    as.POSIXct("2020-01-01", tz = "UTC"),
+    as.POSIXct("2021-12-31", tz = "UTC"),
+    by = "hour"
+  )
+  n <- length(times)
+  month_num <- as.integer(format(times, "%m"))
+  # Seasonal pattern: higher in winter
+  seasonal_component <- ifelse(month_num %in% c(11, 12, 1, 2, 3), 4, 2)
+  data <- data.frame(
+    time = times,
+    wave_height = seasonal_component + rnorm(n, 0, 0.5)
+  )
+
+  result <- calculate_seasonal_means(data)
+  expect_type(result, "list")
+  expect_true("monthly" %in% names(result))
+  expect_true("seasonal" %in% names(result))
+  expect_equal(nrow(result$monthly), 12)
+  expect_equal(nrow(result$seasonal), 4)
+  # Winter should have higher mean than summer
+  winter <- result$seasonal[result$seasonal$season == "Winter (DJF)", ]
+  summer <- result$seasonal[result$seasonal$season == "Summer (JJA)", ]
+  expect_true(winter$mean > summer$mean)
+})
+
+test_that("calculate_annual_trends works with synthetic data", {
+  set.seed(42)
+  # 5 years of data with slight upward trend
+  years <- 2016:2020
+  times <- do.call(c, lapply(years, function(y) {
+    seq.POSIXt(
+      as.POSIXct(paste0(y, "-01-01"), tz = "UTC"),
+      as.POSIXct(paste0(y, "-12-31"), tz = "UTC"),
+      by = "day"
+    )
+  }))
+  n <- length(times)
+  year_num <- as.integer(format(times, "%Y"))
+  trend <- 0.1 * (year_num - 2016)
+  data <- data.frame(
+    time = times,
+    wave_height = 3 + trend + rnorm(n, 0, 0.3)
+  )
+
+  result <- calculate_annual_trends(data)
+  expect_type(result, "list")
+  expect_true("annual_stats" %in% names(result))
+  expect_true("trend_per_decade" %in% names(result))
+  expect_equal(nrow(result$annual_stats), 5)
+  # Trend should be positive (upward)
+  expect_true(result$trend_per_decade > 0)
+})
+
+test_that("calculate_annual_trends handles insufficient data", {
+  data <- data.frame(
+    time = as.POSIXct(c("2020-01-01", "2020-06-01")),
+    wave_height = c(3, 4)
+  )
+  result <- calculate_annual_trends(data)
+  # Only 1 year - should warn about insufficient data
+  expect_true(is.na(result$trend_per_decade))
+})
+
+test_that("detect_anomalies finds outliers", {
+  set.seed(42)
+  n <- 8760  # 1 year hourly
+  times <- seq.POSIXt(
+    as.POSIXct("2020-01-01", tz = "UTC"),
+    by = "hour", length.out = n
+  )
+  values <- rnorm(n, 3, 1)
+  # Inject anomalies: spike at positions 100 and 5000
+  values[100] <- 20  # Very high
+  values[5000] <- -10  # Very low
+  data <- data.frame(time = times, wave_height = values)
+
+  result <- detect_anomalies(data, threshold = 3)
+  expect_type(result, "list")
+  expect_true("anomalies" %in% names(result))
+  expect_true("seasonal_norms" %in% names(result))
+  # Should detect at least the 2 injected anomalies
+  expect_true(nrow(result$anomalies) >= 2)
+})
+
+test_that("decompose_stl works with sufficient data", {
+  set.seed(42)
+  n <- 24 * 60  # 60 days hourly = 1440 obs
+  times <- seq.POSIXt(
+    as.POSIXct("2020-01-01", tz = "UTC"),
+    by = "hour", length.out = n
+  )
+  # Daily cycle + trend + noise
+  hour <- as.integer(format(times, "%H"))
+  day <- as.integer(difftime(times, times[1], units = "days"))
+  seasonal <- sin(2 * pi * hour / 24)
+  trend <- 0.01 * day
+  data <- data.frame(
+    time = times,
+    wave_height = 3 + seasonal + trend + rnorm(n, 0, 0.2)
+  )
+
+  result <- decompose_stl(data, frequency = "daily")
+  expect_type(result, "list")
+  expect_true("components" %in% names(result))
+  expect_true("summary" %in% names(result))
+  expect_equal(nrow(result$components), n)
+  expect_true(all(c("seasonal", "trend", "remainder") %in% names(result$components)))
+})
+
+test_that("decompose_stl rejects insufficient data", {
+  data <- data.frame(
+    time = Sys.time() + 1:10,
+    wave_height = rnorm(10)
+  )
+  expect_error(decompose_stl(data, frequency = "daily"), "Insufficient data")
+})
+
+test_that("trend_summary_report produces output", {
+  # Minimal mock data
+  seasonal <- list(
+    seasonal = data.frame(
+      season = c("Winter (DJF)", "Spring (MAM)", "Summer (JJA)", "Autumn (SON)"),
+      mean = c(4.0, 3.0, 2.0, 3.5),
+      sd = c(1.0, 0.8, 0.5, 0.9),
+      max = c(10, 8, 5, 9),
+      n = c(1000, 1000, 1000, 1000)
+    ),
+    variable = "wave_height"
+  )
+  annual <- list(
+    trend_per_decade = 0.15,
+    p_value = 0.03,
+    r_squared = 0.6
+  )
+  report <- trend_summary_report(seasonal, annual)
+  expect_type(report, "character")
+  expect_true(nchar(report) > 50)
+  expect_true(grepl("Trend", report))
+  expect_true(grepl("significant", report))
+})

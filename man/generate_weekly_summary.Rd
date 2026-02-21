@@ -7,7 +7,8 @@
 generate_weekly_summary(
   db_path = "inst/extdata/irish_buoys.duckdb",
   lookback_days = 7,
-  qc_filter = NULL
+  qc_filter = NULL,
+  update_result = NULL
 )
 }
 \arguments{
@@ -16,11 +17,13 @@ generate_weekly_summary(
 \item{lookback_days}{Number of days to analyze (default: 7)}
 
 \item{qc_filter}{QC flag filter: 1 = good only, 0 = include unverified, NULL = no filter}
+
+\item{update_result}{Optional result from incremental_update() containing ingestion stats}
 }
 \value{
 List containing summary statistics and comparisons
 }
 \description{
 Compares recent data against historical averages to identify trends
-and anomalies.
+and anomalies. Optionally includes data ingestion statistics.
 }

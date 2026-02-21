@@ -14,6 +14,7 @@
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' # Get last 7 days of data for all stations
 #' data <- download_buoy_data(
 #'   start_date = Sys.Date() - 7,
@@ -25,6 +26,7 @@
 #'   stations = "M3",
 #'   variables = c("time", "WaveHeight", "WavePeriod", "Hmax")
 #' )
+#' }
 download_buoy_data <- function(
     start_date = Sys.Date() - 30,
     end_date = Sys.Date(),
@@ -142,8 +144,10 @@ download_buoy_data <- function(
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' latest <- get_latest_timestamp()
 #' latest_m3 <- get_latest_timestamp("M3")
+#' }
 get_latest_timestamp <- function(station = NULL) {
   base_url <- "https://erddap.marine.ie/erddap/tabledap/IWBNetwork"
 
@@ -178,7 +182,9 @@ get_latest_timestamp <- function(station = NULL) {
 #'
 #' @export
 #' @examples
+#' \dontrun{
 #' stations <- get_stations()
+#' }
 get_stations <- function() {
   base_url <- "https://erddap.marine.ie/erddap/tabledap/IWBNetwork"
 

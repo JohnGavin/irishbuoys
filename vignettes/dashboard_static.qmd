@@ -1,5 +1,5 @@
 ---
-title: "Irish Buoys"
+title: "Irish Buoys Explorer"
 format:
   dashboard:
     orientation: rows
@@ -201,9 +201,9 @@ rogue_winds_full <- buoy_data |>
 
 # Max Wave (m)
 
-## Row
+## Time Series
 
-### Column {.tabset}
+### Station Views {.tabset}
 
 #### All Stations
 
@@ -249,9 +249,9 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "hmax", "Max Wave (m) - M5 H
 create_dygraph(get_station_data(buoy_hourly, "M6"), "hmax", "Max Wave (m) - M6 Hourly", by_station = FALSE)
 ```
 
-## Row {height=35%}
+## Station Comparison {height=35%}
 
-### Column {.tabset}
+### Max Wave Details {.tabset}
 
 #### Statistics
 
@@ -313,9 +313,9 @@ create_dt(hmax_data, paste0(
 
 # Signif Wave (m)
 
-## Row
+## Time Series
 
-### Column {.tabset}
+### Station Views {.tabset}
 
 #### All Stations
 
@@ -361,9 +361,9 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "wave_height", "Signif Wave 
 create_dygraph(get_station_data(buoy_hourly, "M6"), "wave_height", "Signif Wave (m) - M6 Hourly", by_station = FALSE)
 ```
 
-## Row {height=35%}
+## Station Comparison {height=35%}
 
-### Column {.tabset}
+### Signif Wave Details {.tabset}
 
 #### Statistics
 
@@ -422,9 +422,9 @@ create_dt(wave_data, paste0(
 
 # Wind Speed (kn)
 
-## Row
+## Time Series
 
-### Column {.tabset}
+### Station Views {.tabset}
 
 #### All Stations
 
@@ -470,9 +470,9 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "wind_speed", "Wind Speed (k
 create_dygraph(get_station_data(buoy_hourly, "M6"), "wind_speed", "Wind Speed (kn) - M6 Hourly", by_station = FALSE)
 ```
 
-## Row {height=35%}
+## Station Comparison {height=35%}
 
-### Column {.tabset}
+### Wind Details {.tabset}
 
 #### Statistics
 
@@ -521,9 +521,9 @@ create_dt(wind_data, paste0(
 
 # Wind vs Wave
 
-## Row
+## Scatter Analysis
 
-### Column {width=100%}
+### Regression Plots {width=100%}
 
 ```{r}
 #| fig-height: 36
@@ -575,25 +575,25 @@ p <- ggplot(plot_data, aes(x = wind_speed, y = wave_height)) +
   ) +
   theme_minimal(base_size = 12) +
   theme(
-    strip.text = element_text(face = "bold", size = 14, color = "white"),
-    strip.background = element_rect(fill = "#333333", color = NA),
-    panel.background = element_rect(fill = "black", color = NA),
-    plot.background = element_rect(fill = "#1a1a1a", color = NA),
-    panel.grid.major = element_line(color = "white", linewidth = 0.3),
-    panel.grid.minor = element_line(color = "grey50", linewidth = 0.1),
-    axis.text = element_text(color = "white"),
-    axis.title = element_text(color = "white")
+    strip.text = element_text(face = "bold", size = 14, color = "#1a1a1a"),
+    strip.background = element_rect(fill = "#999999", color = NA),
+    panel.background = element_rect(fill = "#B3B3B3", color = NA),
+    plot.background = element_rect(fill = "#B3B3B3", color = NA),
+    panel.grid.major = element_line(color = "#666666", linewidth = 0.3),
+    panel.grid.minor = element_line(color = "#808080", linewidth = 0.1),
+    axis.text = element_text(color = "#1a1a1a"),
+    axis.title = element_text(color = "#1a1a1a")
   )
 
 ggplotly(p, tooltip = "text") |>
   layout(
     title = list(
       text = paste0("Wind Speed vs Signif Wave (wind >20 kn, n=", format_k(n_strong_wind), ", ", date_caption, ")"),
-      font = list(size = 14, color = "white"),
+      font = list(size = 14, color = "#1a1a1a"),
       y = 0.98
     ),
-    paper_bgcolor = "#1a1a1a",
-    plot_bgcolor = "black",
+    paper_bgcolor = "#B3B3B3",
+    plot_bgcolor = "#B3B3B3",
     margin = list(t = 80),
     hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
   )
@@ -601,9 +601,9 @@ ggplotly(p, tooltip = "text") |>
 
 **Caption:** Wind Speed vs [Signif Wave](#variable-definitions) relationship for observations with **wind >20 knots** (strong wind conditions). Panels ordered by regression slope. The slope indicates wave height increase (m) per knot of wind. M6 (deep Atlantic) shows steepest slope due to unlimited fetch. Filtering for high winds focuses on storm conditions where wind-wave coupling is strongest.
 
-## Row {height=25%}
+## Summary Statistics {height=25%}
 
-### Column {.tabset}
+### Wind-Wave Details {.tabset}
 
 #### Regression Statistics
 
@@ -641,9 +641,9 @@ create_dt(scatter_data, paste0(
 
 # Data
 
-## Row
+## Data Table
 
-### Column {.tabset}
+### Rogue Events {.tabset}
 
 #### Rogue Events (Waves + Winds)
 
@@ -795,13 +795,13 @@ datatable(
 
 # Reference
 
-## Row
+## Technical Reference
 
-### Column {.tabset}
+### Reference Details {.tabset}
 
 #### Variable Definitions
 
-##### {.tabset}
+##### Variable Categories {.tabset}
 
 ###### Column Names
 
@@ -889,7 +889,7 @@ This dashboard uses "Signif Wave" and "Max Wave" consistently instead of technic
 
 #### Methodology
 
-##### {.tabset}
+##### Methodology Details {.tabset}
 
 ###### Measurement Window
 

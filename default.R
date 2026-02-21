@@ -39,7 +39,6 @@ analysis_pkgs <- c(
   "SpatialExtremes",# Spatial extreme value modelling
   "quantreg",       # Quantile regression
   "copula",         # Copula models for dependence
-  "copula",         # Copula models for dependence
   "zoo",            # Time series infrastructure
   "xts",            # Extensible time series
   "pointblank"      # Data validation
@@ -51,7 +50,9 @@ viz_pkgs <- c(
   "plotly",         # Interactive plots
   "scales",         # Scale functions
   "DT",             # Interactive tables
-  "dygraphs"        # Time series plots
+  "dygraphs",       # Time series plots
+  "shiny",          # Shiny web apps
+  "shinylive"       # Shinylive deployment
 )
 
 # Development tools
@@ -63,7 +64,13 @@ dev_tools <- c(
   "pkgload",
   "testthat",
   "gert",           # Git operations
-  "quarto"          # Documentation
+  "quarto",         # Documentation
+  "blastula",       # Email reports
+  "withr",          # Test helpers
+  "here",           # Project root detection
+  "covr",           # Test coverage
+  "knitr",          # Vignette engine
+  "rmarkdown"       # Document rendering
 )
 
 # All packages
@@ -72,9 +79,9 @@ all_r_pkgs <- c(core_pkgs, pipeline_pkgs, analysis_pkgs, viz_pkgs, dev_tools)
 # System packages
 system_pkgs <- c("git", "pandoc", "quarto")
 
-# Generate default.nix
+# Use a ~1 month old date for stable, pre-built cachix binaries
 rix::rix(
-  r_ver = "4.5.2",
+  date = "2026-01-19",
   r_pkgs = all_r_pkgs,
   system_pkgs = system_pkgs,
   git_pkgs = NULL,
@@ -88,5 +95,5 @@ cat("default.nix generated with analysis vignette packages\n")
 cat("Core: arrow, duckdb, dplyr, tidyr, lubridate, jsonlite, httr2\n")
 cat("Pipeline: targets, tarchetypes, crew, mirai\n")
 cat("Analysis: mgcv, forecast, extRemes, evd, copula, quantreg, zoo, xts\n")
-cat("Viz: ggplot2, plotly, scales\n")
-cat("Dev: rix, desc, devtools, usethis, testthat, gert, quarto\n")
+cat("Viz: ggplot2, plotly, scales, shiny, shinylive\n")
+cat("Dev: rix, desc, devtools, usethis, testthat, gert, quarto, blastula, here, covr\n")

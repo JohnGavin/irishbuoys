@@ -31,6 +31,7 @@ Downloads data from the Marine Institute's ERDDAP server for the Irish
 Weather Buoy Network. Supports filtering by date range, stations, and variables.
 }
 \examples{
+\dontrun{
 # Get last 7 days of data for all stations
 data <- download_buoy_data(
   start_date = Sys.Date() - 7,
@@ -42,4 +43,5 @@ wave_data <- download_buoy_data(
   stations = "M3",
   variables = c("time", "WaveHeight", "WavePeriod", "Hmax")
 )
+}
 }

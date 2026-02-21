@@ -55,5 +55,8 @@ list(
   plan_telemetry,
   plan_evidence,  # Claude session evidence and verification logs
   plan_vignettes,  # MANDATORY: All vignettes rendered via targets for reproducibility
-  plan_pkgctx  # LLM context files via pkgctx (https://github.com/b-rodrigues/pkgctx)
+  plan_pkgctx,  # LLM context files via pkgctx (https://github.com/b-rodrigues/pkgctx)
+  plan_qa_gates,  # MANDATORY: Adversarial QA, quality gates, coverage (cannot be skipped)
+  plan_nix_sync,  # DESCRIPTION/default.nix drift detection
+  plan_email_report  # Weekly email summary via Gmail
 )
