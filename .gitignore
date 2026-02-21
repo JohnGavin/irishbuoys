@@ -8,15 +8,14 @@
 # Nix
 nix-shell-root
 
-# targets
-_targets/
+# targets — committed to git (large objects via LFS)
+# See _targets/.gitignore for selective tracking
 
 # Data
 *.duckdb
 *.parquet
 *.arrow
 *.csv
-inst/extdata/*.rds
 inst/extdata/*.duckdb
 # JSON ignored except in docs/ and vignettes/data/
 *.json

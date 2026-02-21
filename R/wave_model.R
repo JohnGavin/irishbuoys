@@ -61,9 +61,9 @@ prepare_wave_features <- function(data, lags = 1:3) {
   }
 
   # Defensive: lags validation
-  if (!is.numeric(lags) || any(lags < 1)) {
+  if (!is.numeric(lags) || any(!is.finite(lags)) || any(lags < 1)) {
     cli::cli_abort(c(
-      "x" = "{.arg lags} must be positive integers",
+      "x" = "{.arg lags} must be finite positive integers",
       "i" = "You provided {.val {lags}}"
     ))
   }
@@ -86,22 +86,26 @@ prepare_wave_features <- function(data, lags = 1:3) {
    }
  }
 
- # Create lagged wind speed
- data$wind_speed_lag1 <- NA_real_
- for (station in unique(data$station_id)) {
-   idx <- which(data$station_id == station)
-   if (length(idx) > 1) {
-     data$wind_speed_lag1[idx] <- dplyr::lag(data$wind_speed[idx], n = 1)
+ # Create lagged wind speed (if available)
+ if ("wind_speed" %in% names(data)) {
+   data$wind_speed_lag1 <- NA_real_
+   for (station in unique(data$station_id)) {
+     idx <- which(data$station_id == station)
+     if (length(idx) > 1) {
+       data$wind_speed_lag1[idx] <- dplyr::lag(data$wind_speed[idx], n = 1)
+     }
    }
  }
 
- # Pressure tendency (change from previous hour)
- data$pressure_change <- NA_real_
- for (station in unique(data$station_id)) {
-   idx <- which(data$station_id == station)
-   if (length(idx) > 1) {
-     data$pressure_change[idx] <- data$atmospheric_pressure[idx] -
-       dplyr::lag(data$atmospheric_pressure[idx], n = 1)
+ # Pressure tendency (change from previous hour, if available)
+ if ("atmospheric_pressure" %in% names(data)) {
+   data$pressure_change <- NA_real_
+   for (station in unique(data$station_id)) {
+     idx <- which(data$station_id == station)
+     if (length(idx) > 1) {
+       data$pressure_change[idx] <- data$atmospheric_pressure[idx] -
+         dplyr::lag(data$atmospheric_pressure[idx], n = 1)
+     }
    }
  }
 
@@ -197,9 +201,10 @@ train_wave_model <- function(
   }
 
   # Defensive: train_fraction validation
-  if (!is.numeric(train_fraction) || train_fraction <= 0 || train_fraction >= 1) {
+  if (!is.numeric(train_fraction) || length(train_fraction) != 1 ||
+      !is.finite(train_fraction) || train_fraction <= 0 || train_fraction >= 1) {
     cli::cli_abort(c(
-      "x" = "{.arg train_fraction} must be between 0 and 1 (exclusive)",
+      "x" = "{.arg train_fraction} must be a finite number between 0 and 1 (exclusive)",
       "i" = "You provided {.val {train_fraction}}"
     ))
   }

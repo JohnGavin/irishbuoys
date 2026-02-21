@@ -8,7 +8,7 @@
 # Helper to find project root
 find_project_root <- function() {
   tryCatch(
-    rprojroot::find_package_root_file(),
+    here::here(),
     error = function(e) {
       # Fallback: look for _targets.R
       paths <- c("../..", "../../..", getwd())

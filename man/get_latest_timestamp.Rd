@@ -17,6 +17,8 @@ Queries the ERDDAP server to find the most recent data timestamp
 available for the Irish Weather Buoy Network.
 }
 \examples{
+\dontrun{
 latest <- get_latest_timestamp()
 latest_m3 <- get_latest_timestamp("M3")
+}
 }
