@@ -8,8 +8,9 @@
 # Nix
 nix-shell-root
 
-# targets — committed to git (large objects via LFS)
-# See _targets/.gitignore for selective tracking
+# targets — pipeline state stored on targets-runs branch (not main)
+# See .github/workflows/weekly-update.yml for incremental CI pattern
+_targets/
 
 # Data
 *.duckdb
