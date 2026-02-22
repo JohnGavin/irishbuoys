@@ -22,10 +22,14 @@ test_that("generate_weekly_summary: empty string db_path", {
   )
 })
 
-test_that("generate_weekly_summary: non-existent directory path", {
-  expect_error(
-    generate_weekly_summary(db_path = "/nonexistent/path/to/db.duckdb")
-  )
+test_that("generate_weekly_summary: non-existent directory path creates new db", {
+  # connect_duckdb() creates missing directories via dir.create(recursive=TRUE)
+  # so a nonexistent path succeeds (creates empty DB) rather than erroring
+  tmp_db <- file.path(tempdir(), "nonexistent_subdir", "test.duckdb")
+  on.exit(unlink(dirname(tmp_db), recursive = TRUE), add = TRUE)
+  result <- generate_weekly_summary(db_path = tmp_db)
+  expect_type(result, "list")
+  expect_equal(nrow(result$current_week), 0)
 })
 
 test_that("generate_weekly_summary: directory instead of file", {
