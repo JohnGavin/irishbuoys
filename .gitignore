@@ -26,6 +26,9 @@ inst/extdata/*.duckdb
 !docs/**/*.parquet
 !vignettes/data/*.parquet
 
+# Symlinks / generated
+AGENTS.md
+
 # OS files
 .DS_Store
 Thumbs.db
