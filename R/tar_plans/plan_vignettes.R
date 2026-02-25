@@ -25,21 +25,24 @@ plan_vignettes <- list(
   # Dependencies: analysis_data, rogue_wave_events, return_levels, joint_analysis_results
   tarchetypes::tar_quarto(
     vignette_wave_analysis,
-    path = "vignettes/wave_analysis.qmd"
+    path = "vignettes/wave_analysis.qmd",
+    quiet = FALSE
   ),
 
   # Telemetry - Pipeline metrics and performance tracking
   # Dependencies: telemetry_summary
   tarchetypes::tar_quarto(
     vignette_telemetry,
-    path = "vignettes/telemetry.qmd"
+    path = "vignettes/telemetry.qmd",
+    quiet = FALSE
   ),
 
   # Static Data API - Endpoint documentation
   # Dependencies: api_index, api_vignette_endpoints_dt, save_api_files
   tarchetypes::tar_quarto(
     vignette_api_usage,
-    path = "vignettes/api-usage.qmd"
+    path = "vignettes/api-usage.qmd",
+    quiet = FALSE
   )
 
   # NOTE: dashboard_shinylive.qmd is NOT included as a target because:
