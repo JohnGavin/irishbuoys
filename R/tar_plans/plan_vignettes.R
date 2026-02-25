@@ -33,6 +33,13 @@ plan_vignettes <- list(
   tarchetypes::tar_quarto(
     vignette_telemetry,
     path = "vignettes/telemetry.qmd"
+  ),
+
+  # Static Data API - Endpoint documentation
+  # Dependencies: api_index, api_vignette_endpoints_dt, save_api_files
+  tarchetypes::tar_quarto(
+    vignette_api_usage,
+    path = "vignettes/api-usage.qmd"
   )
 
   # NOTE: dashboard_shinylive.qmd is NOT included as a target because:

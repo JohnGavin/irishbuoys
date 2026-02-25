@@ -128,6 +128,12 @@ jobs:
             cd vignettes && quarto render dashboard_static.qmd --output-dir ../docs/articles/
           " || echo "dashboard_static render failed"
 
+      - name: Render api-usage vignette
+        run: |
+          nix-shell default.nix -A shell --run "
+            cd vignettes && quarto render api-usage.qmd --output-dir ../docs/articles/
+          " || echo "api-usage render failed"
+
       # ── Commit Rendered Outputs to main ─────────────────────
 
       - name: Commit rendered outputs to main
@@ -135,6 +141,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add inst/extdata/*.rds || true
+          git add docs/api/ || true
           git add docs/articles/ docs/vignettes/ || true
           git diff --staged --quiet || git commit -m "Weekly update: data + vignettes - $(date +'%Y-%m-%d')"
           git push || true

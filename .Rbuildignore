@@ -36,5 +36,8 @@
 ^vignettes/wave_analysis\.qmd$
 ^vignettes/debug\.qmd$
 ^vignettes/telemetry\.qmd$
+^vignettes/api-usage\.qmd$
 ^\.claude$
 ^_targets\.yaml$
+^inst/extdata/ctx$
+^AGENTS\.md$

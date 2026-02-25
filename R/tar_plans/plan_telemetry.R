@@ -741,18 +741,40 @@ plan_telemetry <- list(
   # VIGNETTE TITLES (for consistency between .qmd and _pkgdown.yml)
   # ==========================================================================
 
-  # Canonical vignette titles - single source of truth
-  # Use tar_read(vignette_titles) in YAML templating or _pkgdown.yml updates
+  # Canonical vignette titles - derived from filesystem + YAML front matter
+  # Scans vignettes/ for .qmd files and extracts title from YAML header
+  # Automatically updates when vignettes are added/removed/renamed
   targets::tar_target(
     vignette_titles,
-    tibble::tribble(
-      ~file,                           ~title,                        ~navbar_text,    ~section,
-      "dashboard_static.qmd",          "Irish Buoys Dashboard",       "Dashboard",     "Dashboards",
-      "wave_analysis.qmd",             "Wave Analysis",               "Analysis",      "Analysis",
-      "telemetry.qmd",                 "Telemetry",                   "Telemetry",     "Monitoring",
-      "validation_analysis_data.qmd",  "Validation: Analysis Data",   "Analysis Data", "Validation",
-      "validation_rogue_events.qmd",   "Validation: Rogue Waves",     "Rogue Waves",   "Validation"
-    )
+    {
+      qmd_files <- list.files("vignettes", pattern = "\\.qmd$", full.names = TRUE)
+      titles <- lapply(qmd_files, function(f) {
+        lines <- readLines(f, n = 20, warn = FALSE)
+        # Find YAML delimiters
+        yaml_markers <- which(lines == "---")
+        if (length(yaml_markers) < 2) {
+          return(tibble::tibble(
+            file = basename(f), title = basename(f),
+            navbar_text = tools::file_path_sans_ext(basename(f)),
+            section = "Other"
+          ))
+        }
+        yaml_block <- lines[(yaml_markers[1] + 1):(yaml_markers[2] - 1)]
+        title_line <- grep("^title:", yaml_block, value = TRUE)
+        title <- if (length(title_line) > 0) {
+          gsub('^title:\\s*["\']?|["\']?\\s*$', "", title_line[1])
+        } else {
+          tools::file_path_sans_ext(basename(f))
+        }
+        tibble::tibble(
+          file = basename(f),
+          title = title,
+          navbar_text = sub("^(\\S+\\s*\\S*).*", "\\1", title),
+          section = "Auto-detected"
+        )
+      })
+      dplyr::bind_rows(titles)
+    }
   ),
 
   # ==========================================================================
