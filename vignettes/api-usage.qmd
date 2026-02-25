@@ -1,0 +1,136 @@
+---
+title: "Static Data API"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    code-fold: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+
+# All data loaded from pre-computed targets via tar_load().
+# MANDATORY: No inline computation. Every chunk is ONE expression.
+library(targets)
+
+targets::tar_config_set(store = "../_targets")
+
+safe_tar_read <- function(name) {
+  tryCatch(
+    targets::tar_read_raw(name),
+    error = function(e) {
+      htmltools::div(
+        class = "alert alert-warning",
+        htmltools::h4("Data Not Available"),
+        htmltools::p(
+          "The ", htmltools::code(name), " target has not been built."
+        ),
+        htmltools::p("Run ", htmltools::code("targets::tar_make()"), " to generate.")
+      )
+    }
+  )
+}
+
+tryCatch({
+  tar_load(api_index)
+  tar_load(api_vignette_endpoints_dt)
+  tar_load(api_vignette_example_response)
+  tar_load(save_api_files)
+  tar_load(code_api_curl_latest)
+  tar_load(code_api_r_jsonlite)
+  tar_load(code_api_python_requests)
+  targets_loaded <- TRUE
+}, error = function(e) {
+  targets_loaded <<- FALSE
+})
+```
+
+## Overview {#overview}
+
+The irishbuoys package provides a **static JSON API** served via GitHub Pages.
+All endpoints are pre-computed by the targets pipeline and updated weekly
+(Sundays 2 AM UTC).
+
+**Base URL:** `https://johngavin.github.io/irishbuoys/api/v1/`
+
+No authentication required. All responses are JSON. Data is updated weekly
+from the Marine Institute's ERDDAP server.
+
+## Available Endpoints {#endpoints}
+
+```{r endpoints-table}
+safe_tar_read("api_vignette_endpoints_dt")
+```
+
+## Example Response {#example-response}
+
+A sample response from `latest.json` (one observation per station):
+
+```{r example-json}
+#| results: asis
+safe_tar_read("api_vignette_example_response")
+```
+
+## Usage Examples {#usage-examples}
+
+### curl {#curl-example}
+
+```{r curl-code}
+#| results: asis
+code <- safe_tar_read("code_api_curl_latest")
+if (is.character(code)) {
+  cat("```bash\n", paste(code, collapse = "\n"), "\n```\n")
+}
+```
+
+### R (jsonlite) {#r-example}
+
+```{r r-code}
+#| results: asis
+code <- safe_tar_read("code_api_r_jsonlite")
+if (is.character(code)) {
+  cat("```r\n", paste(code, collapse = "\n"), "\n```\n")
+}
+```
+
+### Python (requests) {#python-example}
+
+```{r python-code}
+#| results: asis
+code <- safe_tar_read("code_api_python_requests")
+if (is.character(code)) {
+  cat("```python\n", paste(code, collapse = "\n"), "\n```\n")
+}
+```
+
+## Bulk Data Access {#bulk-data}
+
+For bulk analysis, download the full dataset as Parquet:
+
+```bash
+curl -O https://johngavin.github.io/irishbuoys/vignettes/data/buoy_data.parquet
+```
+
+Read in R with `arrow::read_parquet()` or in Python with `pandas.read_parquet()`.
+
+## API File Summary {#file-summary}
+
+```{r file-sizes}
+safe_tar_read("save_api_files")
+```
+
+## Update Schedule {#update-schedule}
+
+- **Frequency:** Weekly (Sundays 2 AM UTC)
+- **Source:** Marine Institute ERDDAP server
+- **Pipeline:** `targets::tar_make()` with incremental DuckDB updates
+- **CI:** [weekly-update.yml](https://github.com/JohnGavin/irishbuoys/actions/workflows/weekly-update.yml)
+
+Data freshness depends on the ERDDAP server. The pipeline downloads the
+latest 72 hours of observations each run to catch any late-arriving data.

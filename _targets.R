@@ -50,6 +50,7 @@ list(
   plan_wave_analysis,
   plan_joint_analysis,  # Joint distributions between buoys (issue #13)
   plan_dashboard,
+  plan_api,  # Static JSON API at docs/api/v1/ (issue #32)
   plan_doc_examples,
   plan_dashboard_captions,
   plan_telemetry,

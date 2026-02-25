@@ -17,7 +17,18 @@ The `irishbuoys` package provides tools to download, process, and analyze data f
 
 ::: {.panel-tabset}
 
-### Standard R
+### R-universe (Recommended)
+
+Install from [r-universe](https://johngavin.r-universe.dev/irishbuoys) — no compilation needed, binary packages available:
+
+```r
+install.packages(
+  "irishbuoys",
+  repos = c("https://johngavin.r-universe.dev", "https://cloud.r-project.org")
+)
+```
+
+### Standard R (GitHub)
 
 You can install the development version of irishbuoys from GitHub:
 
@@ -26,7 +37,7 @@ You can install the development version of irishbuoys from GitHub:
 remotes::install_github("johngavin/irishbuoys")
 ```
 
-### Nix (Recommended)
+### Nix (Recommended for Development)
 
 For a reproducible development environment using Nix:
 

@@ -1,0 +1,62 @@
+[
+  {
+    "station_id": "",
+    "CallSign": "",
+    "longitude": null,
+    "latitude": null
+  },
+  {
+    "station_id": "Belmullet-AMETS",
+    "CallSign": "Belmullet",
+    "longitude": -10.1422,
+    "latitude": 54.2659
+  },
+  {
+    "station_id": "FS1",
+    "CallSign": "62023",
+    "longitude": -7.9,
+    "latitude": 51.4
+  },
+  {
+    "station_id": "M1",
+    "CallSign": "62090",
+    "longitude": -11.2,
+    "latitude": 53.1266
+  },
+  {
+    "station_id": "M2",
+    "CallSign": "62091",
+    "longitude": -5.4302,
+    "latitude": 53.4836
+  },
+  {
+    "station_id": "M3",
+    "CallSign": "62092",
+    "longitude": -10.5483,
+    "latitude": 51.216
+  },
+  {
+    "station_id": "M4",
+    "CallSign": "62093",
+    "longitude": -9.9991,
+    "latitude": 55
+  },
+  {
+    "station_id": "M4-Archive",
+    "CallSign": "62093",
+    "longitude": -9.0667,
+    "latitude": 54.6667
+  },
+  {
+    "station_id": "M5",
+    "CallSign": "62094",
+    "longitude": -6.7043,
+    "latitude": 51.6904
+  },
+  {
+    "station_id": "M6",
+    "CallSign": "62095",
+    "longitude": -15.8813,
+    "latitude": 53.0748
+  }
+]

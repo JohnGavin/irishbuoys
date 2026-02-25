@@ -1,0 +1,78 @@
+{
+  "updated_at": "2026-02-24T18:19:07Z",
+  "wave_height": [
+    {
+      "return_period": 10,
+      "return_level": 15.6081,
+      "lower": null,
+      "upper": null,
+      "variable": "wave_height"
+    },
+    {
+      "return_period": 50,
+      "return_level": 15.7556,
+      "lower": null,
+      "upper": null,
+      "variable": "wave_height"
+    },
+    {
+      "return_period": 100,
+      "return_level": 15.7697,
+      "lower": null,
+      "upper": null,
+      "variable": "wave_height"
+    }
+  ],
+  "wind_speed": [
+    {
+      "return_period": 10,
+      "return_level": 53.7521,
+      "lower": 48.6704,
+      "upper": 58.8338,
+      "variable": "wind_speed",
+      "_row": "10-year return level"
+    },
+    {
+      "return_period": 50,
+      "return_level": 57.9816,
+      "lower": 47.8427,
+      "upper": 68.1204,
+      "variable": "wind_speed",
+      "_row": "50-year return level"
+    },
+    {
+      "return_period": 100,
+      "return_level": 59.4445,
+      "lower": 46.2526,
+      "upper": 72.6363,
+      "variable": "wind_speed",
+      "_row": "100-year return level"
+    }
+  ],
+  "hmax": [
+    {
+      "return_period": 10,
+      "return_level": 28.6332,
+      "lower": 17.6456,
+      "upper": 39.6208,
+      "variable": "hmax",
+      "_row": "10-year return level"
+    },
+    {
+      "return_period": 50,
+      "return_level": 42.679,
+      "lower": -10.0229,
+      "upper": 95.3808,
+      "variable": "hmax",
+      "_row": "50-year return level"
+    },
+    {
+      "return_period": 100,
+      "return_level": 52.7071,
+      "lower": -40.6769,
+      "upper": 146.0911,
+      "variable": "hmax",
+      "_row": "100-year return level"
+    }
+  ]
+}

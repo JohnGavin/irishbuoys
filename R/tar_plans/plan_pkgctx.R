@@ -1,17 +1,17 @@
 #' Package Context (pkgctx) Targets Plan
 #'
 #' @description
-#' Generate .ctx.yaml files for LLM context using pkgctx.
-#' These files provide compact API documentation that Claude can use
+#' Generate the self-context .ctx.yaml file for this package using pkgctx.
+#' This file provides compact API documentation that Claude can use
 #' to understand package functions without reading full source.
 #'
-#' Pattern:
-#' - pkgctx_* : targets for generating context files
+#' Dependency contexts (dplyr, targets, etc.) are managed centrally by the
+#' `llmcontent` package at `/Users/johngavin/docs_gh/proj/data/llm/content/`.
+#' They are NOT generated per-project.
 #'
 #' @details
-#' Output files are stored in inst/extdata/ctx/ for inclusion in the package.
-#' This follows the "LLM-ready documentation" pattern where context files
-#' are generated as part of the build process.
+#' The self-context file is stored in inst/extdata/ctx/ but excluded from
+#' the package build via .Rbuildignore. It is for local development only.
 #'
 #' @references
 #' - https://github.com/b-rodrigues/pkgctx
@@ -31,7 +31,6 @@ run_pkgctx <- function(pkg, output_file, compact = TRUE, type = "r") {
   # Ensure output directory exists
   dir.create(dirname(output_file), recursive = TRUE, showWarnings = FALSE)
 
-
   # Build command
   compact_flag <- if (compact) "--compact" else ""
   cmd <- sprintf(
@@ -40,7 +39,7 @@ run_pkgctx <- function(pkg, output_file, compact = TRUE, type = "r") {
   )
 
   # Execute
- result <- tryCatch({
+  result <- tryCatch({
     system(cmd, intern = FALSE, ignore.stdout = FALSE, ignore.stderr = FALSE)
   }, error = function(e) {
     cli::cli_warn("pkgctx failed for {pkg}: {e$message}")
@@ -84,9 +83,7 @@ get_description_deps <- function(desc_path = "DESCRIPTION") {
   deps <- unique(c(sapply(imports, clean_pkg), sapply(suggests, clean_pkg)))
   deps <- deps[deps != "" & !is.na(deps)]
 
-  # Filter to packages that are likely useful for LLM context
-
-  # Exclude base R packages and very common ones
+  # Exclude base R packages
   base_pkgs <- c("stats", "graphics", "grDevices", "utils", "datasets",
                  "methods", "base", "tools", "parallel", "compiler",
                  "grid", "splines", "stats4", "tcltk")
@@ -114,10 +111,12 @@ plan_pkgctx <- list(
   ),
 
   # ==========================================================================
-  # CURRENT PACKAGE CONTEXT
+  # SELF-CONTEXT ONLY
   # ==========================================================================
+  # Dependency contexts (dplyr, targets, etc.) live in the centralised
 
-  # Generate context for the current package
+  # llmcontent package, NOT generated per-project.
+
   targets::tar_target(
     pkgctx_self,
     {
@@ -129,66 +128,9 @@ plan_pkgctx <- list(
   ),
 
   # ==========================================================================
-  # DEPENDENCY CONTEXTS
-  # ==========================================================================
-
-  # Get list of dependencies to generate context for
-  targets::tar_target(
-    pkgctx_deps_list,
-    {
-      deps <- get_description_deps("DESCRIPTION")
-
-      # Priority packages (always generate)
-      priority <- c("dplyr", "tidyr", "purrr", "ggplot2", "tibble",
-                    "targets", "DBI", "duckdb", "arrow", "pointblank",
-                    "cli", "rlang", "httr2", "jsonlite", "lubridate")
-
-      # Only include priority packages that are actually dependencies
-      deps_to_generate <- intersect(priority, deps)
-
-      cli::cli_alert_info("Dependencies to generate context for: {paste(deps_to_generate, collapse = ', ')}")
-      deps_to_generate
-    }
-  ),
-
-  # Generate context for each priority dependency
-  targets::tar_target(
-    pkgctx_deps,
-    {
-      if (length(pkgctx_deps_list) == 0) {
-        return(tibble::tibble(package = character(), ctx_file = character(), success = logical()))
-      }
-
-      results <- lapply(pkgctx_deps_list, function(pkg) {
-        output_file <- file.path(pkgctx_dir, paste0(pkg, ".ctx.yaml"))
-
-        # Skip if recent file exists (within 7 days)
-        if (file.exists(output_file)) {
-          file_age_days <- as.numeric(difftime(Sys.time(), file.mtime(output_file), units = "days"))
-          if (file_age_days < 7) {
-            cli::cli_alert_info("Skipping {pkg} (generated {round(file_age_days, 1)} days ago)")
-            return(tibble::tibble(package = pkg, ctx_file = output_file, success = TRUE, skipped = TRUE))
-          }
-        }
-
-        result <- run_pkgctx(pkg, output_file, compact = TRUE)
-        tibble::tibble(
-          package = pkg,
-          ctx_file = result,
-          success = !is.na(result),
-          skipped = FALSE
-        )
-      })
-
-      dplyr::bind_rows(results)
-    }
-  ),
-
-  # ==========================================================================
   # API DRIFT DETECTION
   # ==========================================================================
 
-  # Check if package API has changed since last context generation
   targets::tar_target(
     pkgctx_api_drift,
     {
@@ -264,19 +206,15 @@ plan_pkgctx <- list(
     pkgctx_summary,
     {
       self_exists <- file.exists(pkgctx_self)
-      deps_generated <- sum(pkgctx_deps$success, na.rm = TRUE)
-      deps_total <- nrow(pkgctx_deps)
 
       ctx_files <- list.files(pkgctx_dir, pattern = "\\.ctx\\.yaml$", full.names = TRUE)
       total_size_kb <- sum(file.size(ctx_files)) / 1024
 
       tibble::tibble(
-        metric = c("Self Context", "Dependencies Generated", "Dependencies Total",
-                   "Total Files", "Total Size (KB)", "Context Directory"),
+        metric = c("Self Context", "Total Files", "Total Size (KB)",
+                   "Context Directory"),
         value = c(
           if (self_exists) "Yes" else "No",
-          as.character(deps_generated),
-          as.character(deps_total),
           as.character(length(ctx_files)),
           sprintf("%.1f", total_size_kb),
           pkgctx_dir

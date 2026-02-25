@@ -47,6 +47,10 @@ articles:
     contents:
       - dashboard_static
       - wave_analysis
+  - title: Data Access
+    navbar: API
+    contents:
+      - api-usage
   - title: Data Quality
     navbar: Data Quality
     contents:
@@ -179,6 +183,12 @@ reference:
       - joint_analysis_summary
       - predict_station_lagged
       - station_distance_matrix
+
+  - title: "Static API"
+    desc: "Functions for generating static JSON API files"
+    contents:
+      - generate_api_index
+      - generate_api_latest
 
   - title: "Documentation"
     desc: "Data dictionary and variable documentation"

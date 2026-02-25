@@ -1,0 +1,38 @@
+{
+  "api": "irishbuoys",
+  "version": "v1",
+  "base_url": "https://johngavin.github.io/irishbuoys/api/v1/",
+  "updated_at": "2026-02-24T18:19:03Z",
+  "endpoints": [
+    {
+      "endpoint": "stations.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/stations.json",
+      "description": "All buoy station metadata (ID, call sign, coordinates)"
+    },
+    {
+      "endpoint": "stats.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/stats.json",
+      "description": "Summary statistics per station and overall"
+    },
+    {
+      "endpoint": "rogue-waves.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/rogue-waves.json",
+      "description": "Detected rogue wave events (Hmax > 2x significant wave height)"
+    },
+    {
+      "endpoint": "return-levels.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/return-levels.json",
+      "description": "GEV return levels for 10, 50, 100-year periods (wave, wind, Hmax)"
+    },
+    {
+      "endpoint": "data-dictionary.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/data-dictionary.json",
+      "description": "Variable metadata: names, units, descriptions, typical ranges"
+    },
+    {
+      "endpoint": "latest.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/latest.json",
+      "description": "Most recent observation per station"
+    }
+  ]
+}
