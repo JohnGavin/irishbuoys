@@ -59,5 +59,6 @@ list(
   plan_pkgctx,  # LLM context files via pkgctx (https://github.com/b-rodrigues/pkgctx)
   plan_qa_gates,  # MANDATORY: Adversarial QA, quality gates, coverage (cannot be skipped)
   plan_nix_sync,  # DESCRIPTION/default.nix drift detection
-  plan_email_report  # Weekly email summary via Gmail
+  plan_email_report,  # Weekly email summary via Gmail
+  plan_storm_alert  # Daily storm forecast alerts via Open-Meteo + Gmail
 )
