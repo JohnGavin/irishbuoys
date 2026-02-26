@@ -128,6 +128,83 @@ test_that("analyze_gust_factor works with synthetic data", {
   expect_true(mean_gf > 1)
 })
 
+# --- Tests for calculate_gpd_return_levels ---
+
+test_that("calculate_gpd_return_levels works with valid fit", {
+  fit <- list(
+    u = 5.0,
+    scale = 1.2,
+    shape = 0.1,
+    n_exceed = 500,
+    se_scale = 0.08,
+    se_shape = 0.03
+  )
+
+  result <- calculate_gpd_return_levels(fit, return_periods = c(1, 5, 10))
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 3)
+  expect_true(all(c("return_period", "return_level", "lower", "upper") %in% names(result)))
+
+  # Return levels should increase with period
+  expect_true(all(diff(result$return_level) > 0))
+
+  # CIs should contain point estimate
+  expect_true(all(result$lower <= result$return_level))
+  expect_true(all(result$upper >= result$return_level))
+
+  # All values should be finite
+
+  expect_true(all(is.finite(result$return_level)))
+  expect_true(all(is.finite(result$lower)))
+  expect_true(all(is.finite(result$upper)))
+})
+
+test_that("calculate_gpd_return_levels handles shape=0 (exponential case)", {
+  fit <- list(
+    u = 3.0,
+    scale = 0.8,
+    shape = 0.0,  # Exactly zero -> exponential fallback
+    n_exceed = 300,
+    se_scale = 0.05,
+    se_shape = 0.02
+  )
+
+  result <- calculate_gpd_return_levels(fit, return_periods = c(1, 5, 10))
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 3)
+  # All return levels should be finite (no NaN/Inf from division by zero)
+  expect_true(all(is.finite(result$return_level)))
+  # Should still be increasing
+  expect_true(all(diff(result$return_level) > 0))
+})
+
+test_that("calculate_gpd_return_levels returns NA for error fit", {
+  fit <- list(
+    u = 5.0,
+    n_exceed = 10,
+    error = "Insufficient exceedances (<30)"
+  )
+
+  result <- calculate_gpd_return_levels(fit, return_periods = c(1, 5, 10))
+
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 3)
+  expect_true(all(is.na(result$return_level)))
+  expect_true(all(is.na(result$lower)))
+  expect_true(all(is.na(result$upper)))
+  expect_equal(result$threshold_value[1], 5.0)
+  expect_equal(result$method[1], "GPD")
+})
+
+test_that("calculate_gpd_return_levels handles non-list input", {
+  result <- calculate_gpd_return_levels("not a list")
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 3)
+  expect_true(all(is.na(result$return_level)))
+})
+
 test_that("compare_rogue_wave_gust returns two-row comparison", {
   data <- data.frame(
     wave_height = c(3, 4, 5, 2.5, 3.5),

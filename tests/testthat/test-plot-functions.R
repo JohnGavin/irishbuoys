@@ -344,6 +344,44 @@ test_that("create_plot_gusts_vs_waves returns plotly", {
   expect_s3_class(result, "plotly")
 })
 
+# --- Per-station return levels plot tests ---
+
+test_that("create_plot_return_levels_per_station returns NULL for NULL", {
+  expect_null(create_plot_return_levels_per_station(NULL, "avg_wave"))
+})
+
+test_that("create_plot_return_levels_per_station returns NULL for missing variable", {
+  skip_if_not_installed("plotly")
+  d <- data.frame(
+    station = c("M2", "M3"),
+    variable = c("avg_wave", "avg_wave"),
+    variable_label = c("Avg Wave (m)", "Avg Wave (m)"),
+    return_period = c(1, 1),
+    return_level = c(5.0, 6.0),
+    lower = c(4.0, 5.0),
+    upper = c(6.0, 7.0),
+    stringsAsFactors = FALSE
+  )
+  # Filter for a variable that doesn't exist
+  expect_null(create_plot_return_levels_per_station(d, "nonexistent"))
+})
+
+test_that("create_plot_return_levels_per_station returns plotly", {
+  skip_if_not_installed("plotly")
+  d <- data.frame(
+    station = rep(c("M2", "M3", "M4"), each = 3),
+    variable = rep("avg_wave", 9),
+    variable_label = rep("Avg Wave (m)", 9),
+    return_period = rep(c(1, 5, 10), 3),
+    return_level = c(4.5, 6.2, 7.1, 5.0, 6.8, 7.8, 3.9, 5.5, 6.4),
+    lower = c(3.8, 5.0, 5.8, 4.2, 5.5, 6.3, 3.2, 4.3, 5.1),
+    upper = c(5.2, 7.4, 8.4, 5.8, 8.1, 9.3, 4.6, 6.7, 7.7),
+    stringsAsFactors = FALSE
+  )
+  result <- create_plot_return_levels_per_station(d, "avg_wave")
+  expect_s3_class(result, "plotly")
+})
+
 test_that("create_plot_gusts_vs_waves returns NULL when no extreme events", {
   skip_if_not_installed("plotly")
   # Data with all normal ratios

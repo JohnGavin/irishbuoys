@@ -52,7 +52,7 @@ generate_api_index <- function(
       list(
         endpoint = "return-levels.json",
         url = paste0(base_url, "return-levels.json"),
-        description = "GEV return levels for 10, 50, 100-year periods (wave, wind, Hmax)"
+        description = "GPD return levels per station for 1, 5, 10-year periods (avg wave, rogue wave, avg wind, wind gust)"
       ),
       list(
         endpoint = "data-dictionary.json",
