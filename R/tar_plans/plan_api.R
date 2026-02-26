@@ -70,15 +70,34 @@ plan_api <- list(
     }
   ),
 
-  # Return levels (pooled GEV)
+  # Return levels (per-station GPD)
   targets::tar_target(
     api_return_levels,
     {
+      rl <- return_levels_per_station
+      rl <- rl[!is.na(rl$return_level), ]
+
+      # Build nested by_station structure
+      stations <- unique(rl$station)
+      by_station <- lapply(stats::setNames(stations, stations), function(st) {
+        st_data <- rl[rl$station == st, ]
+        vars <- unique(st_data$variable)
+        lapply(stats::setNames(vars, vars), function(v) {
+          v_data <- st_data[st_data$variable == v, ]
+          vals <- stats::setNames(
+            round(v_data$return_level, 2),
+            paste0(v_data$return_period, "yr")
+          )
+          as.list(vals)
+        })
+      })
+
       list(
         updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-        wave_height = return_levels_wave_pooled,
-        wind_speed = return_levels_wind_pooled,
-        hmax = return_levels_hmax_pooled
+        method = "GPD",
+        threshold = "95th percentile",
+        return_periods = c(1, 5, 10),
+        by_station = by_station
       )
     }
   ),

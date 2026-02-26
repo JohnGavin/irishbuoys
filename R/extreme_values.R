@@ -357,6 +357,144 @@ create_return_level_plot_data <- function(
   return(rl_data)
 }
 
+#' Calculate GPD Return Levels from Per-Station Fits
+#'
+#' @description
+#' Computes return levels from a GPD (Generalized Pareto Distribution) fit
+#' produced by `mev::fit.gpd()`. Uses the standard GPD return level formula
+#' with delta method confidence intervals.
+#'
+#' The formula is:
+#' \deqn{z_T = u + \frac{\sigma}{\xi}\left[(\lambda T)^{\xi} - 1\right]}
+#' where \eqn{u} is the threshold, \eqn{\sigma} is the scale, \eqn{\xi} is
+#' the shape, \eqn{\lambda} is the exceedance rate, and \eqn{T} is the
+#' return period in years.
+#'
+#' When shape is approximately zero, the exponential fallback is used:
+#' \deqn{z_T = u + \sigma \log(\lambda T)}
+#'
+#' @param gpd_fit A list from the per-station GPD fitting targets, with elements:
+#'   `u` (threshold), `scale`, `shape`, `n_exceed`, and optionally
+#'   `se_scale`, `se_shape`. If it contains an `error` field, NA rows are returned.
+#' @param return_periods Numeric vector of return periods in years (default: c(1, 5, 10))
+#' @param n_obs_per_year Number of observations per year for exceedance rate
+#'   calculation (default: 8760 for hourly data)
+#' @param n_total Total number of observations. If NULL, estimated from
+#'   `n_exceed` and threshold percentile.
+#' @param exceedance_rate Pre-computed exceedance rate (lambda). If NULL,
+#'   estimated as `n_exceed / n_total`.
+#' @param conf_level Confidence level for intervals (default: 0.95)
+#'
+#' @return Data frame with columns: `return_period`, `return_level`, `lower`,
+#'   `upper`, `threshold_value`, `method`. Returns NA return levels if the fit
+#'   has an error or missing parameters.
+#'
+#' @family extreme-values
+#' @export
+calculate_gpd_return_levels <- function(
+    gpd_fit,
+    return_periods = c(1, 5, 10),
+    n_obs_per_year = 8760,
+    n_total = NULL,
+    exceedance_rate = NULL,
+    conf_level = 0.95
+) {
+  # Validate input type
+  if (!is.list(gpd_fit)) {
+    return(data.frame(
+      return_period = return_periods,
+      return_level = NA_real_,
+      lower = NA_real_,
+      upper = NA_real_,
+      threshold_value = NA_real_,
+      method = "GPD",
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  # Return NA rows for failed fits
+  if (!is.null(gpd_fit$error) || is.null(gpd_fit$scale) || is.null(gpd_fit$shape)) {
+    return(data.frame(
+      return_period = return_periods,
+      return_level = NA_real_,
+      lower = NA_real_,
+      upper = NA_real_,
+      threshold_value = if (!is.null(gpd_fit$u)) gpd_fit$u else NA_real_,
+      method = "GPD",
+      stringsAsFactors = FALSE
+    ))
+  }
+
+  u <- as.numeric(gpd_fit$u)
+  sigma <- as.numeric(gpd_fit$scale)
+  xi <- as.numeric(gpd_fit$shape)
+  n_exceed <- gpd_fit$n_exceed
+
+  # Compute exceedance rate (lambda = n_exceed / n_total)
+  if (!is.null(exceedance_rate)) {
+    lambda <- exceedance_rate
+  } else if (!is.null(n_total)) {
+    lambda <- n_exceed / n_total * n_obs_per_year
+  } else {
+    # Estimate n_total from threshold percentile if available
+    # Default: assume 95th percentile threshold -> 5% exceedance
+    lambda <- n_exceed / (n_exceed / 0.05) * n_obs_per_year
+  }
+
+  z_alpha <- stats::qnorm(1 - (1 - conf_level) / 2)
+
+  results <- lapply(return_periods, function(T_val) {
+    m <- lambda * T_val  # expected number of exceedances in T years
+
+    # Return level formula
+    if (abs(xi) < 1e-6) {
+      # Exponential case (shape ~ 0)
+      z_T <- u + sigma * log(m)
+
+      # Delta method: dz/dsigma = log(m), dz/dxi ~ 0
+      if (!is.null(gpd_fit$se_scale)) {
+        se_z <- abs(log(m)) * as.numeric(gpd_fit$se_scale)
+      } else {
+        se_z <- NA_real_
+      }
+    } else {
+      # General GPD case
+      z_T <- u + (sigma / xi) * (m^xi - 1)
+
+      # Delta method CIs
+      if (!is.null(gpd_fit$se_scale) && !is.null(gpd_fit$se_shape)) {
+        se_sigma <- as.numeric(gpd_fit$se_scale)
+        se_xi <- as.numeric(gpd_fit$se_shape)
+
+        # Partial derivatives
+        dz_dsigma <- (m^xi - 1) / xi
+        dz_dxi <- (sigma / xi) * (m^xi * log(m) - (m^xi - 1) / xi)
+
+        # Variance via delta method (assuming uncorrelated for simplicity)
+        var_z <- dz_dsigma^2 * se_sigma^2 + dz_dxi^2 * se_xi^2
+        se_z <- sqrt(var_z)
+      } else {
+        se_z <- NA_real_
+      }
+    }
+
+    lower <- if (is.finite(se_z)) z_T - z_alpha * se_z else NA_real_
+    upper <- if (is.finite(se_z)) z_T + z_alpha * se_z else NA_real_
+
+    data.frame(
+      return_period = T_val,
+      return_level = z_T,
+      lower = lower,
+      upper = upper,
+      threshold_value = u,
+      method = "GPD",
+      stringsAsFactors = FALSE
+    )
+  })
+
+  do.call(rbind, results)
+}
+
 #' Analyze Gust Factor
 #'
 #' @description

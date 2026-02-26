@@ -103,6 +103,21 @@ plan_dashboard <- list(
     }
   ),
 
+  # Save return levels for dashboard Forecasts page
+  targets::tar_target(
+    dashboard_return_levels,
+    {
+      dir.create("inst/extdata", recursive = TRUE, showWarnings = FALSE)
+      saveRDS(
+        return_levels_per_station,
+        "inst/extdata/dashboard_return_levels.rds",
+        compress = "xz"
+      )
+      cli::cli_alert_success("Saved dashboard return levels to inst/extdata/")
+      return_levels_per_station
+    }
+  ),
+
   # Save dashboard data to inst/extdata
   targets::tar_target(
     save_dashboard_data,
@@ -119,11 +134,15 @@ plan_dashboard <- list(
       # Save time series data for dygraphs
       saveRDS(dashboard_timeseries, "inst/extdata/dashboard_timeseries.rds", compress = "xz")
 
+      # Save return levels (also saved by dashboard_return_levels, but include in manifest)
+      saveRDS(dashboard_return_levels, "inst/extdata/dashboard_return_levels.rds", compress = "xz")
+
       # Get file sizes
       files <- c(
         "inst/extdata/dashboard_buoy_data.rds",
         "inst/extdata/dashboard_stats.rds",
-        "inst/extdata/dashboard_timeseries.rds"
+        "inst/extdata/dashboard_timeseries.rds",
+        "inst/extdata/dashboard_return_levels.rds"
       )
 
       sizes <- file.info(files)$size

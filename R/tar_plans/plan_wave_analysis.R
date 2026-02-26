@@ -372,6 +372,102 @@ plan_wave_analysis <- list(
     }
   ),
 
+  # GPD per-station gust using mev::fit.gpd()
+  targets::tar_target(
+    gpd_gust_per_station,
+    {
+      stations <- unique(analysis_data$station_id)
+      thresholds <- c(low = 0.90, medium = 0.95, high = 0.99)
+
+      results <- lapply(stations, function(st) {
+        d <- analysis_data[analysis_data$station_id == st & !is.na(analysis_data$gust), ]
+
+        station_results <- lapply(names(thresholds), function(thr_name) {
+          u <- stats::quantile(d$gust, thresholds[thr_name])
+          exceedances <- d$gust[d$gust > u]
+
+          if (length(exceedances) < 30) {
+            return(list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances), error = "Insufficient exceedances (<30)"
+            ))
+          }
+
+          tryCatch({
+            fit <- mev::fit.gpd(xdat = exceedances, threshold = as.numeric(u))
+            list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances),
+              scale = fit$estimate["scale"],
+              shape = fit$estimate["shape"],
+              se_scale = fit$std.err["scale"],
+              se_shape = fit$std.err["shape"]
+            )
+          }, error = function(e) {
+            list(
+              station = st, threshold = thr_name, u = as.numeric(u),
+              n_exceed = length(exceedances), error = e$message
+            )
+          })
+        })
+        names(station_results) <- names(thresholds)
+        station_results
+      })
+      names(results) <- stations
+      results
+    }
+  ),
+
+  # ========================================
+  # Per-Station Return Levels (GPD-based)
+  # ========================================
+
+  # Compute return levels from all 4 per-station GPD fits (95% threshold)
+  targets::tar_target(
+    return_levels_per_station,
+    {
+      # Variable mapping: target -> variable column -> label
+      var_map <- list(
+        avg_wave  = list(gpd = gpd_wave_per_station, label = "Avg Wave (m)"),
+        rogue_wave = list(gpd = gpd_hmax_per_station, label = "Rogue Wave (m)"),
+        avg_wind  = list(gpd = gpd_wind_per_station, label = "Avg Wind (kn)"),
+        wind_gust = list(gpd = gpd_gust_per_station, label = "Wind Gust (kn)")
+      )
+
+      all_results <- lapply(names(var_map), function(var_name) {
+        gpd_fits <- var_map[[var_name]]$gpd
+        label <- var_map[[var_name]]$label
+
+        station_results <- lapply(names(gpd_fits), function(st) {
+          # Use "medium" (95%) threshold fit
+          fit <- gpd_fits[[st]][["medium"]]
+          if (is.null(fit)) return(NULL)
+
+          rl <- calculate_gpd_return_levels(
+            fit,
+            return_periods = c(1, 5, 10),
+            n_obs_per_year = 8760
+          )
+
+          rl$station <- st
+          rl$variable <- var_name
+          rl$variable_label <- label
+          rl
+        })
+
+        dplyr::bind_rows(station_results)
+      })
+
+      result <- dplyr::bind_rows(all_results)
+
+      cli::cli_alert_success(
+        "Computed {nrow(result)} return levels ({length(unique(result$station))} stations x {length(unique(result$variable))} variables x 3 periods)"
+      )
+
+      result
+    }
+  ),
+
   # ========================================
   # GEV Pooled Analysis (illustrative, n=8 years only)
   # ========================================
@@ -481,6 +577,8 @@ plan_wave_analysis <- list(
           gpd_wave = gpd_wave_per_station,
           gpd_wind = gpd_wind_per_station,
           gpd_hmax = gpd_hmax_per_station,
+          gpd_gust = gpd_gust_per_station,
+          return_levels_per_station = return_levels_per_station,
           gev_wave_pooled = return_levels_wave_pooled,
           gev_wind_pooled = return_levels_wind_pooled,
           gev_hmax_pooled = return_levels_hmax_pooled
@@ -593,6 +691,27 @@ plan_wave_analysis <- list(
   targets::tar_target(
     plot_return_levels_hmax,
     create_plot_return_levels(return_levels_hmax_pooled, variable = "hmax")
+  ),
+
+  # Per-station return level plots (GPD-based)
+  targets::tar_target(
+    plot_return_levels_per_station_wave,
+    create_plot_return_levels_per_station(return_levels_per_station, "avg_wave")
+  ),
+
+  targets::tar_target(
+    plot_return_levels_per_station_rogue,
+    create_plot_return_levels_per_station(return_levels_per_station, "rogue_wave")
+  ),
+
+  targets::tar_target(
+    plot_return_levels_per_station_wind,
+    create_plot_return_levels_per_station(return_levels_per_station, "avg_wind")
+  ),
+
+  targets::tar_target(
+    plot_return_levels_per_station_gust,
+    create_plot_return_levels_per_station(return_levels_per_station, "wind_gust")
   ),
 
   # Gust factor plots

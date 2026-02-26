@@ -512,6 +512,70 @@ create_plot_return_levels <- function(return_levels, variable = "wave", date_cap
     )
 }
 
+#' Create Per-Station Return Levels Plot
+#'
+#' @description
+#' Creates a grouped bar chart showing GPD return levels by station for a
+#' given variable, with error bars for confidence intervals.
+#'
+#' @param return_levels_df Data frame from `return_levels_per_station` target
+#'   with columns: station, variable, return_period, return_level, lower, upper
+#' @param variable_filter Character, which variable to plot (one of
+#'   "avg_wave", "rogue_wave", "avg_wind", "wind_gust")
+#'
+#' @return plotly object, or NULL if no data for the requested variable
+#'
+#' @export
+create_plot_return_levels_per_station <- function(return_levels_df, variable_filter) {
+  if (is.null(return_levels_df) || nrow(return_levels_df) == 0) {
+    return(NULL)
+  }
+
+  d <- return_levels_df[return_levels_df$variable == variable_filter, ]
+  d <- d[!is.na(d$return_level), ]
+
+  if (nrow(d) == 0) {
+    return(NULL)
+  }
+
+  label <- d$variable_label[1]
+
+  # Color palette for return periods
+  period_colors <- c("1" = "#4393c3", "5" = "#f4a582", "10" = "#d6604d")
+
+  d$period_label <- paste0(d$return_period, "-yr")
+  d$period_label <- factor(d$period_label, levels = c("1-yr", "5-yr", "10-yr"))
+
+  plotly::plot_ly(
+    d,
+    x = ~station,
+    y = ~return_level,
+    color = ~period_label,
+    colors = c("1-yr" = "#4393c3", "5-yr" = "#f4a582", "10-yr" = "#d6604d"),
+    type = "bar",
+    error_y = list(
+      type = "data",
+      symmetric = FALSE,
+      array = ~upper - return_level,
+      arrayminus = ~return_level - lower,
+      color = "gray40"
+    ),
+    text = ~paste0(
+      "Station: ", station, "<br>",
+      "Period: ", return_period, " year<br>",
+      label, ": ", round(return_level, 2), "<br>",
+      "95% CI: [", round(lower, 2), ", ", round(upper, 2), "]"
+    ),
+    hoverinfo = "text"
+  ) |>
+    irishbuoys_layout(
+      title = paste0("Per-Station Return Levels: ", label, " (GPD, 95th pct threshold)"),
+      xaxis = list(title = "Station"),
+      yaxis = list(title = label),
+      barmode = "group"
+    )
+}
+
 #' Create Gust Factor by Category Plot
 #'
 #' @param gust_analysis Gust factor analysis results

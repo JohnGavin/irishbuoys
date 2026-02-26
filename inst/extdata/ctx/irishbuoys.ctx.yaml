@@ -1,6 +1,6 @@
 Fetching R package: .
   → Using local path: /Users/johngavin/docs_gh/proj/data/weather/irish_buoy_network/irishbuoys...
-  → Version: 0.1.3
+  → Version: 0.1.4
   → Parsing source...
 ---
 kind: context_header
@@ -9,7 +9,7 @@ llm_instructions: This is an LLM-optimized API specification for the R package '
 kind: package
 schema_version: '1.1'
 name: irishbuoys
-version: 0.1.3
+version: 0.1.4
 language: R
 description: Analyze Irish Weather Buoy Network Data
 ---
@@ -256,6 +256,15 @@ arguments:
   return_levels: Return levels data frame
   variable: Variable name for title ("wave", "wind", or "hmax")
 returns: plotly object
+---
+kind: function
+name: create_plot_return_levels_per_station
+exported: true
+signature: create_plot_return_levels_per_station(return_levels_df, variable_filter)
+arguments:
+  return_levels_df: 'Data frame from return_levels_per_station target with columns: station, variable, return_period,...'
+  variable_filter: Character, which variable to plot (one of "avg_wave", "rogue_wave", "avg_wind", "wind_gust")
+returns: plotly object, or NULL if no data for the requested variable
 ---
 kind: function
 name: create_plot_gust_by_category
@@ -743,6 +752,19 @@ arguments:
 returns: Data frame suitable for plotting
 ---
 kind: function
+name: calculate_gpd_return_levels
+exported: true
+signature: calculate_gpd_return_levels(gpd_fit,return_periods = c(1, 5, 10),n_obs_per_year = 8760,n_total = NULL,exceedance_rate = NULL,conf_level = 0.95)
+arguments:
+  conf_level: 'Confidence level for intervals (default: 0.95)'
+  exceedance_rate: Pre-computed exceedance rate (lambda).
+  gpd_fit: 'A list from the per-station GPD fitting targets, with elements: u (threshold), scale, shape, n_exceed, and optionally se_scale, se_shape.'
+  n_obs_per_year: 'Number of observations per year for exceedance rate calculation (default: 8760 for hourly data)'
+  n_total: Total number of observations.
+  return_periods: 'Numeric vector of return periods in years (default: c(1, 5, 10))'
+returns: 'Data frame with columns: return_period, return_level, lower, upper, threshold_value, method.'
+---
+kind: function
 name: analyze_gust_factor
 exported: true
 signature: analyze_gust_factor(data, min_wind_speed = 5)
@@ -758,3 +780,21 @@ signature: compare_rogue_wave_gust(data)
 arguments:
   data: Data frame with wave_height, hmax, wind_speed, gust columns
 returns: Data frame comparing occurrence rates
+---
+kind: function
+name: generate_api_index
+exported: true
+signature: generate_api_index(base_url = "https://johngavin.github.io/irishbuoys/api/v1/",endpoints = NULL)
+arguments:
+  base_url: 'Character, base URL for the API (default: "https://johngavin.github.io/irishbuoys/api/v1/")'
+  endpoints: Named list of endpoint metadata.
+returns: A list suitable for jsonlite::toJSON().
+---
+kind: function
+name: generate_api_latest
+exported: true
+signature: generate_api_latest(db_path = "inst/extdata/irish_buoys.duckdb",n = 1L)
+arguments:
+  db_path: 'Character, path to the DuckDB database file (default: "inst/extdata/irish_buoys.duckdb")'
+  n: 'Integer, number of most recent observations per station to return (default: 1L)'
+returns: A tibble with n rows per station, ordered by station and time (most recent first).
