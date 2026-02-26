@@ -2,7 +2,7 @@
   "api": "irishbuoys",
   "version": "v1",
   "base_url": "https://johngavin.github.io/irishbuoys/api/v1/",
-  "updated_at": "2026-02-24T18:19:03Z",
+  "updated_at": "2026-02-25T14:51:53Z",
   "endpoints": [
     {
       "endpoint": "stations.json",
@@ -22,7 +22,7 @@
     {
       "endpoint": "return-levels.json",
       "url": "https://johngavin.github.io/irishbuoys/api/v1/return-levels.json",
-      "description": "GEV return levels for 10, 50, 100-year periods (wave, wind, Hmax)"
+      "description": "GPD return levels per station for 1, 5, 10-year periods (avg wave, rogue wave, avg wind, wind gust)"
     },
     {
       "endpoint": "data-dictionary.json",

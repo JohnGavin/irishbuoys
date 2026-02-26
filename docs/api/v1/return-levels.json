@@ -1,78 +1,118 @@
 {
-  "updated_at": "2026-02-24T18:19:07Z",
-  "wave_height": [
-    {
-      "return_period": 10,
-      "return_level": 15.6081,
-      "lower": null,
-      "upper": null,
-      "variable": "wave_height"
+  "updated_at": "2026-02-25T14:57:31Z",
+  "method": "GPD",
+  "threshold": "95th percentile",
+  "return_periods": [1, 5, 10],
+  "by_station": {
+    "M2": {
+      "avg_wave": {
+        "1yr": 5.75,
+        "5yr": 6.37,
+        "10yr": 6.62
+      },
+      "rogue_wave": {
+        "1yr": 9.34,
+        "5yr": 10.19,
+        "10yr": 10.52
+      },
+      "avg_wind": {
+        "1yr": 42.39,
+        "5yr": 45.03,
+        "10yr": 46.01
+      },
+      "wind_gust": {
+        "1yr": 56.86,
+        "5yr": 60.34,
+        "10yr": 61.62
+      }
     },
-    {
-      "return_period": 50,
-      "return_level": 15.7556,
-      "lower": null,
-      "upper": null,
-      "variable": "wave_height"
+    "M3": {
+      "avg_wave": {
+        "1yr": 12.66,
+        "5yr": 13.65,
+        "10yr": 14.02
+      },
+      "rogue_wave": {
+        "1yr": 19.66,
+        "5yr": 21.19,
+        "10yr": 21.75
+      },
+      "avg_wind": {
+        "1yr": 45.29,
+        "5yr": 48.62,
+        "10yr": 49.91
+      },
+      "wind_gust": {
+        "1yr": 60.61,
+        "5yr": 64.98,
+        "10yr": 66.67
+      }
     },
-    {
-      "return_period": 100,
-      "return_level": 15.7697,
-      "lower": null,
-      "upper": null,
-      "variable": "wave_height"
+    "M4": {
+      "avg_wave": {
+        "1yr": 13.34,
+        "5yr": 14.78,
+        "10yr": 15.35
+      },
+      "rogue_wave": {
+        "1yr": 20.6,
+        "5yr": 22.94,
+        "10yr": 23.88
+      },
+      "avg_wind": {
+        "1yr": 46.6,
+        "5yr": 50.62,
+        "10yr": 52.26
+      },
+      "wind_gust": {
+        "1yr": 62.32,
+        "5yr": 66.61,
+        "10yr": 68.25
+      }
+    },
+    "M5": {
+      "avg_wave": {
+        "1yr": 8.99,
+        "5yr": 10,
+        "10yr": 10.41
+      },
+      "rogue_wave": {
+        "1yr": 14.08,
+        "5yr": 15.6,
+        "10yr": 16.2
+      },
+      "avg_wind": {
+        "1yr": 38.34,
+        "5yr": 40.52,
+        "10yr": 41.34
+      },
+      "wind_gust": {
+        "1yr": 55.13,
+        "5yr": 58.27,
+        "10yr": 59.43
+      }
+    },
+    "M6": {
+      "avg_wave": {
+        "1yr": 14.2,
+        "5yr": 15.67,
+        "10yr": 16.24
+      },
+      "rogue_wave": {
+        "1yr": 22.29,
+        "5yr": 24.79,
+        "10yr": 25.79
+      },
+      "avg_wind": {
+        "1yr": 45.48,
+        "5yr": 48.99,
+        "10yr": 50.38
+      },
+      "wind_gust": {
+        "1yr": 64.78,
+        "5yr": 69.33,
+        "10yr": 71.09
+      }
     }
-  ],
-  "wind_speed": [
-    {
-      "return_period": 10,
-      "return_level": 53.7521,
-      "lower": 48.6704,
-      "upper": 58.8338,
-      "variable": "wind_speed",
-      "_row": "10-year return level"
-    },
-    {
-      "return_period": 50,
-      "return_level": 57.9816,
-      "lower": 47.8427,
-      "upper": 68.1204,
-      "variable": "wind_speed",
-      "_row": "50-year return level"
-    },
-    {
-      "return_period": 100,
-      "return_level": 59.4445,
-      "lower": 46.2526,
-      "upper": 72.6363,
-      "variable": "wind_speed",
-      "_row": "100-year return level"
-    }
-  ],
-  "hmax": [
-    {
-      "return_period": 10,
-      "return_level": 28.6332,
-      "lower": 17.6456,
-      "upper": 39.6208,
-      "variable": "hmax",
-      "_row": "10-year return level"
-    },
-    {
-      "return_period": 50,
-      "return_level": 42.679,
-      "lower": -10.0229,
-      "upper": 95.3808,
-      "variable": "hmax",
-      "_row": "50-year return level"
-    },
-    {
-      "return_period": 100,
-      "return_level": 52.7071,
-      "lower": -40.6769,
-      "upper": 146.0911,
-      "variable": "hmax",
-      "_row": "100-year return level"
-    }
-  ]
+  }
 }

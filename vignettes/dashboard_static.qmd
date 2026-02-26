@@ -639,6 +639,98 @@ create_dt(scatter_data, paste0(
 ))
 ```
 
+# Forecasts
+
+```{r forecasts-setup}
+return_levels <- tryCatch(
+  readRDS(file.path(data_dir, "dashboard_return_levels.rds")),
+  error = function(e) NULL
+)
+```
+
+## Forecast Tables
+
+### Return Level Forecasts {.tabset}
+
+#### 1-Year Return Level
+
+```{r forecast-1yr}
+if (!is.null(return_levels)) {
+  rl_1yr <- return_levels |>
+    filter(return_period == 1, !is.na(return_level)) |>
+    mutate(return_level = round(return_level, 2)) |>
+    select(station, variable_label, return_level) |>
+    tidyr::pivot_wider(names_from = variable_label, values_from = return_level)
+
+  create_dt(rl_1yr, "1-Year Return Levels by Station (GPD, 95th percentile threshold)")
+} else {
+  htmltools::div(class = "alert alert-info", "Return level data not yet computed. Run tar_make() to generate.")
+}
+```
+
+#### 5-Year Return Level
+
+```{r forecast-5yr}
+if (!is.null(return_levels)) {
+  rl_5yr <- return_levels |>
+    filter(return_period == 5, !is.na(return_level)) |>
+    mutate(return_level = round(return_level, 2)) |>
+    select(station, variable_label, return_level) |>
+    tidyr::pivot_wider(names_from = variable_label, values_from = return_level)
+
+  create_dt(rl_5yr, "5-Year Return Levels by Station (GPD, 95th percentile threshold)")
+} else {
+  htmltools::div(class = "alert alert-info", "Return level data not yet computed. Run tar_make() to generate.")
+}
+```
+
+#### 10-Year Return Level
+
+```{r forecast-10yr}
+if (!is.null(return_levels)) {
+  rl_10yr <- return_levels |>
+    filter(return_period == 10, !is.na(return_level)) |>
+    mutate(return_level = round(return_level, 2)) |>
+    select(station, variable_label, return_level) |>
+    tidyr::pivot_wider(names_from = variable_label, values_from = return_level)
+
+  create_dt(rl_10yr, "10-Year Return Levels by Station (GPD, 95th percentile threshold)")
+} else {
+  htmltools::div(class = "alert alert-info", "Return level data not yet computed. Run tar_make() to generate.")
+}
+```
+
+#### All Return Levels
+
+```{r forecast-all}
+if (!is.null(return_levels)) {
+  rl_wide <- return_levels |>
+    filter(!is.na(return_level)) |>
+    mutate(
+      col_name = paste0(variable_label, " ", return_period, "yr"),
+      return_level = round(return_level, 2)
+    ) |>
+    select(station, col_name, return_level) |>
+    tidyr::pivot_wider(names_from = col_name, values_from = return_level)
+
+  create_dt(rl_wide, "All Return Levels by Station (GPD, 95th percentile threshold)")
+} else {
+  htmltools::div(class = "alert alert-info", "Return level data not yet computed. Run tar_make() to generate.")
+}
+```
+
+#### Method
+
+**GPD Return Level Methodology:**
+
+- **Method:** Generalized Pareto Distribution (GPD) via `mev::fit.gpd()`
+- **Threshold:** 95th percentile of each variable per station
+- **Variables:** Avg Wave (m), Rogue Wave (m), Avg Wind (kn), Wind Gust (kn)
+- **Return periods:** 1, 5, and 10 years
+- **Confidence intervals:** 95% via delta method
+
+For detailed methodology and threshold sensitivity analysis, see the [Wave Analysis](wave_analysis.html) vignette.
+
 # Data
 
 ## Data Table

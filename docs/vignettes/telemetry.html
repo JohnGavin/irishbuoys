@@ -34,7 +34,7 @@ ul.task-list li input[type="checkbox"] {
 <link href="telemetry_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="telemetry_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="telemetry_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="telemetry_files/libs/bootstrap/bootstrap-d5fa03fb90ac27921a6d47853be462c0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="telemetry_files/libs/bootstrap/bootstrap-5aeb795fb1f1a222a51c230a0084b391.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <link href="telemetry_files/libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
 <script src="telemetry_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
 <link href="telemetry_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
@@ -55,10 +55,62 @@ ul.task-list li input[type="checkbox"] {
 
 </head>
 
-<body class="fullcontent quarto-light">
+<body class="quarto-light">
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a>
+  <ul class="collapse">
+  <li><a href="#key-metrics" id="toc-key-metrics" class="nav-link" data-scroll-target="#key-metrics">Key Metrics</a></li>
+  </ul></li>
+  <li><a href="#data-coverage" id="toc-data-coverage" class="nav-link" data-scroll-target="#data-coverage">Data Coverage</a>
+  <ul class="collapse">
+  <li><a href="#coverage-timeline" id="toc-coverage-timeline" class="nav-link" data-scroll-target="#coverage-timeline">Coverage Timeline</a></li>
+  <li><a href="#coverage-by-station" id="toc-coverage-by-station" class="nav-link" data-scroll-target="#coverage-by-station">Coverage by Station</a></li>
+  <li><a href="#coverage-freshness" id="toc-coverage-freshness" class="nav-link" data-scroll-target="#coverage-freshness">Data Freshness</a></li>
+  </ul></li>
+  <li><a href="#data-quality" id="toc-data-quality" class="nav-link" data-scroll-target="#data-quality">Data Quality</a>
+  <ul class="collapse">
+  <li><a href="#qc-distribution" id="toc-qc-distribution" class="nav-link" data-scroll-target="#qc-distribution">QC Flag Distribution</a></li>
+  <li><a href="#rogue-events" id="toc-rogue-events" class="nav-link" data-scroll-target="#rogue-events">Rogue Wave Frequency</a></li>
+  </ul></li>
+  <li><a href="#database" id="toc-database" class="nav-link" data-scroll-target="#database">Database</a>
+  <ul class="collapse">
+  <li><a href="#table-summary" id="toc-table-summary" class="nav-link" data-scroll-target="#table-summary">Table Summary</a></li>
+  <li><a href="#storage-size" id="toc-storage-size" class="nav-link" data-scroll-target="#storage-size">Storage Size</a></li>
+  </ul></li>
+  <li><a href="#pipeline" id="toc-pipeline" class="nav-link" data-scroll-target="#pipeline">Pipeline</a>
+  <ul class="collapse">
+  <li><a href="#target-status" id="toc-target-status" class="nav-link" data-scroll-target="#target-status">Target Execution Status</a></li>
+  <li><a href="#timing-metrics" id="toc-timing-metrics" class="nav-link" data-scroll-target="#timing-metrics">Pipeline Performance</a></li>
+  <li><a href="#targets-by-plan" id="toc-targets-by-plan" class="nav-link" data-scroll-target="#targets-by-plan">Targets by Plan</a></li>
+  </ul></li>
+  <li><a href="#tests" id="toc-tests" class="nav-link" data-scroll-target="#tests">Tests</a></li>
+  <li><a href="#git-activity" id="toc-git-activity" class="nav-link" data-scroll-target="#git-activity">Git Activity</a>
+  <ul class="collapse">
+  <li><a href="#commit-frequency" id="toc-commit-frequency" class="nav-link" data-scroll-target="#commit-frequency">Commit Frequency</a></li>
+  <li><a href="#commit-history" id="toc-commit-history" class="nav-link" data-scroll-target="#commit-history">Recent Commits</a></li>
+  </ul></li>
+  <li><a href="#project-files" id="toc-project-files" class="nav-link" data-scroll-target="#project-files">Project Files</a>
+  <ul class="collapse">
+  <li><a href="#files-by-type" id="toc-files-by-type" class="nav-link" data-scroll-target="#files-by-type">File Type Distribution</a></li>
+  </ul></li>
+  <li><a href="#llm-usage" id="toc-llm-usage" class="nav-link" data-scroll-target="#llm-usage">LLM Usage</a>
+  <ul class="collapse">
+  <li><a href="#usage-summary" id="toc-usage-summary" class="nav-link" data-scroll-target="#usage-summary">Usage Summary</a></li>
+  </ul></li>
+  <li><a href="#validation" id="toc-validation" class="nav-link" data-scroll-target="#validation">Validation Reports</a>
+  <ul class="collapse">
+  <li><a href="#validation-analysis" id="toc-validation-analysis" class="nav-link" data-scroll-target="#validation-analysis">analysis_data</a></li>
+  <li><a href="#validation-rogue" id="toc-validation-rogue" class="nav-link" data-scroll-target="#validation-rogue">rogue_wave_events</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -80,152 +132,44 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="overview" class="level1">
-<h1>Overview</h1>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>Project health and data pipeline metrics for the irishbuoys package.</p>
-<section id="row" class="level2" height="20%">
-<h2 height="20%" class="anchored" data-anchor-id="row">Row</h2>
-<section id="column" class="level3">
-<h3 class="anchored" data-anchor-id="column">Column</h3>
-<div class="valuebox" title="Total Observations" data-icon="database">
-<p>3,710</p>
-</div>
-</section>
-<section id="column-1" class="level3">
-<h3 class="anchored" data-anchor-id="column-1">Column</h3>
-<div class="valuebox" title="Database Size" data-icon="hdd">
-<p>2.51 MB</p>
-</div>
-</section>
-<section id="column-2" class="level3">
-<h3 class="anchored" data-anchor-id="column-2">Column</h3>
-<div class="valuebox" title="Active Stations" data-icon="broadcast">
-<p>5</p>
-</div>
-</section>
-<section id="column-3" class="level3">
-<h3 class="anchored" data-anchor-id="column-3">Column</h3>
-<div class="valuebox" title="Commits (30d)" data-icon="git-branch">
-<p>92</p>
-</div>
-</section>
-</section>
-<section id="row-1" class="level2">
-<h2 class="anchored" data-anchor-id="row-1">Row</h2>
-<section id="column-4" class="level3">
-<h3 class="anchored" data-anchor-id="column-4">Column</h3>
-<div class="card" title="Last Updated">
-<p>2026-02-13 18:25 UTC</p>
-</div>
-</section>
-</section>
-</section>
-<section id="data-coverage" class="level1">
-<h1>Data Coverage</h1>
-<p>Station data availability and freshness metrics.</p>
-<section id="row-2" class="level2">
-<h2 class="anchored" data-anchor-id="row-2">Row</h2>
-<section id="column-5" class="level3 tabset">
-<h3 class="tabset anchored" data-anchor-id="column-5">Column</h3>
-<section id="coverage-timeline" class="level4">
-<h4 class="anchored" data-anchor-id="coverage-timeline">Coverage Timeline</h4>
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="telemetry_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="station-details" class="level4">
-<h4 class="anchored" data-anchor-id="station-details">Station Details</h4>
-<div class="cell">
-<div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-36708fbc5150b749a494" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-36708fbc5150b749a494">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Station Data Coverage Summary<\/caption>","data":[["M2","M3","M4","M5","M6"],["2026-01-13T00:00:00Z","2026-01-13T00:00:00Z","2026-01-13T00:00:00Z","2026-01-13T00:00:00Z","2026-01-13T00:00:00Z"],["2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z"],[742,742,742,742,742],[31,31,31,31,31],[0,0,0,0,0]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station_id<\/th>\n      <th>earliest_observation<\/th>\n      <th>latest_observation<\/th>\n      <th>total_observations<\/th>\n      <th>days_with_data<\/th>\n      <th>pct_qc_good<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[3,4,5]},{"name":"station_id","targets":0},{"name":"earliest_observation","targets":1},{"name":"latest_observation","targets":2},{"name":"total_observations","targets":3},{"name":"days_with_data","targets":4},{"name":"pct_qc_good","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-</section>
-<section id="data-freshness" class="level4">
-<h4 class="anchored" data-anchor-id="data-freshness">Data Freshness</h4>
-<div class="cell">
-<div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-1491f893536a53890ed9" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-1491f893536a53890ed9">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Data Freshness by Station<\/caption>","data":[["M3","M5","M2","M6","M4"],["2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z"],[16.2,16.2,16.2,16.2,16.2]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station_id<\/th>\n      <th>latest_observation<\/th>\n      <th>hours_since_update<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":2},{"name":"station_id","targets":0},{"name":"latest_observation","targets":1},{"name":"hours_since_update","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-</section>
-</section>
-</section>
-</section>
-<section id="data-quality" class="level1">
-<h1>Data Quality</h1>
-<p>QC flag trends and rogue wave detection metrics.</p>
-<section id="row-3" class="level2">
-<h2 class="anchored" data-anchor-id="row-3">Row</h2>
-<section id="column-6" class="level3" width="50%">
-<h3 width="50%" class="anchored" data-anchor-id="column-6">Column</h3>
-<div class="card" title="QC Flag Distribution Over Time">
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="telemetry_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="column-7" class="level3" width="50%">
-<h3 width="50%" class="anchored" data-anchor-id="column-7">Column</h3>
-<div class="card" title="Rogue Wave Event Frequency">
-<div class="cell">
-<div class="cell-output-display">
-<p>Plot not available. Run tar_make() to generate.</p>
-</div>
-</div>
-</div>
-</section>
-</section>
-</section>
-<section id="database" class="level1">
-<h1>Database</h1>
-<p>Storage metrics and table information.</p>
-<section id="row-4" class="level2">
-<h2 class="anchored" data-anchor-id="row-4">Row</h2>
-<section id="column-8" class="level3 tabset">
-<h3 class="tabset anchored" data-anchor-id="column-8">Column</h3>
-<section id="tables" class="level4">
-<h4 class="anchored" data-anchor-id="tables">Tables</h4>
-<div class="cell">
-<div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-53effdc5fc93e2245645" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-53effdc5fc93e2245645">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Database Tables<\/caption>","data":[["buoy_data","stations","update_log"],[3710,5,1],[22,7,7]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>table_name<\/th>\n      <th>n_rows<\/th>\n      <th>n_columns<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"table_name","targets":0},{"name":"n_rows","targets":1},{"name":"n_columns","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-</section>
-<section id="file-size" class="level4">
-<h4 class="anchored" data-anchor-id="file-size">File Size</h4>
+<section id="key-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="key-metrics">Key Metrics</h3>
 <div class="cell">
 <div class="cell-output-display">
 <table class="caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">path</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">size_bytes</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">size_mb</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">last_modified</th>
+<th style="text-align: left;">Metric</th>
+<th style="text-align: right;">Value</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">inst/extdata/irish_buoys.duckdb</td>
-<td style="text-align: right;">2633728</td>
-<td style="text-align: right;">2.51</td>
-<td style="text-align: left;">2026-02-12 21:56:16</td>
+<td style="text-align: left;">Total Observations</td>
+<td style="text-align: right;">289,152</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Database Size</td>
+<td style="text-align: right;">58.76 MB</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Active Stations</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Commits (30d)</td>
+<td style="text-align: right;">124</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Last Updated</td>
+<td style="text-align: right;">2026-02-25 14:53 UTC</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Date Range</td>
+<td style="text-align: right;">2019-01-01 to 2026-02-25</td>
 </tr>
 </tbody>
 </table>
@@ -233,125 +177,422 @@ ul.task-list li input[type="checkbox"] {
 </div>
 </section>
 </section>
-</section>
-</section>
-<section id="pipeline" class="level1">
-<h1>Pipeline</h1>
-<p>Targets pipeline status and timing metrics.</p>
-<section id="row-5" class="level2">
-<h2 class="anchored" data-anchor-id="row-5">Row</h2>
-<section id="column-9" class="level3" width="40%">
-<h3 width="40%" class="anchored" data-anchor-id="column-9">Column</h3>
-<div class="card" title="Target Status Summary">
+<section id="data-coverage" class="level2">
+<h2 class="anchored" data-anchor-id="data-coverage">Data Coverage</h2>
+<p>Station data availability and freshness across the full historical period (2019-present).</p>
+<section id="coverage-timeline" class="level3">
+<h3 class="anchored" data-anchor-id="coverage-timeline">Coverage Timeline</h3>
 <div class="cell">
 <div class="cell-output-display">
-<table class="caption-top">
+<div>
+<figure class="figure">
+<p><img src="telemetry_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="coverage-by-station" class="level3">
+<h3 class="anchored" data-anchor-id="coverage-by-station">Coverage by Station</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-5eccbccc5c567119f5f8" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-5eccbccc5c567119f5f8">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Station Data Coverage Summary<\/caption>","data":[["M2","M3","M4","M5","M6"],["2019-01-01T00:00:00Z","2019-01-01T00:00:00Z","2019-04-17T09:00:00Z","2019-01-01T00:00:00Z","2019-01-01T00:00:00Z"],["2026-02-14T20:00:00Z","2026-02-14T20:00:00Z","2026-02-14T20:00:00Z","2026-02-14T20:00:00Z","2026-02-14T20:00:00Z"],[56268,56449,58728,61208,56499],[2393,2406,2488,2585,2397],[0,0,0,0,0]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station_id<\/th>\n      <th>earliest_observation<\/th>\n      <th>latest_observation<\/th>\n      <th>total_observations<\/th>\n      <th>days_with_data<\/th>\n      <th>pct_qc_good<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[3,4,5]},{"name":"station_id","targets":0},{"name":"earliest_observation","targets":1},{"name":"latest_observation","targets":2},{"name":"total_observations","targets":3},{"name":"days_with_data","targets":4},{"name":"pct_qc_good","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="coverage-freshness" class="level3">
+<h3 class="anchored" data-anchor-id="coverage-freshness">Data Freshness</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-4ec004ac6e3c4dae8511" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4ec004ac6e3c4dae8511">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Data Freshness by Station<\/caption>","data":[["M4","M2","M6","M5","M3"],["2026-02-14T20:00:00Z","2026-02-14T20:00:00Z","2026-02-14T20:00:00Z","2026-02-14T20:00:00Z","2026-02-14T20:00:00Z"],[258.9,258.9,258.9,258.9,258.9]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station_id<\/th>\n      <th>latest_observation<\/th>\n      <th>hours_since_update<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":2},{"name":"station_id","targets":0},{"name":"latest_observation","targets":1},{"name":"hours_since_update","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+<section id="data-quality" class="level2">
+<h2 class="anchored" data-anchor-id="data-quality">Data Quality</h2>
+<p>QC flag trends and rogue wave detection metrics for the full historical period.</p>
+<section id="qc-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="qc-distribution">QC Flag Distribution</h3>
+<p>QC flags: 0=unknown, 1=good, 9=missing. Monthly distribution across full historical data, colored by season.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="telemetry_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="rogue-events" class="level3">
+<h3 class="anchored" data-anchor-id="rogue-events">Rogue Wave Frequency</h3>
+<p>Rogue waves: Hmax &gt; 2 x significant wave height. Monthly event counts across full historical period.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>plot_telemetry_rogue_frequency</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="database" class="level2">
+<h2 class="anchored" data-anchor-id="database">Database</h2>
+<p>Storage metrics and table information for the DuckDB database.</p>
+<section id="table-summary" class="level3">
+<h3 class="anchored" data-anchor-id="table-summary">Table Summary</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-191a05f8ee42636229d4" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-191a05f8ee42636229d4">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Database Tables<\/caption>","data":[["buoy_data","stations","update_log"],[289152,5,8],[22,7,7]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>table_name<\/th>\n      <th>n_rows<\/th>\n      <th>n_columns<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"table_name","targets":0},{"name":"n_rows","targets":1},{"name":"n_columns","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="storage-size" class="level3">
+<h3 class="anchored" data-anchor-id="storage-size">Storage Size</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
 <thead>
 <tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">status</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">n_targets</th>
+<th style="text-align: left;">Metric</th>
+<th style="text-align: right;">Value</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td></td>
-<td></td>
+<tr class="odd">
+<td style="text-align: left;">File</td>
+<td style="text-align: right;">inst/extdata/irish_buoys.duckdb</td>
 </tr>
-
+<tr class="even">
+<td style="text-align: left;">Size</td>
+<td style="text-align: right;">58.76 MB</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Last Modified</td>
+<td style="text-align: right;">2026-02-14 21:03</td>
+</tr>
 </tbody>
 </table>
 </div>
 </div>
-</div>
 </section>
-<section id="column-10" class="level3" width="60%">
-<h3 width="60%" class="anchored" data-anchor-id="column-10">Column</h3>
-<div class="card" title="Pipeline Timing">
+</section>
+<section id="pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="pipeline">Pipeline</h2>
+<p>Targets pipeline status, timing metrics, and execution history.</p>
+<section id="target-status" class="level3">
+<h3 class="anchored" data-anchor-id="target-status">Target Execution Status</h3>
 <div class="cell">
 <div class="cell-output-display">
-<ul>
-<li>Total runtime: NA seconds</li>
-<li>Average target: NA seconds</li>
-<li>Slowest target: NA seconds</li>
-<li>Last run: NA</li>
-</ul>
-</div>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-4a2bb8c2ed773115becb" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4a2bb8c2ed773115becb">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"data":[[],[]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>status<\/th>\n      <th>n_targets<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":1},{"name":"status","targets":0},{"name":"n_targets","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
+<section id="timing-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="timing-metrics">Pipeline Performance</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Metric</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Total runtime</td>
+<td style="text-align: right;">NA seconds</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Average per target</td>
+<td style="text-align: right;">NA seconds</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Slowest target</td>
+<td style="text-align: right;">NA seconds</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Last run</td>
+<td style="text-align: right;">NA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
-<section id="row-6" class="level2">
-<h2 class="anchored" data-anchor-id="row-6">Row</h2>
-<section id="column-11" class="level3">
-<h3 class="anchored" data-anchor-id="column-11">Column</h3>
-<div class="card" title="Target Metrics by Plan">
-<p>Count, size (MB), and timing (seconds) for each target, grouped by tar_plan. TOTAL row shows overall totals.</p>
+<section id="targets-by-plan" class="level3">
+<h3 class="anchored" data-anchor-id="targets-by-plan">Targets by Plan</h3>
+<p>Target counts, size, and timing by pipeline plan (from <code>R/tar_plans/plan_*.R</code>).</p>
 <div class="cell">
 <div class="cell-output-display">
 <p>No target metrics available</p>
 </div>
 </div>
+</section>
+</section>
+<section id="tests" class="level2">
+<h2 class="anchored" data-anchor-id="tests">Tests</h2>
+<p>Unit test and quality assurance metrics for the irishbuoys package.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">By Category</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">By File</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Test Types</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Aggregated counts of tests, expectations, and snapshot tests grouped by test category.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-b1ffd31d92080be547d9" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-b1ffd31d92080be547d9">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Test Summary by Category<\/caption>","data":[["Contains Snapshots","Defensive/Null Guards","TOTAL"],[1,2,3],[6,35,41],[7,67,74],[5,0,5]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>test_type<\/th>\n      <th>n_files<\/th>\n      <th>total_tests<\/th>\n      <th>total_expectations<\/th>\n      <th>total_snapshots<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":15,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[1,2,3,4]},{"name":"test_type","targets":0},{"name":"n_files","targets":1},{"name":"total_tests","targets":2},{"name":"total_expectations","targets":3},{"name":"total_snapshots","targets":4}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100],"rowCallback":"function(row, data, displayNum, displayIndex, dataIndex) {\nvar value=data[0]; $(row).css({'background-color':value == \"TOTAL\" ? \"#e8f4f8\" : null});\n}"}},"evals":["options.rowCallback"],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-bf35c52f66a82399d76e" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-bf35c52f66a82399d76e">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Test Files by Type<\/caption>","data":[["test-data-consistency.R","test-defensive-programming.R","test-doc-dependencies.R"],["Contains Snapshots","Defensive/Null Guards","Defensive/Null Guards"],[6,32,3],[7,59,8],[5,0,0]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>file<\/th>\n      <th>test_type<\/th>\n      <th>n_tests<\/th>\n      <th>n_expectations<\/th>\n      <th>n_snapshots<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3,4]},{"name":"file","targets":0},{"name":"test_type","targets":1},{"name":"n_tests","targets":2},{"name":"n_expectations","targets":3},{"name":"n_snapshots","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 43%">
+<col style="width: 56%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Category</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Unit Tests</td>
+<td>Standard <code>test_that()</code> blocks testing individual functions</td>
+</tr>
+<tr class="even">
+<td>Adversarial/Edge Cases</td>
+<td>Tests for NULL, NA, empty inputs, boundary conditions</td>
+</tr>
+<tr class="odd">
+<td>Defensive/Null Guards</td>
+<td>Tests verifying <code>cli::cli_abort()</code> on invalid inputs</td>
+</tr>
+<tr class="even">
+<td>Contains Snapshots</td>
+<td>Files with <code>expect_snapshot()</code> calls</td>
+</tr>
+<tr class="odd">
+<td>Integration Tests</td>
+<td>End-to-end tests spanning multiple components</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </section>
-</section>
-</section>
-<section id="git-activity" class="level1">
-<h1>Git Activity</h1>
-<p>Repository commit history and activity.</p>
-<section id="row-7" class="level2">
-<h2 class="anchored" data-anchor-id="row-7">Row</h2>
-<section id="column-12" class="level3" width="40%">
-<h3 width="40%" class="anchored" data-anchor-id="column-12">Column</h3>
-<div class="card" title="Commit Frequency (Last 30 Days)">
+<section id="git-activity" class="level2">
+<h2 class="anchored" data-anchor-id="git-activity">Git Activity</h2>
+<p>Repository commit history and development activity.</p>
+<section id="commit-frequency" class="level3">
+<h3 class="anchored" data-anchor-id="commit-frequency">Commit Frequency</h3>
 <div class="cell">
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="telemetry_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="telemetry_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="commit-history" class="level3">
+<h3 class="anchored" data-anchor-id="commit-history">Recent Commits</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-2902996403979a497aad" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-2902996403979a497aad">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Recent Git Commits<\/caption>","data":[["450913b","58d0f2c","cda7bc7","eaf0293","68c8460","0ee72a3","24e0074","e9add5e","64caf0c","d7a68dc","4ae6544","f89cf4e","b8189a9","0efe4a6","03f5291","1baa3a5","d1aae55","70f332a","dc1bc80","4f5f33a","7ec7b89","2fe4fab","de87339","354e816","fd3cc47","4d4a030","61908ef","bbbf4b9","e04ae5d","a2a79a8","0a49fb8","1aa97c1","99a572d","fd5b654","11c0e48","0ec0dfc","36e819d","420e88e","394fafa","9d19252","c788e33","f2c2c2c","fbaf9e3","9e25302","291de12","897be19","8c2344d","46972f2","97cd4fc","c6e93d6"],["John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","jg &lt;JohnGavin@users.noreply.github.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;"],["2026-02-25T11:29:07Z","2026-02-22T19:56:54Z","2026-02-22T13:03:43Z","2026-02-22T12:49:04Z","2026-02-21T20:26:31Z","2026-02-21T19:42:22Z","2026-02-19T20:31:50Z","2026-02-18T22:14:45Z","2026-02-18T17:42:31Z","2026-02-18T14:54:07Z","2026-02-18T12:53:17Z","2026-02-17T23:25:20Z","2026-02-17T23:24:01Z","2026-02-17T15:28:55Z","2026-02-17T15:27:49Z","2026-02-17T15:27:33Z","2026-02-16T12:09:30Z","2026-02-15T22:34:15Z","2026-02-15T22:10:53Z","2026-02-15T20:17:21Z","2026-02-15T19:26:01Z","2026-02-15T13:19:17Z","2026-02-15T13:15:26Z","2026-02-15T12:45:59Z","2026-02-15T12:45:41Z","2026-02-15T12:45:27Z","2026-02-15T12:45:09Z","2026-02-14T15:06:26Z","2026-02-14T14:38:22Z","2026-02-14T14:33:59Z","2026-02-13T20:44:17Z","2026-02-13T20:30:13Z","2026-02-13T18:30:18Z","2026-02-13T17:43:44Z","2026-02-13T17:38:09Z","2026-02-13T15:25:30Z","2026-02-12T15:30:00Z","2026-02-12T14:51:21Z","2026-02-12T14:39:02Z","2026-02-12T12:23:23Z","2026-02-12T12:04:10Z","2026-02-12T10:51:08Z","2026-02-12T10:30:28Z","2026-02-12T10:28:50Z","2026-02-11T15:38:41Z","2026-02-11T15:36:33Z","2026-02-11T15:35:27Z","2026-02-11T15:29:46Z","2026-02-11T15:26:01Z","2026-02-11T15:03:34Z"],["feat: static JSON API at docs/api/v1/ (issue #32)\n\n- Add R/api_static.R with gen","chore: clean stale branches, gitignore AGENTS.md, add plans + fix_031\n\n- Deleted","fix: correct adversarial test for nonexistent db path\n\nconnect_duckdb() creates ","ci: add r-universe test workflow\n\nTests the exact r-universe build process on pu","Merge pull request #16 from JohnGavin/feat/issue-15-rf-predictions\n\nfeat: Displa","fix: adopt remaining b-rodrigues + official targets CI patterns\n\n- Add GITHUB_PA","fix(#30): commit _targets/ to git with LFS for CI vignette rendering (#31)\n\n* fi","docs: re-render telemetry.html with html format (no Row/Column labels)\n\nCo-Autho","Merge pull request #29 from JohnGavin/fix-issue-28-articles-telemetry\n\nfix(#28):","Merge pull request #27 from JohnGavin/fix-issue-20-silver-quality-gate\n\nfeat(#20","Merge pull request #26 from JohnGavin/fix-issue-25-cachix-push\n\nfix(#25): push_t","docs: rebuild pkgdown, remove debug.html\n\nRebuild home + reference for gray 70 t","Merge pull request #24 from JohnGavin/fix-issue-23-vignette-overhaul\n\nfix(#23): ","docs: Rebuild pkgdown home page after PR #22 merge\n\nCo-Authored-By: Claude Opus ","Revert \"docs: Rebuild pkgdown site with PR #22 changes\"\n\nThis reverts commit 1ba","docs: Rebuild pkgdown site with PR #22 changes\n\nUpdated reference docs for email","feat: Email reports, Nix sync, DT tables, package cleanup (#21) (#22)\n\nWire emai","docs: Remove duplicate 'All Articles' navbar link\n\nCo-Authored-By: Claude Opus 4","docs: Rebuild pkgdown site with latest PR #19 changes\n\n- Add URL field to DESCRI","feat: Add QA gates as targets and increase test coverage from 8.8% to 41.9% (#19","fix: Harden QA, fix cachix push, wrap ERDDAP examples (#17)\n\n* fix: Harden QA, f","docs: Regenerate README.md from README.qmd\n\nUpdated project structure tree and t","fix: Add permissions for API drift workflow and fix R CMD check notes\n\n- Add per","docs: Update rendered vignettes with LLM usage dashboard\n\n- Regenerate telemetry","chore(pkgctx): Add generated LLM context files\n\nGenerated via: nix run github:b-","feat(telemetry): Add LLM usage tracking with deduplication\n\n- Add LLM Usage &amp; Co","feat(pkgctx): Add LLM context generation and API drift detection\n\n- Add R/tar_pl","docs: Improve pkgdown navbar and README collapsibility\n\npkgdown config:\n- Move t","feat: Add adversarial tests and evidence logging pipeline\n\nAdversarial Tests (59","fix: Add defensive NULL guards to exported functions\n\nAdd comprehensive input va","fix(telemetry): Fix valuebox formatting and add figure files\n\n- Use cat() with o","Website restructuring: dark theme, filters, tabsets, cleanup\n\nPhase 1: Dark plot","Rebuild vignettes with nested tabsets in Reference section\n\n- wave_analysis.html","Fix pkgdown config and move telemetry.qmd to vignettes\n\n- Move telemetry.qmd fro","Restructure Reference section with nested tabsets, update title\n\n- wave_analysis","feat(#13): Add joint distribution analysis for multi-buoy dependencies (#14)\n\n* ","Fix gh-pages deployment and add target metrics to telemetry\n\nREADME Fixes (now d","Add telemetry vignette with all-targets architecture\n\n- Create R/tar_plans/plan_","Add ALL README code chunks as targets with function dependencies\n\n- Rewrite plan","Fix dashboard per user feedback round 2\n\n- Change title to \"Irish Weather Buoys\"","Fix dashboard issues per user feedback\n\n- Add date of max wave/signif to caption","Fix README examples: use str(head(data, 3)) for efficiency\n\nShow structure of fi","Re-render README.md with current project structure\n\nRegenerates README from READ","Implement dashboard improvements per plan\n\n- Replace Hs/Hmax with Signif Wave/Ma","Add placeholder debug.html to fix 404\n\nNix environment segfault due to missing n","Simplify debug.qmd setup to avoid pkgload segfault\n\nRemove pkgload::load_all() w","Increase CI timeout from 5 to 15 minutes\n\nR CMD check needs more than 5 minutes ","Update wave_analysis.qmd: title, station tabs, merged Reference\n\n- Changed title","Fix misleading glimpse output - use actual data, not fake sample\n\nIMPORTANT: Nev","Improve dashboard_static.qmd with source links and data tabs\n\nReference section:"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>sha<\/th>\n      <th>author<\/th>\n      <th>date<\/th>\n      <th>message<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":15,"scrollX":true,"columnDefs":[{"name":"sha","targets":0},{"name":"author","targets":1},{"name":"date","targets":2},{"name":"message","targets":3}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+<section id="project-files" class="level2">
+<h2 class="anchored" data-anchor-id="project-files">Project Files</h2>
+<section id="files-by-type" class="level3">
+<h3 class="anchored" data-anchor-id="files-by-type">File Type Distribution</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-20505b97a9932f3cdafd" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-20505b97a9932f3cdafd">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Project File Types<\/caption>","data":[["Rd","R","gz","metadata","ts","tgz","js","css","ttf","rds","md","(no extension)","qmd","map","json","yml","duckdb","mjs","nix","sh","so","TAG","bak","cjs","conf","csv","html","lua","parquet","scss","wasm","woff","woff2","yaml"],[97,65,56,56,45,37,24,10,10,8,7,6,6,5,4,3,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>extension<\/th>\n      <th>n_files<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":1},{"name":"extension","targets":0},{"name":"n_files","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+<section id="llm-usage" class="level2">
+<h2 class="anchored" data-anchor-id="llm-usage">LLM Usage</h2>
+<p>Claude Code usage statistics for the irishbuoys project.</p>
+<section id="usage-summary" class="level3">
+<h3 class="anchored" data-anchor-id="usage-summary">Usage Summary</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-9a87c9b4dfe1e5a87c6c" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-9a87c9b4dfe1e5a87c6c">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>LLM Usage Summary (irishbuoys project)<\/caption>","data":[["Total Cost (USD)","Total Tokens","Total Requests","Days Active","Avg Cost/Day","Avg Tokens/Day","Date Range"],["$912.48","324,188,328","3,157","14","$65.18","23,156,309","2026-01-30 to 2026-02-15"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>metric<\/th>\n      <th>value<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"name":"metric","targets":0},{"name":"value","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Cost Trends</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Token Usage</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">By Model</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">Daily Log</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false" href="">Pricing Reference</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>Estimated daily costs based on Claude API pricing.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="telemetry_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </div>
-</section>
-<section id="column-13" class="level3" width="60%">
-<h3 width="60%" class="anchored" data-anchor-id="column-13">Column</h3>
-<div class="card" title="Recent Commits">
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>Breakdown of input, output, and cache tokens. Cache tokens reduce costs.</p>
 <div class="cell">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-029e2c72222aa0bdaf29" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-029e2c72222aa0bdaf29">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Recent Git Commits<\/caption>","data":[["30d5c46","120c7c9","e757836","ad01144","36e819d","420e88e","394fafa","9d19252","c788e33","f2c2c2c","fbaf9e3","9e25302","291de12","897be19","8c2344d","46972f2","97cd4fc","c6e93d6","d4d8339","f662753","61d1ab7","eccd087","f8e4709","c4f49be","e742791","1798b16","187867f","8228257","3a5067f","82343c4","688bc39","f6194ce","7c23246","55e86be","6f9f112","535310e","029b13e","6bf634d","9d927d3","43153dc","8c84b2b","1464a88","dc3a4a1","38102f1","67fee79","de1723c","f92c552","d4c28f2","dfdf44f","e8e7eb3"],["John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;"],["2026-02-12T21:55:59Z","2026-02-12T20:33:49Z","2026-02-12T20:27:00Z","2026-02-12T20:14:24Z","2026-02-12T15:30:00Z","2026-02-12T14:51:21Z","2026-02-12T14:39:02Z","2026-02-12T12:23:23Z","2026-02-12T12:04:10Z","2026-02-12T10:51:08Z","2026-02-12T10:30:28Z","2026-02-12T10:28:50Z","2026-02-11T15:38:41Z","2026-02-11T15:36:33Z","2026-02-11T15:35:27Z","2026-02-11T15:29:46Z","2026-02-11T15:26:01Z","2026-02-11T15:03:34Z","2026-02-11T15:00:45Z","2026-02-11T13:59:06Z","2026-02-11T13:18:54Z","2026-02-11T13:07:55Z","2026-02-11T12:36:44Z","2026-02-11T12:23:45Z","2026-02-11T12:08:50Z","2026-02-11T11:53:39Z","2026-02-08T21:01:24Z","2026-02-08T20:32:46Z","2026-02-08T20:17:58Z","2026-02-08T12:27:34Z","2026-02-08T11:36:30Z","2026-02-08T10:57:20Z","2026-02-07T21:20:46Z","2026-02-07T21:04:45Z","2026-02-07T20:02:59Z","2026-02-07T19:24:39Z","2026-02-07T13:39:03Z","2026-02-07T13:36:21Z","2026-02-07T13:28:31Z","2026-02-05T13:53:28Z","2026-02-05T13:49:52Z","2026-02-05T13:44:53Z","2026-02-05T12:32:49Z","2026-02-05T10:12:00Z","2026-02-05T10:11:47Z","2026-02-05T10:01:03Z","2026-02-04T13:12:36Z","2026-02-04T12:53:37Z","2026-02-04T12:49:46Z","2026-02-04T12:24:11Z"],["feat: Add pointblank reports to index, fix tar_quarto deprecation\n\n- docs/articl","feat: Update articles index and fix debug.qmd parsing\n\n- docs/articles/index.htm","feat: Add vignettes to targets pipeline for reproducibility\n\nMANDATORY: All vign","feat(#13): Add joint distribution analysis for multi-buoy dependencies\n\nAdd func","Fix gh-pages deployment and add target metrics to telemetry\n\nREADME Fixes (now d","Add telemetry vignette with all-targets architecture\n\n- Create R/tar_plans/plan_","Add ALL README code chunks as targets with function dependencies\n\n- Rewrite plan","Fix dashboard per user feedback round 2\n\n- Change title to \"Irish Weather Buoys\"","Fix dashboard issues per user feedback\n\n- Add date of max wave/signif to caption","Fix README examples: use str(head(data, 3)) for efficiency\n\nShow structure of fi","Re-render README.md with current project structure\n\nRegenerates README from READ","Implement dashboard improvements per plan\n\n- Replace Hs/Hmax with Signif Wave/Ma","Add placeholder debug.html to fix 404\n\nNix environment segfault due to missing n","Simplify debug.qmd setup to avoid pkgload segfault\n\nRemove pkgload::load_all() w","Increase CI timeout from 5 to 15 minutes\n\nR CMD check needs more than 5 minutes ","Update wave_analysis.qmd: title, station tabs, merged Reference\n\n- Changed title","Fix misleading glimpse output - use actual data, not fake sample\n\nIMPORTANT: Nev","Improve dashboard_static.qmd with source links and data tabs\n\nReference section:","Add purrr to Imports for tidyverse consistency\n\npurrr is part of tidyverse and c","Fix R CMD check warnings for pointblank validation\n\n- Replace non-existent point","Add Documentation section with vignette links to README\n\n- Static Dashboard: Sta","Add pointblank validation with Debug page for gh-pages\n\n- Move pointblank from S","Add pointblank data validation to targets pipeline\n\n- R/validation.R: New valida","Improve wave_analysis dashboard Key Metrics and page structure\n\n- Key Metrics ta","Fix wave_analysis.qmd formatting and reorganize dashboards\n\n- wave_analysis.qmd:","Improve dashboard with hourly data, captions, and page reorg\n\n- Reorder pages: M","Fix dashboard rendering and README examples\n\n- Render dashboards with quarto dir","Rebuild docs: dashboards with new terminology, pkgdown with new functions\n\nDashb","Dashboard improvements: terminology, Max Wave page, Reference tabsets\n\nTheme 1: ","Exclude _targets/ and docs/ from project structure display\n\nThese generated fold","Pin nixpkgs to 2026-01-22 to fix macOS 26.2 segfaults\n\nThe cli/rlang packages cr","Fix DuckDB ICU extension error in CI\n\nReplace EXTRACT() with strftime() in SQL q","Dashboard: Switch to inline plot generation, add data sampling\n\n- Remove pre-com","Fix README and add code example evaluation\n\n- Fix fs::dir_tree(recurse=2) to lim","Add code-as-target pattern for documentation examples\n\n- Create R/tar_plans/plan","Dashboard styling and structure improvements\n\n- Fix plotly visibility: gray80 ba","Update rendered wave_analysis dashboard\n\nCo-Authored-By: Claude Opus 4.5 &lt;norepl","Migrate DBI queries to dplyr verbs with dbplyr backend\n\n- Add buoy_tbl() helper ","Add GPD per-station EVA, irishbuoys_layout(), vignette restructure\n\nMajor change","Add EVA Methodology section explaining GEV theory and limitations\n\n- New \"EVA Me","Fix wave_analysis visual issues: color contrast, legends, 5x1 layout\n\n- Events b","Fix data gaps: staging table insert, NaN handling, date format, color contrast\n\n","Full 2019-2026 dataset, by-station gust analysis, dashboard optimization\n\n- Load","Remove wrongly-nested vignettes output directory\n","Convert plots to plotly, add Beaufort scale, reorder wave analysis sections\n\ndas","Refactor dashboards: remove value boxes, add pages/tabsets, full width dygraphs\n","Fix vignettes: weather data loading, timestamp columns, column names\n\n- Fix wave","Fix dashboard vignette rendering paths\n\n- Use relative paths for data files duri","Add dygraphs dashboard with pages/tabsets, fix header overlap\n\nDashboard improve","Add README.md rendered from README.qmd\n\nIncludes Cachix binary cache documentati"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>sha<\/th>\n      <th>author<\/th>\n      <th>date<\/th>\n      <th>message<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":15,"scrollX":true,"columnDefs":[{"name":"sha","targets":0},{"name":"author","targets":1},{"name":"date","targets":2},{"name":"message","targets":3}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<div>
+<figure class="figure">
+<p><img src="telemetry_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
 </div>
-</section>
-</section>
-</section>
-<section id="project" class="level1">
-<h1>Project</h1>
-<p>Project structure and file statistics.</p>
-<section id="row-8" class="level2">
-<h2 class="anchored" data-anchor-id="row-8">Row</h2>
-<section id="column-14" class="level3">
-<h3 class="anchored" data-anchor-id="column-14">Column</h3>
-<div class="card" title="File Types">
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
 <div class="cell">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-ffad04fee0de712f561a" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-ffad04fee0de712f561a">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Project File Types<\/caption>","data":[["Rd","gz","metadata","ts","tgz","R","js","css","ttf","rds","(no extension)","qmd","map","md","json","yml","mjs","sh","so","TAG","bak","cjs","conf","csv","duckdb","html","lua","nix","parquet","scss","wasm","woff","woff2"],[92,56,56,45,37,33,24,10,10,8,6,6,5,5,4,3,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>extension<\/th>\n      <th>n_files<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":1},{"name":"extension","targets":0},{"name":"n_files","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div>
+<figure class="figure">
+<p><img src="telemetry_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-db46bb6eb9f5c22c113b" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-db46bb6eb9f5c22c113b">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Usage by Model<\/caption>","data":[[900.54,11.93,0],[320182141,4006187,0],[3066,66,25],[98.7,1.3,0],["opus-4-5-20251101","opus-4-1-20250805","&lt;synthetic&gt;"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>total_cost<\/th>\n      <th>total_tokens<\/th>\n      <th>n_requests<\/th>\n      <th>pct_cost<\/th>\n      <th>model<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[0,1,2,3]},{"name":"total_cost","targets":0},{"name":"total_tokens","targets":1},{"name":"n_requests","targets":2},{"name":"pct_cost","targets":3},{"name":"model","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-a752554ce934390bfe39" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-a752554ce934390bfe39">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Daily LLM Usage<\/caption>","data":[["2026-01-30","2026-01-30","2026-01-31","2026-01-31","2026-01-31","2026-02-01","2026-02-01","2026-02-02","2026-02-02","2026-02-03","2026-02-03","2026-02-04","2026-02-04","2026-02-05","2026-02-05","2026-02-07","2026-02-07","2026-02-08","2026-02-08","2026-02-11","2026-02-11","2026-02-12","2026-02-12","2026-02-13","2026-02-14","2026-02-15"],["&lt;synthetic&gt;","opus-4-1-20250805","&lt;synthetic&gt;","opus-4-1-20250805","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","&lt;synthetic&gt;","opus-4-5-20251101","opus-4-5-20251101","opus-4-5-20251101","opus-4-5-20251101"],[1,53,3,13,244,1,224,3,129,2,156,2,276,2,251,2,372,4,291,1,256,4,341,308,215,3],[0,365,0,116,6460,0,3584,0,17579,0,1175,0,1958,0,26816,0,2725,0,12928,0,21246,0,10748,29813,4545,23],[0,145,0,38,4133,0,462,0,290,0,326,0,611,0,22625,0,774,0,574,0,603,0,7106,765,498,7],[0,112219,0,148731,1349747,0,1319477,0,965711,0,1253120,0,1277327,0,1038693,0,1641245,0,1801266,0,1633709,0,2596551,1776886,726475,132931],[0,2722560,0,1022013,22655742,0,21020445,0,12131269,0,15242718,0,26131369,0,25803175,0,39901209,0,27286210,0,26915658,0,32125437,29302671,23710589,264137],[0,2835289,0,1170898,24016082,0,22343968,0,13114849,0,16497339,0,27411265,0,26891309,0,41545953,0,29100978,0,28571216,0,34739842,31110135,24442107,397098],[0,7.2253,0,4.7096,68.19410000000001,0,64.2419,0,41.1386,0,52.1182,0,73.0214,0,69.9556,0,105.687,0,85.1724,0,81.4628,0,109.6147,88.7637,58.1843,2.9886]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>date<\/th>\n      <th>model<\/th>\n      <th>n_requests<\/th>\n      <th>total_input<\/th>\n      <th>total_output<\/th>\n      <th>total_cache_creation<\/th>\n      <th>total_cache_read<\/th>\n      <th>total_tokens<\/th>\n      <th>estimated_cost_usd<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,8]},{"name":"date","targets":0},{"name":"model","targets":1},{"name":"n_requests","targets":2},{"name":"total_input","targets":3},{"name":"total_output","targets":4},{"name":"total_cache_creation","targets":5},{"name":"total_cache_read","targets":6},{"name":"total_tokens","targets":7},{"name":"estimated_cost_usd","targets":8}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Input</th>
+<th>Output</th>
+<th>Cache Create</th>
+<th>Cache Read</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Opus 4.5</td>
+<td>$15/M</td>
+<td>$75/M</td>
+<td>$18.75/M</td>
+<td>$1.875/M</td>
+</tr>
+<tr class="even">
+<td>Sonnet 4</td>
+<td>$3/M</td>
+<td>$15/M</td>
+<td>$3.75/M</td>
+<td>$0.375/M</td>
+</tr>
+<tr class="odd">
+<td>Haiku 3.5</td>
+<td>$0.80/M</td>
+<td>$4/M</td>
+<td>$1/M</td>
+<td>$0.08/M</td>
+</tr>
+</tbody>
+</table>
+<p>Data source: Claude Code session files in <code>~/.claude/projects/</code>.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="validation" class="level2">
+<h2 class="anchored" data-anchor-id="validation">Validation Reports</h2>
+<p>Pointblank validation reports embedded below. See also: <a href="validation_analysis_data.html">analysis_data Validation</a> | <a href="validation_rogue_events.html">rogue_wave_events Validation</a></p>
+<section id="validation-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="validation-analysis">analysis_data</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>validation_analysis_data.html</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</section>
+<section id="validation-rogue" class="level3">
+<h3 class="anchored" data-anchor-id="validation-rogue">rogue_wave_events</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>validation_rogue_events.html</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
 </div>
 </div>
 <hr>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>*Generated: 2026-02-13 20:43 UTC *</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>*All data loaded from pre-computed targets via tar_load()*</code></pre>
-</div>
-</div>
-</section>
+<p><em>Generated: 2026-02-25 15:33 UTC </em> <em>All data loaded from pre-computed targets via tar_load()</em> <em>Data range: Full historical (2019-present), NO sampling</em></p>
 </section>
 </section>
 
