@@ -527,6 +527,83 @@ arguments:
 returns: Character string with formatted report
 ---
 kind: function
+name: knots_to_beaufort
+exported: true
+signature: knots_to_beaufort(wind_speed_kn)
+arguments:
+  wind_speed_kn: Numeric vector of wind speeds in knots.
+returns: Integer vector of Beaufort numbers (0-12).
+---
+kind: function
+name: beaufort_to_description
+exported: true
+signature: beaufort_to_description(beaufort)
+arguments:
+  beaufort: Integer vector of Beaufort numbers (0-12).
+returns: Character vector of Beaufort descriptions.
+---
+kind: function
+name: fetch_open_meteo_forecast
+exported: true
+signature: fetch_open_meteo_forecast(lat, lon, station_id,forecast_days = 7, timeout = 30)
+arguments:
+  forecast_days: Integer number of forecast days (1-16, default 7).
+  lat: Latitude in decimal degrees.
+  lon: Longitude in decimal degrees.
+  station_id: Character station identifier (e.g.
+  timeout: Numeric request timeout in seconds (default 30).
+returns: 'Tibble with columns: station_id, time, wind_speed_kn, wind_gust_kn, forecast_fetched_at.'
+---
+kind: function
+name: fetch_all_forecasts
+exported: true
+signature: fetch_all_forecasts(station_info = get_station_info(),forecast_days = 7, timeout = 30)
+arguments:
+  forecast_days: Integer number of forecast days (default 7).
+  station_info: Data frame with station_id, lat, lon columns (default from \link[=get_station_info]{get_station_info()}).
+  timeout: Numeric request timeout in seconds (default 30).
+returns: Combined tibble of all station forecasts.
+---
+kind: function
+name: detect_storm_events
+exported: true
+signature: detect_storm_events(forecasts, threshold_knots = NULL,use_gusts = TRUE)
+arguments:
+  forecasts: Tibble from \link[=fetch_all_forecasts]{fetch_all_forecasts()} or \link[=fetch_open_meteo_forecast]{fetch_open_meteo_forecast()}.
+  threshold_knots: Numeric threshold in knots (default NULL, uses env var or 34).
+  use_gusts: Logical; if TRUE (default), also flag rows where gusts exceed threshold.
+returns: 'Tibble with columns: station_id, time, wind_speed_kn, wind_gust_kn, beaufort, description, is_gust_driven.'
+---
+kind: function
+name: fetch_met_eireann_warnings
+exported: true
+signature: fetch_met_eireann_warnings(timeout = 10)
+arguments:
+  timeout: Numeric request timeout in seconds (default 10).
+returns: Character vector of warning lines, or NULL if unavailable.
+---
+kind: function
+name: create_storm_alert_email
+exported: true
+signature: create_storm_alert_email(storm_events,station_info = get_station_info(),met_warnings = NULL)
+arguments:
+  met_warnings: Character vector from \link[=fetch_met_eireann_warnings]{fetch_met_eireann_warnings()}, or NULL.
+  station_info: Data frame from \link[=get_station_info]{get_station_info()} (default).
+  storm_events: Tibble from \link[=detect_storm_events]{detect_storm_events()}.
+returns: A blastula email object.
+---
+kind: function
+name: send_storm_alert
+exported: true
+signature: send_storm_alert(threshold_knots = NULL,recipient = Sys.getenv("GMAIL_USERNAME"),sender = Sys.getenv("GMAIL_USERNAME"),dry_run = FALSE)
+arguments:
+  dry_run: Logical; if TRUE, saves HTML preview to tempdir instead of sending.
+  recipient: Email recipient (default from GMAIL_USERNAME env var).
+  sender: Email sender (default from GMAIL_USERNAME env var).
+  threshold_knots: Numeric threshold in knots (default NULL, uses env var or 34).
+returns: 'List with: status ("sent", "no_storms", "preview", "error"), n_storms, stations_affected, preview_file (if dry_run), error (if failed).'
+---
+kind: function
 name: validate_buoy_data
 exported: true
 signature: validate_buoy_data(data,target_name = "analysis_data",min_rows = 100,report_path = NULL)

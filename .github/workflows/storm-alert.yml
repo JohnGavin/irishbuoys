@@ -1,0 +1,72 @@
+name: Daily Storm Alert
+
+# Checks Open-Meteo wind forecasts for all Irish buoy stations.
+# Sends email alert ONLY when Beaufort 8+ (gale force) winds are forecast.
+# No email on calm days.
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Daily 8am UTC
+  workflow_dispatch:
+
+jobs:
+  storm-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      STORM_ALERT_THRESHOLD_KNOTS: '34'
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+        with:
+          logger: pretty
+          log-directives: nix_installer=trace
+          backtrace: full
+
+      - name: Setup magic Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Setup Cachix (rstats-on-nix + johngavin)
+        uses: cachix/cachix-action@v15
+        with:
+          name: rstats-on-nix
+          extraPullNames: johngavin
+
+      - name: Build development environment
+        run: nix-build default.nix -A shell --no-out-link
+
+      - name: Run storm alert check
+        run: |
+          nix-shell default.nix -A shell --run "Rscript -e '
+            devtools::load_all()
+            result <- send_storm_alert()
+            cat(\"Status:\", result\$status, \"\\n\")
+            cat(\"Storms:\", result\$n_storms, \"\\n\")
+            if (!is.null(result\$stations_affected)) {
+              cat(\"Stations:\", paste(result\$stations_affected, collapse = \", \"), \"\\n\")
+            }
+            # Save result for artifact
+            saveRDS(result, \"storm_alert_result.rds\")
+            # Save preview if available
+            if (!is.null(result\$preview_file) && file.exists(result\$preview_file)) {
+              file.copy(result\$preview_file, \"storm_alert_preview.html\")
+            }
+            # Exit 1 only on error (not on no_storms)
+            if (result\$status == \"error\") quit(status = 1)
+          '"
+
+      - name: Upload result artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: storm-alert-result
+          path: |
+            storm_alert_result.rds
+            storm_alert_preview.html
+          retention-days: 7
+          if-no-files-found: ignore
