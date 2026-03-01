@@ -10,14 +10,56 @@ name: Weekly Data Update
 #   4. Render vignettes (tar_load works — _targets/ is present)
 #   5. Commit rendered outputs (inst/extdata/*.rds, docs/) to main
 #   6. Save _targets/ state to targets-runs branch for next run
+#
+# Schedule:
+#   - Always runs on Sundays at 2 AM UTC (regular weekly update)
+#   - Runs daily Mon-Sat ONLY when STORM_MODE repo variable is "true"
+#     (set by storm-alert.yml when Beaufort 8+ winds are forecast)
+#   - Reverts to weekly when storm forecast clears
+#   - Can always be triggered manually via workflow_dispatch
 
 on:
   schedule:
-    - cron: '0 2 * * 0'  # Sundays 2 AM UTC
+    - cron: '0 2 * * *'  # Daily at 2 AM UTC (gate job skips non-storm weekdays)
   workflow_dispatch:
 
 jobs:
+  # ── Gate Job: skip Mon-Sat unless storm mode is active ────
+  should-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      run_pipeline: ${{ steps.check.outputs.run_pipeline }}
+      reason: ${{ steps.check.outputs.reason }}
+    steps:
+      - name: Check if update needed
+        id: check
+        run: |
+          DAY_OF_WEEK=$(date -u +%u)  # 1=Mon ... 7=Sun
+          EVENT="${{ github.event_name }}"
+          STORM_MODE="${{ vars.STORM_MODE }}"
+
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "run_pipeline=true" >> $GITHUB_OUTPUT
+            echo "reason=manual trigger" >> $GITHUB_OUTPUT
+          elif [ "$DAY_OF_WEEK" = "7" ]; then
+            echo "run_pipeline=true" >> $GITHUB_OUTPUT
+            echo "reason=regular Sunday update" >> $GITHUB_OUTPUT
+          elif [ "$STORM_MODE" = "true" ]; then
+            echo "run_pipeline=true" >> $GITHUB_OUTPUT
+            echo "reason=storm mode active (daily update)" >> $GITHUB_OUTPUT
+          else
+            echo "run_pipeline=false" >> $GITHUB_OUTPUT
+            echo "reason=skipped (not Sunday, no storm mode)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Report decision
+        run: echo "::notice::Pipeline decision - run=${{ steps.check.outputs.run_pipeline }} (${{ steps.check.outputs.reason }})"
+
+  # ── Main Pipeline Job ────────────────────────────────────
   update-data:
+    needs: should-run
+    if: needs.should-run.outputs.run_pipeline == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -89,6 +131,7 @@ jobs:
           GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         run: |
+          echo "::notice::Update reason: ${{ needs.should-run.outputs.reason }}"
           nix-shell default.nix -A shell --run "Rscript -e '
             devtools::load_all()
             result <- incremental_update(db_path = \"inst/extdata/irish_buoys.duckdb\", lookback_hours = 72)
@@ -143,7 +186,7 @@ jobs:
           git add inst/extdata/*.rds || true
           git add docs/api/ || true
           git add docs/articles/ docs/vignettes/ || true
-          git diff --staged --quiet || git commit -m "Weekly update: data + vignettes - $(date +'%Y-%m-%d')"
+          git diff --staged --quiet || git commit -m "Data update (${{ needs.should-run.outputs.reason }}): $(date +'%Y-%m-%d')"
           git push || true
 
       # ── Save Pipeline State to targets-runs ─────────────────

@@ -12,6 +12,8 @@
 #' - api_stats          : Dashboard statistics (stats.json)
 #' - api_rogue_waves    : Rogue wave events (rogue-waves.json)
 #' - api_return_levels  : GEV return levels (return-levels.json)
+#' - api_seasonal       : Monthly/seasonal means + annual trends (seasonal.json)
+#' - api_correlations   : Inter-station correlations (correlations.json)
 #' - api_data_dictionary: Variable metadata (data-dictionary.json)
 #' - api_latest         : Most recent observation per station (latest.json)
 #' - api_index          : Endpoint catalogue (index.json)
@@ -102,6 +104,57 @@ plan_api <- list(
     }
   ),
 
+  # Seasonal statistics (monthly/seasonal means + annual trends)
+  targets::tar_target(
+    api_seasonal,
+    {
+      list(
+        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
+        wave = list(
+          monthly = seasonal_means_wave$monthly,
+          seasonal = seasonal_means_wave$seasonal
+        ),
+        wind = list(
+          monthly = seasonal_means_wind$monthly,
+          seasonal = seasonal_means_wind$seasonal
+        ),
+        annual_trends = list(
+          wave = list(
+            annual_stats = annual_trends_wave$annual_stats,
+            trend_per_decade = round(annual_trends_wave$trend_per_decade, 4),
+            p_value = round(annual_trends_wave$p_value, 4),
+            r_squared = round(annual_trends_wave$r_squared, 4)
+          ),
+          wind = list(
+            annual_stats = annual_trends_wind$annual_stats,
+            trend_per_decade = round(annual_trends_wind$trend_per_decade, 4),
+            p_value = round(annual_trends_wind$p_value, 4),
+            r_squared = round(annual_trends_wind$r_squared, 4)
+          )
+        )
+      )
+    }
+  ),
+
+  # Inter-station correlations
+  targets::tar_target(
+    api_correlations,
+    {
+      list(
+        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
+        overall = list(
+          wind_wave = round(dashboard_stats$overall$wind_wave_correlation, 4),
+          wave_hmax = round(dashboard_stats$overall$wave_hmax_correlation, 4)
+        ),
+        station_pairs = list(
+          wave_height = pair_correlations_wave,
+          wind_speed = pair_correlations_wind,
+          hmax = pair_correlations_hmax
+        )
+      )
+    }
+  ),
+
   # Data dictionary
   targets::tar_target(
     api_data_dictionary,
@@ -152,7 +205,9 @@ plan_api <- list(
         "rogue-waves.json" = api_rogue_waves,
         "return-levels.json" = api_return_levels,
         "data-dictionary.json" = api_data_dictionary,
-        "latest.json" = api_latest
+        "latest.json" = api_latest,
+        "seasonal.json" = api_seasonal,
+        "correlations.json" = api_correlations
       )
 
       # Write each file

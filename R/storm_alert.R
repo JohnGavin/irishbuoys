@@ -362,9 +362,28 @@ create_storm_alert_email <- function(storm_events,
     n_stations, " station", if (n_stations > 1) "s", " affected | ",
     "Max Beaufort ", max_beaufort, " (",
     beaufort_to_description(max_beaufort), ")</p>",
+    "<p style='margin:4px 0 0;font-size:0.9em;'>",
+    "<a href='https://johngavin.github.io/irishbuoys/' style='color:#ffcdd2;'>Website</a>",
+    " | <a href='https://github.com/JohnGavin/irishbuoys' style='color:#ffcdd2;'>GitHub</a>",
+    "</p>",
     "</div>",
 
     "<h2 style='color:#333;margin-top:20px;'>Station Summary</h2>",
+    "<p style='color:#555;font-size:0.9em;margin-bottom:8px;'>",
+    "Forecast wind conditions at ",
+    "<a href='https://www.marine.ie/site-area/data-services/real-time-observations/irish-weather-buoy-network'>Irish Weather Buoy Network</a> ",
+    "station coordinates. ",
+    "Max Wind and Max Gust are in ",
+    "<a href='https://en.wikipedia.org/wiki/Knot_(unit)'>knots</a> (1 kn = 0.514 m/s); ",
+    "<a href='https://en.wikipedia.org/wiki/Beaufort_scale'>Beaufort</a> ",
+    "classifies sea state (8 = Gale, 10 = Storm, 12 = Hurricane Force). ",
+    "This alert triggers when sustained wind or gusts reach ",
+    "<strong>Beaufort 8 (34 knots)</strong> or above. ",
+    "Hours = forecast hours exceeding the threshold in the next 7 days. ",
+    "Source: <a href='https://open-meteo.com/'>Open-Meteo</a> hourly forecasts. ",
+    "Storm alerts run daily at 08:00 UTC; ",
+    "buoy observation data updates weekly (Sundays 02:00 UTC).",
+    "</p>",
     "<table style='border-collapse:collapse;width:100%;'>",
     "<tr style='background:#f5f5f5;'>",
     "<th style='padding:8px;border:1px solid #ddd;'>Station</th>",
@@ -382,18 +401,34 @@ create_storm_alert_email <- function(storm_events,
 
     "<hr style='margin-top:20px;'>",
     "<p style='color:#666;font-size:0.85em;'>",
-    "Generated on ", format(Sys.time(), "%Y-%m-%d %H:%M UTC"), " by irishbuoys package<br>",
-    "Forecast source: <a href='https://open-meteo.com/'>Open-Meteo</a> | ",
-    "Observations: <a href='https://erddap.marine.ie/'>Marine Institute ERDDAP</a>",
+    "Generated on ", format(Sys.time(), "%Y-%m-%d %H:%M UTC"), " by the ",
+    "<a href='https://johngavin.github.io/irishbuoys/'>irishbuoys</a> R package ",
+    "(<a href='https://github.com/JohnGavin/irishbuoys'>source on GitHub</a>).<br>",
+    "Forecast data: <a href='https://open-meteo.com/'>Open-Meteo</a> | ",
+    "Buoy observations: <a href='https://erddap.marine.ie/'>Marine Institute ERDDAP</a><br>",
+    "Schedule: storm alerts daily at 08:00 UTC | buoy data updates Sundays at 02:00 UTC",
+    "</p>",
+    "<p style='color:#999;font-size:0.8em;font-style:italic;'>",
+    "Disclaimer: irishbuoys is an independent open-source project. ",
+    "It is not affiliated with, endorsed by, or part of the ",
+    "Marine Institute or the Irish Weather Buoy Network. ",
+    "Forecast data is provided by Open-Meteo and should not be used as a substitute ",
+    "for official marine weather warnings from ",
+    "<a href='https://www.met.ie/warnings'>Met Eireann</a>.",
     "</p>",
     "</div>"
   )
 
   blastula::compose_email(
     body = blastula::md(email_body),
-    footer = blastula::md(
-      "Automated storm alert from the Irish Weather Buoy Network monitoring system."
-    )
+    footer = blastula::md(paste0(
+      "Automated alert from the ",
+      "[irishbuoys](https://johngavin.github.io/irishbuoys/) R package ",
+      "([GitHub](https://github.com/JohnGavin/irishbuoys)). ",
+      "This is an independent open-source project, not affiliated with the Marine Institute ",
+      "or the Irish Weather Buoy Network. ",
+      "Always consult [Met Eireann](https://www.met.ie/warnings) for official marine warnings."
+    ))
   )
 }
 

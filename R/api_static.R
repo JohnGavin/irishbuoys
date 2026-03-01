@@ -63,6 +63,16 @@ generate_api_index <- function(
         endpoint = "latest.json",
         url = paste0(base_url, "latest.json"),
         description = "Most recent observation per station"
+      ),
+      list(
+        endpoint = "seasonal.json",
+        url = paste0(base_url, "seasonal.json"),
+        description = "Monthly and seasonal statistics with annual trends (wave height, wind speed)"
+      ),
+      list(
+        endpoint = "correlations.json",
+        url = paste0(base_url, "correlations.json"),
+        description = "Inter-station correlations for wave height, wind speed, and max wave height"
       )
     )
   }

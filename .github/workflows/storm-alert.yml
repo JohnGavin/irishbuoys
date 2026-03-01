@@ -3,11 +3,20 @@ name: Daily Storm Alert
 # Checks Open-Meteo wind forecasts for all Irish buoy stations.
 # Sends email alert ONLY when Beaufort 8+ (gale force) winds are forecast.
 # No email on calm days.
+#
+# Storm mode: When storms are detected, sets STORM_MODE=true repo variable.
+# This causes the data update workflow to run daily instead of weekly.
+# When forecast clears (no Beaufort 8+), STORM_MODE is set to false and
+# data updates revert to the regular Sunday schedule.
 
 on:
   schedule:
     - cron: '0 8 * * *'  # Daily 8am UTC
   workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
 
 jobs:
   storm-check:
@@ -41,6 +50,7 @@ jobs:
         run: nix-build default.nix -A shell --no-out-link
 
       - name: Run storm alert check
+        id: alert
         run: |
           nix-shell default.nix -A shell --run "Rscript -e '
             devtools::load_all()
@@ -56,9 +66,52 @@ jobs:
             if (!is.null(result\$preview_file) && file.exists(result\$preview_file)) {
               file.copy(result\$preview_file, \"storm_alert_preview.html\")
             }
+            # Write storm status for subsequent workflow steps
+            writeLines(result\$status, \"storm_status.txt\")
+            writeLines(as.character(result\$n_storms), \"storm_count.txt\")
             # Exit 1 only on error (not on no_storms)
             if (result\$status == \"error\") quit(status = 1)
           '"
+
+          # Export status for subsequent steps
+          STATUS=$(cat storm_status.txt 2>/dev/null || echo "error")
+          N_STORMS=$(cat storm_count.txt 2>/dev/null || echo "0")
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "n_storms=$N_STORMS" >> $GITHUB_OUTPUT
+
+          if [ "$N_STORMS" -gt "0" ] 2>/dev/null; then
+            echo "storms_detected=true" >> $GITHUB_OUTPUT
+          else
+            echo "storms_detected=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set storm mode ON (storms detected)
+        if: steps.alert.outputs.storms_detected == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PREVIOUS=$(gh variable get STORM_MODE 2>/dev/null || echo "false")
+          gh variable set STORM_MODE --body "true"
+          echo "::notice::STORM MODE ON - ${{ steps.alert.outputs.n_storms }} storm hours detected (was: $PREVIOUS)"
+
+      - name: Set storm mode OFF (no storms)
+        if: steps.alert.outputs.storms_detected == 'false' && steps.alert.outputs.status != 'error'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PREVIOUS=$(gh variable get STORM_MODE 2>/dev/null || echo "false")
+          gh variable set STORM_MODE --body "false"
+          if [ "$PREVIOUS" = "true" ]; then
+            echo "::notice::STORM MODE OFF - forecast cleared, reverting to weekly data updates"
+          fi
+
+      - name: Trigger data update (entering storm mode)
+        if: steps.alert.outputs.storms_detected == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::notice::Triggering data update workflow (storm mode active)"
+          gh workflow run weekly-update.yml || echo "::warning::Failed to trigger data update"
 
       - name: Upload result artifact
         if: always()
