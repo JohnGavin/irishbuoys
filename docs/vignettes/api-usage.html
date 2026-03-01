@@ -69,17 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="api-usage_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="api-usage_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="api-usage_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="api-usage_files/libs/bootstrap/bootstrap-5aeb795fb1f1a222a51c230a0084b391.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<link href="api-usage_files/libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
-<script src="api-usage_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-<link href="api-usage_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
-<script src="api-usage_files/libs/datatables-binding-0.34.0/datatables.js"></script>
-<script src="api-usage_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-<link href="api-usage_files/libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
-<link href="api-usage_files/libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
-<script src="api-usage_files/libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
-<link href="api-usage_files/libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
-<script src="api-usage_files/libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="api-usage_files/libs/bootstrap/bootstrap-f59036d9f42336bd5a1ebad648f3ab41.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
@@ -95,6 +85,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
   <li><a href="#endpoints" id="toc-endpoints" class="nav-link" data-scroll-target="#endpoints">Available Endpoints</a></li>
   <li><a href="#example-response" id="toc-example-response" class="nav-link" data-scroll-target="#example-response">Example Response</a></li>
+  <li><a href="#seasonal-endpoint" id="toc-seasonal-endpoint" class="nav-link" data-scroll-target="#seasonal-endpoint">Seasonal Endpoint</a></li>
+  <li><a href="#correlations-endpoint" id="toc-correlations-endpoint" class="nav-link" data-scroll-target="#correlations-endpoint">Correlations Endpoint</a></li>
   <li><a href="#usage-examples" id="toc-usage-examples" class="nav-link" data-scroll-target="#usage-examples">Usage Examples</a>
   <ul class="collapse">
   <li><a href="#curl-example" id="toc-curl-example" class="nav-link" data-scroll-target="#curl-example">curl</a></li>
@@ -138,68 +130,84 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="endpoints">Available Endpoints</h2>
 <div class="cell">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-b6f5a235d24a7f4438f8" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-b6f5a235d24a7f4438f8">{"x":{"filter":"none","vertical":false,"caption":"<caption>Available API Endpoints<\/caption>","data":[["stations.json","stats.json","rogue-waves.json","return-levels.json","data-dictionary.json","latest.json"],["https://johngavin.github.io/irishbuoys/api/v1/stations.json","https://johngavin.github.io/irishbuoys/api/v1/stats.json","https://johngavin.github.io/irishbuoys/api/v1/rogue-waves.json","https://johngavin.github.io/irishbuoys/api/v1/return-levels.json","https://johngavin.github.io/irishbuoys/api/v1/data-dictionary.json","https://johngavin.github.io/irishbuoys/api/v1/latest.json"],["All buoy station metadata (ID, call sign, coordinates)","Summary statistics per station and overall","Detected rogue wave events (Hmax &gt; 2x significant wave height)","GPD return levels per station for 1, 5, 10-year periods (avg wave, rogue wave, avg wind, wind gust)","Variable metadata: names, units, descriptions, typical ranges","Most recent observation per station"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>endpoint<\/th>\n      <th>url<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"dom":"Bfrtip","buttons":["csv","print"],"columnDefs":[{"width":"120px","targets":0},{"width":"300px","targets":1},{"name":"endpoint","targets":0},{"name":"url","targets":1},{"name":"description","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>api_vignette_endpoints_dt</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
 </div>
 </div>
 </section>
 <section id="example-response" class="level2">
 <h2 class="anchored" data-anchor-id="example-response">Example Response</h2>
 <p>A sample response from <code>latest.json</code> (one observation per station):</p>
-<p>{ “updated_at”: “2026-02-24T18:19:03Z”, “n_stations”: 5, “observations”: [ { “time”: “2026-02-14T20:00:00”, “station_id”: “M4”, “call_sign”: “62093”, “longitude”: -9.9991, “latitude”: 55, “atmospheric_pressure”: 995.654, “air_temperature”: 6.504, “dew_point”: null, “wind_direction”: 162, “wind_speed”: 32.56, “gust”: 43.376, “relative_humidity”: 92.09, “sea_temperature”: 9.939, “salinity”: 35.1717, “wave_height”: 1.992, “wave_period”: 8.203, “mean_wave_direction”: 325, “hmax”: 6.406, “tp”: 11.719, “thtp”: 306.563, “sprtp”: 230.625, “qc_flag”: 0 } ] }</p>
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>api_vignette_example_response</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</section>
+<section id="seasonal-endpoint" class="level2">
+<h2 class="anchored" data-anchor-id="seasonal-endpoint">Seasonal Endpoint</h2>
+<p>The <code>seasonal.json</code> endpoint provides monthly and seasonal (DJF/MAM/JJA/SON) mean statistics for wave height and wind speed, plus annual trend analysis with linear trend per decade and significance (p-value).</p>
+<p><strong>Fields:</strong> <code>wave.monthly</code>, <code>wave.seasonal</code>, <code>wind.monthly</code>, <code>wind.seasonal</code>, <code>annual_trends.wave</code>, <code>annual_trends.wind</code></p>
+</section>
+<section id="correlations-endpoint" class="level2">
+<h2 class="anchored" data-anchor-id="correlations-endpoint">Correlations Endpoint</h2>
+<p>The <code>correlations.json</code> endpoint provides overall wind-wave and wave-Hmax correlations plus inter-station pair correlations (cross-correlation analysis) for wave height, wind speed, and maximum wave height.</p>
+<p><strong>Fields:</strong> <code>overall.wind_wave</code>, <code>overall.wave_hmax</code>, <code>station_pairs.wave_height</code>, <code>station_pairs.wind_speed</code>, <code>station_pairs.hmax</code></p>
 </section>
 <section id="usage-examples" class="level2">
 <h2 class="anchored" data-anchor-id="usage-examples">Usage Examples</h2>
 <section id="curl-example" class="level3">
 <h3 class="anchored" data-anchor-id="curl-example">curl</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Fetch latest observations (one per station)</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> https://johngavin.github.io/irishbuoys/api/v1/latest.json </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="r-example" class="level3">
 <h3 class="anchored" data-anchor-id="r-example">R (jsonlite)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># R: Read the API index</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>index <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/index.json"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>index<span class="sc">$</span>endpoints</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Read latest observations</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>latest <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/latest.json"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>latest<span class="sc">$</span>observations </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="python-example" class="level3">
 <h3 class="anchored" data-anchor-id="python-example">Python (requests)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Python: Read the API</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="st">"https://johngavin.github.io/irishbuoys/api/v1/"</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get latest observations</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>latest <span class="op">=</span> requests.get(base <span class="op">+</span> <span class="st">"latest.json"</span>).json()</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(latest[<span class="st">"observations"</span>])</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head()) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="bulk-data" class="level2">
 <h2 class="anchored" data-anchor-id="bulk-data">Bulk Data Access</h2>
 <p>For bulk analysis, download the full dataset as Parquet:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-O</span> https://johngavin.github.io/irishbuoys/vignettes/data/buoy_data.parquet</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-O</span> https://johngavin.github.io/irishbuoys/vignettes/data/buoy_data.parquet</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Read in R with <code>arrow::read_parquet()</code> or in Python with <code>pandas.read_parquet()</code>.</p>
 </section>
 <section id="file-summary" class="level2">
 <h2 class="anchored" data-anchor-id="file-summary">API File Summary</h2>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 7 × 4
-  file                 path                             size_bytes size_kb
-  &lt;chr&gt;                &lt;chr&gt;                                 &lt;dbl&gt;   &lt;dbl&gt;
-1 index.json           docs/api/v1/index.json                 1431     1.4
-2 stations.json        docs/api/v1/stations.json              1085     1.1
-3 stats.json           docs/api/v1/stats.json                 1956     1.9
-4 rogue-waves.json     docs/api/v1/rogue-waves.json         589891   576. 
-5 return-levels.json   docs/api/v1/return-levels.json         2142     2.1
-6 data-dictionary.json docs/api/v1/data-dictionary.json       5408     5.3
-7 latest.json          docs/api/v1/latest.json                3184     3.1</code></pre>
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>save_api_files</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
 </div>
 </div>
 </section>
@@ -212,6 +220,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>CI:</strong> <a href="https://github.com/JohnGavin/irishbuoys/actions/workflows/weekly-update.yml">weekly-update.yml</a></li>
 </ul>
 <p>Data freshness depends on the ERDDAP server. The pipeline downloads the latest 72 hours of observations each run to catch any late-arriving data.</p>
+<hr>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Disclaimer:</strong> <code>irishbuoys</code> is an independent open-source project (<a href="https://johngavin.github.io/irishbuoys/">website</a>, <a href="https://github.com/JohnGavin/irishbuoys">GitHub</a>). It is not affiliated with, endorsed by, or part of the <a href="https://www.marine.ie/">Marine Institute</a> or the Irish Weather Buoy Network. For official marine weather warnings, consult <a href="https://www.met.ie/warnings">Met Eireann</a>.</p>
+</div>
+</div>
+</div>
 </section>
 
 </main>

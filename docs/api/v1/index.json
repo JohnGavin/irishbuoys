@@ -2,7 +2,7 @@
   "api": "irishbuoys",
   "version": "v1",
   "base_url": "https://johngavin.github.io/irishbuoys/api/v1/",
-  "updated_at": "2026-02-25T14:51:53Z",
+  "updated_at": "2026-03-01T13:02:14Z",
   "endpoints": [
     {
       "endpoint": "stations.json",
@@ -33,6 +33,16 @@
       "endpoint": "latest.json",
       "url": "https://johngavin.github.io/irishbuoys/api/v1/latest.json",
       "description": "Most recent observation per station"
+    },
+    {
+      "endpoint": "seasonal.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/seasonal.json",
+      "description": "Monthly and seasonal statistics with annual trends (wave height, wind speed)"
+    },
+    {
+      "endpoint": "correlations.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/correlations.json",
+      "description": "Inter-station correlations for wave height, wind speed, and max wave height"
     }
   ]
 }
