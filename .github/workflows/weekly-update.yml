@@ -23,6 +23,9 @@ on:
     - cron: '0 2 * * *'  # Daily at 2 AM UTC (gate job skips non-storm weekdays)
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   # ── Gate Job: skip Mon-Sat unless storm mode is active ────
   should-run:

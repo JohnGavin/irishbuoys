@@ -86,7 +86,8 @@ var_display_names <- c(
   "gust" = "Gust (kn)"
 )
 
-create_dygraph <- function(data, variable = "wave_height", title = "", by_station = TRUE) {
+create_dygraph <- function(data, variable = "wave_height", title = "", by_station = TRUE,
+                           default_days = 30) {
   display_name <- if (variable %in% names(var_display_names)) var_display_names[[variable]] else variable
 
   if (by_station && length(unique(data$station_id)) > 1) {
@@ -103,6 +104,14 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
   y_max <- max(ts_data, na.rm = TRUE) * 1.05  # 5% padding above max
   y_min <- min(0, min(ts_data, na.rm = TRUE))  # Start at 0 or below if negative
 
+  # Default date window: show last N days if specified, full range otherwise
+  date_window <- NULL
+  if (!is.null(default_days)) {
+    max_date <- max(index(ts_data))
+    min_window <- max_date - as.difftime(default_days, units = "days")
+    date_window <- c(min_window, max_date)
+  }
+
   dygraph(ts_data, main = title, width = "100%") |>
     dyOptions(
       labelsUTC = TRUE,
@@ -114,7 +123,7 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
       colors = RColorBrewer::brewer.pal(max(3, ncol(ts_data)), "Set1")[1:ncol(ts_data)]
     ) |>
     dyAxis("y", valueRange = c(y_min, y_max)) |>
-    dyRangeSelector(height = 40) |>
+    dyRangeSelector(height = 40, dateWindow = date_window) |>
     dyCrosshair(direction = "vertical") |>
     dyHighlight(highlightCircleSize = 5, highlightSeriesBackgroundAlpha = 0.2, hideOnMouseOut = FALSE) |>
     dyLegend(show = "always", width = 400)
