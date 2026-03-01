@@ -42,6 +42,8 @@ tryCatch({
   tar_load(api_vignette_endpoints_dt)
   tar_load(api_vignette_example_response)
   tar_load(save_api_files)
+  tar_load(api_seasonal)
+  tar_load(api_correlations)
   tar_load(code_api_curl_latest)
   tar_load(code_api_r_jsonlite)
   tar_load(code_api_python_requests)
@@ -75,6 +77,50 @@ A sample response from `latest.json` (one observation per station):
 ```{r example-json}
 #| results: asis
 safe_tar_read("api_vignette_example_response")
+```
+
+## Seasonal Endpoint {#seasonal-endpoint}
+
+The `seasonal.json` endpoint provides monthly and seasonal (DJF/MAM/JJA/SON)
+mean statistics for wave height and wind speed, plus annual trend analysis
+with linear trend per decade and significance (p-value).
+
+**Fields:** `wave.monthly`, `wave.seasonal`, `wind.monthly`, `wind.seasonal`,
+`annual_trends.wave`, `annual_trends.wind`
+
+```{r seasonal-example}
+#| results: asis
+seasonal <- safe_tar_read("api_seasonal")
+if (is.list(seasonal) && "wave" %in% names(seasonal)) {
+  cat("```json\n")
+  cat(jsonlite::toJSON(
+    list(wave = list(monthly = head(seasonal$wave$monthly, 3))),
+    pretty = TRUE, auto_unbox = TRUE
+  ))
+  cat("\n```\n")
+}
+```
+
+## Correlations Endpoint {#correlations-endpoint}
+
+The `correlations.json` endpoint provides overall wind-wave and wave-Hmax
+correlations plus inter-station pair correlations (cross-correlation analysis)
+for wave height, wind speed, and maximum wave height.
+
+**Fields:** `overall.wind_wave`, `overall.wave_hmax`, `station_pairs.wave_height`,
+`station_pairs.wind_speed`, `station_pairs.hmax`
+
+```{r correlations-example}
+#| results: asis
+corr <- safe_tar_read("api_correlations")
+if (is.list(corr) && "overall" %in% names(corr)) {
+  cat("```json\n")
+  cat(jsonlite::toJSON(
+    list(overall = corr$overall),
+    pretty = TRUE, auto_unbox = TRUE
+  ))
+  cat("\n```\n")
+}
 ```
 
 ## Usage Examples {#usage-examples}
@@ -134,3 +180,9 @@ safe_tar_read("save_api_files")
 
 Data freshness depends on the ERDDAP server. The pipeline downloads the
 latest 72 hours of observations each run to catch any late-arriving data.
+
+---
+
+::: {.callout-note appearance="minimal"}
+**Disclaimer:** `irishbuoys` is an independent open-source project ([website](https://johngavin.github.io/irishbuoys/), [GitHub](https://github.com/JohnGavin/irishbuoys)). It is not affiliated with, endorsed by, or part of the [Marine Institute](https://www.marine.ie/) or the Irish Weather Buoy Network. For official marine weather warnings, consult [Met Eireann](https://www.met.ie/warnings).
+:::

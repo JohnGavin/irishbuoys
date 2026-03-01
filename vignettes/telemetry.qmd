@@ -459,3 +459,9 @@ cat("*Generated:", format(Sys.time(), "%Y-%m-%d %H:%M UTC"), "*\n")
 cat("*All data loaded from pre-computed targets via tar_load()*\n")
 cat("*Data range: Full historical (2019-present), NO sampling*")
 ```
+
+---
+
+::: {.callout-note appearance="minimal"}
+**Disclaimer:** `irishbuoys` is an independent open-source project ([website](https://johngavin.github.io/irishbuoys/), [GitHub](https://github.com/JohnGavin/irishbuoys)). It is not affiliated with, endorsed by, or part of the [Marine Institute](https://www.marine.ie/) or the Irish Weather Buoy Network. For official marine weather warnings, consult [Met Eireann](https://www.met.ie/warnings).
+:::

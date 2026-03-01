@@ -11,7 +11,9 @@ execute:
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 <!-- badges: end -->
 
-The `irishbuoys` package provides tools to download, process, and analyze data from the Irish Weather Buoy Network. It includes functions for accessing real-time and historical data via the Marine Institute's ERDDAP server, storing data in DuckDB for efficient querying, and building predictive models for wave height and weather conditions.
+The `irishbuoys` package provides tools to download, process, and analyze data from the [Irish Weather Buoy Network](https://www.marine.ie/site-area/data-services/real-time-observations/irish-weather-buoy-network). It includes functions for accessing real-time and historical data via the Marine Institute's ERDDAP server, storing data in DuckDB for efficient querying, and building predictive models for wave height and weather conditions.
+
+> **Disclaimer:** `irishbuoys` is an independent open-source project. It is not affiliated with, endorsed by, or part of the [Marine Institute](https://www.marine.ie/) or the Irish Weather Buoy Network. Buoy observation data is sourced from the Marine Institute's publicly available [ERDDAP server](https://erddap.marine.ie/erddap/). Wind forecasts used in storm alerts come from [Open-Meteo](https://open-meteo.com/). For official marine weather warnings, consult [Met Eireann](https://www.met.ie/warnings).
 
 ## Installation
 

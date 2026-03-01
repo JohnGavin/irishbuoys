@@ -1388,3 +1388,9 @@ See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked
 ---
 
 *Analysis generated `r generated_time` using irishbuoys v`r pkg_version`*
+
+---
+
+::: {.callout-note appearance="minimal"}
+**Disclaimer:** `irishbuoys` is an independent open-source project ([website](https://johngavin.github.io/irishbuoys/), [GitHub](https://github.com/JohnGavin/irishbuoys)). It is not affiliated with, endorsed by, or part of the [Marine Institute](https://www.marine.ie/) or the Irish Weather Buoy Network. For official marine weather warnings, consult [Met Eireann](https://www.met.ie/warnings).
+:::

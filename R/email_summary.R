@@ -284,14 +284,25 @@ create_email_summary <- function(summary) {
     },
 
     "<hr>",
-    "<p><small>Generated on ", Sys.Date(), " by irishbuoys package</small></p>",
-    "<p><small>Data source: Marine Institute ERDDAP Server</small></p>"
+    "<p><small>Generated on ", Sys.Date(), " by the ",
+    "<a href='https://johngavin.github.io/irishbuoys/'>irishbuoys</a> R package ",
+    "(<a href='https://github.com/JohnGavin/irishbuoys'>source on GitHub</a>).</small></p>",
+    "<p><small>Data source: <a href='https://erddap.marine.ie/'>Marine Institute ERDDAP Server</a></small></p>",
+    "<p><small><em>Disclaimer: irishbuoys is an independent open-source project. ",
+    "It is not affiliated with, endorsed by, or part of the Marine Institute ",
+    "or the Irish Weather Buoy Network.</em></small></p>"
   )
 
   # Create email using blastula
   email <- blastula::compose_email(
     body = blastula::md(email_body),
-    footer = blastula::md("This is an automated report from the Irish Weather Buoy Network monitoring system.")
+    footer = blastula::md(paste0(
+      "Automated report from the ",
+      "[irishbuoys](https://johngavin.github.io/irishbuoys/) R package ",
+      "([GitHub](https://github.com/JohnGavin/irishbuoys)). ",
+      "This is an independent open-source project, not affiliated with the Marine Institute ",
+      "or the Irish Weather Buoy Network."
+    ))
   )
 
   return(email)
