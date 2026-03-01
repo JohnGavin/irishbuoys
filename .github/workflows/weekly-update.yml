@@ -156,29 +156,21 @@ jobs:
       # ── Render Vignettes ────────────────────────────────────
       # _targets/ is present (restored + updated), so tar_load() works
 
-      - name: Render wave_analysis vignette
+      - name: Render vignettes to docs/articles/
         run: |
-          nix-shell default.nix -A shell --run "
-            cd vignettes && quarto render wave_analysis.qmd --output-dir ../docs/articles/
-          " || echo "wave_analysis render failed"
-
-      - name: Render telemetry vignette
-        run: |
-          nix-shell default.nix -A shell --run "
-            cd vignettes && quarto render telemetry.qmd --output-dir ../docs/articles/
-          " || echo "telemetry render failed"
-
-      - name: Render dashboard_static vignette
-        run: |
-          nix-shell default.nix -A shell --run "
-            cd vignettes && quarto render dashboard_static.qmd --output-dir ../docs/articles/
-          " || echo "dashboard_static render failed"
-
-      - name: Render api-usage vignette
-        run: |
-          nix-shell default.nix -A shell --run "
-            cd vignettes && quarto render api-usage.qmd --output-dir ../docs/articles/
-          " || echo "api-usage render failed"
+          mkdir -p docs/articles
+          for qmd in wave_analysis telemetry dashboard_static api-usage; do
+            echo "::group::Rendering ${qmd}"
+            nix-shell default.nix -A shell --run "
+              cd vignettes && quarto render ${qmd}.qmd
+            " || { echo "::warning::${qmd} render failed"; continue; }
+            # Copy rendered output to pkgdown articles directory
+            cp "vignettes/${qmd}.html" "docs/articles/" 2>/dev/null || true
+            if [ -d "vignettes/${qmd}_files" ]; then
+              cp -r "vignettes/${qmd}_files" "docs/articles/"
+            fi
+            echo "::endgroup::"
+          done
 
       # ── Commit Rendered Outputs to main ─────────────────────
 
