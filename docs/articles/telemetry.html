@@ -31,606 +31,706 @@ ul.task-list li input[type="checkbox"] {
 <script src="telemetry_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="telemetry_files/libs/quarto-html/anchor.min.js"></script>
 <link href="telemetry_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="telemetry_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="telemetry_files/libs/quarto-html/quarto-syntax-highlighting-dark-b758ccaa5987ceb1b75504551e579abf.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
-<link href="telemetry_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<link href="telemetry_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="telemetry_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="telemetry_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="telemetry_files/libs/bootstrap/bootstrap-28163b1fbaa4d35fdae8b703aca03440.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="telemetry_files/libs/bootstrap/bootstrap-dark-28163b1fbaa4d35fdae8b703aca03440.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
-<link href="telemetry_files/libs/bootstrap/bootstrap-28163b1fbaa4d35fdae8b703aca03440.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
-<script src="telemetry_files/libs/quarto-dashboard/quarto-dashboard.js"></script>
-<script src="telemetry_files/libs/quarto-dashboard/stickythead.js"></script>
-
-
-
-<script src="telemetry_files/libs/quarto-dashboard/web-components.js" type="module"></script>
-<script src="telemetry_files/libs/quarto-dashboard/components.js"></script>
-
-<link href="telemetry_files/libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet">
-<script src="telemetry_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-<link href="telemetry_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
-<script src="telemetry_files/libs/datatables-binding-0.34.0/datatables.js"></script>
-<script src="telemetry_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
-<link href="telemetry_files/libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
-<link href="telemetry_files/libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
-<script src="telemetry_files/libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="telemetry_files/libs/jszip-1.13.6/jszip.min.js"></script>
-<link href="telemetry_files/libs/dt-ext-buttons-1.13.6/css/buttons.dataTables.min.css" rel="stylesheet">
-<script src="telemetry_files/libs/dt-ext-buttons-1.13.6/js/dataTables.buttons.min.js"></script>
-<script src="telemetry_files/libs/dt-ext-buttons-1.13.6/js/buttons.html5.min.js"></script>
-<script src="telemetry_files/libs/dt-ext-buttons-1.13.6/js/buttons.colVis.min.js"></script>
-<script src="telemetry_files/libs/dt-ext-buttons-1.13.6/js/buttons.print.min.js"></script>
-<link href="telemetry_files/libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet">
-<script src="telemetry_files/libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="telemetry_files/libs/bootstrap/bootstrap-f59036d9f42336bd5a1ebad648f3ab41.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
 
 </head>
 
-<body class="quarto-dashboard dashboard-fill fullcontent quarto-light">
+<body class="quarto-light">
 
-<header id="quarto-dashboard-header">
-<nav class="navbar navbar-expand-md slim" data-bs-theme="dark">
-  <div class="navbar-container container-fluid">
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-controls="dashboard-collapse" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>    
-
-
-    <div class="navbar-brand-container">
-
-
-      <div class="navbar-title">
-        <div class="navbar-title-text"><a href="#">Telemetry</a></div>
-        
-        
-      </div>
-    </div>
-<div id="dashboard-collapse" class="navbar-collapse collapse"><ul class="navbar-nav navbar-nav-scroll me-auto" role="tablist"><li class="nav-item" role="presentation"><a id="tab-overview" class="nav-link active" data-bs-toggle="tab" role="tab" data-bs-target="#overview" data-scrolling="false" href="#overview" aria-controls="overview" aria-selected="true"><span class="nav-link-text">Overview</span></a></li><li class="nav-item" role="presentation"><a id="tab-data-coverage" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#data-coverage" data-scrolling="false" href="#data-coverage" aria-controls="data-coverage" aria-selected="false"><span class="nav-link-text">Data Coverage</span></a></li><li class="nav-item" role="presentation"><a id="tab-data-quality" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#data-quality" data-scrolling="false" href="#data-quality" aria-controls="data-quality" aria-selected="false"><span class="nav-link-text">Data Quality</span></a></li><li class="nav-item" role="presentation"><a id="tab-database" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#database" data-scrolling="false" href="#database" aria-controls="database" aria-selected="false"><span class="nav-link-text">Database</span></a></li><li class="nav-item" role="presentation"><a id="tab-pipeline" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#pipeline" data-scrolling="false" href="#pipeline" aria-controls="pipeline" aria-selected="false"><span class="nav-link-text">Pipeline</span></a></li><li class="nav-item" role="presentation"><a id="tab-git-activity" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#git-activity" data-scrolling="false" href="#git-activity" aria-controls="git-activity" aria-selected="false"><span class="nav-link-text">Git Activity</span></a></li><li class="nav-item" role="presentation"><a id="tab-project" class="nav-link" data-bs-toggle="tab" role="tab" data-bs-target="#project" data-scrolling="false" href="#project" aria-controls="project" aria-selected="false"><span class="nav-link-text">Project</span></a></li></ul></div></div>
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a>
+  <ul class="collapse">
+  <li><a href="#key-metrics" id="toc-key-metrics" class="nav-link" data-scroll-target="#key-metrics">Key Metrics</a></li>
+  </ul></li>
+  <li><a href="#data-coverage" id="toc-data-coverage" class="nav-link" data-scroll-target="#data-coverage">Data Coverage</a>
+  <ul class="collapse">
+  <li><a href="#coverage-timeline" id="toc-coverage-timeline" class="nav-link" data-scroll-target="#coverage-timeline">Coverage Timeline</a></li>
+  <li><a href="#coverage-by-station" id="toc-coverage-by-station" class="nav-link" data-scroll-target="#coverage-by-station">Coverage by Station</a></li>
+  <li><a href="#coverage-freshness" id="toc-coverage-freshness" class="nav-link" data-scroll-target="#coverage-freshness">Data Freshness</a></li>
+  </ul></li>
+  <li><a href="#data-quality" id="toc-data-quality" class="nav-link" data-scroll-target="#data-quality">Data Quality</a>
+  <ul class="collapse">
+  <li><a href="#qc-distribution" id="toc-qc-distribution" class="nav-link" data-scroll-target="#qc-distribution">QC Flag Distribution</a></li>
+  <li><a href="#rogue-events" id="toc-rogue-events" class="nav-link" data-scroll-target="#rogue-events">Rogue Wave Frequency</a></li>
+  </ul></li>
+  <li><a href="#database" id="toc-database" class="nav-link" data-scroll-target="#database">Database</a>
+  <ul class="collapse">
+  <li><a href="#table-summary" id="toc-table-summary" class="nav-link" data-scroll-target="#table-summary">Table Summary</a></li>
+  <li><a href="#storage-size" id="toc-storage-size" class="nav-link" data-scroll-target="#storage-size">Storage Size</a></li>
+  </ul></li>
+  <li><a href="#pipeline" id="toc-pipeline" class="nav-link" data-scroll-target="#pipeline">Pipeline</a>
+  <ul class="collapse">
+  <li><a href="#target-status" id="toc-target-status" class="nav-link" data-scroll-target="#target-status">Target Execution Status</a></li>
+  <li><a href="#timing-metrics" id="toc-timing-metrics" class="nav-link" data-scroll-target="#timing-metrics">Pipeline Performance</a></li>
+  <li><a href="#targets-by-plan" id="toc-targets-by-plan" class="nav-link" data-scroll-target="#targets-by-plan">Targets by Plan</a></li>
+  </ul></li>
+  <li><a href="#tests" id="toc-tests" class="nav-link" data-scroll-target="#tests">Tests</a></li>
+  <li><a href="#git-activity" id="toc-git-activity" class="nav-link" data-scroll-target="#git-activity">Git Activity</a>
+  <ul class="collapse">
+  <li><a href="#commit-frequency" id="toc-commit-frequency" class="nav-link" data-scroll-target="#commit-frequency">Commit Frequency</a></li>
+  <li><a href="#commit-history" id="toc-commit-history" class="nav-link" data-scroll-target="#commit-history">Recent Commits</a></li>
+  </ul></li>
+  <li><a href="#project-files" id="toc-project-files" class="nav-link" data-scroll-target="#project-files">Project Files</a>
+  <ul class="collapse">
+  <li><a href="#files-by-type" id="toc-files-by-type" class="nav-link" data-scroll-target="#files-by-type">File Type Distribution</a></li>
+  </ul></li>
+  <li><a href="#llm-usage" id="toc-llm-usage" class="nav-link" data-scroll-target="#llm-usage">LLM Usage</a>
+  <ul class="collapse">
+  <li><a href="#usage-summary" id="toc-usage-summary" class="nav-link" data-scroll-target="#usage-summary">Usage Summary</a></li>
+  </ul></li>
+  <li><a href="#validation" id="toc-validation" class="nav-link" data-scroll-target="#validation">Validation Reports</a>
+  <ul class="collapse">
+  <li><a href="#validation-analysis" id="toc-validation-analysis" class="nav-link" data-scroll-target="#validation-analysis">analysis_data</a></li>
+  <li><a href="#validation-rogue" id="toc-validation-rogue" class="nav-link" data-scroll-target="#validation-rogue">rogue_wave_events</a></li>
+  </ul></li>
+  </ul>
 </nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Telemetry</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
 </header>
-<div class="page-layout-custom quarto-dashboard-content bslib-gap-spacing html-fill-container bslib-page-fill quarto-dashboard-pages">  
 
-<div class="bslib-grid-item html-fill-item tab-content bslib-grid" data-layout="fill" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div id="overview" class="dashboard-page tab-pane show active html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-overview">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content) minmax(3em, 20fr) minmax(3em, 80fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
+
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>Project health and data pipeline metrics for the irishbuoys package.</p>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr) minmax(3em, 1fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card valuebox html-fill-item html-fill-container bslib-card bslib-value-box bg-secondary showcase-left-center" data-bslib-card-init="" data-require-bs-caller="card()">
-<div class="card-body html-fill-item html-fill-container">
-<div class="html-fill-item html-fill-container value-box-grid">
-<div class="value-box-showcase html-fill-item html-fill-container">
-
-<i class="bi bi-database"></i></div>
-<div class="value-box-area">
-<p class="value-box-title">
-Total Observations
+<section id="key-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="key-metrics">Key Metrics</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>telemetry_summary</code>
+ target has not been built.
 </p>
-<p class="value-box-value">
-<div class="cell html-fill-item html-fill-container">
-<div class="cell-output cell-output-stdout html-fill-item html-fill-container">
-<pre><code>[1] "3,710"</code></pre>
-</div>
-</div>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
 </p>
 </div>
 </div>
 </div>
-<script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div><div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card valuebox html-fill-item html-fill-container bslib-card bslib-value-box bg-secondary showcase-left-center" data-bslib-card-init="" data-require-bs-caller="card()">
-<div class="card-body html-fill-item html-fill-container">
-<div class="html-fill-item html-fill-container value-box-grid">
-<div class="value-box-showcase html-fill-item html-fill-container">
-
-<i class="bi bi-hdd"></i></div>
-<div class="value-box-area">
-<p class="value-box-title">
-Database Size
+</section>
+</section>
+<section id="data-coverage" class="level2">
+<h2 class="anchored" data-anchor-id="data-coverage">Data Coverage</h2>
+<p>Station data availability and freshness across the full historical period (2019-present).</p>
+<section id="coverage-timeline" class="level3">
+<h3 class="anchored" data-anchor-id="coverage-timeline">Coverage Timeline</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>plot_telemetry_coverage_timeline</code>
+ target has not been built.
 </p>
-<p class="value-box-value">
-<div class="cell html-fill-item html-fill-container">
-<div class="cell-output cell-output-stdout html-fill-item html-fill-container">
-<pre><code>[1] "2.51 MB"</code></pre>
-</div>
-</div>
-</p>
-</div>
-</div>
-</div>
-<script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div><div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card valuebox html-fill-item html-fill-container bslib-card bslib-value-box bg-secondary showcase-left-center" data-bslib-card-init="" data-require-bs-caller="card()">
-<div class="card-body html-fill-item html-fill-container">
-<div class="html-fill-item html-fill-container value-box-grid">
-<div class="value-box-showcase html-fill-item html-fill-container">
-
-<i class="bi bi-broadcast"></i></div>
-<div class="value-box-area">
-<p class="value-box-title">
-Active Stations
-</p>
-<p class="value-box-value">
-<div class="cell html-fill-item html-fill-container">
-<div class="cell-output cell-output-stdout html-fill-item html-fill-container">
-<pre><code>[1] 5</code></pre>
-</div>
-</div>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
 </p>
 </div>
 </div>
 </div>
-<script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div><div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card valuebox html-fill-item html-fill-container bslib-card bslib-value-box bg-secondary showcase-left-center" data-bslib-card-init="" data-require-bs-caller="card()">
-<div class="card-body html-fill-item html-fill-container">
-<div class="html-fill-item html-fill-container value-box-grid">
-<div class="value-box-showcase html-fill-item html-fill-container">
-
-<i class="bi bi-git-branch"></i></div>
-<div class="value-box-area">
-<p class="value-box-title">
-Commits (30d)
+</section>
+<section id="coverage-by-station" class="level3">
+<h3 class="anchored" data-anchor-id="coverage-by-station">Coverage by Station</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_station_coverage</code>
+ target has not been built.
 </p>
-<p class="value-box-value">
-<div class="cell html-fill-item html-fill-container">
-<div class="cell-output cell-output-stdout html-fill-item html-fill-container">
-<pre><code>[1] 92</code></pre>
-</div>
-</div>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
 </p>
 </div>
 </div>
 </div>
-<script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div>
-</div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="Last Updated" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-Last Updated
-</span></div></div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output cell-output-stdout html-fill-item html-fill-container">
-<pre><code>[1] "2026-02-13 18:25 UTC"</code></pre>
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</section>
+<section id="coverage-freshness" class="level3">
+<h3 class="anchored" data-anchor-id="coverage-freshness">Data Freshness</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_freshness</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
 </div>
 </div>
-</div>
-<div id="data-coverage" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-data-coverage">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<p>Station data availability and freshness metrics.</p>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="card tabset html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header dashboard-card-no-title bslib-navs-card-title">
-
-<ul class="nav nav-tabs card-header-tabs" role="tablist" data-tabsetid="card-tabset-8"><li class="nav-item" role="presentation"><a href="#card-tabset-8-1" role="tab" data-toggle="tab" data-bs-toggle="tab" data-value="Coverage Timeline" aria-selected="true" class="nav-link active">Coverage Timeline</a></li><li class="nav-item" role="presentation"><a href="#card-tabset-8-2" role="tab" data-toggle="tab" data-bs-toggle="tab" data-value="Station Details" aria-selected="false" class="nav-link">Station Details</a></li><li class="nav-item" role="presentation"><a href="#card-tabset-8-3" role="tab" data-toggle="tab" data-bs-toggle="tab" data-value="Data Freshness" aria-selected="false" class="nav-link">Data Freshness</a></li></ul></div>
-
-
-
-<div class="tab-content html-fill-item html-fill-container" data-tabset-id="card-tabset-8"><div class="tab-pane active show html-fill-item html-fill-container" role="tabpanel" id="card-tabset-8-1"><div class="card-body html-fill-item html-fill-container" data-title="Coverage Timeline">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<img src="telemetry_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid quarto-dashboard-img-contain">
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div>
-</div></div><div class="tab-pane html-fill-item html-fill-container" role="tabpanel" id="card-tabset-8-2"><div class="card-body html-fill-item html-fill-container" data-title="Station Details">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<div class="datatables html-widget html-fill-item html-fill-container" id="htmlwidget-cb436e7158b447506e3d" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-cb436e7158b447506e3d">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Station Data Coverage Summary<\/caption>","data":[["M2","M3","M4","M5","M6"],["2026-01-13T00:00:00Z","2026-01-13T00:00:00Z","2026-01-13T00:00:00Z","2026-01-13T00:00:00Z","2026-01-13T00:00:00Z"],["2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z"],[742,742,742,742,742],[31,31,31,31,31],[0,0,0,0,0]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station_id<\/th>\n      <th>earliest_observation<\/th>\n      <th>latest_observation<\/th>\n      <th>total_observations<\/th>\n      <th>days_with_data<\/th>\n      <th>pct_qc_good<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[3,4,5]},{"name":"station_id","targets":0},{"name":"earliest_observation","targets":1},{"name":"latest_observation","targets":2},{"name":"total_observations","targets":3},{"name":"days_with_data","targets":4},{"name":"pct_qc_good","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div>
-</div></div><div class="tab-pane html-fill-item html-fill-container" role="tabpanel" id="card-tabset-8-3"><div class="card-body html-fill-item html-fill-container" data-title="Data Freshness">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<div class="datatables html-widget html-fill-item html-fill-container" id="htmlwidget-e4286555bd8f486fa7e4" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-e4286555bd8f486fa7e4">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Data Freshness by Station<\/caption>","data":[["M3","M5","M2","M6","M4"],["2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z","2026-02-12T21:00:00Z"],[16.2,16.2,16.2,16.2,16.2]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station_id<\/th>\n      <th>latest_observation<\/th>\n      <th>hours_since_update<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":2},{"name":"station_id","targets":0},{"name":"latest_observation","targets":1},{"name":"hours_since_update","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div>
-</div></div></div><bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</section>
+</section>
+<section id="data-quality" class="level2">
+<h2 class="anchored" data-anchor-id="data-quality">Data Quality</h2>
+<p>QC flag trends and rogue wave detection metrics for the full historical period.</p>
+<section id="qc-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="qc-distribution">QC Flag Distribution</h3>
+<p>QC flags: 0=unknown, 1=good, 9=missing. Monthly distribution across full historical data, colored by season.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>plot_telemetry_qc_trends</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
 </div>
 </div>
-<div id="data-quality" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-data-quality">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<p>QC flag trends and rogue wave detection metrics.</p>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 50fr) minmax(3em, 50fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="QC Flag Distribution Over Time" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-QC Flag Distribution Over Time
-</span></div></div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<img src="telemetry_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid quarto-dashboard-img-contain">
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div><div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="Rogue Wave Event Frequency" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-Rogue Wave Event Frequency
-</span></div></div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<p>Plot not available. Run tar_make() to generate.</p>
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</section>
+<section id="rogue-events" class="level3">
+<h3 class="anchored" data-anchor-id="rogue-events">Rogue Wave Frequency</h3>
+<p>Rogue waves: Hmax &gt; 2 x significant wave height. Monthly event counts across full historical period.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>plot_telemetry_rogue_frequency</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
 </div>
 </div>
-</div>
-<div id="database" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-database">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<p>Storage metrics and table information.</p>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="card tabset html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header dashboard-card-no-title bslib-navs-card-title">
-
-<ul class="nav nav-tabs card-header-tabs" role="tablist" data-tabsetid="card-tabset-16"><li class="nav-item" role="presentation"><a href="#card-tabset-16-1" role="tab" data-toggle="tab" data-bs-toggle="tab" data-value="Tables" aria-selected="true" class="nav-link active">Tables</a></li><li class="nav-item" role="presentation"><a href="#card-tabset-16-2" role="tab" data-toggle="tab" data-bs-toggle="tab" data-value="File Size" aria-selected="false" class="nav-link">File Size</a></li></ul></div>
-
-
-<div class="tab-content html-fill-item html-fill-container" data-tabset-id="card-tabset-16"><div class="tab-pane active show html-fill-item html-fill-container" role="tabpanel" id="card-tabset-16-1"><div class="card-body html-fill-item html-fill-container" data-title="Tables">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<div class="datatables html-widget html-fill-item html-fill-container" id="htmlwidget-25a00adae99563ec7ed3" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-25a00adae99563ec7ed3">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Database Tables<\/caption>","data":[["buoy_data","stations","update_log"],[3710,5,1],[22,7,7]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>table_name<\/th>\n      <th>n_rows<\/th>\n      <th>n_columns<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[1,2]},{"name":"table_name","targets":0},{"name":"n_rows","targets":1},{"name":"n_columns","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</section>
+</section>
+<section id="database" class="level2">
+<h2 class="anchored" data-anchor-id="database">Database</h2>
+<p>Storage metrics and table information for the DuckDB database.</p>
+<section id="table-summary" class="level3">
+<h3 class="anchored" data-anchor-id="table-summary">Table Summary</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_db_info</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
 </div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
 </div>
-</div></div><div class="tab-pane html-fill-item html-fill-container" role="tabpanel" id="card-tabset-16-2"><div class="card-body html-fill-item html-fill-container" data-title="File Size">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<table class="caption-top table table-sm table-striped small">
+</section>
+<section id="storage-size" class="level3">
+<h3 class="anchored" data-anchor-id="storage-size">Storage Size</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>telemetry_db_file_size</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="pipeline">Pipeline</h2>
+<p>Targets pipeline status, timing metrics, and execution history.</p>
+<section id="target-status" class="level3">
+<h3 class="anchored" data-anchor-id="target-status">Target Execution Status</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>telemetry_pipeline_status</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</section>
+<section id="timing-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="timing-metrics">Pipeline Performance</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>telemetry_pipeline_status</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</section>
+<section id="targets-by-plan" class="level3">
+<h3 class="anchored" data-anchor-id="targets-by-plan">Targets by Plan</h3>
+<p>Target counts, size, and timing by pipeline plan (from <code>R/tar_plans/plan_*.R</code>).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_target_metrics</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="tests" class="level2">
+<h2 class="anchored" data-anchor-id="tests">Tests</h2>
+<p>Unit test and quality assurance metrics for the irishbuoys package.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">By Category</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">By File</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false" href="">Test Types</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<p>Aggregated counts of tests, expectations, and snapshot tests grouped by test category.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_test_summary</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_test_stats</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 43%">
+<col style="width: 56%">
+</colgroup>
 <thead>
 <tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">path</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">size_bytes</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">size_mb</th>
-<th style="text-align: left;" data-quarto-table-cell-role="th">last_modified</th>
+<th>Category</th>
+<th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td style="text-align: left;">inst/extdata/irish_buoys.duckdb</td>
-<td style="text-align: right;">2633728</td>
-<td style="text-align: right;">2.51</td>
-<td style="text-align: left;">2026-02-12 21:56:16</td>
+<td>Unit Tests</td>
+<td>Standard <code>test_that()</code> blocks testing individual functions</td>
+</tr>
+<tr class="even">
+<td>Adversarial/Edge Cases</td>
+<td>Tests for NULL, NA, empty inputs, boundary conditions</td>
+</tr>
+<tr class="odd">
+<td>Defensive/Null Guards</td>
+<td>Tests verifying <code>cli::cli_abort()</code> on invalid inputs</td>
+</tr>
+<tr class="even">
+<td>Contains Snapshots</td>
+<td>Files with <code>expect_snapshot()</code> calls</td>
+</tr>
+<tr class="odd">
+<td>Integration Tests</td>
+<td>End-to-end tests spanning multiple components</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
 </div>
-</div></div></div><bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</section>
+<section id="git-activity" class="level2">
+<h2 class="anchored" data-anchor-id="git-activity">Git Activity</h2>
+<p>Repository commit history and development activity.</p>
+<section id="commit-frequency" class="level3">
+<h3 class="anchored" data-anchor-id="commit-frequency">Commit Frequency</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>plot_telemetry_commit_frequency</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
 </div>
 </div>
-<div id="pipeline" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-pipeline">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content) minmax(3em, 1fr) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<p>Targets pipeline status and timing metrics.</p>
+</section>
+<section id="commit-history" class="level3">
+<h3 class="anchored" data-anchor-id="commit-history">Recent Commits</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_commits</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 40fr) minmax(3em, 60fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="Target Status Summary" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-Target Status Summary
-</span></div></div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<table class="caption-top">
+</div>
+</div>
+</section>
+</section>
+<section id="project-files" class="level2">
+<h2 class="anchored" data-anchor-id="project-files">Project Files</h2>
+<section id="files-by-type" class="level3">
+<h3 class="anchored" data-anchor-id="files-by-type">File Type Distribution</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_file_types</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="llm-usage" class="level2">
+<h2 class="anchored" data-anchor-id="llm-usage">LLM Usage</h2>
+<p>Claude Code usage statistics for the irishbuoys project.</p>
+<section id="usage-summary" class="level3">
+<h3 class="anchored" data-anchor-id="usage-summary">Usage Summary</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_llm_summary</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">Cost Trends</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Token Usage</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false" href="">By Model</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false" href="">Daily Log</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-5" role="tab" aria-controls="tabset-2-5" aria-selected="false" href="">Pricing Reference</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<p>Estimated daily costs based on Claude API pricing.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>plot_telemetry_llm_cost_trend</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p>Breakdown of input, output, and cache tokens. Cache tokens reduce costs.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>plot_telemetry_llm_tokens</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>plot_telemetry_llm_by_model</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_llm_by_model</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>table_telemetry_llm_daily</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-5-tab">
+<table class="caption-top table">
 <thead>
 <tr class="header">
-<th style="text-align: left;" data-quarto-table-cell-role="th">status</th>
-<th style="text-align: right;" data-quarto-table-cell-role="th">n_targets</th>
+<th>Model</th>
+<th>Input</th>
+<th>Output</th>
+<th>Cache Create</th>
+<th>Cache Read</th>
 </tr>
 </thead>
 <tbody>
-<tr>
-<td></td>
-<td></td>
+<tr class="odd">
+<td>Opus 4.5</td>
+<td>$15/M</td>
+<td>$75/M</td>
+<td>$18.75/M</td>
+<td>$1.875/M</td>
 </tr>
-
+<tr class="even">
+<td>Sonnet 4</td>
+<td>$3/M</td>
+<td>$15/M</td>
+<td>$3.75/M</td>
+<td>$0.375/M</td>
+</tr>
+<tr class="odd">
+<td>Haiku 3.5</td>
+<td>$0.80/M</td>
+<td>$4/M</td>
+<td>$1/M</td>
+<td>$0.08/M</td>
+</tr>
 </tbody>
 </table>
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div><div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="Pipeline Timing" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-Pipeline Timing
-</span></div></div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<ul>
-<li>Total runtime: NA seconds</li>
-<li>Average target: NA seconds</li>
-<li>Slowest target: NA seconds</li>
-<li>Last run: NA</li>
-</ul>
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div>
-</div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="Target Metrics by Plan" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-Target Metrics by Plan
-</span></div></div>
-<div class="card-body html-fill-item html-fill-container">
-<p>Count, size (MB), and timing (seconds) for each target, grouped by tar_plan. TOTAL row shows overall totals.</p>
-</div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<p>No target metrics available</p>
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+<p>Data source: Claude Code session files in <code>~/.claude/projects/</code>.</p>
 </div>
 </div>
 </div>
-</div>
-<div id="git-activity" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-git-activity">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<p>Repository commit history and activity.</p>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 40fr) minmax(3em, 60fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="Commit Frequency (Last 30 Days)" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-Commit Frequency (Last 30 Days)
-</span></div></div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<img src="telemetry_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid quarto-dashboard-img-contain">
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-</div><div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="Recent Commits" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-Recent Commits
-</span></div></div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<div class="datatables html-widget html-fill-item html-fill-container" id="htmlwidget-6a2014022656e5177556" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-6a2014022656e5177556">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Recent Git Commits<\/caption>","data":[["30d5c46","120c7c9","e757836","ad01144","36e819d","420e88e","394fafa","9d19252","c788e33","f2c2c2c","fbaf9e3","9e25302","291de12","897be19","8c2344d","46972f2","97cd4fc","c6e93d6","d4d8339","f662753","61d1ab7","eccd087","f8e4709","c4f49be","e742791","1798b16","187867f","8228257","3a5067f","82343c4","688bc39","f6194ce","7c23246","55e86be","6f9f112","535310e","029b13e","6bf634d","9d927d3","43153dc","8c84b2b","1464a88","dc3a4a1","38102f1","67fee79","de1723c","f92c552","d4c28f2","dfdf44f","e8e7eb3"],["John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;","John Gavin &lt;john.b.gavin@gmail.com&gt;"],["2026-02-12T21:55:59Z","2026-02-12T20:33:49Z","2026-02-12T20:27:00Z","2026-02-12T20:14:24Z","2026-02-12T15:30:00Z","2026-02-12T14:51:21Z","2026-02-12T14:39:02Z","2026-02-12T12:23:23Z","2026-02-12T12:04:10Z","2026-02-12T10:51:08Z","2026-02-12T10:30:28Z","2026-02-12T10:28:50Z","2026-02-11T15:38:41Z","2026-02-11T15:36:33Z","2026-02-11T15:35:27Z","2026-02-11T15:29:46Z","2026-02-11T15:26:01Z","2026-02-11T15:03:34Z","2026-02-11T15:00:45Z","2026-02-11T13:59:06Z","2026-02-11T13:18:54Z","2026-02-11T13:07:55Z","2026-02-11T12:36:44Z","2026-02-11T12:23:45Z","2026-02-11T12:08:50Z","2026-02-11T11:53:39Z","2026-02-08T21:01:24Z","2026-02-08T20:32:46Z","2026-02-08T20:17:58Z","2026-02-08T12:27:34Z","2026-02-08T11:36:30Z","2026-02-08T10:57:20Z","2026-02-07T21:20:46Z","2026-02-07T21:04:45Z","2026-02-07T20:02:59Z","2026-02-07T19:24:39Z","2026-02-07T13:39:03Z","2026-02-07T13:36:21Z","2026-02-07T13:28:31Z","2026-02-05T13:53:28Z","2026-02-05T13:49:52Z","2026-02-05T13:44:53Z","2026-02-05T12:32:49Z","2026-02-05T10:12:00Z","2026-02-05T10:11:47Z","2026-02-05T10:01:03Z","2026-02-04T13:12:36Z","2026-02-04T12:53:37Z","2026-02-04T12:49:46Z","2026-02-04T12:24:11Z"],["feat: Add pointblank reports to index, fix tar_quarto deprecation\n\n- docs/articl","feat: Update articles index and fix debug.qmd parsing\n\n- docs/articles/index.htm","feat: Add vignettes to targets pipeline for reproducibility\n\nMANDATORY: All vign","feat(#13): Add joint distribution analysis for multi-buoy dependencies\n\nAdd func","Fix gh-pages deployment and add target metrics to telemetry\n\nREADME Fixes (now d","Add telemetry vignette with all-targets architecture\n\n- Create R/tar_plans/plan_","Add ALL README code chunks as targets with function dependencies\n\n- Rewrite plan","Fix dashboard per user feedback round 2\n\n- Change title to \"Irish Weather Buoys\"","Fix dashboard issues per user feedback\n\n- Add date of max wave/signif to caption","Fix README examples: use str(head(data, 3)) for efficiency\n\nShow structure of fi","Re-render README.md with current project structure\n\nRegenerates README from READ","Implement dashboard improvements per plan\n\n- Replace Hs/Hmax with Signif Wave/Ma","Add placeholder debug.html to fix 404\n\nNix environment segfault due to missing n","Simplify debug.qmd setup to avoid pkgload segfault\n\nRemove pkgload::load_all() w","Increase CI timeout from 5 to 15 minutes\n\nR CMD check needs more than 5 minutes ","Update wave_analysis.qmd: title, station tabs, merged Reference\n\n- Changed title","Fix misleading glimpse output - use actual data, not fake sample\n\nIMPORTANT: Nev","Improve dashboard_static.qmd with source links and data tabs\n\nReference section:","Add purrr to Imports for tidyverse consistency\n\npurrr is part of tidyverse and c","Fix R CMD check warnings for pointblank validation\n\n- Replace non-existent point","Add Documentation section with vignette links to README\n\n- Static Dashboard: Sta","Add pointblank validation with Debug page for gh-pages\n\n- Move pointblank from S","Add pointblank data validation to targets pipeline\n\n- R/validation.R: New valida","Improve wave_analysis dashboard Key Metrics and page structure\n\n- Key Metrics ta","Fix wave_analysis.qmd formatting and reorganize dashboards\n\n- wave_analysis.qmd:","Improve dashboard with hourly data, captions, and page reorg\n\n- Reorder pages: M","Fix dashboard rendering and README examples\n\n- Render dashboards with quarto dir","Rebuild docs: dashboards with new terminology, pkgdown with new functions\n\nDashb","Dashboard improvements: terminology, Max Wave page, Reference tabsets\n\nTheme 1: ","Exclude _targets/ and docs/ from project structure display\n\nThese generated fold","Pin nixpkgs to 2026-01-22 to fix macOS 26.2 segfaults\n\nThe cli/rlang packages cr","Fix DuckDB ICU extension error in CI\n\nReplace EXTRACT() with strftime() in SQL q","Dashboard: Switch to inline plot generation, add data sampling\n\n- Remove pre-com","Fix README and add code example evaluation\n\n- Fix fs::dir_tree(recurse=2) to lim","Add code-as-target pattern for documentation examples\n\n- Create R/tar_plans/plan","Dashboard styling and structure improvements\n\n- Fix plotly visibility: gray80 ba","Update rendered wave_analysis dashboard\n\nCo-Authored-By: Claude Opus 4.5 &lt;norepl","Migrate DBI queries to dplyr verbs with dbplyr backend\n\n- Add buoy_tbl() helper ","Add GPD per-station EVA, irishbuoys_layout(), vignette restructure\n\nMajor change","Add EVA Methodology section explaining GEV theory and limitations\n\n- New \"EVA Me","Fix wave_analysis visual issues: color contrast, legends, 5x1 layout\n\n- Events b","Fix data gaps: staging table insert, NaN handling, date format, color contrast\n\n","Full 2019-2026 dataset, by-station gust analysis, dashboard optimization\n\n- Load","Remove wrongly-nested vignettes output directory\n","Convert plots to plotly, add Beaufort scale, reorder wave analysis sections\n\ndas","Refactor dashboards: remove value boxes, add pages/tabsets, full width dygraphs\n","Fix vignettes: weather data loading, timestamp columns, column names\n\n- Fix wave","Fix dashboard vignette rendering paths\n\n- Use relative paths for data files duri","Add dygraphs dashboard with pages/tabsets, fix header overlap\n\nDashboard improve","Add README.md rendered from README.qmd\n\nIncludes Cachix binary cache documentati"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>sha<\/th>\n      <th>author<\/th>\n      <th>date<\/th>\n      <th>message<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":15,"scrollX":true,"columnDefs":[{"name":"sha","targets":0},{"name":"author","targets":1},{"name":"date","targets":2},{"name":"message","targets":3}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":[],"jsHooks":[]}</script>
-</div>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
+</section>
+</section>
+<section id="validation" class="level2">
+<h2 class="anchored" data-anchor-id="validation">Validation Reports</h2>
+<p>Pointblank validation reports embedded below. See also: <a href="validation_analysis_data.html">analysis_data Validation</a> | <a href="validation_rogue_events.html">rogue_wave_events Validation</a></p>
+<section id="validation-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="validation-analysis">analysis_data</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>validation_analysis_data.html</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
 </div>
 </div>
-</div>
-<div id="project" class="dashboard-page tab-pane grid-skip html-fill-item html-fill-container" data-orientation="rows" aria-labelledby="tab-project">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, max-content) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<p>Project structure and file statistics.</p>
-</div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-columns: minmax(3em, 1fr);
-grid-auto-rows: minmax(0, 1fr);">
-<div class="html-fill-item html-fill-container bslib-grid" style="display: grid; grid-template-rows: minmax(3em, 1fr) minmax(3em, max-content) minmax(3em, 1fr); grid-auto-columns: minmax(0, 1fr);">
-<div class="card html-fill-item html-fill-container bslib-card" data-title="File Types" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-header"><div class="card-title"><span style="display: inline">
-File Types
-</span></div></div>
-<div class="cell card-body html-fill-item html-fill-container">
-<div class="cell-output-display html-fill-item html-fill-container">
-<div class="datatables html-widget html-fill-item html-fill-container" id="htmlwidget-99f8e96beb037c216d01" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-99f8e96beb037c216d01">{"x":{"filter":"none","vertical":false,"extensions":["Buttons"],"caption":"<caption>Project File Types<\/caption>","data":[["Rd","gz","metadata","ts","tgz","R","js","css","ttf","rds","(no extension)","qmd","map","md","json","yml","mjs","sh","so","TAG","bak","cjs","conf","csv","duckdb","html","lua","nix","parquet","scss","wasm","woff","woff2"],[92,56,56,45,37,33,24,10,10,8,6,6,5,5,4,3,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>extension<\/th>\n      <th>n_files<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"dom":"Bfrtip","buttons":["csv","excel","print"],"pageLength":10,"scrollX":true,"columnDefs":[{"className":"dt-right","targets":1},{"name":"extension","targets":0},{"name":"n_files","targets":1}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</section>
+<section id="validation-rogue" class="level3">
+<h3 class="anchored" data-anchor-id="validation-rogue">rogue_wave_events</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="alert alert-warning">
+<h4 class="anchored">Data Not Available</h4>
+<p>
+The 
+<code>validation_rogue_events.html</code>
+ target has not been built.
+</p>
+<p>
+Run 
+<code>targets::tar_make()</code>
+ to generate.
+</p>
 </div>
 </div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="card html-fill-item html-fill-container bslib-card" data-fill="false" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
+</div>
 <hr>
+<p><em>Generated: 2026-03-01 13:58 UTC </em> <em>All data loaded from pre-computed targets via tar_load()</em> <em>Data range: Full historical (2019-present), NO sampling</em></p>
+<hr>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
 </div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div class="card cell html-fill-item html-fill-container bslib-card" data-bslib-card-init="" data-require-bs-caller="card()" data-full-screen="false">
-<div class="card-body html-fill-item html-fill-container">
-<div class="cell-output cell-output-stdout html-fill-item html-fill-container">
-<pre><code>*Generated: 2026-02-13 20:27 UTC *</code></pre>
-</div>
-<div class="cell-output cell-output-stdout html-fill-item html-fill-container">
-<pre><code>*All data loaded from pre-computed targets via tar_load()*</code></pre>
+<div class="callout-body-container">
+<p><strong>Disclaimer:</strong> <code>irishbuoys</code> is an independent open-source project (<a href="https://johngavin.github.io/irishbuoys/">website</a>, <a href="https://github.com/JohnGavin/irishbuoys">GitHub</a>). It is not affiliated with, endorsed by, or part of the <a href="https://www.marine.ie/">Marine Institute</a> or the Irish Weather Buoy Network. For official marine weather warnings, consult <a href="https://www.met.ie/warnings">Met Eireann</a>.</p>
 </div>
 </div>
-<bslib-tooltip placement="auto" bsoptions="[]" data-require-bs-version="5" data-require-bs-caller="tooltip()">
-    <template>Expand</template>
-    <span class="bslib-full-screen-enter badge rounded-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" style="height:1em;width:1em;" aria-hidden="true" role="img"><path d="M20 5C20 4.4 19.6 4 19 4H13C12.4 4 12 3.6 12 3C12 2.4 12.4 2 13 2H21C21.6 2 22 2.4 22 3V11C22 11.6 21.6 12 21 12C20.4 12 20 11.6 20 11V5ZM4 19C4 19.6 4.4 20 5 20H11C11.6 20 12 20.4 12 21C12 21.6 11.6 22 11 22H3C2.4 22 2 21.6 2 21V13C2 12.4 2.4 12 3 12C3.6 12 4 12.4 4 13V19Z"></path></svg>
-    </span>
-</bslib-tooltip><script data-bslib-card-init="">bslib.Card.initializeAllCards();</script></div>
-<div id="3ade8a4a-fb1d-4a6c-8409-ac45482d5fc9" class="hidden html-fill-item html-fill-container">
+</div>
+</section>
+</section>
 
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-
+</main>
+<!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
@@ -1031,16 +1131,8 @@ File Types
     }
   });
   </script>
-</div> <!-- /container fluid -->
+</div> <!-- /content -->
 
-<script type="application/javascript">
-window.document.addEventListener("DOMContentLoaded", function (_event) {
-  if (window.bslib.Card) {
-    window.bslib.Card.initializeAllCards();
-  }
-}); 
-</script>
-  
 
 
 
