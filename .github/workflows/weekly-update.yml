@@ -25,6 +25,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 jobs:
   # ── Gate Job: skip Mon-Sat unless storm mode is active ────
@@ -244,3 +246,46 @@ jobs:
         with:
           name: pipeline-failure
           path: .
+
+  # ── Deploy to GitHub Pages ──────────────────────────────
+  # GITHUB_TOKEN pushes don't trigger other workflows (GitHub limitation),
+  # so we deploy pages directly from this workflow instead of relying on
+  # deploy-dashboard.yml to detect the docs/ push.
+  deploy-pages:
+    needs: update-data
+    if: success()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: "pages"
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main  # Checkout after update-data has pushed
+
+      - name: Verify docs exist
+        run: |
+          if [ ! -f "docs/index.html" ]; then
+            echo "::warning::No docs/index.html found — skipping deploy"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          fi
+        id: check
+
+      - name: Setup Pages
+        if: steps.check.outputs.skip != 'true'
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        if: steps.check.outputs.skip != 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Deploy to GitHub Pages
+        if: steps.check.outputs.skip != 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
