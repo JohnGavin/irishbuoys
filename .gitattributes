@@ -1,7 +1,0 @@
-# Git LFS tracking for large binary files (> 1 MB)
-# _targets/ no longer on main — pipeline state stored on targets-runs branch
-
-# inst/extdata/ large RDS files
-inst/extdata/wave_analysis_summary.rds filter=lfs diff=lfs merge=lfs -text
-inst/extdata/dashboard_buoy_data.rds filter=lfs diff=lfs merge=lfs -text
-inst/extdata/seasonal_analysis.rds filter=lfs diff=lfs merge=lfs -text

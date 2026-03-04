@@ -96,26 +96,16 @@ jobs:
           fi
 
       # ── Data Update & Pipeline ──────────────────────────────
+      # targets controls everything: data_update target calls incremental_update()
+      # with LOOKBACK_HOURS env var. No explicit call needed — prevents double-update.
 
-      - name: Perform incremental data update
+      - name: Run pipeline (data update + analysis + vignettes)
         env:
           GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          LOOKBACK_HOURS: '72'
         run: |
           echo "::notice::Update trigger: ${{ github.event_name }}"
-          nix-shell default.nix -A shell --run "Rscript -e '
-            devtools::load_all()
-            result <- incremental_update(db_path = \"inst/extdata/irish_buoys.duckdb\", lookback_hours = 72)
-            saveRDS(result, file = paste0(\"update_log_\", Sys.Date(), \".rds\"))
-            if (result\$status == \"error\") quit(status = 1)
-            cat(\"Records added:\", result\$records_added, \"\\n\")
-          '"
-
-      - name: Run targets pipeline
-        env:
-          GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-        run: |
           nix-shell default.nix -A shell --run "Rscript -e '
             targets::tar_config_set(store = \"_targets\")
             targets::tar_make()
@@ -126,7 +116,8 @@ jobs:
 
       - name: Render vignettes (explicit re-render after data update)
         run: |
-          for qmd in wave_analysis telemetry dashboard_static api-usage; do
+          # dashboard_static is rendered by tar_make() via plan_vignettes target
+          for qmd in wave_analysis telemetry api-usage; do
             echo "::group::Rendering ${qmd}"
             nix-shell default.nix -A shell --run "
               cd vignettes && quarto render ${qmd}.qmd
