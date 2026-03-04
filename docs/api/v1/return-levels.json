@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-03-04T08:56:53Z",
+  "updated_at": "2026-03-04T10:11:20Z",
   "method": "GPD",
   "threshold": "95th percentile",
   "return_periods": [1, 5, 10],
