@@ -15,11 +15,12 @@ NULL
 
 plan_vignettes <- list(
 
-  # Dashboard Static - TEMPORARILY DISABLED due to quarto CLI issues
-  # tarchetypes::tar_quarto(
-  #   vignette_dashboard_static,
-  #   path = "vignettes/dashboard_static.qmd"
-  # ),
+  # Dashboard Static
+  tarchetypes::tar_quarto(
+    vignette_dashboard_static,
+    path = "vignettes/dashboard_static.qmd",
+    quiet = FALSE
+  ),
 
   # Wave Analysis - Extreme value analysis and rogue waves
   # Dependencies: analysis_data, rogue_wave_events, return_levels, joint_analysis_results
