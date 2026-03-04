@@ -20,8 +20,10 @@ library(xts)
 library(tidyr)
 
 # Load pre-computed data from targets pipeline
-data_dir <- "../inst/extdata"
-if (!dir.exists(data_dir)) {
+# Try multiple paths: vignettes/ context, project root (tar_quarto), installed package
+data_dir <- c("../inst/extdata", "inst/extdata")
+data_dir <- Find(dir.exists, data_dir)
+if (is.null(data_dir)) {
   data_dir <- system.file("extdata", package = "irishbuoys")
 }
 
@@ -33,8 +35,8 @@ dashboard_ts <- readRDS(file.path(data_dir, "dashboard_timeseries.rds"))
 pkg_version <- tryCatch(
   as.character(packageVersion("irishbuoys")),
   error = function(e) {
-    desc_file <- "../DESCRIPTION"
-    if (file.exists(desc_file)) {
+    desc_file <- Find(file.exists, c("../DESCRIPTION", "DESCRIPTION"))
+    if (!is.null(desc_file)) {
       desc <- read.dcf(desc_file)
       desc[1, "Version"]
     } else "dev"
