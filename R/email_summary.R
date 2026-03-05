@@ -1,3 +1,113 @@
+#' Compute Data Coverage and Gaps
+#'
+#' @description
+#' Computes temporal coverage and gap analysis for buoy stations.
+#' Uses dplyr only (no raw SQL).
+#'
+#' @param con DBI connection to DuckDB database
+#' @param start_date Start date for analysis
+#' @param end_date End date for analysis
+#'
+#' @return List with `coverage` tibble and `gaps` tibble
+#'
+#' @export
+compute_data_coverage <- function(con, start_date, end_date) {
+  expected_hours <- as.integer(
+    difftime(as.POSIXct(end_date), as.POSIXct(start_date), units = "hours")
+  )
+
+  # Hourly coverage per station
+  coverage <- buoy_tbl(con) |>
+    dplyr::filter(
+      .data$time >= !!as.POSIXct(start_date, tz = "UTC"),
+      .data$time < !!as.POSIXct(end_date, tz = "UTC")
+    ) |>
+    dplyr::mutate(hour = clock::date_floor(.data$time, "hour")) |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      actual_hours = dplyr::n_distinct(.data$hour),
+      n_records = dplyr::n(),
+      .groups = "drop"
+    ) |>
+    dplyr::collect() |>
+    dplyr::mutate(
+      expected_hours = expected_hours,
+      coverage_pct = round(100 * .data$actual_hours / expected_hours, 1),
+      missing_hours = expected_hours - .data$actual_hours
+    )
+
+  # Gap detection: gaps >= 6 hours
+  all_obs <- buoy_tbl(con) |>
+    dplyr::filter(
+      .data$time >= !!as.POSIXct(start_date, tz = "UTC"),
+      .data$time < !!as.POSIXct(end_date, tz = "UTC")
+    ) |>
+    dplyr::mutate(hour = clock::date_floor(.data$time, "hour")) |>
+    dplyr::distinct(.data$station_id, .data$hour) |>
+    dplyr::collect() |>
+    dplyr::arrange(.data$station_id, .data$hour) |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::mutate(
+      prev_hour = dplyr::lag(.data$hour),
+      gap_hours = as.numeric(difftime(.data$hour, .data$prev_hour, units = "hours"))
+    ) |>
+    dplyr::ungroup()
+
+  gaps <- all_obs |>
+    dplyr::filter(.data$gap_hours >= 6) |>
+    dplyr::transmute(
+      .data$station_id,
+      gap_start = .data$prev_hour,
+      gap_end = .data$hour,
+      gap_hours = .data$gap_hours
+    )
+
+  list(coverage = coverage, gaps = gaps)
+}
+
+#' Validate Email Data Freshness
+#'
+#' Checks that the latest observation timestamps in ingestion_stats
+#' are within an acceptable window of the current time.
+#'
+#' @param ingestion_stats Tibble with `station_id` and `latest` columns
+#' @param max_stale_hours Maximum acceptable age of data in hours (default: 96)
+#'
+#' @return ingestion_stats (invisibly), or aborts if ALL stations are stale
+#' @export
+validate_email_freshness <- function(ingestion_stats, max_stale_hours = 96) {
+  if (is.null(ingestion_stats) || nrow(ingestion_stats) == 0) {
+    cli::cli_abort(c(
+      "x" = "No ingestion statistics available.",
+      "i" = "The database may be empty or the lookback window too narrow."
+    ))
+  }
+
+  now <- Sys.time()
+  stale <- ingestion_stats |>
+    dplyr::mutate(
+      age_hours = as.numeric(difftime(now, .data$latest, units = "hours"))
+    ) |>
+    dplyr::filter(.data$age_hours > max_stale_hours)
+
+  if (nrow(stale) == nrow(ingestion_stats)) {
+    cli::cli_abort(c(
+      "x" = "ALL stations have stale data (> {max_stale_hours}h old).",
+      "i" = "Oldest: {round(max(stale$age_hours, na.rm = TRUE), 1)} hours.",
+      "i" = "Check that data_update target ran successfully before email generation."
+    ))
+  }
+
+  if (nrow(stale) > 0) {
+    cli::cli_warn(c(
+      "!" = "{nrow(stale)}/{nrow(ingestion_stats)} stations have data > {max_stale_hours}h old.",
+      "i" = "Stale stations: {paste(stale$station_id, collapse = ', ')}"
+    ))
+  }
+
+  invisible(ingestion_stats)
+}
+
 #' Generate Weekly Summary Statistics
 #'
 #' @description
@@ -26,122 +136,152 @@ generate_weekly_summary <- function(
   current_date <- Sys.Date()
   start_date <- current_date - lookback_days
 
-  # Build QC filter clause
-  qc_clause <- if (!is.null(qc_filter)) {
-    glue::glue("AND qc_flag = {qc_filter}")
-  } else {
-    "AND qc_flag != 9"
+  # Helper: apply QC filter to a lazy table reference
+  apply_qc <- function(tbl_ref, qc = qc_filter) {
+    if (!is.null(qc)) {
+      tbl_ref |> dplyr::filter(.data$qc_flag == !!qc)
+    } else {
+      tbl_ref |> dplyr::filter(.data$qc_flag != 9L)
+    }
   }
 
+  # Base filtered reference for the current week
+  base_current <- buoy_tbl(con) |>
+    dplyr::filter(
+      .data$time >= !!as.POSIXct(start_date, tz = "UTC"),
+      .data$time < !!as.POSIXct(current_date, tz = "UTC")
+    ) |>
+    apply_qc()
+
   # Current week statistics
-  current_week <- DBI::dbGetQuery(con, glue::glue("
-    SELECT
-      station_id,
-      AVG(wave_height) as avg_wave_height,
-      MAX(wave_height) as max_wave_height,
-      AVG(wind_speed) as avg_wind_speed,
-      MAX(wind_speed) as max_wind_speed,
-      AVG(air_temperature) as avg_air_temp,
-      AVG(sea_temperature) as avg_sea_temp,
-      COUNT(*) as n_observations
-    FROM buoy_data
-    WHERE time >= '{start_date}'
-      AND time < '{current_date}'
-      {qc_clause}
-    GROUP BY station_id
-  "))
+  current_week <- base_current |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      avg_wave_height = mean(.data$wave_height, na.rm = TRUE),
+      max_wave_height = max(.data$wave_height, na.rm = TRUE),
+      avg_wind_speed = mean(.data$wind_speed, na.rm = TRUE),
+      max_wind_speed = max(.data$wind_speed, na.rm = TRUE),
+      avg_air_temp = mean(.data$air_temperature, na.rm = TRUE),
+      avg_sea_temp = mean(.data$sea_temperature, na.rm = TRUE),
+      n_observations = dplyr::n(),
+      .groups = "drop"
+    ) |>
+    dplyr::collect()
 
   # Previous week comparison
-  prev_week <- DBI::dbGetQuery(con, glue::glue("
-    SELECT
-      station_id,
-      AVG(wave_height) as avg_wave_height,
-      MAX(wave_height) as max_wave_height,
-      AVG(wind_speed) as avg_wind_speed,
-      MAX(wind_speed) as max_wind_speed,
-      AVG(air_temperature) as avg_air_temp
-    FROM buoy_data
-    WHERE time >= '{start_date - 7}'
-      AND time < '{start_date}'
-      {qc_clause}
-    GROUP BY station_id
-  "))
+  prev_week <- buoy_tbl(con) |>
+    dplyr::filter(
+      .data$time >= !!as.POSIXct(start_date - 7, tz = "UTC"),
+      .data$time < !!as.POSIXct(start_date, tz = "UTC")
+    ) |>
+    apply_qc() |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      avg_wave_height = mean(.data$wave_height, na.rm = TRUE),
+      max_wave_height = max(.data$wave_height, na.rm = TRUE),
+      avg_wind_speed = mean(.data$wind_speed, na.rm = TRUE),
+      max_wind_speed = max(.data$wind_speed, na.rm = TRUE),
+      avg_air_temp = mean(.data$air_temperature, na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    dplyr::collect()
 
   # Historical averages for this time of year
-  historical <- DBI::dbGetQuery(con, glue::glue("
-    SELECT
-      station_id,
-      AVG(wave_height) as hist_avg_wave_height,
-      PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY wave_height) as p95_wave_height,
-      AVG(wind_speed) as hist_avg_wind_speed,
-      PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY wind_speed) as p95_wind_speed,
-      AVG(air_temperature) as hist_avg_air_temp,
-      AVG(sea_temperature) as hist_avg_sea_temp
-    FROM buoy_data
-    WHERE strftime(time, '%W') = strftime(TIMESTAMP '{current_date}', '%W')
-      AND time < '{start_date}'
-      {qc_clause}
-    GROUP BY station_id
-  "))
+  # Collect historical data, then filter by ISO week in R
+  current_week_num <- as.integer(format(current_date, "%W"))
+  historical <- buoy_tbl(con) |>
+    dplyr::filter(.data$time < !!as.POSIXct(start_date, tz = "UTC")) |>
+    apply_qc() |>
+    dplyr::collect() |>
+    dplyr::mutate(week_num = as.integer(format(.data$time, "%W"))) |>
+    dplyr::filter(.data$week_num == !!current_week_num) |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      hist_avg_wave_height = mean(.data$wave_height, na.rm = TRUE),
+      p95_wave_height = stats::quantile(.data$wave_height, 0.95, na.rm = TRUE),
+      hist_avg_wind_speed = mean(.data$wind_speed, na.rm = TRUE),
+      p95_wind_speed = stats::quantile(.data$wind_speed, 0.95, na.rm = TRUE),
+      hist_avg_air_temp = mean(.data$air_temperature, na.rm = TRUE),
+      hist_avg_sea_temp = mean(.data$sea_temperature, na.rm = TRUE),
+      .groups = "drop"
+    )
 
-  # Check for extreme events
-  extremes <- DBI::dbGetQuery(con, glue::glue("
-    SELECT
-      station_id,
-      time,
-      'High Waves' as event_type,
-      wave_height as value
-    FROM buoy_data
-    WHERE time >= '{start_date}'
-      AND wave_height > 8
-      {qc_clause}
+  # Check for extreme events — three separate dplyr queries bound together
+  high_waves <- base_current |>
+    dplyr::filter(.data$wave_height > 8) |>
+    dplyr::transmute(
+      station_id = .data$station_id,
+      time = .data$time,
+      event_type = "High Waves",
+      value = .data$wave_height
+    ) |>
+    dplyr::collect()
 
-    UNION ALL
+  storm_winds <- base_current |>
+    dplyr::filter(.data$wind_speed > 48) |>
+    dplyr::transmute(
+      station_id = .data$station_id,
+      time = .data$time,
+      event_type = "Storm Winds",
+      value = .data$wind_speed
+    ) |>
+    dplyr::collect()
 
-    SELECT
-      station_id,
-      time,
-      'Storm Winds' as event_type,
-      wind_speed as value
-    FROM buoy_data
-    WHERE time >= '{start_date}'
-      AND wind_speed > 48
-      {qc_clause}
+  rogue_waves <- base_current |>
+    dplyr::filter(
+      .data$hmax > 2 * .data$wave_height,
+      .data$wave_height > 2
+    ) |>
+    dplyr::transmute(
+      station_id = .data$station_id,
+      time = .data$time,
+      event_type = "Rogue Wave",
+      value = .data$hmax
+    ) |>
+    dplyr::collect()
 
-    UNION ALL
-
-    SELECT
-      station_id,
-      time,
-      'Rogue Wave' as event_type,
-      hmax as value
-    FROM buoy_data
-    WHERE time >= '{start_date}'
-      AND hmax > 2 * wave_height
-      AND wave_height > 2
-      {qc_clause}
-
-    ORDER BY time DESC
-  "))
+  extremes <- dplyr::bind_rows(high_waves, storm_winds, rogue_waves) |>
+    dplyr::arrange(dplyr::desc(.data$time))
 
   # Ingestion stats: new records per station this week
-  ingestion_stats <- DBI::dbGetQuery(con, glue::glue("
-    SELECT
-      station_id,
-      COUNT(*) as new_records,
-      MIN(time) as earliest,
-      MAX(time) as latest
-    FROM buoy_data
-    WHERE time >= '{start_date}'
-      AND time < '{current_date}'
-    GROUP BY station_id
-    ORDER BY station_id
-  "))
+  ingestion_stats <- buoy_tbl(con) |>
+    dplyr::filter(
+      .data$time >= !!as.POSIXct(start_date, tz = "UTC"),
+      .data$time < !!as.POSIXct(current_date, tz = "UTC")
+    ) |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      new_records = dplyr::n(),
+      earliest = min(.data$time, na.rm = TRUE),
+      latest = max(.data$time, na.rm = TRUE),
+      .groups = "drop"
+    ) |>
+    dplyr::arrange(.data$station_id) |>
+    dplyr::collect()
+
+  # Validate freshness when data exists (abort if ALL stations stale, warn if some)
+  if (nrow(ingestion_stats) > 0) {
+    validate_email_freshness(ingestion_stats, max_stale_hours = 96)
+  } else {
+    cli::cli_warn(c(
+      "!" = "No ingestion data found in lookback window.",
+      "i" = "Email may contain stale data. Check that the database has recent records."
+    ))
+  }
 
   # Database totals
   db_stats <- tryCatch(
     get_database_stats(con),
     error = function(e) NULL
+  )
+
+  # Data coverage analysis
+  data_coverage <- tryCatch(
+    compute_data_coverage(con, start_date, current_date),
+    error = function(e) {
+      cli::cli_warn("Failed to compute data coverage: {e$message}")
+      NULL
+    }
   )
 
   # Combine results
@@ -151,6 +291,7 @@ generate_weekly_summary <- function(
     historical = historical,
     extreme_events = extremes,
     ingestion_stats = ingestion_stats,
+    data_coverage = data_coverage,
     db_stats = db_stats,
     update_result = update_result,
     report_date = current_date,
@@ -248,6 +389,66 @@ create_email_summary <- function(summary) {
     ""
   }
 
+  # Format data coverage section
+  coverage_text <- if (!is.null(summary$data_coverage)) {
+    cov <- summary$data_coverage$coverage
+    gaps <- summary$data_coverage$gaps
+
+    # Coverage table with color coding
+    cov_rows <- paste(vapply(seq_len(nrow(cov)), function(i) {
+      row <- cov[i, ]
+      color <- if (row$coverage_pct >= 90) "#28a745"
+               else if (row$coverage_pct >= 80) "#ffc107"
+               else "#dc3545"
+      paste0(
+        "<tr><td>", row$station_id, "</td>",
+        "<td>", row$expected_hours, "</td>",
+        "<td>", row$actual_hours, "</td>",
+        "<td style='color:", color, "; font-weight:bold'>", row$coverage_pct, "%</td>",
+        "<td>", row$missing_hours, "</td></tr>"
+      )
+    }, character(1)), collapse = "")
+
+    cov_table <- paste0(
+      "<h2>Data Coverage &amp; Gaps</h2>",
+      "<p><small>Coverage = distinct hours with observations / expected ",
+      "<a href='https://en.wikipedia.org/wiki/Hourly'>hourly</a> observations. ",
+      "Source: <a href='https://erddap.marine.ie/'>Marine Institute ERDDAP</a></small></p>",
+      "<table border='1' style='border-collapse: collapse;'>",
+      "<tr><th>Station</th><th>Expected Hours</th><th>Actual Hours</th>",
+      "<th>Coverage</th><th>Missing Hours</th></tr>",
+      cov_rows,
+      "</table>"
+    )
+
+    # Gaps sub-table
+    gaps_table <- if (nrow(gaps) > 0) {
+      gap_rows <- paste(vapply(seq_len(nrow(gaps)), function(i) {
+        row <- gaps[i, ]
+        paste0(
+          "<tr><td>", row$station_id, "</td>",
+          "<td>", row$gap_start, "</td>",
+          "<td>", row$gap_end, "</td>",
+          "<td>", row$gap_hours, "h</td></tr>"
+        )
+      }, character(1)), collapse = "")
+
+      paste0(
+        "<h3>Significant Gaps (&ge; 6 hours)</h3>",
+        "<table border='1' style='border-collapse: collapse;'>",
+        "<tr><th>Station</th><th>Gap Start</th><th>Gap End</th><th>Duration</th></tr>",
+        gap_rows,
+        "</table>"
+      )
+    } else {
+      "<p>No significant gaps (&ge; 6 hours) detected.</p>"
+    }
+
+    paste0(cov_table, gaps_table)
+  } else {
+    ""
+  }
+
   # Create email body
   email_body <- paste0(
     "<h1>Irish Weather Buoy Network - Weekly Summary</h1>",
@@ -256,6 +457,8 @@ create_email_summary <- function(summary) {
 
     ingestion_text,
     db_totals_text,
+
+    coverage_text,
 
     "<h2>This Week's Statistics</h2>",
     station_stats,

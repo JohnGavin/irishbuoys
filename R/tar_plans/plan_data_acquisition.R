@@ -15,10 +15,20 @@ plan_data_acquisition <- list(
     get_database_stats()
   ),
 
-  # Perform incremental update if needed
+  # Single source of truth for data updates.
+
+  # CI controls lookback via LOOKBACK_HOURS env var (e.g., storm-alert sets 72).
+  # tar_make() is the ONLY caller — no explicit incremental_update() in CI.
   targets::tar_target(
     data_update,
-    incremental_update(lookback_hours = 48)
+    {
+      lookback <- as.integer(Sys.getenv("LOOKBACK_HOURS", unset = "48"))
+      incremental_update(
+        db_path = "inst/extdata/irish_buoys.duckdb",
+        lookback_hours = lookback
+      )
+    },
+    cue = targets::tar_cue(mode = "always")
   ),
 
   # Download specific date range for analysis

@@ -9,8 +9,8 @@ test_that("generate_weekly_summary returns expected structure", {
   expect_type(result, "list")
   expect_named(result, c(
     "current_week", "previous_week", "historical",
-    "extreme_events", "ingestion_stats", "db_stats",
-    "update_result", "report_date", "period"
+    "extreme_events", "ingestion_stats", "data_coverage",
+    "db_stats", "update_result", "report_date", "period"
   ), ignore.order = TRUE)
   expect_s3_class(result$current_week, "data.frame")
   expect_s3_class(result$previous_week, "data.frame")
@@ -93,4 +93,70 @@ test_that("create_email_summary errors on invalid input", {
   expect_error(create_email_summary(NULL))
   expect_error(create_email_summary(NA))
   expect_error(create_email_summary(list()))
+})
+
+# validate_email_freshness() tests
+test_that("validate_email_freshness: fresh data passes silently", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3", "M4"),
+    latest = Sys.time() - c(1, 2, 3) * 3600  # 1-3 hours ago
+  )
+  expect_silent(validate_email_freshness(stats))
+  result <- validate_email_freshness(stats)
+  expect_identical(result, stats)
+})
+
+test_that("validate_email_freshness: partially stale data warns", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3", "M4"),
+    latest = Sys.time() - c(1, 200, 200) * 3600  # M2 fresh, M3/M4 stale
+
+  )
+  expect_warning(
+    validate_email_freshness(stats),
+    "stations have data"
+  )
+})
+
+test_that("validate_email_freshness: all stale data aborts", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3"),
+    latest = Sys.time() - c(200, 200) * 3600  # Both >96h old
+  )
+  expect_error(
+    validate_email_freshness(stats),
+    "ALL stations have stale data"
+  )
+})
+
+test_that("validate_email_freshness: empty ingestion_stats aborts", {
+  stats <- tibble::tibble(
+    station_id = character(0),
+    latest = as.POSIXct(character(0))
+  )
+  expect_error(
+    validate_email_freshness(stats),
+    "No ingestion statistics"
+  )
+})
+
+test_that("validate_email_freshness: NULL ingestion_stats aborts", {
+  expect_error(
+    validate_email_freshness(NULL),
+    "No ingestion statistics"
+  )
+})
+
+test_that("validate_email_freshness: custom max_stale_hours threshold", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3"),
+    latest = Sys.time() - c(10, 10) * 3600  # 10 hours old
+  )
+  # 96h default: passes
+  expect_silent(validate_email_freshness(stats, max_stale_hours = 96))
+  # 5h threshold: all stale -> aborts
+  expect_error(
+    validate_email_freshness(stats, max_stale_hours = 5),
+    "ALL stations have stale data"
+  )
 })
