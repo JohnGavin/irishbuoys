@@ -137,87 +137,68 @@ analyze_rogue_statistics <- function(
 
   cli::cli_h2("Analyzing Rogue Wave Statistics")
 
-  # Overall statistics
-  overall <- DBI::dbGetQuery(con, glue::glue("
-    WITH eligible AS (
-      SELECT *
-      FROM buoy_data
-      WHERE wave_height >= {min_wave_height}
-        AND hmax IS NOT NULL
-        AND wave_height IS NOT NULL
-    ),
-    rogue_events AS (
-      SELECT *
-      FROM eligible
-      WHERE hmax > {threshold} * wave_height
+  # Eligible observations: wave_height >= threshold with valid hmax
+  eligible_tbl <- buoy_tbl(con) |>
+    dplyr::filter(
+      .data$wave_height >= !!min_wave_height,
+      !is.na(.data$hmax),
+      !is.na(.data$wave_height)
     )
-    SELECT
-      (SELECT COUNT(*) FROM eligible) as total_observations,
-      (SELECT COUNT(*) FROM rogue_events) as rogue_count,
-      ROUND(100.0 * (SELECT COUNT(*) FROM rogue_events) /
-            NULLIF((SELECT COUNT(*) FROM eligible), 0), 2) as rogue_pct,
-      (SELECT AVG(hmax / wave_height) FROM rogue_events) as avg_rogue_ratio,
-      (SELECT MAX(hmax / wave_height) FROM rogue_events) as max_rogue_ratio,
-      (SELECT MAX(hmax) FROM rogue_events) as max_hmax
-  "))
+
+  # Overall statistics
+  eligible_data <- eligible_tbl |>
+    dplyr::mutate(
+      is_rogue = .data$hmax > !!threshold * .data$wave_height,
+      rogue_ratio = .data$hmax / .data$wave_height
+    ) |>
+    dplyr::collect()
+
+  rogue_data <- dplyr::filter(eligible_data, .data$is_rogue)
+
+  overall <- tibble::tibble(
+    total_observations = nrow(eligible_data),
+    rogue_count = nrow(rogue_data),
+    rogue_pct = round(100 * nrow(rogue_data) / max(nrow(eligible_data), 1), 2),
+    avg_rogue_ratio = if (nrow(rogue_data) > 0) round(mean(rogue_data$rogue_ratio), 4) else NA_real_,
+    max_rogue_ratio = if (nrow(rogue_data) > 0) round(max(rogue_data$rogue_ratio), 4) else NA_real_,
+    max_hmax = if (nrow(rogue_data) > 0) round(max(rogue_data$hmax), 2) else NA_real_
+  )
 
   # Statistics by station
-  by_station <- DBI::dbGetQuery(con, glue::glue("
-    WITH eligible AS (
-      SELECT *
-      FROM buoy_data
-      WHERE wave_height >= {min_wave_height}
-        AND hmax IS NOT NULL
-    )
-    SELECT
-      station_id,
-      COUNT(*) as total_obs,
-      SUM(CASE WHEN hmax > {threshold} * wave_height THEN 1 ELSE 0 END) as rogue_count,
-      ROUND(100.0 * SUM(CASE WHEN hmax > {threshold} * wave_height THEN 1 ELSE 0 END) /
-            COUNT(*), 2) as rogue_pct,
-      ROUND(AVG(CASE WHEN hmax > {threshold} * wave_height
-                THEN hmax / wave_height END), 2) as avg_rogue_ratio,
-      ROUND(MAX(hmax), 2) as max_hmax,
-      ROUND(AVG(wave_height), 2) as avg_wave_height
-    FROM eligible
-    GROUP BY station_id
-    ORDER BY rogue_pct DESC
-  "))
+  by_station <- eligible_data |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      total_obs = dplyr::n(),
+      rogue_count = sum(.data$is_rogue),
+      rogue_pct = round(100 * sum(.data$is_rogue) / dplyr::n(), 2),
+      avg_rogue_ratio = round(mean(.data$rogue_ratio[.data$is_rogue], na.rm = TRUE), 2),
+      max_hmax = round(max(.data$hmax), 2),
+      avg_wave_height = round(mean(.data$wave_height), 2),
+      .groups = "drop"
+    ) |>
+    dplyr::arrange(dplyr::desc(.data$rogue_pct))
 
   # Conditions associated with rogue waves vs normal waves
-  conditions <- DBI::dbGetQuery(con, glue::glue("
-    WITH eligible AS (
-      SELECT
-        *,
-        CASE WHEN hmax > {threshold} * wave_height THEN 'rogue' ELSE 'normal' END as wave_type
-      FROM buoy_data
-      WHERE wave_height >= {min_wave_height}
-        AND hmax IS NOT NULL
+  conditions <- eligible_data |>
+    dplyr::mutate(
+      wave_type = dplyr::if_else(.data$is_rogue, "rogue", "normal")
+    ) |>
+    dplyr::group_by(.data$wave_type) |>
+    dplyr::summarise(
+      n = dplyr::n(),
+      avg_wave_height = round(mean(.data$wave_height, na.rm = TRUE), 2),
+      avg_wave_period = round(mean(.data$wave_period, na.rm = TRUE), 2),
+      avg_wind_speed = round(mean(.data$wind_speed, na.rm = TRUE), 1),
+      avg_gust = round(mean(.data$gust, na.rm = TRUE), 1),
+      avg_pressure = round(mean(.data$atmospheric_pressure, na.rm = TRUE), 1),
+      .groups = "drop"
     )
-    SELECT
-      wave_type,
-      COUNT(*) as n,
-      ROUND(AVG(wave_height), 2) as avg_wave_height,
-      ROUND(AVG(wave_period), 2) as avg_wave_period,
-      ROUND(AVG(wind_speed), 1) as avg_wind_speed,
-      ROUND(AVG(gust), 1) as avg_gust,
-      ROUND(AVG(atmospheric_pressure), 1) as avg_pressure
-    FROM eligible
-    GROUP BY wave_type
-  "))
 
   # Time distribution (hour of day)
-  hourly <- DBI::dbGetQuery(con, glue::glue("
-    SELECT
-      CAST(strftime(time, '%H') AS INTEGER) as hour,
-      COUNT(*) as rogue_count
-    FROM buoy_data
-    WHERE hmax > {threshold} * wave_height
-      AND wave_height >= {min_wave_height}
-      AND hmax IS NOT NULL
-    GROUP BY strftime(time, '%H')
-    ORDER BY hour
-  "))
+  hourly <- rogue_data |>
+    dplyr::mutate(hour = as.integer(format(.data$time, "%H"))) |>
+    dplyr::count(.data$hour, name = "rogue_count") |>
+    dplyr::arrange(.data$hour)
 
   result <- list(
     overall = overall,
