@@ -346,7 +346,6 @@ log_update <- function(con, start_date, end_date, records_added, stations, notes
 #' @param end_date End date for query
 #' @param variables Character vector of variables to return
 #' @param qc_filter Logical, filter for good quality data only (default: TRUE)
-#' @param sql_query Optional custom SQL query (bypasses dplyr)
 #'
 #' @return Data frame with query results
 #'
@@ -368,19 +367,11 @@ query_buoy_data <- function(
     start_date = NULL,
     end_date = NULL,
     variables = NULL,
-    qc_filter = TRUE,
-    sql_query = NULL
+    qc_filter = TRUE
 ) {
 
-  # Use custom SQL if provided (fallback for complex queries)
-  if (!is.null(sql_query)) {
-    result <- DBI::dbGetQuery(con, sql_query)
-    cli::cli_alert_success("Retrieved {nrow(result)} records (custom SQL)")
-    return(result)
-  }
-
   # Start with lazy table reference
-tbl_ref <- buoy_tbl(con)
+  tbl_ref <- buoy_tbl(con)
 
   # Apply filters using dplyr verbs (translated to SQL)
   if (!is.null(stations)) {
