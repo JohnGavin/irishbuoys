@@ -248,8 +248,12 @@ get_database_stats <- function(db_path = "inst/extdata/irish_buoys.duckdb") {
       latest_date = max(.data$time, na.rm = TRUE)
     ) |>
     dplyr::collect()
-  # Add n_days - requires SQL for DATE() function
-  overall$n_days <- DBI::dbGetQuery(con, "SELECT COUNT(DISTINCT DATE(time)) as n FROM buoy_data")$n
+  # Add n_days using dplyr
+  overall$n_days <- buoy_tbl(con) |>
+    dplyr::mutate(date = as.Date(.data$time)) |>
+    dplyr::summarise(n = dplyr::n_distinct(.data$date)) |>
+    dplyr::collect() |>
+    dplyr::pull(n)
 
   # Per-station statistics (using dplyr)
   by_station <- buoy_tbl(con) |>
