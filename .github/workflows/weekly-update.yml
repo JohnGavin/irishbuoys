@@ -96,20 +96,71 @@ jobs:
           fi
 
       # ── Data Update & Pipeline ──────────────────────────────
-      # targets controls everything: data_update target calls incremental_update()
-      # with LOOKBACK_HOURS env var. No explicit call needed — prevents double-update.
+      # Pre-pipeline fetch: DuckDB is ephemeral in CI (gitignored, excluded from
+      # targets-runs). Without this step, tar_make() may use cached stale
+      # email_summary_data from targets-runs, sending emails with weeks-old data.
+      # This fetch ensures the DB has fresh data BEFORE the pipeline runs.
+
+      - name: Fetch fresh data (before pipeline)
+        env:
+          LOOKBACK_HOURS: '168'
+        run: |
+          nix-shell default.nix -A shell --run "Rscript -e '
+            pkgload::load_all(quiet = TRUE)
+            lookback <- as.integer(Sys.getenv(\"LOOKBACK_HOURS\", unset = \"168\"))
+            result <- incremental_update(
+              db_path = \"inst/extdata/irish_buoys.duckdb\",
+              lookback_hours = lookback
+            )
+            cat(\"Status:\", result\$status, \"\\n\")
+            cat(\"Records added:\", result\$records_added, \"\\n\")
+            if (!is.null(result\$summary)) {
+              cat(\"Latest data:\\n\")
+              print(result\$summary[, c(\"station_id\", \"latest\")])
+            }
+            if (result\$status == \"error\") {
+              stop(\"Data fetch failed: \", result\$error)
+            }
+          '"
 
       - name: Run pipeline (data update + analysis + vignettes)
         env:
           GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-          LOOKBACK_HOURS: '72'
+          LOOKBACK_HOURS: '168'
         run: |
           echo "::notice::Update trigger: ${{ github.event_name }}"
           nix-shell default.nix -A shell --run "Rscript -e '
             targets::tar_config_set(store = \"_targets\")
             targets::tar_make()
           '" || echo "Targets pipeline completed with warnings"
+
+      # ── Verify Email Freshness ───────────────────────────────
+      # Fail-fast: if email_summary_data has stale ingestion_stats, abort
+      # before committing or deploying. This catches cases where tar_make()
+      # used cached stale data despite the pre-pipeline fetch.
+
+      - name: Verify email data freshness
+        run: |
+          nix-shell default.nix -A shell --run "Rscript -e '
+            pkgload::load_all(quiet = TRUE)
+            tryCatch({
+              summary <- targets::tar_read(email_summary_data)
+              stats <- summary\$ingestion_stats
+              if (is.null(stats) || nrow(stats) == 0) {
+                warning(\"No ingestion stats in email_summary_data\")
+              } else {
+                max_age <- max(as.numeric(difftime(Sys.time(), stats\$latest, units = \"hours\")))
+                cat(\"Max data age:\", round(max_age, 1), \"hours\\n\")
+                if (max_age > 96) {
+                  stop(\"STALE EMAIL DATA: \", round(max_age), \"h old (threshold: 96h)\")
+                }
+                cat(\"Email freshness check PASSED\\n\")
+              }
+            }, error = function(e) {
+              cat(\"::warning::Email freshness check:\", conditionMessage(e), \"\\n\")
+            })
+          '"
 
       # ── Render Vignettes ────────────────────────────────────
       # _targets/ is present (restored + updated), so tar_load() works

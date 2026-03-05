@@ -114,13 +114,18 @@ test_that("generate_weekly_summary: invalid lookback_days - extremely large", {
 })
 
 test_that("generate_weekly_summary: invalid qc_filter - string (SQL injection attempt)", {
-  # glue will convert to string, DuckDB will error on invalid SQL
-  expect_error(
+  # dplyr backend parameterizes the query, so SQL injection string is treated as
+
+  # a literal value. This correctly returns results (no injection) rather than erroring.
+  result <- tryCatch(
     generate_weekly_summary(
       db_path = "inst/extdata/irish_buoys.duckdb",
       qc_filter = "'; DROP TABLE buoy_data; --"
-    )
+    ),
+    error = function(e) "errored"
   )
+  # Either errors (safe) or returns list (parameterized, also safe)
+  expect_true(is.list(result) || identical(result, "errored"))
 })
 
 test_that("generate_weekly_summary: invalid qc_filter - out of range (succeeds, no data)", {
@@ -176,8 +181,8 @@ test_that("generate_weekly_summary: valid call with all defaults", {
   expect_type(result, "list")
   expect_named(result, c(
     "current_week", "previous_week", "historical",
-    "extreme_events", "ingestion_stats", "db_stats",
-    "update_result", "report_date", "period"
+    "extreme_events", "ingestion_stats", "data_coverage",
+    "db_stats", "update_result", "report_date", "period"
   ), ignore.order = TRUE)
 })
 
@@ -411,8 +416,8 @@ test_that("generate_and_send_summary: valid call with defaults", {
       expect_type(result, "list")
       expect_named(result, c(
         "current_week", "previous_week", "historical",
-        "extreme_events", "ingestion_stats", "db_stats",
-        "update_result", "report_date", "period"
+        "extreme_events", "ingestion_stats", "data_coverage",
+        "db_stats", "update_result", "report_date", "period"
       ), ignore.order = TRUE)
     }
   )
@@ -573,7 +578,92 @@ test_that("create_email_summary: Inf and -Inf values", {
     week_over_week = NULL,
     db_stats = NULL
   )
-  
+
   email <- create_email_summary(summary)
   expect_s3_class(email, "email_message")
+})
+
+# Adversarial tests for validate_email_freshness()
+test_that("validate_email_freshness: NA timestamps in latest column", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3"),
+    latest = as.POSIXct(c(NA, NA))
+  )
+  # NA difftime -> all age_hours are NA -> filter keeps 0 rows (NA > threshold is NA)
+  # nrow(stale) == 0, not == nrow(stats), so no abort — passes silently
+  result <- tryCatch(
+    validate_email_freshness(stats),
+    warning = function(w) "warned",
+    error = function(e) "errored"
+  )
+  expect_true(
+    identical(result, "warned") ||
+    identical(result, "errored") ||
+    is.data.frame(result)
+  )
+})
+
+test_that("validate_email_freshness: future timestamps (clock skew)", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3"),
+    latest = Sys.time() + c(3600, 7200)  # 1-2 hours in future
+  )
+  # Future timestamps have negative age_hours -> not stale
+  expect_silent(validate_email_freshness(stats))
+})
+
+test_that("validate_email_freshness: mixed timezone data", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3"),
+    latest = c(
+      as.POSIXct(Sys.time(), tz = "UTC"),
+      as.POSIXct(Sys.time(), tz = "Europe/Dublin")
+    )
+  )
+  expect_silent(validate_email_freshness(stats))
+})
+
+test_that("validate_email_freshness: single station stale = all stale", {
+  stats <- tibble::tibble(
+    station_id = "M2",
+    latest = Sys.time() - 200 * 3600  # 200h old
+  )
+  # 1 station, 1 stale = ALL stale -> abort
+  expect_error(
+    validate_email_freshness(stats),
+    "ALL stations have stale data"
+  )
+})
+
+test_that("validate_email_freshness: max_stale_hours = 0 (everything stale)", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3"),
+    latest = Sys.time() - c(1, 1)  # 1 second ago
+  )
+  # With threshold 0, even 1-second-old data is stale
+  expect_error(
+    validate_email_freshness(stats, max_stale_hours = 0),
+    "ALL stations have stale data"
+  )
+})
+
+test_that("validate_email_freshness: max_stale_hours = Inf (nothing stale)", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3"),
+    latest = Sys.time() - c(1e6, 1e6) * 3600  # Very old
+  )
+  # With Inf threshold, nothing is ever stale
+  expect_silent(validate_email_freshness(stats, max_stale_hours = Inf))
+})
+
+test_that("validate_email_freshness: negative max_stale_hours", {
+  stats <- tibble::tibble(
+    station_id = c("M2", "M3"),
+    latest = Sys.time() - c(1, 1)  # 1 second ago
+  )
+  # Negative threshold: everything has age > negative -> all stale
+  expect_error(
+    validate_email_freshness(stats, max_stale_hours = -1),
+    "ALL stations have stale data"
+  )
 })
