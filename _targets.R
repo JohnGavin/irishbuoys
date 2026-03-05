@@ -16,6 +16,7 @@ tar_option_set(
     "duckdb", "DBI", "dplyr", "ggplot2", "cli",
     "extRemes",  # For extreme value analysis
     "copula",    # For joint dependence analysis (issue #13)
+    "SpatialExtremes",  # For max-stable spatial EVT models
     "DT",        # For telemetry tables
     "gert"       # For git metrics
   ),
@@ -49,6 +50,7 @@ list(
   plan_quality_control,
   plan_wave_analysis,
   plan_joint_analysis,  # Joint distributions between buoys (issue #13)
+  plan_spatial_extreme_values,  # H1 extremal dependence + max-stable (spatial EVT)
   plan_dashboard,
   plan_api,  # Static JSON API at docs/api/v1/ (issue #32)
   plan_doc_examples,
