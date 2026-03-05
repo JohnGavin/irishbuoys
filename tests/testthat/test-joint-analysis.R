@@ -106,3 +106,121 @@ test_that("cross_correlation_stations warns on insufficient data", {
   expect_message(result <- cross_correlation_stations(data, "M2", "M3", max_lag = 48))
   expect_true(is.na(result$optimal_lag))
 })
+
+# --- Tests for compute_extremal_dependence ---
+
+test_that("compute_extremal_dependence returns expected structure", {
+  skip_if_not_installed("copula")
+  set.seed(42)
+  n <- 1000
+  # Simulate positively correlated wave heights at two stations
+  z <- rnorm(n)
+  data <- data.frame(
+    time = rep(seq.POSIXt(as.POSIXct("2020-01-01"), by = "hour", length.out = n), 2),
+    station_id = rep(c("M2", "M3"), each = n),
+    wave_height = c(
+      3 + z + rnorm(n, 0, 0.5),
+      2.5 + 0.8 * z + rnorm(n, 0, 0.5)
+    ),
+    stringsAsFactors = FALSE
+  )
+
+  result <- compute_extremal_dependence(data, n_bootstrap = 20)
+
+  expect_type(result, "list")
+  expect_true("dependence_table" %in% names(result))
+  expect_equal(result$method, "gumbel_copula")
+  expect_equal(result$n_bootstrap, 20)
+
+  dt <- result$dependence_table
+  expect_s3_class(dt, "data.frame")
+  expect_equal(nrow(dt), 1)  # One pair: M2-M3
+  expected_cols <- c(
+    "station1", "station2", "distance_km", "kendall_tau",
+    "lambda_upper", "lambda_lower", "lambda_upper_ci_low",
+    "lambda_upper_ci_high", "n_concurrent", "copula_alpha",
+    "chi_q95", "chi_q99", "h1_significant"
+  )
+  expect_true(all(expected_cols %in% names(dt)))
+})
+
+test_that("compute_extremal_dependence detects dependence in correlated data", {
+  skip_if_not_installed("copula")
+  set.seed(123)
+  n <- 500
+  z <- rnorm(n)
+  data <- data.frame(
+    time = rep(seq.POSIXt(as.POSIXct("2020-01-01"), by = "hour", length.out = n), 2),
+    station_id = rep(c("M2", "M3"), each = n),
+    wave_height = c(3 + z, 3 + 0.9 * z + rnorm(n, 0, 0.3)),
+    stringsAsFactors = FALSE
+  )
+
+  result <- compute_extremal_dependence(data, n_bootstrap = 10)
+  dt <- result$dependence_table
+
+  # With strong correlation, Kendall's tau should be positive
+
+  expect_true(dt$kendall_tau > 0.3)
+  # Lambda should be positive
+  expect_true(dt$lambda_upper > 0)
+  # With 2000 strongly correlated obs, h1 should be significant
+  expect_true(dt$h1_significant)
+})
+
+test_that("compute_extremal_dependence handles multiple station pairs", {
+  skip_if_not_installed("copula")
+  set.seed(42)
+  n <- 500
+  time_seq <- seq.POSIXt(as.POSIXct("2020-01-01"), by = "hour", length.out = n)
+  data <- data.frame(
+    time = rep(time_seq, 3),
+    station_id = rep(c("M2", "M3", "M4"), each = n),
+    wave_height = c(rnorm(n, 3, 1), rnorm(n, 2.5, 0.8), rnorm(n, 2, 0.6)),
+    stringsAsFactors = FALSE
+  )
+
+  result <- compute_extremal_dependence(data, n_bootstrap = 10)
+  # 3 stations = 3 pairs: M2-M3, M2-M4, M3-M4
+  expect_equal(nrow(result$dependence_table), 3)
+})
+
+test_that("compute_extremal_dependence errors on missing columns", {
+  data <- data.frame(time = Sys.time(), station_id = "M2")
+  expect_error(
+    compute_extremal_dependence(data),
+    "Missing required columns"
+  )
+})
+
+test_that("compute_extremal_dependence errors on single station", {
+  data <- data.frame(
+    time = Sys.time() + 1:100,
+    station_id = "M2",
+    wave_height = rnorm(100)
+  )
+  expect_error(
+    compute_extremal_dependence(data),
+    "at least 2 stations"
+  )
+})
+
+test_that("compute_extremal_dependence skips pairs with insufficient data", {
+  skip_if_not_installed("copula")
+  # M2 has 500 obs, M3 has only 10 — should skip the pair
+  data <- data.frame(
+    time = c(
+      seq.POSIXt(as.POSIXct("2020-01-01"), by = "hour", length.out = 500),
+      seq.POSIXt(as.POSIXct("2025-01-01"), by = "hour", length.out = 10)
+    ),
+    station_id = c(rep("M2", 500), rep("M3", 10)),
+    wave_height = rnorm(510, 3, 1),
+    stringsAsFactors = FALSE
+  )
+
+  result <- compute_extremal_dependence(data, n_bootstrap = 5)
+  # No overlapping times, so pair should be skipped
+  expect_true(
+    nrow(result$dependence_table) == 0 || !is.null(result$error)
+  )
+})
