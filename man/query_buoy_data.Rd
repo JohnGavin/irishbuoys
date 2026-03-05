@@ -10,8 +10,7 @@ query_buoy_data(
   start_date = NULL,
   end_date = NULL,
   variables = NULL,
-  qc_filter = TRUE,
-  sql_query = NULL
+  qc_filter = TRUE
 )
 }
 \arguments{
@@ -26,8 +25,6 @@ query_buoy_data(
 \item{variables}{Character vector of variables to return}
 
 \item{qc_filter}{Logical, filter for good quality data only (default: TRUE)}
-
-\item{sql_query}{Optional custom SQL query (bypasses dplyr)}
 }
 \value{
 Data frame with query results
