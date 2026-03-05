@@ -4,11 +4,13 @@
 
 plan_email_report <- list(
   # Generate weekly summary data
+  # data_update dependency ensures fresh data before email generation
   targets::tar_target(
     email_summary_data,
     generate_weekly_summary(
       db_path = "inst/extdata/irish_buoys.duckdb",
-      lookback_days = 7
+      lookback_days = 7,
+      update_result = data_update
     )
   ),
 
@@ -19,9 +21,23 @@ plan_email_report <- list(
   ),
 
   # Send email or save preview
+  # Freshness check HERE (not in email_summary_data) because this target
+
+  # always runs even when email_summary_data is cached from targets-runs.
   targets::tar_target(
     email_sent,
     {
+      # Gate: refuse to send stale emails
+      stats <- email_summary_data$ingestion_stats
+      if (!is.null(stats) && nrow(stats) > 0) {
+        validate_email_freshness(stats, max_stale_hours = 96)
+      } else {
+        cli::cli_abort(c(
+          "x" = "Refusing to send email: no ingestion data available.",
+          "i" = "The data_update target may have failed or returned cached stale data."
+        ))
+      }
+
       gmail_user <- Sys.getenv("GMAIL_USERNAME")
       gmail_pass <- Sys.getenv("GMAIL_APP_PASSWORD")
 
