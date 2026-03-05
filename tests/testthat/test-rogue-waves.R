@@ -125,3 +125,115 @@ test_that("compare_rogue_wave_gust handles all-NA wave data", {
   result <- compare_rogue_wave_gust(data)
   expect_equal(result$n_events[1], 0)  # No rogue waves
 })
+
+# --- Tests for test_rogue_propagation ---
+
+test_that("test_rogue_propagation returns expected structure", {
+  set.seed(42)
+  n <- 2000
+  time_seq <- seq.POSIXt(as.POSIXct("2020-01-01"), by = "hour", length.out = n)
+
+  # Two stations with some rogue events
+  data <- data.frame(
+    time = rep(time_seq, 2),
+    station_id = rep(c("M2", "M3"), each = n),
+    wave_height = c(rgamma(n, 4, 1.2), rgamma(n, 3.5, 1.2)),
+    hmax = c(rgamma(n, 6, 1.0), rgamma(n, 5.5, 1.0)),
+    stringsAsFactors = FALSE
+  )
+
+  result <- test_rogue_propagation(
+    data,
+    station_pairs = list(c("M2", "M3")),
+    n_permutations = 20
+  )
+
+  expect_type(result, "list")
+  expect_true("h3_table" %in% names(result))
+  expect_true("rogue_events" %in% names(result))
+  expect_true("n_rogue_total" %in% names(result))
+
+  h3 <- result$h3_table
+  expect_s3_class(h3, "data.frame")
+  expected_cols <- c(
+    "station1", "station2", "distance_km", "theoretical_lag_hrs",
+    "n_rogue_s1", "n_rogue_s2", "p_value", "h3_significant", "h3_verdict"
+  )
+  expect_true(all(expected_cols %in% names(h3)))
+})
+
+test_that("test_rogue_propagation errors on missing columns", {
+  data <- data.frame(time = Sys.time(), station_id = "M2", wave_height = 3)
+  expect_error(
+    test_rogue_propagation(data),
+    "Missing required columns"
+  )
+})
+
+test_that("test_rogue_propagation handles no rogue events", {
+  set.seed(42)
+  n <- 200
+  # All hmax/wave_height ratios < 2 so no rogues
+  data <- data.frame(
+    time = rep(seq.POSIXt(as.POSIXct("2020-01-01"), by = "hour", length.out = n), 2),
+    station_id = rep(c("M2", "M3"), each = n),
+    wave_height = rep(3, 2 * n),
+    hmax = rep(4, 2 * n),
+    stringsAsFactors = FALSE
+  )
+
+  result <- test_rogue_propagation(data, n_permutations = 10)
+  expect_equal(nrow(result$h3_table), 0)
+  expect_equal(result$n_rogue_total, 0)
+})
+
+test_that("test_rogue_propagation skips pairs with too few rogues", {
+  set.seed(42)
+  n <- 500
+  time_seq <- seq.POSIXt(as.POSIXct("2020-01-01"), by = "hour", length.out = n)
+
+  # M2 gets many rogues, M3 gets only 1
+  wh_m2 <- rep(3, n)
+  hmax_m2 <- rep(4, n)
+  hmax_m2[1:20] <- 8  # 20 rogues
+
+  wh_m3 <- rep(3, n)
+  hmax_m3 <- rep(4, n)
+  hmax_m3[1] <- 8  # Only 1 rogue
+
+  data <- data.frame(
+    time = rep(time_seq, 2),
+    station_id = rep(c("M2", "M3"), each = n),
+    wave_height = c(wh_m2, wh_m3),
+    hmax = c(hmax_m2, hmax_m3),
+    stringsAsFactors = FALSE
+  )
+
+  result <- test_rogue_propagation(
+    data,
+    station_pairs = list(c("M2", "M3")),
+    n_permutations = 10
+  )
+
+  h3 <- result$h3_table
+  expect_equal(nrow(h3), 1)
+  # Should be INCONCLUSIVE due to too few rogues at M3
+  expect_true(grepl("INCONCLUSIVE", h3$h3_verdict))
+  expect_true(is.na(h3$p_value))
+})
+
+test_that("test_rogue_propagation filters to valid station pairs", {
+  set.seed(42)
+  n <- 200
+  # Only M2 data, no M3/M6 — should yield no valid pairs
+  data <- data.frame(
+    time = seq.POSIXt(as.POSIXct("2020-01-01"), by = "hour", length.out = n),
+    station_id = "M2",
+    wave_height = rgamma(n, 4, 1.2),
+    hmax = rgamma(n, 8, 1.0),
+    stringsAsFactors = FALSE
+  )
+
+  result <- test_rogue_propagation(data, n_permutations = 10)
+  expect_equal(nrow(result$h3_table), 0)
+})
