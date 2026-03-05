@@ -1,0 +1,141 @@
+---
+title: "Spatial Extreme Value Analysis"
+format:
+  html:
+    toc: true
+    code-fold: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+#| include: false
+
+library(targets)
+library(dplyr)
+library(DT)
+
+# Set targets store to project root
+targets::tar_config_set(store = "../_targets")
+
+# Load pre-computed results (ZERO computation in vignette)
+targets::tar_load(c(
+  spatial_evt_results,
+  spatial_dependence_table,
+  spatial_rogue_h3_table
+))
+```
+
+## Overview
+
+This vignette presents the spatial extreme value analysis of significant wave
+heights across the Irish Marine Buoy Network. Three hypotheses are tested:
+
+- **H1 (Spatial Coherence):** Do extreme wave events show significant spatial
+  dependence between stations?
+- **H3 (Rogue Wave Propagation):** Do rogue wave events at one station cluster
+  temporally with events at another, consistent with wave propagation?
+- **Max-Stable Process:** Can a Brown-Resnick max-stable model capture the
+  joint spatial extremal structure? (Illustrative only — 5 stations is below
+  the recommended minimum of ~20.)
+
+## H1: Pairwise Extremal Dependence
+
+The upper tail dependence coefficient $\lambda_U$ is estimated for all station
+pairs via Gumbel copula fitting. For a Gumbel copula with parameter $\alpha$:
+
+$$\lambda_U = 2 - 2^{1/\alpha}$$
+
+Bootstrap confidence intervals (100 replicates) determine whether $\lambda_U$
+is significantly greater than zero.
+
+```{r h1-table}
+spatial_dependence_table |>
+  mutate(
+    across(c(kendall_tau, lambda_upper, lambda_upper_ci_low, lambda_upper_ci_high),
+           \(x) round(x, 3)),
+    distance_km = round(distance_km, 0),
+    h1_verdict = ifelse(h1_significant, "Significant", "Not significant")
+  ) |>
+  select(
+    `Station 1` = station1,
+    `Station 2` = station2,
+    `Distance (km)` = distance_km,
+    `Kendall tau` = kendall_tau,
+    `Lambda U` = lambda_upper,
+    `CI Low` = lambda_upper_ci_low,
+    `CI High` = lambda_upper_ci_high,
+    `N obs` = n_concurrent,
+    Verdict = h1_verdict
+  ) |>
+  DT::datatable(
+    caption = "Pairwise upper tail dependence (Gumbel copula, 95% bootstrap CI)",
+    options = list(pageLength = 15, dom = "t"),
+    rownames = FALSE
+  )
+```
+
+**Key finding:** `r spatial_evt_results$n_h1_significant` of
+`r spatial_evt_results$n_pairs` station pairs show significant positive
+extremal dependence ($\lambda_U$ CI > 0).
+
+## H3: Rogue Wave Spatial Propagation
+
+Rogue waves are defined as events where $H_{max} > 2.0 \times H_s$ with
+$H_s \geq 2.0$ m. For each directed station pair, a permutation test
+(500 replicates) assesses whether rogue events at the source station are
+followed by rogue events at the receiver station within a propagation
+time window (distance / 30 km/h deep-water group velocity).
+
+```{r h3-table}
+if (nrow(spatial_rogue_h3_table) > 0) {
+  spatial_rogue_h3_table |>
+    mutate(
+      across(c(co_occurrence_rate, marginal_rate, perm_mean_rate, p_value),
+             \(x) round(x, 3)),
+      distance_km = round(distance_km, 0),
+      theoretical_lag_hrs = round(theoretical_lag_hrs, 1)
+    ) |>
+    select(
+      Source = station1,
+      Receiver = station2,
+      `Distance (km)` = distance_km,
+      `Lag (hrs)` = theoretical_lag_hrs,
+      `N rogues (src)` = n_rogue_s1,
+      `N rogues (rcv)` = n_rogue_s2,
+      `Co-occur rate` = co_occurrence_rate,
+      `Marginal rate` = marginal_rate,
+      `p-value` = p_value,
+      Verdict = h3_verdict
+    ) |>
+    DT::datatable(
+      caption = "Rogue wave spatial clustering permutation test",
+      options = list(pageLength = 15, dom = "t"),
+      rownames = FALSE
+    )
+} else {
+  cat("No rogue wave events detected — H3 test not applicable.")
+}
+```
+
+**Result:** `r spatial_evt_results$n_h3_significant` pairs show significant
+spatial clustering of rogue wave events (p < 0.05).
+
+## Max-Stable Process
+
+```{r maxstable}
+ms <- spatial_evt_results$maxstable
+if (ms$fitted) {
+  cat(sprintf(
+    "A %s max-stable model was fitted successfully.\nParameters: %s\n",
+    ms$model_type,
+    paste(names(ms$parameters), round(ms$parameters, 3), sep = " = ", collapse = ", ")
+  ))
+} else {
+  cat("Max-stable model fitting failed or was not attempted.\n")
+  if (!is.null(ms$reason)) cat("Reason:", ms$reason, "\n")
+}
+cat("\nLimitation:", ms$limitation)
+```

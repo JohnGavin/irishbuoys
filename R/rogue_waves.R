@@ -415,3 +415,227 @@ rogue_wave_report <- function(con, days = 30) {
 
   return(report)
 }
+
+#' Test Spatial Propagation of Rogue Wave Events
+#'
+#' @description
+#' Tests whether rogue wave events at one station are followed by rogue events
+#' at another station within a time window consistent with wave propagation.
+#' Uses a permutation test: the null hypothesis is that rogue events at the
+#' second station are uniformly distributed over time (no clustering with the
+#' first station).
+#'
+#' For each station pair, the theoretical propagation lag is estimated as
+#' `distance_km / propagation_speed_kmh` (default 30 km/h for deep-water
+#' swell group velocity). Co-occurrence is counted when a station-2 rogue event
+#' falls within `[lag - tolerance, lag + tolerance]` hours of a station-1 event.
+#'
+#' @param data Data frame with columns: `time` (POSIXct), `station_id`
+#'   (character), `wave_height` (numeric), `hmax` (numeric).
+#' @param rogue_threshold Hmax/Hs ratio threshold for rogue classification
+#'   (default: 2.0).
+#' @param min_wave_height Minimum significant wave height in metres for a
+#'   qualifying observation (default: 2.0).
+#' @param station_pairs Optional list of character vectors, each of length 2,
+#'   specifying directed pairs `c(source, receiver)`. If `NULL`, uses default
+#'   focus pairs: M6->M2, M6->M3, M6->M5, M2->M3, M3->M5.
+#' @param propagation_speed_kmh Assumed deep-water group velocity in km/h
+#'   (default: 30).
+#' @param n_permutations Number of permutations for the test (default: 500).
+#' @param station_info Optional data frame from [get_station_info()]. If `NULL`,
+#'   uses the default 5-station network.
+#'
+#' @return List with:
+#'   \describe{
+#'     \item{h3_table}{Data frame with columns: `station1`, `station2`,
+#'       `distance_km`, `theoretical_lag_hrs`, `n_rogue_s1`, `n_rogue_s2`,
+#'       `co_occurrence_count`, `co_occurrence_rate`, `marginal_rate`,
+#'       `perm_mean_rate`, `p_value`, `h3_significant` (logical), `h3_verdict`.}
+#'     \item{rogue_events}{Data frame of all detected rogue wave events.}
+#'     \item{n_rogue_total}{Total number of rogue events across all stations.}
+#'   }
+#'
+#' @family rogue-waves
+#' @export
+#' @examples
+#' \dontrun{
+#' con <- connect_duckdb()
+#' data <- query_buoy_data(con, variables = c("time", "station_id", "wave_height", "hmax"))
+#' result <- test_rogue_propagation(data)
+#' result$h3_table
+#' DBI::dbDisconnect(con)
+#' }
+test_rogue_propagation <- function(
+    data,
+    rogue_threshold = 2.0,
+    min_wave_height = 2.0,
+    station_pairs = NULL,
+    propagation_speed_kmh = 30,
+    n_permutations = 500,
+    station_info = NULL
+) {
+  # Validate inputs
+  required_cols <- c("time", "station_id", "wave_height", "hmax")
+  missing_cols <- setdiff(required_cols, names(data))
+  if (length(missing_cols) > 0) {
+    cli::cli_abort(c(
+      "x" = "Missing required columns: {.val {missing_cols}}",
+      "i" = "Data must contain: {.val {required_cols}}"
+    ))
+  }
+
+  if (is.null(station_info)) {
+    station_info <- get_station_info()
+  }
+  dist_matrix <- station_distance_matrix(station_info)
+
+  # Identify rogue events
+  valid_idx <- !is.na(data$hmax) & !is.na(data$wave_height) &
+    data$wave_height >= min_wave_height
+  rogue_data <- data[valid_idx, ]
+  rogue_data$rogue_ratio <- rogue_data$hmax / rogue_data$wave_height
+  rogue_data$is_rogue <- rogue_data$rogue_ratio > rogue_threshold
+
+  rogue_events <- rogue_data[rogue_data$is_rogue, ]
+  cli::cli_alert_info(
+    "Detected {nrow(rogue_events)} rogue events out of {nrow(rogue_data)} qualifying observations"
+  )
+
+  if (nrow(rogue_events) == 0) {
+    cli::cli_alert_warning("No rogue wave events detected")
+    return(list(
+      h3_table = data.frame(),
+      rogue_events = rogue_events,
+      n_rogue_total = 0
+    ))
+  }
+
+  # Default station pairs
+  if (is.null(station_pairs)) {
+    station_pairs <- list(
+      c("M6", "M2"), c("M6", "M3"), c("M6", "M5"),
+      c("M2", "M3"), c("M3", "M5")
+    )
+  }
+
+  # Filter to pairs where both stations exist in data
+  available_stations <- unique(data$station_id)
+  station_pairs <- Filter(function(p) {
+    p[1] %in% available_stations && p[2] %in% available_stations
+  }, station_pairs)
+
+  if (length(station_pairs) == 0) {
+    cli::cli_alert_warning("No valid station pairs found in data")
+    return(list(
+      h3_table = data.frame(),
+      rogue_events = rogue_events,
+      n_rogue_total = nrow(rogue_events)
+    ))
+  }
+
+  cli::cli_alert_info(
+    "Testing rogue propagation for {length(station_pairs)} station pairs ({n_permutations} permutations)"
+  )
+
+  total_hours <- as.numeric(
+    difftime(max(rogue_data$time), min(rogue_data$time), units = "hours")
+  )
+
+  results <- lapply(station_pairs, function(pair) {
+    s1 <- pair[1]
+    s2 <- pair[2]
+
+    # Distance and theoretical lag
+    dist_km <- if (s1 %in% rownames(dist_matrix) && s2 %in% colnames(dist_matrix)) {
+      dist_matrix[s1, s2]
+    } else {
+      NA_real_
+    }
+    theoretical_lag_hrs <- dist_km / propagation_speed_kmh
+
+    # Rogue event times at each station
+    r1_times <- rogue_events$time[rogue_events$station_id == s1]
+    r2_times <- rogue_events$time[rogue_events$station_id == s2]
+
+    if (length(r1_times) < 3 || length(r2_times) < 3) {
+      cli::cli_alert_warning(
+        "Skipping {s1}->{s2}: too few rogues ({length(r1_times)}, {length(r2_times)})"
+      )
+      return(data.frame(
+        station1 = s1, station2 = s2,
+        distance_km = dist_km,
+        theoretical_lag_hrs = theoretical_lag_hrs,
+        n_rogue_s1 = length(r1_times), n_rogue_s2 = length(r2_times),
+        co_occurrence_count = NA_integer_,
+        co_occurrence_rate = NA_real_, marginal_rate = NA_real_,
+        perm_mean_rate = NA_real_, p_value = NA_real_,
+        h3_significant = NA,
+        h3_verdict = "INCONCLUSIVE - too few rogue events",
+        stringsAsFactors = FALSE, row.names = NULL
+      ))
+    }
+
+    # Co-occurrence window
+    lag_window <- max(1, round(theoretical_lag_hrs))
+    tolerance <- max(2, lag_window)
+
+    # Count observed co-occurrences
+    r1_num <- as.numeric(r1_times)
+    r2_num <- as.numeric(r2_times)
+    co_occur <- sum(vapply(r1_num, function(t1) {
+      time_diffs_hrs <- (r2_num - t1) / 3600
+      any(abs(time_diffs_hrs - lag_window) <= tolerance)
+    }, logical(1)))
+    obs_rate <- co_occur / length(r1_times)
+
+    # Marginal rate
+    marginal_rate <- length(r2_times) * (2 * tolerance) / total_hours
+
+    # Permutation test
+    all_s2_times <- data$time[data$station_id == s2]
+    all_s2_num <- as.numeric(all_s2_times)
+    perm_rates <- replicate(n_permutations, {
+      perm_r2 <- sample(all_s2_num, length(r2_times), replace = FALSE)
+      perm_co <- sum(vapply(r1_num, function(t1) {
+        any(abs((perm_r2 - t1) / 3600 - lag_window) <= tolerance)
+      }, logical(1)))
+      perm_co / length(r1_times)
+    })
+
+    p_value <- mean(perm_rates >= obs_rate)
+    is_sig <- p_value < 0.05
+
+    data.frame(
+      station1 = s1, station2 = s2,
+      distance_km = dist_km,
+      theoretical_lag_hrs = theoretical_lag_hrs,
+      n_rogue_s1 = length(r1_times), n_rogue_s2 = length(r2_times),
+      co_occurrence_count = co_occur,
+      co_occurrence_rate = obs_rate,
+      marginal_rate = marginal_rate,
+      perm_mean_rate = mean(perm_rates),
+      p_value = p_value,
+      h3_significant = is_sig,
+      h3_verdict = if (is_sig) {
+        "SUPPORTED - significant spatial clustering"
+      } else {
+        "NOT SUPPORTED - no significant clustering"
+      },
+      stringsAsFactors = FALSE, row.names = NULL
+    )
+  })
+
+  h3_table <- do.call(rbind, results)
+  row.names(h3_table) <- NULL
+
+  n_sig <- sum(h3_table$h3_significant, na.rm = TRUE)
+  cli::cli_alert_success(
+    "{n_sig}/{nrow(h3_table)} pairs show significant rogue wave clustering (p < 0.05)"
+  )
+
+  list(
+    h3_table = h3_table,
+    rogue_events = rogue_events,
+    n_rogue_total = nrow(rogue_events)
+  )
+}
