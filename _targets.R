@@ -47,6 +47,7 @@ for (plan_file in plan_files) {
 # explicitly here to ensure correct execution order and visibility
 list(
   plan_data_acquisition,
+  plan_data_validation,  # Temporal coverage, gaps, freshness, duplicates
   plan_quality_control,
   plan_wave_analysis,
   plan_joint_analysis,  # Joint distributions between buoys (issue #13)
