@@ -564,3 +564,215 @@ joint_analysis_summary <- function(data, variable = "wave_height") {
     variable = variable
   )
 }
+
+#' Compute Pairwise Extremal Dependence Across Stations
+#'
+#' @description
+#' Estimates the upper tail dependence coefficient (lambda_U) for all unique
+#' station pairs using a Gumbel copula. For Gumbel copula with parameter alpha,
+#' lambda_U = 2 - 2^(1/alpha). Bootstrap confidence intervals assess whether
+#' lambda_U is significantly greater than zero (H1: spatial coherence of extremes).
+#'
+#' Also computes empirical chi statistics at multiple quantile levels and
+#' Kendall's tau for overall rank dependence.
+#'
+#' @param data Data frame with columns: `time` (POSIXct), `station_id` (character),
+#'   and the variable specified by `variable`.
+#' @param variable Variable to analyze (default: `"wave_height"`).
+#' @param threshold_quantile Quantile levels at which to compute empirical chi
+#'   (default: `seq(0.9, 0.99, by = 0.01)`).
+#' @param n_bootstrap Number of bootstrap replicates for lambda CI (default: 100).
+#' @param boot_subsample Maximum observations per bootstrap replicate. Subsampling
+#'   speeds computation for large datasets (default: 5000).
+#' @param station_info Optional data frame with station metadata (from
+#'   [get_station_info()]). If `NULL`, uses the default 5-station network.
+#'
+#' @return List with:
+#'   \describe{
+#'     \item{dependence_table}{Data frame with columns: `station1`, `station2`,
+#'       `distance_km`, `kendall_tau`, `lambda_upper`, `lambda_lower`,
+#'       `lambda_upper_ci_low`, `lambda_upper_ci_high`, `n_concurrent`,
+#'       `copula_alpha`, `chi_q95`, `chi_q99`, `h1_significant` (logical).}
+#'     \item{method}{Character: `"gumbel_copula"`.}
+#'     \item{n_bootstrap}{Integer: number of bootstrap replicates used.}
+#'     \item{threshold_quantile}{Numeric vector of quantile levels for chi.}
+#'   }
+#'   If the copula package is unavailable or no valid pairs exist, returns
+#'   a list with an `error` field.
+#'
+#' @family joint-analysis
+#' @export
+#' @examples
+#' \dontrun{
+#' con <- connect_duckdb()
+#' data <- query_buoy_data(con, variables = c("time", "station_id", "wave_height"))
+#' result <- compute_extremal_dependence(data)
+#' result$dependence_table
+#' DBI::dbDisconnect(con)
+#' }
+compute_extremal_dependence <- function(
+    data,
+    variable = "wave_height",
+    threshold_quantile = seq(0.9, 0.99, by = 0.01),
+    n_bootstrap = 100,
+    boot_subsample = 5000,
+    station_info = NULL
+) {
+  if (!requireNamespace("copula", quietly = TRUE)) {
+    cli::cli_abort(c(
+      "x" = "Package {.pkg copula} is required for extremal dependence analysis.",
+      "i" = "Add {.pkg copula} to your Nix environment."
+    ))
+  }
+
+  # Validate inputs
+  required_cols <- c("time", "station_id", variable)
+  missing_cols <- setdiff(required_cols, names(data))
+  if (length(missing_cols) > 0) {
+    cli::cli_abort(c(
+      "x" = "Missing required columns: {.val {missing_cols}}",
+      "i" = "Data must contain: {.val {required_cols}}"
+    ))
+  }
+
+  if (is.null(station_info)) {
+    station_info <- get_station_info()
+  }
+  dist_matrix <- station_distance_matrix(station_info)
+
+  stations <- sort(unique(data$station_id))
+  if (length(stations) < 2) {
+    cli::cli_abort(c(
+      "x" = "Need at least 2 stations, found {length(stations)}.",
+      "i" = "Check {.arg data$station_id}."
+    ))
+  }
+
+  pairs <- utils::combn(stations, 2, simplify = FALSE)
+  cli::cli_alert_info(
+    "Computing extremal dependence for {length(pairs)} station pairs ({n_bootstrap} bootstrap replicates)"
+  )
+
+  results <- lapply(pairs, function(pair) {
+    s1 <- pair[1]
+    s2 <- pair[2]
+
+    # Align observations by time
+    d1 <- data[data$station_id == s1, c("time", variable)]
+    d2 <- data[data$station_id == s2, c("time", variable)]
+    names(d1) <- c("time", "v1")
+    names(d2) <- c("time", "v2")
+
+    joined <- merge(d1, d2, by = "time", all = FALSE)
+    joined <- joined[stats::complete.cases(joined), ]
+
+    if (nrow(joined) < 100) {
+      cli::cli_alert_warning(
+        "Skipping {s1}-{s2}: only {nrow(joined)} concurrent observations"
+      )
+      return(NULL)
+    }
+
+    # Empirical chi at quantile levels
+    chi_vals <- vapply(threshold_quantile, function(q) {
+      u1 <- stats::quantile(joined$v1, q)
+      u2 <- stats::quantile(joined$v2, q)
+      n_s1_exceed <- sum(joined$v1 > u1)
+      if (n_s1_exceed == 0) return(NA_real_)
+      sum(joined$v1 > u1 & joined$v2 > u2) / n_s1_exceed
+    }, numeric(1))
+    names(chi_vals) <- paste0("q", threshold_quantile)
+
+    # Kendall's tau (subsample for speed)
+    if (nrow(joined) > 10000) {
+      tau_idx <- sample(nrow(joined), 10000)
+      tau <- stats::cor(joined$v1[tau_idx], joined$v2[tau_idx], method = "kendall")
+    } else {
+      tau <- stats::cor(joined$v1, joined$v2, method = "kendall")
+    }
+
+    # Fit Gumbel copula for upper tail dependence
+    cop_result <- tryCatch({
+      u_obs <- copula::pobs(cbind(joined$v1, joined$v2))
+      gumbel_fit <- copula::fitCopula(
+        copula::gumbelCopula(dim = 2), u_obs, method = "ml"
+      )
+      alpha <- copula::coef(gumbel_fit)
+      lambda_U <- 2 - 2^(1 / alpha)
+
+      # Bootstrap CI for lambda_U
+      boot_n <- min(nrow(u_obs), boot_subsample)
+      lambda_boot <- replicate(n_bootstrap, {
+        idx <- sample(nrow(u_obs), boot_n, replace = TRUE)
+        tryCatch({
+          fit_b <- copula::fitCopula(
+            copula::gumbelCopula(dim = 2), u_obs[idx, ], method = "ml"
+          )
+          2 - 2^(1 / copula::coef(fit_b))
+        }, error = function(e) NA_real_)
+      })
+      lambda_ci <- stats::quantile(lambda_boot, c(0.025, 0.975), na.rm = TRUE)
+
+      list(
+        alpha = alpha,
+        lambda_U = lambda_U,
+        ci_low = unname(lambda_ci[1]),
+        ci_high = unname(lambda_ci[2])
+      )
+    }, error = function(e) {
+      cli::cli_alert_warning("Copula fit failed for {s1}-{s2}: {e$message}")
+      list(alpha = NA_real_, lambda_U = NA_real_, ci_low = NA_real_, ci_high = NA_real_)
+    })
+
+    # Distance
+    dist_km <- if (s1 %in% rownames(dist_matrix) && s2 %in% colnames(dist_matrix)) {
+      dist_matrix[s1, s2]
+    } else {
+      NA_real_
+    }
+
+    data.frame(
+      station1 = s1,
+      station2 = s2,
+      distance_km = dist_km,
+      kendall_tau = tau,
+      lambda_upper = cop_result$lambda_U,
+      # Gumbel copula has lambda_L = 0 by construction (upper-tail-only dependence)
+      lambda_lower = 0,
+      lambda_upper_ci_low = cop_result$ci_low,
+      lambda_upper_ci_high = cop_result$ci_high,
+      n_concurrent = nrow(joined),
+      copula_alpha = cop_result$alpha,
+      chi_q95 = chi_vals["q0.95"],
+      chi_q99 = chi_vals["q0.99"],
+      h1_significant = !is.na(cop_result$ci_low) && cop_result$ci_low > 0,
+      stringsAsFactors = FALSE,
+      row.names = NULL
+    )
+  })
+
+  dep_table <- do.call(rbind, Filter(Negate(is.null), results))
+  row.names(dep_table) <- NULL
+
+  if (is.null(dep_table) || nrow(dep_table) == 0) {
+    return(list(
+      dependence_table = data.frame(),
+      method = "gumbel_copula",
+      n_bootstrap = n_bootstrap,
+      threshold_quantile = threshold_quantile,
+      error = "No valid station pairs with sufficient concurrent data"
+    ))
+  }
+
+  n_sig <- sum(dep_table$h1_significant, na.rm = TRUE)
+  cli::cli_alert_success(
+    "{n_sig}/{nrow(dep_table)} pairs show significant positive extremal dependence (lambda CI > 0)"
+  )
+
+  list(
+    dependence_table = dep_table,
+    method = "gumbel_copula",
+    n_bootstrap = n_bootstrap,
+    threshold_quantile = threshold_quantile
+  )
+}
