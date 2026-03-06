@@ -133,7 +133,7 @@ jobs:
           nix-shell default.nix -A shell --run "Rscript -e '
             targets::tar_config_set(store = \"_targets\")
             targets::tar_make()
-          '" || echo "Targets pipeline completed with warnings"
+          '"
 
       # ── Verify Email Freshness ───────────────────────────────
       # Fail-fast: if email_summary_data has stale ingestion_stats, abort
