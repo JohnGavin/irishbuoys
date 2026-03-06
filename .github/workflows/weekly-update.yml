@@ -171,8 +171,8 @@ jobs:
 
       - name: Render vignettes (explicit re-render after data update)
         run: |
-          # dashboard_static is rendered by tar_make() via plan_vignettes target
-          for qmd in wave_analysis telemetry api-usage; do
+          # All vignettes rendered explicitly (vignette targets excluded from tar_make)
+          for qmd in dashboard_static wave_analysis telemetry api-usage; do
             echo "::group::Rendering ${qmd}"
             nix-shell default.nix -A shell --run "
               cd vignettes && quarto render ${qmd}.qmd
