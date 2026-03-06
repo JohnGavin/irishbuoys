@@ -33,7 +33,7 @@ plan_wave_analysis <- list(
   # ========================================
 
   # Load all historical data from DuckDB (filtered for analysis)
-  # Uses dplyr verbs translated to SQL for efficient DuckDB execution
+  # Always re-run: DuckDB is ephemeral in CI (rebuilt from ERDDAP each run)
   targets::tar_target(
     analysis_data,
     {
@@ -59,7 +59,8 @@ plan_wave_analysis <- list(
       cli::cli_alert_success("Loaded {nrow(data)} QC-passed observations")
       # Validate with pointblank (falls back to basic validation if not installed)
       validate_buoy_data(data, "analysis_data", min_rows = 100)
-    }
+    },
+    cue = targets::tar_cue(mode = "always")
   ),
 
   # Missing data grid: daily observation counts by station
