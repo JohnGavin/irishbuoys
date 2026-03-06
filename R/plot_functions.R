@@ -47,13 +47,13 @@ create_plot_rogue_all <- function(rogue_events) {
           type = "line",
           x0 = min(rogue_events$time), x1 = max(rogue_events$time),
           y0 = 2.0, y1 = 2.0,
-          line = list(color = "red", dash = "dash", width = 2)
+          line = list(color = "#ff4444", dash = "dash", width = 2)
         ),
         list(
           type = "line",
           x0 = min(rogue_events$time), x1 = max(rogue_events$time),
           y0 = 2.2, y1 = 2.2,
-          line = list(color = "darkred", dash = "dot", width = 1.5)
+          line = list(color = "#ff8800", dash = "dot", width = 1.5)
         )
       ),
       annotations = list(
@@ -61,13 +61,13 @@ create_plot_rogue_all <- function(rogue_events) {
           x = max(rogue_events$time), y = 2.0,
           text = "Rogue threshold (2.0)",
           showarrow = FALSE, xanchor = "right", yanchor = "bottom",
-          font = list(color = "red", size = 10)
+          font = list(color = "#ff4444", size = 10)
         ),
         list(
           x = max(rogue_events$time), y = 2.2,
           text = "Severe (2.2)",
           showarrow = FALSE, xanchor = "right", yanchor = "bottom",
-          font = list(color = "darkred", size = 10)
+          font = list(color = "#ff8800", size = 10)
         )
       )
     )
@@ -108,7 +108,7 @@ create_plot_rogue_by_station <- function(rogue_events, date_caption = NULL) {
       marker = list(
         size = 8, opacity = 0.85,
         color = station_colors[st],
-        line = list(width = 0.5, color = "black")
+        line = list(width = 0.5, color = "rgba(255, 255, 255, 0.3)")
       ),
       text = ~paste0(
         "Station: ", station_id, "<br>",
@@ -831,7 +831,7 @@ create_plot_rogue_gusts_by_station <- function(rogue_gust_events, date_caption =
       marker = list(
         size = 8, opacity = 0.85,
         color = station_colors[st],
-        line = list(width = 0.5, color = "black")
+        line = list(width = 0.5, color = "rgba(255, 255, 255, 0.3)")
       ),
       text = ~paste0(
         "Station: ", station_id, "<br>",

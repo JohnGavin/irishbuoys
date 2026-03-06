@@ -1,9 +1,9 @@
 #' Standard Plotly Theme for Irish Buoys Package
 #'
 #' @description
-#' Applies consistent styling to all plotly plots in the irishbuoys package.
-#' Includes gray 70 background (#B3B3B3), bottom-positioned horizontal legend,
-#' and white hoverlabels for readability.
+#' Applies consistent dark styling to all plotly plots in the irishbuoys package.
+#' Uses black background with white grid lines to match the Quarto cosmo dashboard
+#' theme. Bottom-positioned horizontal legend with white hoverlabels.
 #'
 #' @param p A plotly object
 #' @param title Optional title string
@@ -23,32 +23,32 @@ irishbuoys_layout <- function(p, title = NULL, ...) {
   p |> plotly::layout(
     title = list(
       text = title,
-      font = list(size = 14, color = "#1a1a1a")
+      font = list(size = 14, color = "#e0e0e0")
     ),
-    plot_bgcolor = "#B3B3B3",
-    paper_bgcolor = "#B3B3B3",
+    plot_bgcolor = "#1a1a1a",
+    paper_bgcolor = "#1a1a1a",
     xaxis = list(
-      gridcolor = "#666666",
+      gridcolor = "rgba(255, 255, 255, 0.2)",
       gridwidth = 0.5,
-      zerolinecolor = "#333333",
-      tickfont = list(color = "#1a1a1a"),
-      titlefont = list(color = "#1a1a1a")
+      zerolinecolor = "rgba(255, 255, 255, 0.3)",
+      tickfont = list(color = "#cccccc"),
+      titlefont = list(color = "#e0e0e0")
     ),
     yaxis = list(
-      gridcolor = "#666666",
+      gridcolor = "rgba(255, 255, 255, 0.2)",
       gridwidth = 0.5,
-      zerolinecolor = "#333333",
-      tickfont = list(color = "#1a1a1a"),
-      titlefont = list(color = "#1a1a1a")
+      zerolinecolor = "rgba(255, 255, 255, 0.3)",
+      tickfont = list(color = "#cccccc"),
+      titlefont = list(color = "#e0e0e0")
     ),
     legend = list(
       orientation = "h",
       y = -0.15,
       x = 0.5,
       xanchor = "center",
-      font = list(color = "#1a1a1a", size = 12),
-      bgcolor = "#D9D9D9",
-      bordercolor = "#999999",
+      font = list(color = "#e0e0e0", size = 12),
+      bgcolor = "rgba(40, 40, 40, 0.8)",
+      bordercolor = "#555555",
       borderwidth = 1
     ),
     hoverlabel = list(
