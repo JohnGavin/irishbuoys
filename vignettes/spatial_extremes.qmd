@@ -17,8 +17,9 @@ library(targets)
 library(dplyr)
 library(DT)
 
-# Set targets store to project root
-targets::tar_config_set(store = "../_targets")
+# Set targets store - works from project root or vignettes/
+store_path <- if (dir.exists("_targets")) "_targets" else "../_targets"
+targets::tar_config_set(store = store_path)
 
 # Load pre-computed results (ZERO computation in vignette)
 targets::tar_load(c(

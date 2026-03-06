@@ -19,7 +19,8 @@ execute:
 # MANDATORY: No inline computation. Every chunk is ONE expression.
 library(targets)
 
-targets::tar_config_set(store = "../_targets")
+store_path <- if (dir.exists("_targets")) "_targets" else "../_targets"
+targets::tar_config_set(store = store_path)
 
 safe_tar_read <- function(name) {
   tryCatch(
