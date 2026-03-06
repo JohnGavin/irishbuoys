@@ -39,6 +39,7 @@ plan_data_validation <- list(
           time >= .env$start_dt,
           time < .env$end_dt
         ) |>
+        dplyr::collect() |>
         dplyr::mutate(
           hour = as.POSIXct(format(time, "%Y-%m-%d %H:00:00"), tz = "UTC")
         ) |>
@@ -48,7 +49,6 @@ plan_data_validation <- list(
           n_records = dplyr::n(),
           .groups = "drop"
         ) |>
-        dplyr::collect() |>
         dplyr::mutate(
           expected_hours = expected_hours,
           coverage_pct = round(100 * actual_hours / expected_hours, 1),
@@ -102,11 +102,11 @@ plan_data_validation <- list(
           time >= .env$start_dt,
           time < .env$end_dt
         ) |>
+        dplyr::collect() |>
         dplyr::mutate(
           hour = as.POSIXct(format(time, "%Y-%m-%d %H:00:00"), tz = "UTC")
         ) |>
         dplyr::distinct(station_id, hour) |>
-        dplyr::collect() |>
         dplyr::arrange(station_id, hour) |>
         dplyr::group_by(station_id) |>
         dplyr::mutate(
