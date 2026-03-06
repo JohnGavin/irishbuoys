@@ -11,6 +11,8 @@ plan_dashboard <- list(
 
   # Prepare main buoy data for dashboard (compressed)
   # Uses dplyr verbs translated to SQL for efficient DuckDB execution
+  # Always re-run: DuckDB is ephemeral in CI (rebuilt from ERDDAP each run)
+  # Without cue = "always", targets caches stale data from targets-runs branch
   targets::tar_target(
     dashboard_buoy_data,
     {
@@ -31,7 +33,8 @@ plan_dashboard <- list(
 
       cli::cli_alert_success("Prepared {nrow(data)} records for dashboard")
       data
-    }
+    },
+    cue = targets::tar_cue(mode = "always")
   ),
 
   # Calculate dashboard statistics
