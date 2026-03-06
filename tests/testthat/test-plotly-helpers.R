@@ -7,15 +7,14 @@ test_that("irishbuoys_layout returns plotly object", {
   expect_s3_class(result, "plotly")
 })
 
-test_that("irishbuoys_layout applies gray 70 background", {
+test_that("irishbuoys_layout applies dark background", {
   skip_if_not_installed("plotly")
   p <- plotly::plot_ly(x = 1:3, y = 1:3, type = "scatter", mode = "markers")
   result <- irishbuoys_layout(p)
   layout <- result$x$layoutAttrs
-  # Check that at least one layout attribute set contains gray 70
-
+  # Check that at least one layout attribute set contains dark background
   attrs <- unlist(layout, recursive = TRUE)
-  expect_true(any(grepl("#B3B3B3", attrs)))
+  expect_true(any(grepl("#1a1a1a", attrs)))
 })
 
 test_that("irishbuoys_layout sets title when provided", {
