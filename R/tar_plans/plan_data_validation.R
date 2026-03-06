@@ -402,12 +402,12 @@ plan_data_validation <- list(
       )
 
       cli::cli_h2("Data Validation Report")
-      cli::cli_alert_info(
-        "Stations: {nrow(report$temporal_coverage)} | " %
-        "Gaps: {nrow(report$temporal_gaps)} | " %
-        "Duplicates: {report$duplicate_check$duplicates} | " %
+      cli::cli_alert_info(paste0(
+        "Stations: {nrow(report$temporal_coverage)} | ",
+        "Gaps: {nrow(report$temporal_gaps)} | ",
+        "Duplicates: {report$duplicate_check$duplicates} | ",
         "Freshness: {report$freshness$hours_old}h"
-      )
+      ))
 
       report
     },
