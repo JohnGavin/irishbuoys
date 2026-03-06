@@ -38,8 +38,9 @@ incremental_update <- function(
 
   if (is.na(latest_db)) {
     cli::cli_alert_warning("Database is empty. Performing initial data load...")
-    # If database is empty, get last 30 days
-    start_time <- Sys.Date() - 30
+    # Use lookback_hours to determine how far back to fetch
+    start_time <- Sys.time() - (lookback_hours * 3600)
+    cli::cli_alert_info("Fetching {lookback_hours} hours of historical data")
   } else {
     # Convert to POSIXct
     latest_db <- as.POSIXct(latest_db, tz = "UTC")

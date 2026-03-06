@@ -17,19 +17,22 @@ compute_data_coverage <- function(con, start_date, end_date) {
   )
 
   # Hourly coverage per station
+  # Collect first, then truncate to hour in R (clock/lubridate not available on DuckDB)
   coverage <- buoy_tbl(con) |>
     dplyr::filter(
       .data$time >= !!as.POSIXct(start_date, tz = "UTC"),
       .data$time < !!as.POSIXct(end_date, tz = "UTC")
     ) |>
-    dplyr::mutate(hour = clock::date_floor(.data$time, "hour")) |>
+    dplyr::collect() |>
+    dplyr::mutate(
+      hour = as.POSIXct(format(.data$time, "%Y-%m-%d %H:00:00"), tz = "UTC")
+    ) |>
     dplyr::group_by(.data$station_id) |>
     dplyr::summarise(
       actual_hours = dplyr::n_distinct(.data$hour),
       n_records = dplyr::n(),
       .groups = "drop"
     ) |>
-    dplyr::collect() |>
     dplyr::mutate(
       expected_hours = expected_hours,
       coverage_pct = round(100 * .data$actual_hours / expected_hours, 1),
@@ -37,14 +40,17 @@ compute_data_coverage <- function(con, start_date, end_date) {
     )
 
   # Gap detection: gaps >= 6 hours
+  # Collect first, then truncate to hour in R
   all_obs <- buoy_tbl(con) |>
     dplyr::filter(
       .data$time >= !!as.POSIXct(start_date, tz = "UTC"),
       .data$time < !!as.POSIXct(end_date, tz = "UTC")
     ) |>
-    dplyr::mutate(hour = clock::date_floor(.data$time, "hour")) |>
-    dplyr::distinct(.data$station_id, .data$hour) |>
     dplyr::collect() |>
+    dplyr::mutate(
+      hour = as.POSIXct(format(.data$time, "%Y-%m-%d %H:00:00"), tz = "UTC")
+    ) |>
+    dplyr::distinct(.data$station_id, .data$hour) |>
     dplyr::arrange(.data$station_id, .data$hour) |>
     dplyr::group_by(.data$station_id) |>
     dplyr::mutate(

@@ -103,7 +103,9 @@ jobs:
 
       - name: Fetch fresh data (before pipeline)
         env:
-          LOOKBACK_HOURS: '168'
+          # Full history: DuckDB is ephemeral in CI, so fetch all data since 2019
+          # (~65000 hours = 7.4 years). incremental_update() uses this when DB is empty.
+          LOOKBACK_HOURS: '65000'
         run: |
           nix-shell default.nix -A shell --run "Rscript -e '
             pkgload::load_all(quiet = TRUE)
