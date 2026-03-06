@@ -36,8 +36,9 @@ if (requireNamespace("devtools", quietly = TRUE)) {
 
 theme_set(theme_minimal(base_size = 12))
 
-# Set targets store to project root
-targets::tar_config_set(store = "../_targets")
+# Set targets store - works from project root or vignettes/
+store_path <- if (dir.exists("_targets")) "_targets" else "../_targets"
+targets::tar_config_set(store = store_path)
 
 # Load targets data only - generate plots inline to keep file size small
 # NOTE: Pre-computed plotly objects embed all data as JSON (20MB+)

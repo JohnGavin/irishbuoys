@@ -19,7 +19,8 @@ execute:
 # MANDATORY: Uses FULL historical data (2019-2026), never sampled.
 library(targets)
 
-targets::tar_config_set(store = "../_targets")
+store_path <- if (dir.exists("_targets")) "_targets" else "../_targets"
+targets::tar_config_set(store = store_path)
 
 not_available_msg <- function(target_name) {
   htmltools::div(
