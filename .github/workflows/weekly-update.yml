@@ -123,7 +123,7 @@ jobs:
             }
           '"
 
-      - name: Run pipeline (data update + analysis + vignettes)
+      - name: Run pipeline (data update + analysis)
         env:
           GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
@@ -132,7 +132,11 @@ jobs:
           echo "::notice::Update trigger: ${{ github.event_name }}"
           nix-shell default.nix -A shell --run "Rscript -e '
             targets::tar_config_set(store = \"_targets\")
-            targets::tar_make()
+            # Exclude vignette targets in CI (rendered separately below)
+            # Avoids DT htmlwidgets Nix store path issues
+            targets::tar_make(
+              names = !tidyselect::starts_with(\"vignette_\")
+            )
           '"
 
       # ── Verify Email Freshness ───────────────────────────────
