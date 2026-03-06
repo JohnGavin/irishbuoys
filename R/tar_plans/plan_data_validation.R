@@ -30,17 +30,17 @@ plan_data_validation <- list(
 
       end_date <- Sys.Date()
       start_date <- end_date - LOOKBACK_DAYS_VALIDATION
-      expected_hours <- as.integer(
-        difftime(as.POSIXct(end_date), as.POSIXct(start_date), units = "hours")
-      )
+      start_dt <- as.POSIXct(start_date, tz = "UTC")
+      end_dt <- as.POSIXct(end_date, tz = "UTC")
+      expected_hours <- as.integer(difftime(end_dt, start_dt, units = "hours"))
 
       coverage <- buoy_tbl(con) |>
         dplyr::filter(
-          time >= !!as.POSIXct(start_date, tz = "UTC"),
-          time < !!as.POSIXct(end_date, tz = "UTC")
+          time >= .env$start_dt,
+          time < .env$end_dt
         ) |>
         dplyr::mutate(
-          hour = clock::date_floor(time, "hour")
+          hour = as.POSIXct(format(time, "%Y-%m-%d %H:00:00"), tz = "UTC")
         ) |>
         dplyr::group_by(station_id) |>
         dplyr::summarise(
@@ -94,14 +94,16 @@ plan_data_validation <- list(
 
       end_date <- Sys.Date()
       start_date <- end_date - LOOKBACK_DAYS_VALIDATION
+      start_dt <- as.POSIXct(start_date, tz = "UTC")
+      end_dt <- as.POSIXct(end_date, tz = "UTC")
 
       all_obs <- buoy_tbl(con) |>
         dplyr::filter(
-          time >= !!as.POSIXct(start_date, tz = "UTC"),
-          time < !!as.POSIXct(end_date, tz = "UTC")
+          time >= .env$start_dt,
+          time < .env$end_dt
         ) |>
         dplyr::mutate(
-          hour = clock::date_floor(time, "hour")
+          hour = as.POSIXct(format(time, "%Y-%m-%d %H:00:00"), tz = "UTC")
         ) |>
         dplyr::distinct(station_id, hour) |>
         dplyr::collect() |>
@@ -148,11 +150,13 @@ plan_data_validation <- list(
 
       end_date <- Sys.Date()
       start_date <- end_date - LOOKBACK_DAYS_VALIDATION
+      start_dt <- as.POSIXct(start_date, tz = "UTC")
+      end_dt <- as.POSIXct(end_date, tz = "UTC")
 
       intervals <- buoy_tbl(con) |>
         dplyr::filter(
-          time >= !!as.POSIXct(start_date, tz = "UTC"),
-          time < !!as.POSIXct(end_date, tz = "UTC")
+          time >= .env$start_dt,
+          time < .env$end_dt
         ) |>
         dplyr::select(station_id, time) |>
         dplyr::collect() |>
@@ -198,6 +202,8 @@ plan_data_validation <- list(
 
       end_date <- Sys.Date()
       start_date <- end_date - LOOKBACK_DAYS_VALIDATION
+      start_dt <- as.POSIXct(start_date, tz = "UTC")
+      end_dt <- as.POSIXct(end_date, tz = "UTC")
 
       # Get stations active in the database (ever)
       all_stations <- buoy_tbl(con) |>
@@ -209,8 +215,8 @@ plan_data_validation <- list(
       # Get stations present in the validation window
       recent_stations <- buoy_tbl(con) |>
         dplyr::filter(
-          time >= !!as.POSIXct(start_date, tz = "UTC"),
-          time < !!as.POSIXct(end_date, tz = "UTC")
+          time >= .env$start_dt,
+          time < .env$end_dt
         ) |>
         dplyr::distinct(station_id) |>
         dplyr::collect() |>
@@ -324,11 +330,13 @@ plan_data_validation <- list(
 
       end_date <- Sys.Date()
       start_date <- end_date - LOOKBACK_DAYS_VALIDATION
+      start_dt <- as.POSIXct(start_date, tz = "UTC")
+      end_dt <- as.POSIXct(end_date, tz = "UTC")
 
       recent <- buoy_tbl(con) |>
         dplyr::filter(
-          time >= !!as.POSIXct(start_date, tz = "UTC"),
-          time < !!as.POSIXct(end_date, tz = "UTC")
+          time >= .env$start_dt,
+          time < .env$end_dt
         ) |>
         dplyr::collect()
 
