@@ -378,6 +378,98 @@ detect_anomalies <- function(
   ))
 }
 
+#' Detect Outliers using IQR Method
+#'
+#' @description
+#' Identifies outliers using the interquartile range (IQR) method.
+#' Values beyond Q1 - multiplier*IQR or Q3 + multiplier*IQR are flagged.
+#'
+#' @param data Data frame with the variable to check
+#' @param variable Name of the variable (default: "wave_height")
+#' @param multiplier IQR multiplier for outlier threshold (default: 1.5)
+#'
+#' @return The input data frame with an additional `is_outlier` logical column.
+#'
+#' @export
+detect_outliers_iqr <- function(data, variable = "wave_height", multiplier = 1.5) {
+  values <- data[[variable]]
+  q <- stats::quantile(values, probs = c(0.25, 0.75), na.rm = TRUE)
+  iqr <- q[2] - q[1]
+  lower <- q[1] - multiplier * iqr
+  upper <- q[2] + multiplier * iqr
+  data$is_outlier <- !is.na(values) & (values < lower | values > upper)
+  data
+}
+
+#' Mann-Kendall Trend Test
+#'
+#' @description
+#' Performs a non-parametric Mann-Kendall trend test on a time series variable.
+#' Uses Kendall's tau via `stats::cor.test(method = "kendall")`.
+#'
+#' @param data Data frame with time and value columns
+#' @param variable Name of the variable (default: "wave_height")
+#' @param time_col Name of the time column (default: "time")
+#'
+#' @return List with tau, p_value, and trend_direction ("increasing",
+#'   "decreasing", or "no trend").
+#'
+#' @export
+mann_kendall_test <- function(data, variable = "wave_height", time_col = "time") {
+  valid <- !is.na(data[[variable]])
+  values <- data[[variable]][valid]
+  time_index <- seq_along(values)
+
+  if (length(values) < 3) {
+    cli::cli_abort("Need at least 3 non-NA observations for Mann-Kendall test.")
+  }
+
+  test <- stats::cor.test(time_index, values, method = "kendall")
+
+  direction <- if (test$p.value > 0.05) {
+    "no trend"
+  } else if (test$estimate > 0) {
+    "increasing"
+  } else {
+    "decreasing"
+  }
+
+  list(
+    tau = as.numeric(test$estimate),
+    p_value = test$p.value,
+    trend_direction = direction
+  )
+}
+
+#' Compute ACF Summary
+#'
+#' @description
+#' Computes autocorrelation function values and returns them as a tibble.
+#' Useful for examining temporal dependence structure in buoy data.
+#'
+#' @param data Data frame with the variable to analyze
+#' @param variable Name of the variable (default: "wave_height")
+#' @param max_lag Maximum number of lags (default: 48)
+#'
+#' @return A tibble with columns `lag` and `acf`.
+#'
+#' @export
+compute_acf_summary <- function(data, variable = "wave_height", max_lag = 48) {
+  values <- data[[variable]]
+  values <- values[!is.na(values)]
+
+  if (length(values) < max_lag + 1) {
+    cli::cli_abort("Need at least {max_lag + 1} non-NA observations for ACF.")
+  }
+
+  acf_result <- stats::acf(values, lag.max = max_lag, plot = FALSE)
+
+  tibble::tibble(
+    lag = as.integer(acf_result$lag[-1]),
+    acf = as.numeric(acf_result$acf[-1])
+  )
+}
+
 #' Create Trend Summary Report
 #'
 #' @description

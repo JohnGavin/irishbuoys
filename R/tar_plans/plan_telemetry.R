@@ -1451,7 +1451,7 @@ plan_telemetry <- list(
       top <- data |>
         dplyr::filter(!is.na(bytes)) |>
         dplyr::arrange(dplyr::desc(bytes)) |>
-        utils::head(10) |>
+        utils::head(5) |>
         dplyr::mutate(
           size_mb = round(bytes / 1024^2, 2),
           size_label = dplyr::case_when(
@@ -1466,7 +1466,7 @@ plan_telemetry <- list(
         top,
         caption = htmltools::tags$caption(
           style = "caption-side: bottom; text-align: left;",
-          "Top 10 targets by stored object size. ",
+          "Top 5 targets by stored object size. ",
           "Columns: plan source, target name, human-readable size, size in MB. ",
           "Key: Largest targets dominate _targets/ storage. ",
           "Source: targets::tar_meta()."
@@ -1485,7 +1485,7 @@ plan_telemetry <- list(
       top <- data |>
         dplyr::filter(!is.na(seconds)) |>
         dplyr::arrange(dplyr::desc(seconds)) |>
-        utils::head(10) |>
+        utils::head(5) |>
         dplyr::mutate(
           time_label = dplyr::case_when(
             seconds >= 60 ~ paste0(round(seconds / 60, 1), " min"),
@@ -1498,11 +1498,35 @@ plan_telemetry <- list(
         top,
         caption = htmltools::tags$caption(
           style = "caption-side: bottom; text-align: left;",
-          "Top 10 targets by computation time. ",
+          "Top 5 targets by computation time. ",
           "Columns: plan source, target name, human-readable duration, seconds. ",
           "Key: Slowest targets are optimization candidates. ",
           "Source: targets::tar_meta()."
         )
+      )
+    }
+  ),
+
+  # ==========================================================================
+  # CI WORKFLOW RUNTIMES
+  # ==========================================================================
+
+  targets::tar_target(
+    table_telemetry_ci_workflows,
+    {
+      wf <- telemetry_github_activity$recent_workflows
+      if (is.null(wf) || nrow(wf) == 0) {
+        return(htmltools::p("No CI workflow data available"))
+      }
+      create_telemetry_dt(
+        wf,
+        caption = htmltools::tags$caption(
+          style = "caption-side: bottom; text-align: left;",
+          "Recent CI workflow runs (last 5). ",
+          "Columns: workflow name, conclusion/status, created timestamp. ",
+          "Source: GitHub Actions API."
+        ),
+        pageLength = 5
       )
     }
   )

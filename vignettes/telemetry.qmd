@@ -84,6 +84,7 @@ tryCatch({
   tar_load(table_telemetry_codebase_metrics)
   tar_load(table_telemetry_top_size)
   tar_load(table_telemetry_top_time)
+  tar_load(table_telemetry_ci_workflows)
 
   targets_loaded <- TRUE
 }, error = function(e) {
@@ -391,6 +392,18 @@ if (exists("table_telemetry_github_activity")) {
   table_telemetry_github_activity
 } else {
   not_available_msg("table_telemetry_github_activity")
+}
+```
+
+### CI Workflows {#ci-workflows}
+
+Recent GitHub Actions workflow runs: name, status/conclusion, and timestamp.
+
+```{r}
+if (exists("table_telemetry_ci_workflows")) {
+  table_telemetry_ci_workflows
+} else {
+  not_available_msg("table_telemetry_ci_workflows")
 }
 ```
 

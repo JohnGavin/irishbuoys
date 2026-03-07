@@ -172,6 +172,39 @@ Read in R with `arrow::read_parquet()` or in Python with `pandas.read_parquet()`
 safe_tar_read("save_api_files")
 ```
 
+## Live API {#live-api}
+
+In addition to the static JSON files, irishbuoys provides a live REST API
+powered by [plumber](https://www.rplumber.io/). The API serves the same
+pre-computed JSON data via HTTP endpoints.
+
+### Starting the API
+
+```r
+library(irishbuoys)
+run_api(port = 8080)
+# API at http://localhost:8080
+# Swagger docs at http://localhost:8080/__docs__/
+```
+
+### Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /stations` | Station metadata and locations |
+| `GET /rogue-waves` | Detected rogue wave events |
+| `GET /return-levels` | Extreme value return level estimates |
+| `GET /seasonal` | Monthly and seasonal statistics |
+
+### Programmatic Access
+
+```r
+# Create router without starting server (useful for testing)
+pr <- create_api_router()
+```
+
+The live API requires the `plumber` package (`install.packages("plumber")`).
+
 ## Update Schedule {#update-schedule}
 
 - **Frequency:** Weekly (Sundays 2 AM UTC)
