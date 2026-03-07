@@ -75,6 +75,16 @@ tryCatch({
   tar_load(plot_telemetry_rogue_frequency)
   tar_load(plot_telemetry_commit_frequency)
 
+  tar_load(telemetry_commit_velocity)
+  tar_load(table_telemetry_commit_velocity)
+  tar_load(plot_telemetry_commit_velocity)
+  tar_load(telemetry_github_activity)
+  tar_load(table_telemetry_github_activity)
+  tar_load(telemetry_codebase_metrics)
+  tar_load(table_telemetry_codebase_metrics)
+  tar_load(table_telemetry_top_size)
+  tar_load(table_telemetry_top_time)
+
   targets_loaded <- TRUE
 }, error = function(e) {
   targets_loaded <<- FALSE
@@ -208,7 +218,9 @@ if (exists("telemetry_db_file_size") && nrow(telemetry_db_file_size) > 0) {
 
 Targets pipeline status, timing metrics, and execution history.
 
-### Target Execution Status {#target-status}
+::: {.panel-tabset}
+
+### Execution Status {#target-status}
 
 ```{r}
 if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$status_summary)) {
@@ -223,7 +235,7 @@ if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$st
 }
 ```
 
-### Pipeline Performance {#timing-metrics}
+### Performance {#timing-metrics}
 
 ```{r}
 if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$timing)) {
@@ -244,7 +256,7 @@ if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$ti
 }
 ```
 
-### Targets by Plan {#targets-by-plan}
+### By Plan {#targets-by-plan}
 
 Target counts, size, and timing by pipeline plan (from `R/tar_plans/plan_*.R`).
 
@@ -255,6 +267,32 @@ if (exists("table_telemetry_target_metrics")) {
   not_available_msg("table_telemetry_target_metrics")
 }
 ```
+
+### Top by Size {#top-by-size}
+
+Largest targets by stored object size in `_targets/` store.
+
+```{r}
+if (exists("table_telemetry_top_size")) {
+  table_telemetry_top_size
+} else {
+  not_available_msg("table_telemetry_top_size")
+}
+```
+
+### Top by Compute Time {#top-by-time}
+
+Slowest targets by execution time — candidates for optimization.
+
+```{r}
+if (exists("table_telemetry_top_time")) {
+  table_telemetry_top_time
+} else {
+  not_available_msg("table_telemetry_top_time")
+}
+```
+
+:::
 
 ## Tests {#tests}
 
@@ -300,7 +338,30 @@ if (exists("table_telemetry_test_stats")) {
 
 Repository commit history and development activity.
 
-### Commit Frequency {#commit-frequency}
+::: {.panel-tabset}
+
+### Commit Velocity {#commit-velocity}
+
+Weekly commit counts across full project history.
+
+```{r}
+#| fig-height: 4
+if (exists("plot_telemetry_commit_velocity") && !is.null(plot_telemetry_commit_velocity)) {
+  plot_telemetry_commit_velocity
+} else {
+  not_available_msg("plot_telemetry_commit_velocity")
+}
+```
+
+```{r}
+if (exists("table_telemetry_commit_velocity")) {
+  table_telemetry_commit_velocity
+} else {
+  not_available_msg("table_telemetry_commit_velocity")
+}
+```
+
+### Recent Commits (30d) {#commit-frequency}
 
 ```{r}
 #| fig-height: 4
@@ -311,7 +372,7 @@ if (exists("plot_telemetry_commit_frequency") && !is.null(plot_telemetry_commit_
 }
 ```
 
-### Recent Commits {#commit-history}
+### Commit History {#commit-history}
 
 ```{r}
 if (exists("table_telemetry_commits")) {
@@ -321,7 +382,23 @@ if (exists("table_telemetry_commits")) {
 }
 ```
 
+### Issues & PRs {#issues-prs}
+
+GitHub repository activity: open/closed issues and pull requests.
+
+```{r}
+if (exists("table_telemetry_github_activity")) {
+  table_telemetry_github_activity
+} else {
+  not_available_msg("table_telemetry_github_activity")
+}
+```
+
+:::
+
 ## Project Files {#project-files}
+
+::: {.panel-tabset}
 
 ### File Type Distribution {#files-by-type}
 
@@ -332,6 +409,20 @@ if (exists("table_telemetry_file_types")) {
   not_available_msg("table_telemetry_file_types")
 }
 ```
+
+### Codebase Metrics {#codebase-metrics}
+
+R source files, test files, lines of code, exported functions, and package version.
+
+```{r}
+if (exists("table_telemetry_codebase_metrics")) {
+  table_telemetry_codebase_metrics
+} else {
+  not_available_msg("table_telemetry_codebase_metrics")
+}
+```
+
+:::
 
 ## LLM Usage {#llm-usage}
 
