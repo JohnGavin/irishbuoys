@@ -29,7 +29,10 @@ latest_5 <- generate_api_latest(n = 5)
 }
 \seealso{
 Other api: 
+\code{\link{api_plumber}},
 \code{\link{api_static}},
-\code{\link{generate_api_index}()}
+\code{\link{create_api_router}()},
+\code{\link{generate_api_index}()},
+\code{\link{run_api}()}
 }
 \concept{api}

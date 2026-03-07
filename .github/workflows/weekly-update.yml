@@ -125,6 +125,14 @@ jobs:
             }
           '"
 
+      - name: Validate targets plan
+        run: |
+          nix-shell default.nix -A shell --run "Rscript -e '
+            targets::tar_config_set(store = \"_targets\")
+            targets::tar_validate()
+            cat(\"tar_validate() PASSED\\n\")
+          '"
+
       - name: Run pipeline (data update + analysis)
         env:
           GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
@@ -150,22 +158,17 @@ jobs:
         run: |
           nix-shell default.nix -A shell --run "Rscript -e '
             pkgload::load_all(quiet = TRUE)
-            tryCatch({
-              summary <- targets::tar_read(email_summary_data)
-              stats <- summary\$ingestion_stats
-              if (is.null(stats) || nrow(stats) == 0) {
-                warning(\"No ingestion stats in email_summary_data\")
-              } else {
-                max_age <- max(as.numeric(difftime(Sys.time(), stats\$latest, units = \"hours\")))
-                cat(\"Max data age:\", round(max_age, 1), \"hours\\n\")
-                if (max_age > 96) {
-                  stop(\"STALE EMAIL DATA: \", round(max_age), \"h old (threshold: 96h)\")
-                }
-                cat(\"Email freshness check PASSED\\n\")
-              }
-            }, error = function(e) {
-              cat(\"::warning::Email freshness check:\", conditionMessage(e), \"\\n\")
-            })
+            summary <- targets::tar_read(email_summary_data)
+            stats <- summary\$ingestion_stats
+            if (is.null(stats) || nrow(stats) == 0) {
+              stop(\"No ingestion stats in email_summary_data\")
+            }
+            max_age <- max(as.numeric(difftime(Sys.time(), stats\$latest, units = \"hours\")))
+            cat(\"Max data age:\", round(max_age, 1), \"hours\\n\")
+            if (max_age > 96) {
+              stop(\"STALE EMAIL DATA: \", round(max_age), \"h old (threshold: 96h)\")
+            }
+            cat(\"Email freshness check PASSED\\n\")
           '"
 
       # ── Render Vignettes ────────────────────────────────────

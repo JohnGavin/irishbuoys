@@ -122,6 +122,78 @@ test_that("decompose_stl rejects insufficient data", {
   expect_error(decompose_stl(data, frequency = "daily"), "Insufficient data")
 })
 
+test_that("detect_outliers_iqr flags extreme values", {
+  data <- data.frame(
+    wave_height = c(1, 2, 2, 3, 3, 3, 4, 4, 5, 100)
+  )
+  result <- detect_outliers_iqr(data, multiplier = 1.5)
+  expect_true("is_outlier" %in% names(result))
+  # The extreme value 100 should be flagged
+
+  expect_true(result$is_outlier[10])
+  # Most normal values should not be flagged
+  expect_false(result$is_outlier[5])
+})
+
+test_that("detect_outliers_iqr handles NAs", {
+  data <- data.frame(wave_height = c(1, 2, NA, 3, 4))
+  result <- detect_outliers_iqr(data)
+  expect_false(result$is_outlier[3])  # NA -> FALSE
+})
+
+test_that("mann_kendall_test detects increasing trend", {
+  set.seed(42)
+  n <- 200
+  data <- data.frame(
+    time = seq.POSIXt(as.POSIXct("2020-01-01", tz = "UTC"), by = "hour", length.out = n),
+    wave_height = seq(1, 10, length.out = n) + rnorm(n, 0, 0.5)
+  )
+  result <- mann_kendall_test(data)
+  expect_type(result, "list")
+  expect_true(result$tau > 0)
+  expect_true(result$p_value < 0.05)
+  expect_equal(result$trend_direction, "increasing")
+})
+
+test_that("mann_kendall_test returns no trend for random data", {
+  set.seed(123)
+  n <- 100
+  data <- data.frame(
+    time = seq.POSIXt(as.POSIXct("2020-01-01", tz = "UTC"), by = "hour", length.out = n),
+    wave_height = rnorm(n, 3, 0.1)
+  )
+  result <- mann_kendall_test(data)
+  expect_type(result, "list")
+  expect_true("tau" %in% names(result))
+  expect_true("p_value" %in% names(result))
+  expect_true("trend_direction" %in% names(result))
+})
+
+test_that("mann_kendall_test rejects insufficient data", {
+  data <- data.frame(
+    time = Sys.time() + 1:2,
+    wave_height = c(1, 2)
+  )
+  expect_error(mann_kendall_test(data), "at least 3")
+})
+
+test_that("compute_acf_summary returns tibble with correct structure", {
+  set.seed(42)
+  n <- 200
+  data <- data.frame(wave_height = rnorm(n, 3, 1))
+  result <- compute_acf_summary(data, max_lag = 24)
+  expect_s3_class(result, "tbl_df")
+  expect_equal(names(result), c("lag", "acf"))
+  expect_equal(nrow(result), 24)
+  expect_equal(result$lag[1], 1L)
+  expect_equal(result$lag[24], 24L)
+})
+
+test_that("compute_acf_summary rejects insufficient data", {
+  data <- data.frame(wave_height = c(1, 2, 3))
+  expect_error(compute_acf_summary(data, max_lag = 48), "at least 49")
+})
+
 test_that("trend_summary_report produces output", {
   # Minimal mock data
   seasonal <- list(
