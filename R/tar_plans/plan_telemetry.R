@@ -1201,5 +1201,309 @@ plan_telemetry <- list(
           backgroundColor = DT::styleEqual("TOTAL", "#e8f4f8")
         )
     }
+  ),
+
+  # ==========================================================================
+  # COMMIT VELOCITY (weekly, full history)
+  # ==========================================================================
+
+  targets::tar_target(
+    telemetry_commit_velocity,
+    {
+      commits <- tryCatch(
+        gert::git_log(max = 2000),
+        error = function(e) NULL
+      )
+      if (is.null(commits) || nrow(commits) == 0) {
+        return(tibble::tibble(
+          week = as.Date(character()),
+          n_commits = integer()
+        ))
+      }
+      commits |>
+        dplyr::mutate(week = lubridate::floor_date(as.Date(time), "week")) |>
+        dplyr::count(week, name = "n_commits") |>
+        dplyr::arrange(week)
+    }
+  ),
+
+  targets::tar_target(
+    table_telemetry_commit_velocity,
+    {
+      data <- telemetry_commit_velocity
+      if (nrow(data) == 0) return(htmltools::p("No commit data available"))
+      data |>
+        dplyr::mutate(
+          week_label = format(week, "%Y-W%V"),
+          cumulative = cumsum(n_commits)
+        ) |>
+        create_telemetry_dt(
+          caption = htmltools::tags$caption(
+            style = "caption-side: bottom; text-align: left;",
+            "Weekly commit counts. ",
+            "Columns: week start date, ISO week label, commit count, cumulative total. ",
+            "Key: Shows development velocity over full project history. ",
+            "Source: gert::git_log()."
+          )
+        )
+    }
+  ),
+
+  # Plot: Commit velocity timeline
+  targets::tar_target(
+    plot_telemetry_commit_velocity,
+    {
+      data <- telemetry_commit_velocity
+      if (nrow(data) == 0) return(NULL)
+      data |>
+        ggplot2::ggplot(ggplot2::aes(x = week, y = n_commits)) +
+        ggplot2::geom_col(fill = "#3498db", alpha = 0.7) +
+        ggplot2::geom_smooth(method = "loess", se = FALSE, color = "#e74c3c",
+                             span = 0.3, linewidth = 0.8) +
+        ggplot2::labs(
+          title = "Weekly Commit Velocity",
+          subtitle = "Full project history with LOESS trend",
+          caption = paste(
+            "Commits per week from gert::git_log(max = 2000).",
+            "Red line: LOESS smoother showing development intensity trend.",
+            "Source: local git repository."
+          ),
+          x = "Week", y = "Commits"
+        ) +
+        ggplot2::theme_minimal()
+    }
+  ),
+
+  # ==========================================================================
+  # GITHUB ACTIVITY (issues, PRs, workflows)
+  # ==========================================================================
+
+  targets::tar_target(
+    telemetry_github_activity,
+    {
+      tryCatch({
+        owner <- "JohnGavin"
+        repo <- "irishbuoys"
+
+        open_issues <- gh::gh(
+          "GET /repos/{owner}/{repo}/issues",
+          owner = owner, repo = repo,
+          state = "open", per_page = 1,
+          .accept = "application/vnd.github.v3+json"
+        )
+        closed_issues <- gh::gh(
+          "GET /repos/{owner}/{repo}/issues",
+          owner = owner, repo = repo,
+          state = "closed", per_page = 1,
+          .accept = "application/vnd.github.v3+json"
+        )
+        open_prs <- gh::gh(
+          "GET /repos/{owner}/{repo}/pulls",
+          owner = owner, repo = repo,
+          state = "open", per_page = 1,
+          .accept = "application/vnd.github.v3+json"
+        )
+        closed_prs <- gh::gh(
+          "GET /repos/{owner}/{repo}/pulls",
+          owner = owner, repo = repo,
+          state = "closed", per_page = 1,
+          .accept = "application/vnd.github.v3+json"
+        )
+
+        # Get workflow runs (last 5)
+        runs <- gh::gh(
+          "GET /repos/{owner}/{repo}/actions/runs",
+          owner = owner, repo = repo,
+          per_page = 5,
+          .accept = "application/vnd.github.v3+json"
+        )
+        workflow_runs <- if (length(runs$workflow_runs) > 0) {
+          lapply(runs$workflow_runs, function(r) {
+            tibble::tibble(
+              name = r$name %||% "unknown",
+              status = r$conclusion %||% r$status %||% "unknown",
+              created = r$created_at %||% NA_character_
+            )
+          }) |> dplyr::bind_rows()
+        } else {
+          tibble::tibble(name = character(), status = character(), created = character())
+        }
+
+        list(
+          issues_open = length(open_issues),
+          issues_closed = length(closed_issues),
+          prs_open = length(open_prs),
+          prs_closed = length(closed_prs),
+          recent_workflows = workflow_runs,
+          fetched_at = Sys.time()
+        )
+      }, error = function(e) {
+        list(
+          issues_open = NA_integer_,
+          issues_closed = NA_integer_,
+          prs_open = NA_integer_,
+          prs_closed = NA_integer_,
+          recent_workflows = tibble::tibble(
+            name = character(), status = character(), created = character()
+          ),
+          fetched_at = Sys.time(),
+          error = conditionMessage(e)
+        )
+      })
+    }
+  ),
+
+  targets::tar_target(
+    table_telemetry_github_activity,
+    {
+      ga <- telemetry_github_activity
+      if (!is.null(ga$error)) {
+        return(htmltools::p(paste("GitHub API error:", ga$error)))
+      }
+
+      summary_df <- tibble::tibble(
+        Metric = c("Open Issues", "Closed Issues", "Open PRs", "Closed PRs"),
+        Count = c(ga$issues_open, ga$issues_closed, ga$prs_open, ga$prs_closed)
+      )
+
+      create_telemetry_dt(
+        summary_df,
+        caption = htmltools::tags$caption(
+          style = "caption-side: bottom; text-align: left;",
+          "GitHub issues and pull requests summary. ",
+          "Source: GitHub API via gh::gh(). ",
+          "Fetched: ", format(ga$fetched_at, "%Y-%m-%d %H:%M UTC"), "."
+        )
+      )
+    }
+  ),
+
+  # ==========================================================================
+  # CODEBASE METRICS
+  # ==========================================================================
+
+  targets::tar_target(
+    telemetry_codebase_metrics,
+    {
+      r_files <- list.files("R", pattern = "\\.R$", recursive = TRUE)
+      r_files_no_dev <- r_files[!grepl("^dev/", r_files)]
+      test_files <- list.files("tests/testthat", pattern = "^test-.*\\.R$")
+
+      # Count lines of R code (excluding blank/comment)
+      loc <- tryCatch({
+        all_r <- list.files("R", pattern = "\\.R$", full.names = TRUE, recursive = TRUE)
+        all_r <- all_r[!grepl("R/dev/", all_r)]
+        lines <- unlist(lapply(all_r, readLines, warn = FALSE))
+        sum(!grepl("^\\s*$|^\\s*#", lines))
+      }, error = function(e) NA_integer_)
+
+      # Count exported functions from NAMESPACE
+      exports <- tryCatch({
+        ns <- readLines("NAMESPACE", warn = FALSE)
+        sum(grepl("^export\\(", ns))
+      }, error = function(e) NA_integer_)
+
+      # Package version
+      version <- tryCatch({
+        desc <- read.dcf("DESCRIPTION", fields = "Version")
+        as.character(desc[1, 1])
+      }, error = function(e) NA_character_)
+
+      tibble::tibble(
+        Metric = c("R Source Files", "Test Files", "Lines of Code (R)",
+                    "Exported Functions", "Package Version"),
+        Value = c(
+          as.character(length(r_files_no_dev)),
+          as.character(length(test_files)),
+          format(loc, big.mark = ","),
+          as.character(exports),
+          version
+        )
+      )
+    }
+  ),
+
+  targets::tar_target(
+    table_telemetry_codebase_metrics,
+    create_telemetry_dt(
+      telemetry_codebase_metrics,
+      caption = htmltools::tags$caption(
+        style = "caption-side: bottom; text-align: left;",
+        "Codebase size and structure metrics. ",
+        "LOC excludes blank lines and comments. ",
+        "Exports counted from NAMESPACE file. ",
+        "Source: local filesystem."
+      )
+    )
+  ),
+
+  # ==========================================================================
+  # TOP TARGETS BY SIZE AND TIME
+  # ==========================================================================
+
+  targets::tar_target(
+    table_telemetry_top_size,
+    {
+      data <- telemetry_target_metrics$by_target
+      if (is.null(data) || nrow(data) == 0) {
+        return(htmltools::p("No target metrics available"))
+      }
+      top <- data |>
+        dplyr::filter(!is.na(bytes)) |>
+        dplyr::arrange(dplyr::desc(bytes)) |>
+        utils::head(10) |>
+        dplyr::mutate(
+          size_mb = round(bytes / 1024^2, 2),
+          size_label = dplyr::case_when(
+            bytes >= 1024^2 ~ paste0(round(bytes / 1024^2, 1), " MB"),
+            bytes >= 1024 ~ paste0(round(bytes / 1024, 1), " KB"),
+            TRUE ~ paste0(bytes, " B")
+          )
+        ) |>
+        dplyr::select(plan, target, size_label, size_mb)
+
+      create_telemetry_dt(
+        top,
+        caption = htmltools::tags$caption(
+          style = "caption-side: bottom; text-align: left;",
+          "Top 10 targets by stored object size. ",
+          "Columns: plan source, target name, human-readable size, size in MB. ",
+          "Key: Largest targets dominate _targets/ storage. ",
+          "Source: targets::tar_meta()."
+        )
+      )
+    }
+  ),
+
+  targets::tar_target(
+    table_telemetry_top_time,
+    {
+      data <- telemetry_target_metrics$by_target
+      if (is.null(data) || nrow(data) == 0) {
+        return(htmltools::p("No target metrics available"))
+      }
+      top <- data |>
+        dplyr::filter(!is.na(seconds)) |>
+        dplyr::arrange(dplyr::desc(seconds)) |>
+        utils::head(10) |>
+        dplyr::mutate(
+          time_label = dplyr::case_when(
+            seconds >= 60 ~ paste0(round(seconds / 60, 1), " min"),
+            TRUE ~ paste0(round(seconds, 1), " sec")
+          )
+        ) |>
+        dplyr::select(plan, target, time_label, seconds)
+
+      create_telemetry_dt(
+        top,
+        caption = htmltools::tags$caption(
+          style = "caption-side: bottom; text-align: left;",
+          "Top 10 targets by computation time. ",
+          "Columns: plan source, target name, human-readable duration, seconds. ",
+          "Key: Slowest targets are optimization candidates. ",
+          "Source: targets::tar_meta()."
+        )
+      )
+    }
   )
 )
