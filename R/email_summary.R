@@ -350,20 +350,40 @@ create_email_summary <- function(summary) {
     "<p>No extreme events detected this week.</p>"
   }
 
-  # Format station statistics
-  station_stats <- paste(apply(summary$current_week, 1, function(row) {
+  # Format station statistics — join with coverage for missing_hours, sort desc
+  stats_df <- summary$current_week
+  if (!is.null(summary$data_coverage) &&
+      "coverage" %in% names(summary$data_coverage)) {
+    cov_df <- summary$data_coverage$coverage[, c("station_id", "missing_hours")]
+    stats_df <- merge(stats_df, cov_df, by = "station_id", all.x = TRUE)
+    stats_df <- stats_df[order(-stats_df$missing_hours), ]
+  } else if (nrow(stats_df) > 0) {
+    stats_df$missing_hours <- NA_real_
+  }
+
+  station_stats <- if (nrow(stats_df) == 0) {
+    "<p>No station data available this week.</p>"
+  } else {
+    paste(apply(stats_df, 1, function(row) {
+    missing_li <- if (!is.na(row["missing_hours"])) {
+      paste0("<li>Missing Hours: ", row["missing_hours"], "</li>")
+    } else {
+      ""
+    }
     paste0(
       "<h3>Station ", row["station_id"], "</h3>",
       "<ul>",
-      "<li>Average Wave Height: ", round(as.numeric(row["avg_wave_height"]), 2), " m</li>",
+      missing_li,
+      "<li>Observations: ", row["n_observations"], "</li>",
       "<li>Maximum Wave Height: ", round(as.numeric(row["max_wave_height"]), 2), " m</li>",
+      "<li>Average Wave Height: ", round(as.numeric(row["avg_wave_height"]), 2), " m</li>",
       "<li>Average Wind Speed: ", round(as.numeric(row["avg_wind_speed"]), 1), " knots</li>",
       "<li>Air Temperature: ", round(as.numeric(row["avg_air_temp"]), 1), " C</li>",
       "<li>Sea Temperature: ", round(as.numeric(row["avg_sea_temp"]), 1), " C</li>",
-      "<li>Observations: ", row["n_observations"], "</li>",
       "</ul>"
     )
   }), collapse = "")
+  }
 
   # Format ingestion stats table
   ingestion_text <- if (!is.null(summary$ingestion_stats) && nrow(summary$ingestion_stats) > 0) {
@@ -466,11 +486,6 @@ create_email_summary <- function(summary) {
 
     coverage_text,
 
-    "<h2>This Week's Statistics</h2>",
-    station_stats,
-
-    extreme_text,
-
     "<h2>Week-over-Week Changes</h2>",
     if (!is.null(summary$week_over_week)) {
       paste0(
@@ -491,6 +506,11 @@ create_email_summary <- function(summary) {
     } else {
       "<p>Previous week data not available for comparison.</p>"
     },
+
+    extreme_text,
+
+    "<h2>Station Statistics</h2>",
+    station_stats,
 
     "<hr>",
     "<p><small>Generated on ", Sys.Date(), " by the ",
