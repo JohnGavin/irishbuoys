@@ -780,6 +780,25 @@ plan_wave_analysis <- list(
   ),
 
   # ========================================
+  # Trend Analysis: Outliers, Mann-Kendall, ACF
+  # ========================================
+
+  targets::tar_target(
+    wave_outliers_iqr,
+    detect_outliers_iqr(analysis_data, variable = "wave_height", multiplier = 1.5)
+  ),
+
+  targets::tar_target(
+    wave_mann_kendall,
+    mann_kendall_test(analysis_data, variable = "wave_height", time_col = "time")
+  ),
+
+  targets::tar_target(
+    wave_acf_summary,
+    compute_acf_summary(analysis_data, variable = "wave_height", max_lag = 48)
+  ),
+
+  # ========================================
   # Random Forest Wave Prediction
   # ========================================
 

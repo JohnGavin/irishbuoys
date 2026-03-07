@@ -9,7 +9,10 @@ These are written to \verb{docs/api/v1/} and updated weekly by CI.
 }
 \seealso{
 Other api: 
+\code{\link{api_plumber}},
+\code{\link{create_api_router}()},
 \code{\link{generate_api_index}()},
-\code{\link{generate_api_latest}()}
+\code{\link{generate_api_latest}()},
+\code{\link{run_api}()}
 }
 \concept{api}

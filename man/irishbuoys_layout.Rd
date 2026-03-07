@@ -17,9 +17,9 @@ irishbuoys_layout(p, title = NULL, ...)
 A styled plotly object
 }
 \description{
-Applies consistent styling to all plotly plots in the irishbuoys package.
-Includes gray 70 background (#B3B3B3), bottom-positioned horizontal legend,
-and white hoverlabels for readability.
+Applies consistent dark styling to all plotly plots in the irishbuoys package.
+Uses black background with white grid lines to match the Quarto cosmo dashboard
+theme. Bottom-positioned horizontal legend with white hoverlabels.
 }
 \examples{
 \dontrun{

@@ -31,7 +31,10 @@ jsonlite::toJSON(idx, pretty = TRUE, auto_unbox = TRUE)
 }
 \seealso{
 Other api: 
+\code{\link{api_plumber}},
 \code{\link{api_static}},
-\code{\link{generate_api_latest}()}
+\code{\link{create_api_router}()},
+\code{\link{generate_api_latest}()},
+\code{\link{run_api}()}
 }
 \concept{api}

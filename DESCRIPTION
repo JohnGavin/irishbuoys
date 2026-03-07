@@ -47,6 +47,7 @@ Suggests:
     mgcv,
     mirai,
     nanoparquet,
+    plumber,
     plotly,
     quantreg,
     quarto,
