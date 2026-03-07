@@ -38,6 +38,18 @@
         new_paths <- current_paths[-user_dir]
         .libPaths(new_paths)
         rm(current_paths, userlib_paths, user_dir, new_paths)
+        # Warn if R_LIBS_SITE looks contaminated by nested nix-shell.
+        # The shellHook in default.nix handles the actual fix (overrides
+        # R_LIBS_SITE with Nix-computed paths). This is just a diagnostic.
+        n_site_paths <- length(strsplit(Sys.getenv("R_LIBS_SITE"), ":")[[1]])
+        if (n_site_paths > 300) {
+            message(
+                "Warning: R_LIBS_SITE has ", n_site_paths, " paths. ",
+                "Likely nested nix-shell contamination. ",
+                "Re-enter via ./default.sh for a clean shell."
+            )
+        }
+        rm(n_site_paths)
     }
     if (isTRUE(is_code) && interactive() && isFALSE(is_rstudio) && isFALSE(is_positron)) {
         vscode_r_init <- file.path(Sys.getenv(if (.Platform$OS.type == "windows") 

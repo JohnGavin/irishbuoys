@@ -80,6 +80,10 @@ all_r_pkgs <- c(core_pkgs, pipeline_pkgs, analysis_pkgs, viz_pkgs, dev_tools)
 system_pkgs <- c("git", "pandoc", "quarto")
 
 # Use a ~1 month old date for stable, pre-built cachix binaries
+# NOTE: After regenerating, manually verify that default.nix retains the
+# shellHook that overrides R_LIBS_SITE using closePropagation.
+# This prevents nested nix-shell segfaults from ABI mismatch.
+# See: memory/nix-segfault-fix.md
 rix::rix(
   date = "2026-01-19",
   r_pkgs = all_r_pkgs,
