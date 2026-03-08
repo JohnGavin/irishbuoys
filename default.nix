@@ -92,16 +92,19 @@ let
     LC_MEASUREMENT = "en_US.UTF-8";
     
     buildInputs = [ rpkgs system_packages ];
-    # Override R_LIBS_SITE to prevent nested nix-shell contamination.
-    # Without this, impure shells inherit R_LIBS_SITE from the outer shell,
-    # mixing .so files from different nixpkgs revisions → ABI mismatch → segfault.
-    # This computes the correct paths at Nix eval time from the transitive
-    # closure of R package dependencies.
+    # Guard against nested nix-shell R_LIBS_SITE contamination.
+    # In clean environments (CI, pure shells), R_LIBS_SITE has ~218 paths
+    # from Nix setup hooks — leave it alone. In contaminated nested impure
+    # shells, it has 500+ paths mixing .so files from different nixpkgs
+    # revisions → ABI mismatch → segfault. Only override when contaminated.
     shellHook = let
       allDeps = pkgs.lib.closePropagation rpkgs;
       rPkgDeps = builtins.filter (p: builtins.pathExists "${p}/library") allDeps;
     in ''
-      export R_LIBS_SITE="${builtins.concatStringsSep ":" (map (p: "${p}/library") rPkgDeps)}"
+      _n_paths=$(echo "$R_LIBS_SITE" | tr ':' '\n' | wc -l)
+      if [ "$_n_paths" -gt 300 ]; then
+        export R_LIBS_SITE="${builtins.concatStringsSep ":" (map (p: "${p}/library") rPkgDeps)}"
+      fi
     '';
   };
 in
