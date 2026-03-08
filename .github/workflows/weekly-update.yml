@@ -142,10 +142,11 @@ jobs:
           echo "::notice::Update trigger: ${{ github.event_name }}"
           nix-shell default.nix -A shell --run "Rscript -e '
             targets::tar_config_set(store = \"_targets\")
-            # Exclude vignette targets in CI (rendered separately below)
-            # Avoids DT htmlwidgets Nix store path issues
+            # Exclude vignette targets (rendered separately below) and QA gates
+            # (covr::package_coverage takes 50+ min; QA runs in R-CMD-check instead)
             targets::tar_make(
-              names = !tidyselect::starts_with(\"vignette_\")
+              names = !tidyselect::starts_with(\"vignette_\") &
+                      !tidyselect::starts_with(\"qa_\")
             )
           '"
 
