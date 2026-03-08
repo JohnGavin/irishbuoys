@@ -142,11 +142,14 @@ jobs:
           echo "::notice::Update trigger: ${{ github.event_name }}"
           nix-shell default.nix -A shell --run "Rscript -e '
             targets::tar_config_set(store = \"_targets\")
-            # Exclude vignette targets (rendered separately below) and QA gates
-            # (covr::package_coverage takes 50+ min; QA runs in R-CMD-check instead)
+            # Exclude slow dev-only targets from weekly pipeline:
+            # - vignette_*: rendered separately below
+            # - qa_*: covr takes 50+ min; QA runs in R-CMD-check
+            # - pkgctx_*: builds Rust tool from source (~20 min); dev-only
             targets::tar_make(
               names = !tidyselect::starts_with(\"vignette_\") &
-                      !tidyselect::starts_with(\"qa_\")
+                      !tidyselect::starts_with(\"qa_\") &
+                      !tidyselect::starts_with(\"pkgctx_\")
             )
           '"
 
