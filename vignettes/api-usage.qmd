@@ -42,9 +42,18 @@ tryCatch({
   tar_load(api_index)
   tar_load(api_vignette_endpoints_dt)
   tar_load(api_vignette_example_response)
+  tar_load(api_vignette_stations_dt)
+  tar_load(api_vignette_stats_dt)
+  tar_load(api_vignette_return_levels_dt)
+  tar_load(api_vignette_rogue_waves_dt)
+  tar_load(api_vignette_data_dict_dt)
   tar_load(save_api_files)
   tar_load(api_seasonal)
   tar_load(api_correlations)
+  tar_load(api_stats)
+  tar_load(api_return_levels)
+  tar_load(api_rogue_waves)
+  tar_load(api_data_dictionary)
   tar_load(code_api_curl_latest)
   tar_load(code_api_r_jsonlite)
   tar_load(code_api_python_requests)
@@ -71,16 +80,48 @@ from the Marine Institute's ERDDAP server.
 safe_tar_read("api_vignette_endpoints_dt")
 ```
 
-## Example Response {#example-response}
+## Stations {#stations}
 
-A sample response from `latest.json` (one observation per station):
+The `stations.json` endpoint provides metadata for each buoy in the Irish
+Weather Buoy Network, including station ID, name, latitude, and longitude.
+
+```{r stations-table}
+safe_tar_read("api_vignette_stations_dt")
+```
+
+## Latest Observations {#latest}
+
+The `latest.json` endpoint returns the most recent observation per station.
+A sample response (one station):
 
 ```{r example-json}
 #| results: asis
 safe_tar_read("api_vignette_example_response")
 ```
 
-## Seasonal Endpoint {#seasonal-endpoint}
+## Summary Statistics {#stats}
+
+The `stats.json` endpoint provides per-station summary statistics including
+record counts, mean/max wave height, and mean/max wind speed.
+
+```{r stats-table}
+safe_tar_read("api_vignette_stats_dt")
+```
+
+```{r stats-overall}
+#| results: asis
+stats <- safe_tar_read("api_stats")
+if (is.list(stats) && "overall" %in% names(stats)) {
+  cat("**Overall summary:**\n\n")
+  cat(sprintf("- Total records: %s\n", format(stats$overall$total_records, big.mark = ",")))
+  cat(sprintf("- Date range: %s to %s\n", stats$overall$date_range[1], stats$overall$date_range[2]))
+  cat(sprintf("- Stations: %s\n", stats$overall$stations))
+  cat(sprintf("- Wind-wave correlation: %s\n", stats$overall$wind_wave_correlation))
+  cat(sprintf("- Wave-Hmax correlation: %s\n", stats$overall$wave_hmax_correlation))
+}
+```
+
+## Seasonal Patterns {#seasonal}
 
 The `seasonal.json` endpoint provides monthly and seasonal (DJF/MAM/JJA/SON)
 mean statistics for wave height and wind speed, plus annual trend analysis
@@ -89,7 +130,9 @@ with linear trend per decade and significance (p-value).
 **Fields:** `wave.monthly`, `wave.seasonal`, `wind.monthly`, `wind.seasonal`,
 `annual_trends.wave`, `annual_trends.wind`
 
-```{r seasonal-example}
+### Wave data (sample)
+
+```{r seasonal-wave}
 #| results: asis
 seasonal <- safe_tar_read("api_seasonal")
 if (is.list(seasonal) && "wave" %in% names(seasonal)) {
@@ -102,7 +145,37 @@ if (is.list(seasonal) && "wave" %in% names(seasonal)) {
 }
 ```
 
-## Correlations Endpoint {#correlations-endpoint}
+### Wind data (sample)
+
+```{r seasonal-wind}
+#| results: asis
+seasonal <- safe_tar_read("api_seasonal")
+if (is.list(seasonal) && "wind" %in% names(seasonal)) {
+  cat("```json\n")
+  cat(jsonlite::toJSON(
+    list(wind = list(monthly = head(seasonal$wind$monthly, 3))),
+    pretty = TRUE, auto_unbox = TRUE
+  ))
+  cat("\n```\n")
+}
+```
+
+### Annual trends
+
+```{r seasonal-trends}
+#| results: asis
+seasonal <- safe_tar_read("api_seasonal")
+if (is.list(seasonal) && "annual_trends" %in% names(seasonal)) {
+  cat("```json\n")
+  cat(jsonlite::toJSON(
+    list(annual_trends = seasonal$annual_trends),
+    pretty = TRUE, auto_unbox = TRUE
+  ))
+  cat("\n```\n")
+}
+```
+
+## Correlations {#correlations}
 
 The `correlations.json` endpoint provides overall wind-wave and wave-Hmax
 correlations plus inter-station pair correlations (cross-correlation analysis)
@@ -111,7 +184,9 @@ for wave height, wind speed, and maximum wave height.
 **Fields:** `overall.wind_wave`, `overall.wave_hmax`, `station_pairs.wave_height`,
 `station_pairs.wind_speed`, `station_pairs.hmax`
 
-```{r correlations-example}
+### Overall correlations
+
+```{r correlations-overall}
 #| results: asis
 corr <- safe_tar_read("api_correlations")
 if (is.list(corr) && "overall" %in% names(corr)) {
@@ -122,6 +197,87 @@ if (is.list(corr) && "overall" %in% names(corr)) {
   ))
   cat("\n```\n")
 }
+```
+
+### Station pair sample (wave height)
+
+```{r correlations-pairs}
+#| results: asis
+corr <- safe_tar_read("api_correlations")
+if (is.list(corr) && "station_pairs" %in% names(corr)) {
+  pairs <- corr$station_pairs$wave_height
+  if (is.data.frame(pairs)) {
+    sample_pairs <- utils::head(pairs, 5)
+  } else if (is.list(pairs)) {
+    sample_pairs <- utils::head(pairs, 5)
+  } else {
+    sample_pairs <- pairs
+  }
+  cat("```json\n")
+  cat(jsonlite::toJSON(
+    list(station_pairs = list(wave_height = sample_pairs)),
+    pretty = TRUE, auto_unbox = TRUE
+  ))
+  cat("\n```\n")
+}
+```
+
+## Return Levels {#return-levels}
+
+The `return-levels.json` endpoint provides Generalised Pareto Distribution (GPD)
+return level estimates for extreme wave heights. The 95th percentile threshold
+is used, with return periods of 1, 5, and 10 years.
+
+**Method:** GPD | **Threshold:** 95th percentile | **Return periods:** 1, 5, 10 years
+
+```{r return-levels-table}
+safe_tar_read("api_vignette_return_levels_dt")
+```
+
+## Rogue Waves {#rogue-waves}
+
+The `rogue-waves.json` endpoint lists detected rogue wave events where the
+maximum wave height (Hmax) exceeds twice the significant wave height (Hs).
+Events are sorted by the Hmax/Hs ratio (most extreme first).
+
+```{r rogue-waves-table}
+safe_tar_read("api_vignette_rogue_waves_dt")
+```
+
+```{r rogue-waves-count}
+#| results: asis
+rw <- safe_tar_read("api_rogue_waves")
+if (is.list(rw) && "n_events" %in% names(rw)) {
+  cat(sprintf("\n**Total rogue wave events detected:** %s\n", format(rw$n_events, big.mark = ",")))
+}
+```
+
+## Data Dictionary {#data-dictionary}
+
+The `data-dictionary.json` endpoint defines all variables in the dataset,
+including names, descriptions, units, and data types.
+
+```{r data-dict-table}
+safe_tar_read("api_vignette_data_dict_dt")
+```
+
+## Data Sources {#data-sources}
+
+All data originates from the Marine Institute's ERDDAP server:
+
+- **ERDDAP base URL:** <https://erddap.marine.ie/erddap/tabledap/IWBNetwork>
+- **Dataset ID:** `IWBNetwork`
+- **Direct data query (HTML):** <https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html>
+- **Metadata (info page):** <https://erddap.marine.ie/erddap/info/IWBNetwork/index.html>
+
+Example ERDDAP queries:
+
+```bash
+# Latest 100 rows as CSV
+curl "https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?&orderByLimit(%22100%22)"
+
+# Station metadata as JSON
+curl "https://erddap.marine.ie/erddap/tabledap/IWBNetwork.json?station_id,longitude,latitude&distinct()"
 ```
 
 ## Usage Examples {#usage-examples}
@@ -146,6 +302,24 @@ if (is.character(code)) {
 }
 ```
 
+### Fetching stats and seasonal data (R)
+
+```r
+library(jsonlite)
+
+# Per-station statistics
+stats <- fromJSON("https://johngavin.github.io/irishbuoys/api/v1/stats.json")
+stats$overall
+
+# Seasonal patterns
+seasonal <- fromJSON("https://johngavin.github.io/irishbuoys/api/v1/seasonal.json")
+head(seasonal$wave$monthly)
+
+# Return levels
+rl <- fromJSON("https://johngavin.github.io/irishbuoys/api/v1/return-levels.json")
+str(rl$by_station, max.level = 2)
+```
+
 ### Python (requests) {#python-example}
 
 ```{r python-code}
@@ -154,6 +328,24 @@ code <- safe_tar_read("code_api_python_requests")
 if (is.character(code)) {
   cat("```python\n", paste(code, collapse = "\n"), "\n```\n")
 }
+```
+
+### Fetching stats and seasonal data (Python)
+
+```python
+import requests
+import pandas as pd
+
+base = "https://johngavin.github.io/irishbuoys/api/v1/"
+
+# Per-station statistics
+stats = requests.get(base + "stats.json").json()
+print(stats["overall"])
+
+# Seasonal wave patterns
+seasonal = requests.get(base + "seasonal.json").json()
+df_monthly = pd.DataFrame(seasonal["wave"]["monthly"])
+print(df_monthly.head())
 ```
 
 ## Bulk Data Access {#bulk-data}
