@@ -79,6 +79,26 @@ return_levels_per_station <- tryCatch(
   error = function(e) NULL
 )
 
+# Load pre-computed vignette display targets
+tryCatch({
+  targets::tar_load(c(
+    wave_vignette_missing_summary,
+    wave_vignette_rogue_table,
+    wave_vignette_rl_wide,
+    wave_vignette_gpd_params,
+    wave_vignette_threshold_sens,
+    wave_vignette_gev_pooled_params
+  ))
+}, error = function(e) {
+  # Fallback: targets may not exist in older pipeline runs
+  wave_vignette_missing_summary <<- NULL
+  wave_vignette_rogue_table <<- NULL
+  wave_vignette_rl_wide <<- NULL
+  wave_vignette_gpd_params <<- NULL
+  wave_vignette_threshold_sens <<- NULL
+  wave_vignette_gev_pooled_params <<- NULL
+})
+
 # Alias for compatibility
 rogue_events <- rogue_wave_events
 rogue_conditions <- rogue_wave_conditions
@@ -245,21 +265,8 @@ if (!is.null(analysis_summary) && "data_summary" %in% names(analysis_summary)) {
 
 ```{r overview-missing-data}
 #| echo: false
-if (!is.null(missing_data_grid)) {
-  # Summarize missing data by station
-  missing_summary <- missing_data_grid |>
-    group_by(station_id) |>
-    summarise(
-      total_days = n(),
-      days_with_wave = sum(n_wave_height > 0),
-      days_with_wind = sum(n_wind_speed > 0),
-      days_with_hmax = sum(n_hmax > 0),
-      pct_wave = round(100 * days_with_wave / total_days, 1),
-      pct_wind = round(100 * days_with_wind / total_days, 1),
-      pct_hmax = round(100 * days_with_hmax / total_days, 1),
-      .groups = "drop"
-    )
-  create_dt(missing_summary, "Data availability by station (% of days with observations)")
+if (!is.null(wave_vignette_missing_summary)) {
+  create_dt(wave_vignette_missing_summary, "Data availability by station (% of days with observations)")
 } else {
   htmltools::div(class = "alert alert-warning", "Missing data grid not available. Run targets::tar_make()")
 }
@@ -411,18 +418,12 @@ create_plot_rogue_by_station(rogue_events)
 **gust_ratio** = Gust / Wind. Values > 1.5 indicate a rogue gust.
 
 ```{r rogue-waves-table}
-if (has_data) {
-  rogue_events |>
-    mutate(gust_ratio = round(gust / wind_speed, 2)) |>
-    arrange(desc(rogue_ratio)) |>
-    select(time, station_id, wave_height, hmax, rogue_ratio, wind_speed, gust, gust_ratio, atmospheric_pressure) |>
-    mutate(
-      time = format(time, "%Y-%m-%d %H:%M"),
-      across(where(is.numeric), ~round(., 2))
-    ) |>
-    create_dt(paste0("Rogue Wave Events (rogue_ratio > 2.0). ",
-                     format(min(rogue_events$time), "%Y-%m-%d"), " to ",
-                     format(max(rogue_events$time), "%Y-%m-%d")))
+if (!is.null(wave_vignette_rogue_table)) {
+  create_dt(wave_vignette_rogue_table, paste0(
+    "Rogue Wave Events (rogue_ratio > 2.0). ",
+    format(min(rogue_events$time), "%Y-%m-%d"), " to ",
+    format(max(rogue_events$time), "%Y-%m-%d")
+  ))
 }
 ```
 
@@ -557,17 +558,8 @@ Extreme value analysis based on **hourly maximum** observations. Two approaches 
 #### Return Levels: All Stations
 
 ```{r eva-return-levels-all}
-if (!is.null(return_levels_per_station)) {
-  rl_wide <- return_levels_per_station |>
-    filter(!is.na(return_level)) |>
-    mutate(
-      col_name = paste0(variable_label, " ", return_period, "yr"),
-      return_level = round(return_level, 2)
-    ) |>
-    select(station, col_name, return_level) |>
-    tidyr::pivot_wider(names_from = col_name, values_from = return_level)
-
-  create_dt(rl_wide, "Per-Station GPD Return Levels (95th percentile threshold)")
+if (!is.null(wave_vignette_rl_wide)) {
+  create_dt(wave_vignette_rl_wide, "Per-Station GPD Return Levels (95th percentile threshold)")
 } else {
   htmltools::div(class = "alert alert-warning", "Return levels not available. Run targets::tar_make()")
 }
@@ -600,37 +592,8 @@ create_plot_return_levels_per_station(return_levels_per_station, "wind_gust")
 #### GPD Parameters
 
 ```{r eva-gpd-params}
-# Extract GPD parameters for all 4 variables across all stations
-gpd_all <- list(
-  list(name = "Avg Wave", fits = gpd_wave_per_station),
-  list(name = "Rogue Wave", fits = gpd_hmax_per_station),
-  list(name = "Avg Wind", fits = gpd_wind_per_station),
-  list(name = "Wind Gust", fits = gpd_gust_per_station)
-)
-
-gpd_params_list <- lapply(gpd_all, function(var_info) {
-  if (is.null(var_info$fits)) return(NULL)
-  lapply(names(var_info$fits), function(st) {
-    res <- var_info$fits[[st]][["medium"]]
-    if (!is.null(res) && is.null(res$error) && !is.null(res$scale)) {
-      data.frame(
-        variable = var_info$name,
-        station = st,
-        threshold_value = round(res$u, 2),
-        n_exceedances = res$n_exceed,
-        scale = round(as.numeric(res$scale), 3),
-        shape = round(as.numeric(res$shape), 3),
-        se_scale = round(as.numeric(res$se_scale), 4),
-        se_shape = round(as.numeric(res$se_shape), 4),
-        stringsAsFactors = FALSE
-      )
-    }
-  }) |> (\(x) do.call(rbind, Filter(Negate(is.null), x)))()
-})
-
-gpd_params_df <- do.call(rbind, Filter(Negate(is.null), gpd_params_list))
-if (!is.null(gpd_params_df) && nrow(gpd_params_df) > 0) {
-  create_dt(gpd_params_df, "GPD Parameters (95% threshold) - All Variables and Stations")
+if (!is.null(wave_vignette_gpd_params) && nrow(wave_vignette_gpd_params) > 0) {
+  create_dt(wave_vignette_gpd_params, "GPD Parameters (95% threshold) - All Variables and Stations")
 } else {
   htmltools::div(class = "alert alert-warning", "GPD parameters not available")
 }
@@ -658,26 +621,8 @@ where $n_y$ = observations per year, $\lambda$ = exceedance rate.
 **Threshold sensitivity:** GPD results depend on threshold choice. Lower thresholds give more data but may violate asymptotic theory. The [mev](https://cran.r-project.org/package=mev) package provides diagnostics.
 
 ```{r eva-threshold-sensitivity}
-if (!is.null(gpd_wave_per_station) && "M3" %in% names(gpd_wave_per_station)) {
-  m3_gpd <- gpd_wave_per_station[["M3"]]
-  threshold_comparison <- lapply(names(m3_gpd), function(thr) {
-    res <- m3_gpd[[thr]]
-    if (!is.null(res) && is.null(res$error) && !is.null(res$scale)) {
-      data.frame(
-        threshold = thr,
-        quantile = paste0(c(low = "90%", medium = "95%", high = "99%")[thr]),
-        u = round(res$u, 2),
-        n_exceed = res$n_exceed,
-        scale = round(as.numeric(res$scale), 3),
-        shape = round(as.numeric(res$shape), 3),
-        stringsAsFactors = FALSE
-      )
-    }
-  })
-  thr_df <- do.call(rbind, Filter(Negate(is.null), threshold_comparison))
-  if (!is.null(thr_df) && nrow(thr_df) > 0) {
-    create_dt(thr_df, "Threshold sensitivity for M3 wave height (hourly data)")
-  }
+if (!is.null(wave_vignette_threshold_sens) && nrow(wave_vignette_threshold_sens) > 0) {
+  create_dt(wave_vignette_threshold_sens, "Threshold sensitivity for M3 wave height (hourly data)")
 }
 ```
 
@@ -686,29 +631,8 @@ if (!is.null(gpd_wave_per_station) && "M3" %in% names(gpd_wave_per_station)) {
 **Note: Limited sample size (n~8 years).** The pooled GEV analysis below is illustrative only due to few annual maxima. The per-station GPD approach above is preferred.
 
 ```{r eva-gev-pooled-illustrative}
-if (!is.null(analysis_summary) && "gev_pooled_fits" %in% names(analysis_summary)) {
-  gev_fits <- analysis_summary$gev_pooled_fits
-
-  params_df <- data.frame(
-    Variable = c("Signif Wave", "Max Wave", "Wind Speed"),
-    Location = c(gev_fits$wave_height$parameters["location"],
-                 gev_fits$hmax$parameters["location"],
-                 gev_fits$wind_speed$parameters["location"]),
-    Scale = c(gev_fits$wave_height$parameters["scale"],
-              gev_fits$hmax$parameters["scale"],
-              gev_fits$wind_speed$parameters["scale"]),
-    Shape = c(gev_fits$wave_height$parameters["shape"],
-              gev_fits$hmax$parameters["shape"],
-              gev_fits$wind_speed$parameters["shape"]),
-    N_years = c(gev_fits$wave_height$n_years,
-                gev_fits$hmax$n_years,
-                gev_fits$wind_speed$n_years)
-  )
-  params_df$Location <- round(params_df$Location, 2)
-  params_df$Scale <- round(params_df$Scale, 3)
-  params_df$Shape <- round(params_df$Shape, 3)
-
-  create_dt(params_df, "GEV Parameter Estimates - Pooled (illustrative, n~8)")
+if (!is.null(wave_vignette_gev_pooled_params)) {
+  create_dt(wave_vignette_gev_pooled_params, "GEV Parameter Estimates - Pooled (illustrative, n~8)")
 } else {
   htmltools::div(class = "alert alert-warning", "GEV fit data not available")
 }

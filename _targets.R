@@ -53,6 +53,8 @@ list(
   plan_joint_analysis,  # Joint distributions between buoys (issue #13)
   plan_spatial_extreme_values,  # H1 extremal dependence + max-stable (spatial EVT)
   plan_dashboard,
+  plan_dashboard_vignette,  # Pre-computed display data for dashboard_static.qmd
+  plan_wave_vignette,  # Pre-computed display data for wave_analysis.qmd
   plan_api,  # Static JSON API at docs/api/v1/ (issue #32)
   plan_doc_examples,
   plan_dashboard_captions,
