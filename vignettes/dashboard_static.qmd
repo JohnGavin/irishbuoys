@@ -11,6 +11,7 @@ execute:
 ---
 
 ```{r setup}
+library(targets)
 library(dplyr)
 library(ggplot2)
 library(plotly)
@@ -19,17 +20,41 @@ library(dygraphs)
 library(xts)
 library(tidyr)
 
-# Load pre-computed data from targets pipeline
-# Try multiple paths: vignettes/ context, project root (tar_quarto), installed package
-data_dir <- c("../inst/extdata", "inst/extdata")
-data_dir <- Find(dir.exists, data_dir)
-if (is.null(data_dir)) {
-  data_dir <- system.file("extdata", package = "irishbuoys")
-}
+# All data loaded from pre-computed targets via tar_load().
+# MANDATORY: No inline computation. Every chunk is ONE expression.
+store_path <- if (dir.exists("_targets")) "_targets" else "../_targets"
+targets::tar_config_set(store = store_path)
 
-buoy_data <- readRDS(file.path(data_dir, "dashboard_buoy_data.rds"))
-dashboard_stats <- readRDS(file.path(data_dir, "dashboard_stats.rds"))
-dashboard_ts <- readRDS(file.path(data_dir, "dashboard_timeseries.rds"))
+# Load all pre-computed targets
+targets::tar_load(c(
+  dashboard_buoy_data,
+  dash_vignette_hourly,
+  dash_vignette_scalars,
+  dash_vignette_stats,
+  dash_vignette_data_tables,
+  dash_vignette_reg_stats,
+  dash_vignette_scatter_data,
+  dash_vignette_rogue,
+  dash_vignette_rl
+))
+
+# Aliases for concise access
+buoy_data <- dashboard_buoy_data
+buoy_hourly <- dash_vignette_hourly
+sc <- dash_vignette_scalars
+
+# Scalar aliases
+date_caption <- sc$date_caption
+n_records <- sc$n_records
+cor_wind_wave <- sc$cor_wind_wave
+cor_wave_hmax <- sc$cor_wave_hmax
+max_hmax <- sc$max_hmax
+max_hmax_date <- sc$max_hmax_date
+max_station_hmax <- sc$max_hmax_station
+max_signif <- sc$max_signif
+max_signif_date <- sc$max_signif_date
+max_station_signif <- sc$max_signif_station
+stations <- sc$stations
 
 # Get package version
 pkg_version <- tryCatch(
@@ -42,45 +67,23 @@ pkg_version <- tryCatch(
     } else "dev"
   }
 )
+generated_time <- format(Sys.time(), "%Y-%m-%d %H:%M UTC")
 
-# Get unique stations
-stations <- sort(unique(buoy_data$station_id))
-
-# Use HOURLY data directly - preserve full detail
-# Only sample if dataset is extremely large (>200k rows) to keep HTML manageable
-set.seed(42)
-if (nrow(buoy_data) > 200000) {
-  buoy_hourly <- buoy_data |> slice_sample(n = 200000)
-} else {
-  buoy_hourly <- buoy_data
-}
-
-# Human-readable observation count (e.g., "200k")
+# Human-readable observation count
 format_k <- function(n) {
   if (n >= 1000) paste0(round(n / 1000), "k") else as.character(n)
 }
 n_hourly_display <- format_k(nrow(buoy_hourly))
 
-# Calculate summary stats
-valid_ww <- complete.cases(buoy_data$wind_speed, buoy_data$wave_height)
-valid_wh <- complete.cases(buoy_data$wave_height, buoy_data$hmax)
-cor_wind_wave <- round(cor(buoy_data$wind_speed[valid_ww], buoy_data$wave_height[valid_ww]), 3)
-cor_wave_hmax <- round(cor(buoy_data$wave_height[valid_wh], buoy_data$hmax[valid_wh]), 3)
-days_span <- round(as.numeric(difftime(max(buoy_data$time), min(buoy_data$time), units = "days")))
-generated_time <- format(Sys.time(), "%Y-%m-%d %H:%M UTC")
-date_caption <- paste0(format(min(buoy_data$time), "%Y-%m-%d"), " to ", format(max(buoy_data$time), "%Y-%m-%d"))
-n_records <- format(nrow(buoy_data), big.mark = ",")
-
-# Helper function to create station-specific data
+# Helper function to create station-specific data (display filter only)
 get_station_data <- function(data, station) {
   if (station != "All Buoys") {
-    data <- data |> filter(station_id == station)
+    data <- data[data$station_id == station, ]
   }
   data
 }
 
-# Helper function to create dygraph time series - full width
-# Maps variable names to display names (removes hmax from legends)
+# Display names for dygraph legends
 var_display_names <- c(
   "hmax" = "Max Wave (m)",
   "wave_height" = "Signif Wave (m)",
@@ -88,6 +91,7 @@ var_display_names <- c(
   "gust" = "Gust (kn)"
 )
 
+# Dygraph display helper (creates widget from pre-loaded data)
 create_dygraph <- function(data, variable = "wave_height", title = "", by_station = TRUE,
                            default_days = 30) {
   display_name <- if (variable %in% names(var_display_names)) var_display_names[[variable]] else variable
@@ -102,11 +106,9 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
     colnames(ts_data) <- display_name
   }
 
-  # Calculate y-axis range to ensure all data including max values are visible
-  y_max <- max(ts_data, na.rm = TRUE) * 1.05  # 5% padding above max
-  y_min <- min(0, min(ts_data, na.rm = TRUE))  # Start at 0 or below if negative
+  y_max <- max(ts_data, na.rm = TRUE) * 1.05
+  y_min <- min(0, min(ts_data, na.rm = TRUE))
 
-  # Default date window: show last N days if specified, full range otherwise
   date_window <- NULL
   if (!is.null(default_days)) {
     max_date <- max(index(ts_data))
@@ -116,12 +118,8 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
 
   dygraph(ts_data, main = title, width = "100%") |>
     dyOptions(
-      labelsUTC = TRUE,
-      fillGraph = TRUE,
-      fillAlpha = 0.1,
-      drawGrid = TRUE,
-      drawPoints = FALSE,
-      strokeWidth = 1.5,
+      labelsUTC = TRUE, fillGraph = TRUE, fillAlpha = 0.1,
+      drawGrid = TRUE, drawPoints = FALSE, strokeWidth = 1.5,
       colors = RColorBrewer::brewer.pal(max(3, ncol(ts_data)), "Set1")[1:ncol(ts_data)]
     ) |>
     dyAxis("y", valueRange = c(y_min, y_max)) |>
@@ -131,23 +129,16 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
     dyLegend(show = "always", width = 400)
 }
 
-# Helper function for DT tables with optimized timestamp display and frozen headers
+# DT display helper (creates widget from pre-computed table)
 create_dt <- function(data, caption = "", time_width = "140px") {
   time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp", "datetime", "Time (UTC)", "First", "Last"))
 
   dt <- datatable(
-    data,
-    caption = caption,
-    filter = 'top',
-    rownames = FALSE,
+    data, caption = caption, filter = 'top', rownames = FALSE,
     extensions = c('Buttons', 'FixedHeader'),
     options = list(
-      pageLength = 15,
-      dom = 'Bfrtip',
-      buttons = c('copy', 'csv', 'excel'),
-      order = list(list(0, 'desc')),
-      scrollX = TRUE,
-      fixedHeader = TRUE,
+      pageLength = 15, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
+      order = list(list(0, 'desc')), scrollX = TRUE, fixedHeader = TRUE,
       columnDefs = if (length(time_cols) > 0) {
         list(list(width = time_width, targets = time_cols - 1))
       } else NULL
@@ -159,11 +150,10 @@ create_dt <- function(data, caption = "", time_width = "140px") {
     dt <- dt %>%
       DT::formatStyle(columns = time_cols, fontSize = '10px', whiteSpace = 'nowrap')
   }
-
   dt
 }
 
-# Station information with coordinates and depths
+# Static station info (hardcoded reference data)
 station_info <- data.frame(
   Station = c("M2", "M3", "M4", "M5", "M6"),
   Location = c("Southwest Ireland", "Southwest Ireland", "Southeast Ireland", "West Ireland", "Northwest Ireland"),
@@ -173,41 +163,6 @@ station_info <- data.frame(
   `Distance from Shore (km)` = c(50, 65, 30, 55, 320),
   check.names = FALSE
 )
-
-# Pre-compute max values for captions with dates
-max_hmax_row <- buoy_data |> filter(hmax == max(hmax, na.rm = TRUE)) |> slice(1)
-max_hmax <- round(max_hmax_row$hmax, 1)
-max_hmax_date <- format(max_hmax_row$time, "%Y-%m-%d %H:%M")
-max_station_hmax <- max_hmax_row$station_id
-
-max_signif_row <- buoy_data |> filter(wave_height == max(wave_height, na.rm = TRUE)) |> slice(1)
-max_signif <- round(max_signif_row$wave_height, 1)
-max_signif_date <- format(max_signif_row$time, "%Y-%m-%d %H:%M")
-max_station_signif <- max_signif_row$station_id
-
-# Compute max values per station for highlighting
-max_per_station_hmax <- buoy_data |>
-  group_by(station_id) |>
-  filter(hmax == max(hmax, na.rm = TRUE)) |>
-  slice(1) |>
-  ungroup()
-
-max_per_station_signif <- buoy_data |>
-  group_by(station_id) |>
-  filter(wave_height == max(wave_height, na.rm = TRUE)) |>
-  slice(1) |>
-  ungroup()
-
-# Rogue waves and rogue winds for Data tab
-rogue_waves_full <- buoy_data |>
-  filter(!is.na(hmax), !is.na(wave_height), wave_height > 0) |>
-  mutate(wave_ratio = hmax / wave_height) |>
-  filter(wave_ratio > 2.0)
-
-rogue_winds_full <- buoy_data |>
-  filter(!is.na(gust), !is.na(wind_speed), wind_speed > 0) |>
-  mutate(gust_ratio = gust / wind_speed) |>
-  filter(gust_ratio > 1.8)
 ```
 
 # Max Wave (m)
@@ -267,30 +222,7 @@ create_dygraph(get_station_data(buoy_hourly, "M6"), "hmax", "Max Wave (m) - M6 H
 #### Statistics
 
 ```{r}
-# Get date of max wave per station
-max_wave_dates <- buoy_data |>
-  group_by(station_id) |>
-  filter(hmax == max(hmax, na.rm = TRUE)) |>
-  slice(1) |>
-  select(station_id, max_wave_time = time) |>
-  ungroup()
-
-hmax_stats <- buoy_data |>
-  group_by(`Station` = station_id) |>
-  summarise(
-    `Records (hourly)` = format(n(), big.mark = ","),
-    `Max Wave (m)` = round(max(hmax, na.rm = TRUE), 2),
-    `Avg Max Wave (m)` = round(mean(hmax, na.rm = TRUE), 2),
-    `Max Signif (m)` = round(max(wave_height, na.rm = TRUE), 2),
-    `Avg Ratio` = round(mean(hmax / wave_height, na.rm = TRUE), 2),
-    .groups = "drop"
-  ) |>
-  left_join(max_wave_dates, by = c("Station" = "station_id")) |>
-  mutate(`Max Wave Date` = format(max_wave_time, "%Y-%m-%d %H:%M")) |>
-  select(Station, `Records (hourly)`, `Max Wave Date`, `Max Wave (m)`, `Avg Max Wave (m)`, `Max Signif (m)`, `Avg Ratio`) |>
-  arrange(desc(`Max Wave (m)`))
-
-create_dt(hmax_stats, paste0(
+create_dt(dash_vignette_stats$hmax_stats, paste0(
   "Max Wave Statistics by Station (", date_caption, "). ",
   "Max Wave = tallest individual wave in each 17.5-min hourly window. ",
   "Avg Max Wave = mean of all hourly Max Wave values (typical tallest wave per hour). ",
@@ -302,20 +234,7 @@ create_dt(hmax_stats, paste0(
 #### Data Table
 
 ```{r}
-hmax_data <- buoy_data |>
-  select(time, station_id, hmax, wave_height) |>
-  mutate(ratio = round(hmax / wave_height, 2)) |>
-  arrange(desc(hmax)) |>
-  head(5000) |>
-  mutate(
-    `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
-    `Max Wave (m)` = round(hmax, 2),
-    `Signif Wave (m)` = round(wave_height, 2),
-    `Ratio` = ratio
-  ) |>
-  select(`Time (UTC)`, Station = station_id, `Max Wave (m)`, `Signif Wave (m)`, `Ratio`)
-
-create_dt(hmax_data, paste0(
+create_dt(dash_vignette_data_tables$hmax_data, paste0(
   "Max Wave Data ordered by tallest waves (top 5000 of ", n_records, " hourly records). ",
   "Max Wave = single tallest wave. Signif Wave = mean of top 1/3. ",
   "Ratio > 2.0 = potential rogue wave. Conclusion: Extreme waves cluster in winter storms."
@@ -379,29 +298,7 @@ create_dygraph(get_station_data(buoy_hourly, "M6"), "wave_height", "Signif Wave 
 #### Statistics
 
 ```{r}
-# Get date of max signif wave per station
-max_signif_dates <- buoy_data |>
-  group_by(station_id) |>
-  filter(wave_height == max(wave_height, na.rm = TRUE)) |>
-  slice(1) |>
-  select(station_id, max_signif_time = time) |>
-  ungroup()
-
-wave_stats <- buoy_data |>
-  group_by(`Station` = station_id) |>
-  summarise(
-    `Records (hourly)` = format(n(), big.mark = ","),
-    `Max Wave (m)` = round(max(hmax, na.rm = TRUE), 2),
-    `Max Signif (m)` = round(max(wave_height, na.rm = TRUE), 2),
-    `Avg Signif (m)` = round(mean(wave_height, na.rm = TRUE), 2),
-    .groups = "drop"
-  ) |>
-  left_join(max_signif_dates, by = c("Station" = "station_id")) |>
-  mutate(`Max Signif Date` = format(max_signif_time, "%Y-%m-%d %H:%M")) |>
-  select(Station, `Records (hourly)`, `Max Signif Date`, `Max Wave (m)`, `Max Signif (m)`, `Avg Signif (m)`) |>
-  arrange(desc(`Max Signif (m)`))
-
-create_dt(wave_stats, paste0(
+create_dt(dash_vignette_stats$wave_stats, paste0(
   "Signif Wave Statistics by Station (", date_caption, "). ",
   "Signif Wave = mean of highest 1/3 of ~300 waves per 17.5-min window (hourly). ",
   "Max Wave = tallest single wave. ",
@@ -412,19 +309,7 @@ create_dt(wave_stats, paste0(
 #### Data Table
 
 ```{r}
-wave_data <- buoy_data |>
-  select(time, station_id, wave_height, hmax, wave_period) |>
-  arrange(desc(wave_height)) |>
-  head(5000) |>
-  mutate(
-    `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
-    `Signif Wave (m)` = round(wave_height, 2),
-    `Max Wave (m)` = round(hmax, 2),
-    `Wave Period (s)` = round(wave_period, 1)
-  ) |>
-  select(`Time (UTC)`, Station = station_id, `Signif Wave (m)`, `Max Wave (m)`, `Wave Period (s)`)
-
-create_dt(wave_data, paste0(
+create_dt(dash_vignette_data_tables$wave_data, paste0(
   "Signif Wave Data ordered by largest values (top 5000 of ", n_records, " hourly records). ",
   "Signif Wave = mean of top 1/3. Wave Period = average time between wave crests (s). ",
   "Conclusion: Highest Signif Waves typically have longer periods (>10s), indicating Atlantic swell."
@@ -488,19 +373,7 @@ create_dygraph(get_station_data(buoy_hourly, "M6"), "wind_speed", "Wind Speed (k
 #### Statistics
 
 ```{r}
-wind_stats <- buoy_data |>
-  group_by(`Station` = station_id) |>
-  summarise(
-    `Records (hourly)` = n(),
-    `Avg Wind (kn)` = round(mean(wind_speed, na.rm = TRUE), 1),
-    `Max Wind (kn)` = round(max(wind_speed, na.rm = TRUE), 1),
-    `Max Gust (kn)` = round(max(gust, na.rm = TRUE), 1),
-    `Gust Factor` = round(max(gust, na.rm = TRUE) / max(wind_speed, na.rm = TRUE), 2),
-    .groups = "drop"
-  ) |>
-  arrange(desc(`Max Gust (kn)`))
-
-create_dt(wind_stats, paste0(
+create_dt(dash_vignette_stats$wind_stats, paste0(
   "Wind Statistics by Station (", date_caption, "). ",
   "Wind Speed = 10-min average (hourly). Gust = peak 3-second wind (hourly). ",
   "Gust Factor = Gust/Wind ratio. ",
@@ -511,19 +384,7 @@ create_dt(wind_stats, paste0(
 #### Data Table
 
 ```{r}
-wind_data <- buoy_data |>
-  select(time, station_id, wind_speed, gust, atmospheric_pressure) |>
-  arrange(desc(gust)) |>
-  head(5000) |>
-  mutate(
-    `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
-    `Wind Speed (kn)` = round(wind_speed, 1),
-    `Gust (kn)` = round(gust, 1),
-    `Pressure (hPa)` = round(atmospheric_pressure, 1)
-  ) |>
-  select(`Time (UTC)`, Station = station_id, `Wind Speed (kn)`, `Gust (kn)`, `Pressure (hPa)`)
-
-create_dt(wind_data, paste0(
+create_dt(dash_vignette_data_tables$wind_data, paste0(
   "Wind Data ordered by strongest gusts (top 5000 of ", n_records, " hourly records). ",
   "Gust = peak 3-second wind. Low pressure often accompanies high winds. ",
   "Conclusion: Strongest gusts cluster in winter storm events with pressure <990 hPa."
@@ -538,31 +399,16 @@ create_dt(wind_data, paste0(
 
 ```{r}
 #| fig-height: 36
-# Compute regression slopes to order panels (6x1 layout needs more height)
-reg_stats <- buoy_data |>
-  filter(!is.na(wind_speed), !is.na(wave_height)) |>
-  group_by(Station = station_id) |>
-  summarise(
-    Records = n(),
-    Correlation = round(cor(wind_speed, wave_height), 2),
-    Intercept = round(coef(lm(wave_height ~ wind_speed))[1], 2),
-    Slope = round(coef(lm(wave_height ~ wind_speed))[2], 2),
-    .groups = "drop"
-  ) |>
-  arrange(desc(Slope))
+# Pre-computed regression stats and scatter data from targets
+reg_stats <- dash_vignette_reg_stats
+scatter_info <- dash_vignette_scatter_data
+scatter_sample <- scatter_info$data
+n_strong_wind <- scatter_info$n_strong_wind
 
-# Order stations by slope (largest first)
+# Order stations by slope (largest first) - display formatting only
 station_order <- reg_stats$Station
 panel_labels <- paste0(station_order, " (slope=", sprintf("%.2f", reg_stats$Slope), ")")
 
-# Filter for wind_speed > 20 knots and sample for scatter plot
-set.seed(42)
-scatter_sample <- buoy_data |>
-  filter(!is.na(wind_speed), !is.na(wave_height), wind_speed > 20)
-n_strong_wind <- nrow(scatter_sample)
-if (nrow(scatter_sample) > 15000) {
-  scatter_sample <- scatter_sample |> slice_sample(n = 15000)
-}
 plot_data <- scatter_sample |>
   mutate(
     station_label = factor(
@@ -619,7 +465,7 @@ ggplotly(p, tooltip = "text") |>
 #### Regression Statistics
 
 ```{r}
-create_dt(reg_stats, paste0(
+create_dt(dash_vignette_reg_stats, paste0(
   "Linear Regression by Station ordered by slope (", date_caption, "). ",
   "Slope = Signif Wave increase (m) per knot of wind. ",
   "Higher correlation = wind explains more wave variability. ",
@@ -630,20 +476,7 @@ create_dt(reg_stats, paste0(
 #### Data Sample
 
 ```{r}
-scatter_data <- buoy_data |>
-  select(time, station_id, wind_speed, wave_height, hmax) |>
-  filter(!is.na(wind_speed), !is.na(wave_height)) |>
-  arrange(desc(wave_height)) |>
-  head(5000) |>
-  mutate(
-    `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
-    `Wind Speed (kn)` = round(wind_speed, 1),
-    `Signif Wave (m)` = round(wave_height, 2),
-    `Max Wave (m)` = round(hmax, 2)
-  ) |>
-  select(`Time (UTC)`, Station = station_id, `Wind Speed (kn)`, `Signif Wave (m)`, `Max Wave (m)`)
-
-create_dt(scatter_data, paste0(
+create_dt(dash_vignette_data_tables$scatter_data, paste0(
   "Wind-Wave Data ordered by Signif Wave (top 5000 of ", n_records, " hourly records). ",
   "Shows hourly measurements used in regression analysis. ",
   "Conclusion: High Signif Waves generally coincide with high winds, but swell can arrive without local wind."
@@ -653,10 +486,8 @@ create_dt(scatter_data, paste0(
 # Forecasts
 
 ```{r forecasts-setup}
-return_levels <- tryCatch(
-  readRDS(file.path(data_dir, "dashboard_return_levels.rds")),
-  error = function(e) NULL
-)
+# Return levels loaded from dash_vignette_rl target in setup chunk
+rl_data <- dash_vignette_rl
 ```
 
 ## Forecast Tables
@@ -666,14 +497,8 @@ return_levels <- tryCatch(
 #### 1-Year Return Level
 
 ```{r forecast-1yr}
-if (!is.null(return_levels)) {
-  rl_1yr <- return_levels |>
-    filter(return_period == 1, !is.na(return_level)) |>
-    mutate(return_level = round(return_level, 2)) |>
-    select(station, variable_label, return_level) |>
-    tidyr::pivot_wider(names_from = variable_label, values_from = return_level)
-
-  create_dt(rl_1yr, "1-Year Return Levels by Station (GPD, 95th percentile threshold)")
+if (!is.null(rl_data)) {
+  create_dt(rl_data$rl_1yr, "1-Year Return Levels by Station (GPD, 95th percentile threshold)")
 } else {
   htmltools::div(class = "alert alert-info", "Return level data not yet computed. Run tar_make() to generate.")
 }
@@ -682,14 +507,8 @@ if (!is.null(return_levels)) {
 #### 5-Year Return Level
 
 ```{r forecast-5yr}
-if (!is.null(return_levels)) {
-  rl_5yr <- return_levels |>
-    filter(return_period == 5, !is.na(return_level)) |>
-    mutate(return_level = round(return_level, 2)) |>
-    select(station, variable_label, return_level) |>
-    tidyr::pivot_wider(names_from = variable_label, values_from = return_level)
-
-  create_dt(rl_5yr, "5-Year Return Levels by Station (GPD, 95th percentile threshold)")
+if (!is.null(rl_data)) {
+  create_dt(rl_data$rl_5yr, "5-Year Return Levels by Station (GPD, 95th percentile threshold)")
 } else {
   htmltools::div(class = "alert alert-info", "Return level data not yet computed. Run tar_make() to generate.")
 }
@@ -698,14 +517,8 @@ if (!is.null(return_levels)) {
 #### 10-Year Return Level
 
 ```{r forecast-10yr}
-if (!is.null(return_levels)) {
-  rl_10yr <- return_levels |>
-    filter(return_period == 10, !is.na(return_level)) |>
-    mutate(return_level = round(return_level, 2)) |>
-    select(station, variable_label, return_level) |>
-    tidyr::pivot_wider(names_from = variable_label, values_from = return_level)
-
-  create_dt(rl_10yr, "10-Year Return Levels by Station (GPD, 95th percentile threshold)")
+if (!is.null(rl_data)) {
+  create_dt(rl_data$rl_10yr, "10-Year Return Levels by Station (GPD, 95th percentile threshold)")
 } else {
   htmltools::div(class = "alert alert-info", "Return level data not yet computed. Run tar_make() to generate.")
 }
@@ -714,17 +527,8 @@ if (!is.null(return_levels)) {
 #### All Return Levels
 
 ```{r forecast-all}
-if (!is.null(return_levels)) {
-  rl_wide <- return_levels |>
-    filter(!is.na(return_level)) |>
-    mutate(
-      col_name = paste0(variable_label, " ", return_period, "yr"),
-      return_level = round(return_level, 2)
-    ) |>
-    select(station, col_name, return_level) |>
-    tidyr::pivot_wider(names_from = col_name, values_from = return_level)
-
-  create_dt(rl_wide, "All Return Levels by Station (GPD, 95th percentile threshold)")
+if (!is.null(rl_data)) {
+  create_dt(rl_data$rl_all, "All Return Levels by Station (GPD, 95th percentile threshold)")
 } else {
   htmltools::div(class = "alert alert-info", "Return level data not yet computed. Run tar_make() to generate.")
 }
@@ -751,34 +555,7 @@ For detailed methodology and threshold sensitivity analysis, see the [Wave Analy
 #### Rogue Events (Waves + Winds)
 
 ```{r}
-# Merge rogue waves (ratio > 2.0) with rogue winds (gust factor > 1.8)
-# These are the extreme events of interest
-
-# Filter: wind_speed > 20 knots AND wave_height > 2 m (significant storm conditions)
-rogue_merged <- buoy_data |>
-  filter(!is.na(hmax), !is.na(wave_height), wave_height > 2,
-         !is.na(gust), !is.na(wind_speed), wind_speed > 20) |>
-  mutate(
-    wave_ratio = hmax / wave_height,
-    gust_ratio = gust / wind_speed
-  ) |>
-  filter(wave_ratio > 2.0 | gust_ratio > 1.8) |>
-  mutate(
-    `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
-    Station = station_id,
-    `Max Wave (m)` = round(hmax, 2),
-    `Signif Wave (m)` = round(wave_height, 2),
-    `Wave Ratio` = round(wave_ratio, 2),
-    `Rogue Wave?` = ifelse(wave_ratio > 2.0, "Yes", "No"),
-    `Gust (kn)` = round(gust, 1),
-    `Wind (kn)` = round(wind_speed, 1),
-    `Gust Ratio` = round(gust_ratio, 2),
-    `Rogue Wind?` = ifelse(gust_ratio > 1.8, "Yes", "No")
-  ) |>
-  arrange(desc(wave_ratio), desc(gust_ratio)) |>
-  select(`Time (UTC)`, Station, `Max Wave (m)`, `Signif Wave (m)`, `Wave Ratio`, `Rogue Wave?`,
-         `Gust (kn)`, `Wind (kn)`, `Gust Ratio`, `Rogue Wind?`)
-
+rogue_merged <- dash_vignette_rogue$rogue_merged
 n_rogue_merged <- nrow(rogue_merged)
 
 datatable(
@@ -810,22 +587,7 @@ datatable(
 #### Rogue Waves (Ratio > 2.0)
 
 ```{r}
-rogue_waves <- buoy_data |>
-  filter(!is.na(hmax), !is.na(wave_height), wave_height > 0) |>
-  mutate(ratio = hmax / wave_height) |>
-  filter(ratio > 2.0) |>
-  arrange(desc(ratio)) |>
-  mutate(
-    `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
-    Station = station_id,
-    `Max Wave (m)` = round(hmax, 2),
-    `Signif Wave (m)` = round(wave_height, 2),
-    `Ratio` = round(ratio, 2),
-    `Wind (kn)` = round(wind_speed, 1),
-    `Gust (kn)` = round(gust, 1)
-  ) |>
-  select(`Time (UTC)`, Station, `Max Wave (m)`, `Signif Wave (m)`, `Ratio`, `Wind (kn)`, `Gust (kn)`)
-
+rogue_waves <- dash_vignette_rogue$rogue_waves
 n_rogue <- nrow(rogue_waves)
 
 datatable(
@@ -856,27 +618,14 @@ datatable(
 #### Extreme Gusts (Top 1%)
 
 ```{r}
-gust_threshold <- quantile(buoy_data$gust, 0.99, na.rm = TRUE)
-extreme_gusts <- buoy_data |>
-  filter(!is.na(gust), gust >= gust_threshold) |>
-  arrange(desc(gust)) |>
-  mutate(
-    `Time (UTC)` = format(time, "%Y-%m-%d %H:%M"),
-    Station = station_id,
-    `Gust (kn)` = round(gust, 1),
-    `Wind (kn)` = round(wind_speed, 1),
-    `Gust Factor` = round(gust / wind_speed, 2),
-    `Max Wave (m)` = round(hmax, 2),
-    `Pressure (hPa)` = round(atmospheric_pressure, 1)
-  ) |>
-  select(`Time (UTC)`, Station, `Gust (kn)`, `Wind (kn)`, `Gust Factor`, `Max Wave (m)`, `Pressure (hPa)`)
-
+extreme_gusts <- dash_vignette_rogue$extreme_gusts
+gust_threshold <- dash_vignette_rogue$gust_threshold
 n_gusts <- nrow(extreme_gusts)
 
 datatable(
   extreme_gusts,
   caption = htmltools::HTML(paste0(
-    "<b>Extreme Gust Events</b> (", format(n_gusts, big.mark = ","), " events in top 1%, ≥", round(gust_threshold, 1), " kn). ",
+    "<b>Extreme Gust Events</b> (", format(n_gusts, big.mark = ","), " events in top 1%, ≥", gust_threshold, " kn). ",
     "Gust Factor = Gust / Wind Speed; typical 1.3-1.6, >1.8 indicates gusty conditions. ",
     "Sorted by strongest gusts. Low pressure often accompanies extreme wind events."
   )),

@@ -22,6 +22,11 @@
 #' Vignette display targets:
 #' - api_vignette_endpoints_dt     : DT::datatable of endpoints
 #' - api_vignette_example_response : Sample JSON snippet
+#' - api_vignette_stations_dt      : DT::datatable of station metadata
+#' - api_vignette_stats_dt         : DT::datatable of per-station statistics
+#' - api_vignette_return_levels_dt : DT::datatable of return levels (wide)
+#' - api_vignette_rogue_waves_dt   : DT::datatable of top rogue wave events
+#' - api_vignette_data_dict_dt     : DT::datatable of variable definitions
 
 plan_api <- list(
 
@@ -283,6 +288,136 @@ plan_api <- list(
         auto_unbox = TRUE,
         POSIXt = "ISO8601",
         na = "null"
+      )
+    }
+  ),
+
+  # Stations table for vignette
+  targets::tar_target(
+    api_vignette_stations_dt,
+    {
+      st <- api_stations
+      # Remove rows with all-NA numeric columns
+      st <- st[!is.na(st$latitude) & !is.na(st$longitude), ]
+      DT::datatable(
+        st,
+        caption = "Station Metadata",
+        options = list(
+          pageLength = 10,
+          dom = "Bfrtip",
+          buttons = c("csv", "print")
+        ),
+        rownames = FALSE,
+        class = "display compact"
+      )
+    }
+  ),
+
+  # Stats table for vignette
+  targets::tar_target(
+    api_vignette_stats_dt,
+    {
+      st_stats <- api_stats$station_stats
+      df <- dplyr::bind_rows(lapply(names(st_stats), function(nm) {
+        s <- st_stats[[nm]]
+        tibble::tibble(
+          station = nm,
+          n_records = s$n_records %||% NA_integer_,
+          mean_wave_height = round(s$mean_wave_height %||% NA_real_, 2),
+          max_wave_height = round(s$max_wave_height %||% NA_real_, 2),
+          mean_wind_speed = round(s$mean_wind_speed %||% NA_real_, 2),
+          max_wind_speed = round(s$max_wind_speed %||% NA_real_, 2)
+        )
+      }))
+      DT::datatable(
+        df,
+        caption = "Per-Station Summary Statistics",
+        options = list(
+          pageLength = 10,
+          dom = "Bfrtip",
+          buttons = c("csv", "print")
+        ),
+        rownames = FALSE,
+        class = "display compact"
+      )
+    }
+  ),
+
+  # Return levels table for vignette (wide format)
+  targets::tar_target(
+    api_vignette_return_levels_dt,
+    {
+      rl <- api_return_levels$by_station
+      rows <- lapply(names(rl), function(station) {
+        vars <- rl[[station]]
+        lapply(names(vars), function(variable) {
+          periods <- vars[[variable]]
+          tibble::tibble(
+            station = station,
+            variable = variable,
+            `1yr` = periods[["1yr"]] %||% NA_real_,
+            `5yr` = periods[["5yr"]] %||% NA_real_,
+            `10yr` = periods[["10yr"]] %||% NA_real_
+          )
+        })
+      })
+      df <- dplyr::bind_rows(unlist(rows, recursive = FALSE))
+      DT::datatable(
+        df,
+        caption = "GPD Return Levels by Station and Variable",
+        options = list(
+          pageLength = 15,
+          dom = "Bfrtip",
+          buttons = c("csv", "print")
+        ),
+        rownames = FALSE,
+        class = "display compact"
+      ) |> DT::formatRound(columns = c("1yr", "5yr", "10yr"), digits = 2)
+    }
+  ),
+
+  # Rogue waves preview table for vignette (top 20 by ratio)
+  targets::tar_target(
+    api_vignette_rogue_waves_dt,
+    {
+      events <- api_rogue_waves$events
+      if (is.data.frame(events) && nrow(events) > 0) {
+        events <- events[order(-events$hmax_hs_ratio), ]
+        events <- utils::head(events, 20)
+      }
+      DT::datatable(
+        events,
+        caption = paste0(
+          "Top Rogue Wave Events (showing 20 of ",
+          api_rogue_waves$n_events, " total)"
+        ),
+        options = list(
+          pageLength = 10,
+          dom = "Bfrtip",
+          buttons = c("csv", "print"),
+          scrollX = TRUE
+        ),
+        rownames = FALSE,
+        class = "display compact"
+      )
+    }
+  ),
+
+  # Data dictionary table for vignette
+  targets::tar_target(
+    api_vignette_data_dict_dt,
+    {
+      vars <- api_data_dictionary$variables
+      DT::datatable(
+        vars,
+        caption = "Data Dictionary: Variable Definitions",
+        options = list(
+          pageLength = 20,
+          dom = "Bfrtip",
+          buttons = c("csv", "print")
+        ),
+        rownames = FALSE,
+        class = "display compact"
       )
     }
   ),
