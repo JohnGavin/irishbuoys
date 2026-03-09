@@ -1,14 +1,14 @@
 {
-  "updated_at": "2026-03-08T23:50:25Z",
+  "updated_at": "2026-03-09T09:49:02Z",
   "method": "GPD",
   "threshold": "95th percentile",
   "return_periods": [1, 5, 10],
   "by_station": {
     "M2": {
       "avg_wave": {
-        "1yr": 5.74,
-        "5yr": 6.36,
-        "10yr": 6.6
+        "1yr": 5.76,
+        "5yr": 6.4,
+        "10yr": 6.65
       },
       "rogue_wave": {
         "1yr": 9.3,
@@ -96,10 +96,10 @@
       "avg_wave": {
         "1yr": 14.11,
         "5yr": 15.58,
-        "10yr": 16.17
+        "10yr": 16.16
       },
       "rogue_wave": {
-        "1yr": 22.33,
+        "1yr": 22.32,
         "5yr": 24.91,
         "10yr": 25.95
       },
