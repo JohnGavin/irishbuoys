@@ -99,12 +99,36 @@ plan_api <- list(
         })
       })
 
+      # Build ci_methods from ci_comparison if available
+      ci_methods <- tryCatch({
+        ci_comp <- ci_comparison_per_station
+        if (is.null(ci_comp) || nrow(ci_comp) == 0) return(NULL)
+        ci_comp <- ci_comp[!is.na(ci_comp$return_level), ]
+        ci_stations <- unique(ci_comp$station)
+        lapply(stats::setNames(ci_stations, ci_stations), function(st) {
+          st_data <- ci_comp[ci_comp$station == st, ]
+          ci_vars <- unique(st_data$variable)
+          lapply(stats::setNames(ci_vars, ci_vars), function(v) {
+            v_data <- st_data[st_data$variable == v, ]
+            methods <- unique(v_data$method)
+            lapply(stats::setNames(methods, methods), function(m) {
+              m_data <- v_data[v_data$method == m, ]
+              as.list(stats::setNames(
+                round(m_data$return_level, 2),
+                paste0(m_data$return_period, "yr")
+              ))
+            })
+          })
+        })
+      }, error = function(e) NULL)
+
       list(
         updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
         method = "GPD",
         threshold = "95th percentile",
         return_periods = c(1, 5, 10),
-        by_station = by_station
+        by_station = by_station,
+        ci_methods = ci_methods
       )
     }
   ),

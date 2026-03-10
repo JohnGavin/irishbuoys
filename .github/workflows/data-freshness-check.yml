@@ -1,0 +1,106 @@
+name: Data Freshness Monitor
+
+# Lightweight check that queries ERDDAP directly (no Nix build needed).
+# Creates a GitHub issue if the latest available data is older than 24h,
+# indicating an ERDDAP outage or upstream processing problem.
+#
+# Runs every 12 hours — half the frequency of data-update.yml, just
+# enough to catch persistent staleness without noise.
+#
+# See: https://github.com/JohnGavin/irishbuoys/issues/56
+
+on:
+  schedule:
+    - cron: '30 5,17 * * *'  # 05:30 and 17:30 UTC (offset from data-update)
+  workflow_dispatch:
+
+jobs:
+  freshness-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Query ERDDAP for latest timestamp
+        id: check
+        run: |
+          # Fetch the single most recent timestamp from ERDDAP
+          RESPONSE=$(curl -sf --max-time 30 \
+            "https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?time&orderByMax(%22time%22)" \
+            2>/dev/null) || { echo "erddap_down=true" >> $GITHUB_OUTPUT; exit 0; }
+
+          # Parse timestamp (skip header row + units row)
+          LATEST=$(echo "$RESPONSE" | tail -1 | tr -d '"')
+          echo "latest=$LATEST"
+
+          if [ -z "$LATEST" ] || [ "$LATEST" = "time" ]; then
+            echo "erddap_down=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Compute age in hours
+          LATEST_EPOCH=$(date -d "$LATEST" +%s 2>/dev/null || date -j -f "%Y-%m-%dT%H:%M:%SZ" "$LATEST" +%s 2>/dev/null)
+          NOW_EPOCH=$(date +%s)
+          AGE_HOURS=$(( (NOW_EPOCH - LATEST_EPOCH) / 3600 ))
+
+          echo "age_hours=$AGE_HOURS" >> $GITHUB_OUTPUT
+          echo "latest_time=$LATEST" >> $GITHUB_OUTPUT
+          echo "Data age: ${AGE_HOURS}h (latest: $LATEST)"
+
+          if [ "$AGE_HOURS" -gt 24 ]; then
+            echo "stale=true" >> $GITHUB_OUTPUT
+          else
+            echo "stale=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue if ERDDAP is down
+        if: steps.check.outputs.erddap_down == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Check for existing open issue to avoid duplicates
+          EXISTING=$(gh issue list --repo ${{ github.repository }} \
+            --label "data-freshness" --state open --json number --jq '.[0].number' 2>/dev/null)
+          if [ -n "$EXISTING" ]; then
+            echo "Existing issue #$EXISTING — skipping"
+            exit 0
+          fi
+          gh issue create --repo ${{ github.repository }} \
+            --title "ERDDAP server unreachable" \
+            --label "data-freshness,bug" \
+            --body "The Marine Institute ERDDAP server at erddap.marine.ie did not respond.
+
+          **Detected:** $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          **Action:** Check https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html manually.
+
+          This issue was created automatically by the data-freshness-check workflow."
+
+      - name: Create issue if data is stale
+        if: steps.check.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --repo ${{ github.repository }} \
+            --label "data-freshness" --state open --json number --jq '.[0].number' 2>/dev/null)
+          if [ -n "$EXISTING" ]; then
+            echo "Existing issue #$EXISTING — skipping"
+            exit 0
+          fi
+          gh issue create --repo ${{ github.repository }} \
+            --title "Stale ERDDAP data: ${{ steps.check.outputs.age_hours }}h old" \
+            --label "data-freshness,bug" \
+            --body "The latest ERDDAP data is **${{ steps.check.outputs.age_hours }} hours old** (threshold: 24h).
+
+          **Latest timestamp:** \`${{ steps.check.outputs.latest_time }}\`
+          **Detected:** $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+          Possible causes:
+          - Marine Institute ERDDAP processing delay
+          - Buoy maintenance/outage
+          - Data pipeline not running (check data-update.yml runs)
+
+          This issue was created automatically by the data-freshness-check workflow."
+
+      - name: Log freshness result
+        if: always()
+        run: |
+          echo "::notice::ERDDAP latest=${{ steps.check.outputs.latest_time }}, age=${{ steps.check.outputs.age_hours }}h, stale=${{ steps.check.outputs.stale }}"

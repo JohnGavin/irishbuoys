@@ -473,6 +473,120 @@ plan_wave_analysis <- list(
   ),
 
   # ========================================
+  # Confidence Interval Comparison (Issues #51 + #52)
+  # ========================================
+
+  # Order-statistics CIs for 95th/99th quantiles per station
+  targets::tar_target(
+    order_stats_ci_per_station,
+    {
+      var_map <- list(
+        avg_wave   = "wave_height",
+        rogue_wave = "hmax",
+        avg_wind   = "wind_speed",
+        wind_gust  = "gust"
+      )
+
+      all_results <- lapply(names(var_map), function(var_name) {
+        col <- var_map[[var_name]]
+        stations <- unique(analysis_data$station_id)
+
+        station_results <- lapply(stations, function(st) {
+          vals <- analysis_data[[col]][
+            analysis_data$station_id == st & !is.na(analysis_data[[col]])
+          ]
+          if (length(vals) < 100) return(NULL)
+
+          ci <- ci_order_statistics(vals, probs = c(0.95, 0.99))
+          ci$station <- st
+          ci$variable <- var_name
+          ci
+        })
+
+        dplyr::bind_rows(station_results)
+      })
+
+      result <- dplyr::bind_rows(all_results)
+      cli::cli_alert_success(
+        "Computed {nrow(result)} order-statistics CIs"
+      )
+      result
+    }
+  ),
+
+  # Bootstrap CIs for GPD return levels per station (block_size=48 for hourly)
+  targets::tar_target(
+    bootstrap_ci_per_station,
+    {
+      var_map <- list(
+        avg_wave   = "wave_height",
+        rogue_wave = "hmax",
+        avg_wind   = "wind_speed",
+        wind_gust  = "gust"
+      )
+
+      all_results <- lapply(names(var_map), function(var_name) {
+        col <- var_map[[var_name]]
+        stations <- unique(analysis_data$station_id)
+
+        station_results <- lapply(stations, function(st) {
+          d <- analysis_data[
+            analysis_data$station_id == st & !is.na(analysis_data[[col]]),
+          ]
+          if (nrow(d) < 100) return(NULL)
+
+          ci <- ci_bootstrap_return_levels(
+            d,
+            variable = col,
+            return_periods = c(1, 5, 10),
+            n_boot = 500,
+            block_size = 48,
+            seed = 42
+          )
+          ci$station <- st
+          ci$variable <- var_name
+          ci
+        })
+
+        dplyr::bind_rows(station_results)
+      })
+
+      result <- dplyr::bind_rows(all_results)
+      cli::cli_alert_success(
+        "Computed {nrow(result)} bootstrap CIs ({length(unique(result$station))} stations x {length(unique(result$variable))} variables)"
+      )
+      result
+    }
+  ),
+
+  # Combined CI comparison: delta-method vs order-stats vs bootstrap
+  targets::tar_target(
+    ci_comparison_per_station,
+    {
+      # Delta-method CIs from return_levels_per_station (already has method="GPD")
+      delta <- return_levels_per_station
+      if (!is.null(delta)) {
+        delta$method <- "delta"
+        delta <- delta[, c("return_period", "return_level", "lower", "upper",
+                           "station", "variable", "method")]
+      }
+
+      # Bootstrap CIs
+      boot <- bootstrap_ci_per_station
+      if (!is.null(boot)) {
+        boot <- boot[, c("return_period", "return_level", "lower", "upper",
+                          "station", "variable", "method")]
+      }
+
+      result <- dplyr::bind_rows(delta, boot)
+      cli::cli_alert_success(
+        "CI comparison table: {nrow(result)} rows, methods: {paste(unique(result$method), collapse=', ')}"
+      )
+      result
+    }
+  ),
+
+  # ========================================
   # GEV Pooled Analysis (illustrative, n=8 years only)
   # ========================================
 

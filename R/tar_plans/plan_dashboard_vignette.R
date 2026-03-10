@@ -44,7 +44,8 @@ plan_dashboard_vignette <- list(
         max_hmax_station = max_hmax_row$station_id,
         max_signif = round(max_signif_row$wave_height, 1),
         max_signif_date = format(max_signif_row$time, "%Y-%m-%d %H:%M"),
-        max_signif_station = max_signif_row$station_id
+        max_signif_station = max_signif_row$station_id,
+        data_end_time = max(data$time)
       )
     }
   ),
