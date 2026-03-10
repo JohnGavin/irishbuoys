@@ -12,6 +12,7 @@
 #' - wave_vignette_gpd_params        : GPD parameters data frame (all variables/stations)
 #' - wave_vignette_threshold_sens    : Threshold sensitivity for M3 wave height
 #' - wave_vignette_gev_pooled_params : GEV pooled parameter estimates (illustrative)
+#' - wave_vignette_ci_comparison     : CI comparison table (delta vs bootstrap, wide)
 
 plan_wave_vignette <- list(
 
@@ -172,6 +173,27 @@ plan_wave_vignette <- list(
       params_df$Scale <- round(params_df$Scale, 3)
       params_df$Shape <- round(params_df$Shape, 3)
       params_df
+    }
+  ),
+
+  # CI comparison table: delta-method vs bootstrap (wide format for display)
+  targets::tar_target(
+    wave_vignette_ci_comparison,
+    {
+      if (is.null(ci_comparison_per_station)) return(NULL)
+
+      ci_comparison_per_station |>
+        dplyr::filter(!is.na(.data$return_level)) |>
+        dplyr::mutate(
+          ci_label = paste0(
+            round(.data$return_level, 2), " [",
+            round(.data$lower, 2), ", ",
+            round(.data$upper, 2), "]"
+          ),
+          col_name = paste0(.data$method, "_", .data$return_period, "yr")
+        ) |>
+        dplyr::select("station", "variable", "col_name", "ci_label") |>
+        tidyr::pivot_wider(names_from = "col_name", values_from = "ci_label")
     }
   )
 )

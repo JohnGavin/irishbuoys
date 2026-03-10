@@ -4,8 +4,8 @@ name: Daily Storm Alert
 # Sends email alert ONLY when Beaufort 8+ (gale force) winds are forecast.
 # No email on calm days.
 #
-# When storms are detected, directly triggers the weekly-update workflow
-# for an immediate data refresh (instead of waiting for the next scheduled run).
+# When storms are detected, directly triggers the data update workflow
+# for an immediate data refresh (instead of waiting for the next 6-hourly run).
 
 on:
   schedule:
@@ -89,7 +89,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "::notice::Triggering data update workflow (${{ steps.alert.outputs.n_storms }} storm hours detected)"
-          gh workflow run weekly-update.yml || echo "::warning::Failed to trigger data update"
+          gh workflow run data-update.yml || echo "::warning::Failed to trigger data update"
 
       - name: Upload result artifact
         if: always()

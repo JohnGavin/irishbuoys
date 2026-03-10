@@ -808,9 +808,40 @@ create_dt(station_info, paste0(
 
 ---
 
-*Dashboard generated `r generated_time` using irishbuoys v`r pkg_version`*
+```{r data-age, include=FALSE}
+# ISO 8601 timestamp for JS to compute live age in the user's browser
+data_end_iso <- if (!is.null(sc$data_end_time)) {
+  format(sc$data_end_time, "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+} else ""
+```
 
-*Data coverage: `r date_caption` | Total records: `r n_records` hourly observations*
+*Dashboard generated `r generated_time` using irishbuoys v`r pkg_version` | Latest data: [<span id="data-age">loading...</span>]{style="font-weight:bold"}*
+
+*Data coverage: `r date_caption` | Total records: `r n_records` hourly observations | Updated every 6 hours*
+
+```{=html}
+<script>
+(function() {
+  var endTime = "`r data_end_iso`";
+  var el = document.getElementById("data-age");
+  if (!endTime || !el) return;
+  function update() {
+    var diffMs = Date.now() - new Date(endTime).getTime();
+    var hours = Math.floor(diffMs / 3600000);
+    if (hours < 24) {
+      el.textContent = hours + "h ago";
+      el.style.color = hours <= 16 ? "green" : "orange";
+    } else {
+      var days = Math.floor(hours / 24);
+      el.textContent = days + "d " + (hours % 24) + "h ago";
+      el.style.color = "red";
+    }
+  }
+  update();
+  setInterval(update, 60000);
+})();
+</script>
+```
 
 ---
 
