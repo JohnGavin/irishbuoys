@@ -1,4 +1,4 @@
-name: Weekly Data Update
+name: Data Update (6-hourly)
 
 # Incremental pipeline using targets-runs branch pattern
 # (inspired by https://github.com/b-rodrigues/nix_targets_pipeline)
@@ -12,13 +12,17 @@ name: Weekly Data Update
 #   6. Save _targets/ state to targets-runs branch for next run
 #
 # Schedule:
-#   - Always runs on Sundays at 2 AM UTC (regular weekly update)
-#   - Triggered immediately by storm-alert.yml when storms are detected
+#   - Runs every 6 hours (0:00, 6:00, 12:00, 18:00 UTC)
+#   - ERDDAP data is hourly with ~10h lag (data_mode=M / delayed mode)
+#   - 6-hourly runs keep the dashboard within ~16h of real-time
+#   - Also triggered by storm-alert.yml when storms are detected
 #   - Can always be triggered manually via workflow_dispatch
+#
+# See: https://github.com/JohnGavin/irishbuoys/issues/56
 
 on:
   schedule:
-    - cron: '0 2 * * 0'  # Sundays at 2 AM UTC
+    - cron: '0 0,6,12,18 * * *'  # Every 6 hours
   workflow_dispatch:
 
 permissions:
@@ -28,8 +32,8 @@ permissions:
 
 jobs:
   # ── Main Pipeline Job ────────────────────────────────────
-  # Runs on: Sunday schedule, storm-alert dispatch, or manual trigger.
-  # No gate job needed — cron is Sunday-only, other triggers are intentional.
+  # Runs on: 6-hourly schedule, storm-alert dispatch, or manual trigger.
+  # No gate job needed — cron runs are routine, other triggers are intentional.
   update-data:
     runs-on: ubuntu-latest
     timeout-minutes: 90
@@ -153,10 +157,10 @@ jobs:
             )
           '"
 
-      # ── Verify Email Freshness ───────────────────────────────
-      # Fail-fast: if email_summary_data has stale ingestion_stats, abort
-      # before committing or deploying. This catches cases where tar_make()
-      # used cached stale data despite the pre-pipeline fetch.
+      # ── Verify Data Freshness ─────────────────────────────────
+      # Fail-fast: abort before committing or deploying if data is stale.
+      # With 6-hourly runs, data older than 24h indicates a problem
+      # (ERDDAP outage, fetch failure, or pipeline cache issue).
 
       - name: Verify email data freshness
         run: |
@@ -169,10 +173,26 @@ jobs:
             }
             max_age <- max(as.numeric(difftime(Sys.time(), stats\$latest, units = \"hours\")))
             cat(\"Max data age:\", round(max_age, 1), \"hours\\n\")
-            if (max_age > 96) {
-              stop(\"STALE EMAIL DATA: \", round(max_age), \"h old (threshold: 96h)\")
+            if (max_age > 24) {
+              stop(\"STALE EMAIL DATA: \", round(max_age), \"h old (threshold: 24h)\")
             }
             cat(\"Email freshness check PASSED\\n\")
+          '"
+
+      - name: Verify dashboard data freshness
+        run: |
+          nix-shell default.nix -A shell --run "Rscript -e '
+            pkgload::load_all(quiet = TRUE)
+            sc <- targets::tar_read(dash_vignette_scalars)
+            if (is.null(sc\$data_end_time)) {
+              stop(\"No data_end_time in dash_vignette_scalars\")
+            }
+            age_h <- as.numeric(difftime(Sys.time(), sc\$data_end_time, units = \"hours\"))
+            cat(\"Dashboard data age:\", round(age_h, 1), \"hours\\n\")
+            if (age_h > 24) {
+              warning(\"Dashboard data is \", round(age_h), \"h old (threshold: 24h)\")
+            }
+            cat(\"Dashboard freshness check PASSED\\n\")
           '"
 
       # ── Render Vignettes ────────────────────────────────────
@@ -215,7 +235,7 @@ jobs:
           git add inst/extdata/*.rds || true
           git add docs/api/ || true
           git add docs/articles/ docs/vignettes/ || true
-          git diff --staged --quiet || git commit -m "Data update (${{ github.event_name }}): $(date +'%Y-%m-%d')"
+          git diff --staged --quiet || git commit -m "Data update (${{ github.event_name }}): $(date +'%Y-%m-%dT%H:%M')Z"
           git push || true
 
       # ── Save Pipeline State to targets-runs ─────────────────

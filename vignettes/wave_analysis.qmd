@@ -78,6 +78,10 @@ return_levels_per_station <- tryCatch(
   targets::tar_read(return_levels_per_station),
   error = function(e) NULL
 )
+ci_comparison_per_station <- tryCatch(
+  targets::tar_read(ci_comparison_per_station),
+  error = function(e) NULL
+)
 
 # Load pre-computed vignette display targets
 tryCatch({
@@ -98,6 +102,10 @@ tryCatch({
   wave_vignette_threshold_sens <<- NULL
   wave_vignette_gev_pooled_params <<- NULL
 })
+wave_vignette_ci_comparison <- tryCatch(
+  targets::tar_read(wave_vignette_ci_comparison),
+  error = function(e) NULL
+)
 
 # Alias for compatibility
 rogue_events <- rogue_wave_events
@@ -596,6 +604,18 @@ if (!is.null(wave_vignette_gpd_params) && nrow(wave_vignette_gpd_params) > 0) {
   create_dt(wave_vignette_gpd_params, "GPD Parameters (95% threshold) - All Variables and Stations")
 } else {
   htmltools::div(class = "alert alert-warning", "GPD parameters not available")
+}
+```
+
+#### CI Comparison
+
+Comparison of confidence interval methods for GPD return levels: **delta-method** (asymptotic, from standard errors) vs **block bootstrap** (resampled, 500 replicates, block size 48h). Format: *estimate [lower, upper]*.
+
+```{r eva-ci-comparison}
+if (!is.null(wave_vignette_ci_comparison) && nrow(wave_vignette_ci_comparison) > 0) {
+  create_dt(wave_vignette_ci_comparison, "CI Comparison: Delta-method vs Bootstrap (95% level)")
+} else {
+  htmltools::div(class = "alert alert-info", "CI comparison not yet available. Run the pipeline with updated targets.")
 }
 ```
 
