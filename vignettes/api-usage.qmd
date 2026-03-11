@@ -61,6 +61,7 @@ tryCatch({
   tar_load(api_decomposition)
   tar_load(api_spatial)
   tar_load(api_gust_factors)
+  tar_load(api_methods)
   tar_load(code_api_curl_latest)
   tar_load(code_api_r_jsonlite)
   tar_load(code_api_python_requests)
@@ -340,6 +341,28 @@ rogue gust thresholds.
 **Fields:** `summary`, `extreme_gusts`, `by_station`,
 `rogue_gust_threshold`, `n_rogue_gusts`, `pct_rogue_gusts`
 
+## Statistical Methods {#methods}
+
+The `methods.json` endpoint documents all statistical methods used in the
+analyses, including parameter choices, thresholds, and academic references.
+
+**Methods covered:** GPD extreme value analysis, Mann-Kendall trend tests,
+STL decomposition, rogue wave detection, gust factor analysis, cross-correlation.
+
+```{r methods-sample}
+#| results: asis
+methods <- safe_tar_read("api_methods")
+d <- if (is.list(methods) && "data" %in% names(methods)) methods$data else methods
+if (is.list(d) && "gpd" %in% names(d)) {
+  cat("```json\n")
+  cat(jsonlite::toJSON(
+    list(gpd = d$gpd),
+    pretty = TRUE, auto_unbox = TRUE
+  ))
+  cat("\n```\n")
+}
+```
+
 ## Data Sources {#data-sources}
 
 All data originates from the Marine Institute's ERDDAP server:
@@ -473,6 +496,7 @@ run_api(port = 8080)
 | `GET /decomposition` | STL decomposition per station |
 | `GET /spatial` | Cross-station correlations |
 | `GET /gust-factors` | Gust factor analysis |
+| `GET /methods` | Statistical methods documentation |
 
 ### Programmatic Access
 
