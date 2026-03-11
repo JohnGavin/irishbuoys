@@ -4,6 +4,84 @@ format:
   dashboard:
     orientation: rows
     theme: cosmo
+    include-in-header:
+      - text: |
+          <style>
+          .fullscreen-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: rgba(0,0,0,0.95) !important;
+            padding: 20px !important;
+            overflow: auto !important;
+            cursor: zoom-out !important;
+            box-sizing: border-box !important;
+          }
+          .fullscreen-overlay .js-plotly-plot,
+          .fullscreen-overlay .plotly {
+            width: 100% !important;
+            height: calc(100vh - 40px) !important;
+          }
+          .fullscreen-overlay .datatables {
+            max-height: calc(100vh - 40px) !important;
+            overflow: auto !important;
+          }
+          .fullscreen-overlay .dygraph-label,
+          .fullscreen-overlay .dygraphs {
+            width: 100% !important;
+            height: calc(100vh - 40px) !important;
+          }
+          .cell-output-display:has(.js-plotly-plot),
+          .cell-output-display:has(.datatables),
+          .cell-output-display:has(.dygraphs) {
+            cursor: zoom-in;
+          }
+          /* Tab content: show full height, page scrolls instead of card body */
+          .card-body, .tab-content, .tab-pane {
+            overflow: visible !important;
+            max-height: none !important;
+          }
+          .tab-pane .cell-output-display {
+            overflow: visible !important;
+            max-height: none !important;
+          }
+          .tab-pane .datatables {
+            overflow: visible !important;
+            max-height: none !important;
+          }
+          </style>
+          <script>
+          document.addEventListener('click', function(e) {
+            var overlay = e.target.closest('.fullscreen-overlay');
+            if (overlay) {
+              overlay.classList.remove('fullscreen-overlay');
+              var plots = overlay.querySelectorAll('.js-plotly-plot');
+              plots.forEach(function(p) { if (window.Plotly) Plotly.Plots.resize(p); });
+              var dygraphs = overlay.querySelectorAll('.dygraph-graph');
+              dygraphs.forEach(function(d) { if (d.dygraph) d.dygraph.resize(); });
+              return;
+            }
+            var cell = e.target.closest('.cell-output-display');
+            if (!cell) return;
+            var hasPlot = cell.querySelector('.js-plotly-plot');
+            var hasTable = cell.querySelector('.datatables');
+            var hasDygraph = cell.querySelector('.dygraphs');
+            if (!hasPlot && !hasTable && !hasDygraph) return;
+            if (e.target.closest('.modebar')) return;
+            if (e.target.closest('.dygraph-rangesel-fgcanvas')) return;
+            cell.classList.add('fullscreen-overlay');
+            if (hasPlot && window.Plotly) {
+              setTimeout(function() { Plotly.Plots.resize(hasPlot); }, 100);
+            }
+            if (hasDygraph) {
+              var dg = cell.querySelector('.dygraph-graph');
+              if (dg && dg.dygraph) setTimeout(function() { dg.dygraph.resize(); }, 100);
+            }
+          });
+          </script>
 execute:
   echo: false
   warning: false
@@ -129,12 +207,19 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
     dyLegend(show = "always", width = 400)
 }
 
-# DT display helper (creates widget from pre-computed table)
+# DT display helper (creates widget from pre-computed table, caption at top)
 create_dt <- function(data, caption = "", time_width = "140px") {
   time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp", "datetime", "Time (UTC)", "First", "Last"))
 
+  # Force caption to top position
+  cap <- if (nzchar(caption)) {
+    htmltools::tags$caption(style = "caption-side: top; font-size: 0.9em;", caption)
+  } else {
+    NULL
+  }
+
   dt <- datatable(
-    data, caption = caption, filter = 'top', rownames = FALSE,
+    data, caption = cap, filter = 'top', rownames = FALSE,
     extensions = c('Buttons', 'FixedHeader'),
     options = list(
       pageLength = 15, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
@@ -215,7 +300,7 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "hmax", "Max Wave (m) - M5 H
 create_dygraph(get_station_data(buoy_hourly, "M6"), "hmax", "Max Wave (m) - M6 Hourly", by_station = FALSE)
 ```
 
-## Station Comparison {height=35%}
+## Station Comparison
 
 ### Max Wave Details {.tabset}
 
@@ -291,7 +376,7 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "wave_height", "Signif Wave 
 create_dygraph(get_station_data(buoy_hourly, "M6"), "wave_height", "Signif Wave (m) - M6 Hourly", by_station = FALSE)
 ```
 
-## Station Comparison {height=35%}
+## Station Comparison
 
 ### Signif Wave Details {.tabset}
 
@@ -366,7 +451,7 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "wind_speed", "Wind Speed (k
 create_dygraph(get_station_data(buoy_hourly, "M6"), "wind_speed", "Wind Speed (kn) - M6 Hourly", by_station = FALSE)
 ```
 
-## Station Comparison {height=35%}
+## Station Comparison
 
 ### Wind Details {.tabset}
 
@@ -451,14 +536,19 @@ ggplotly(p, tooltip = "text") |>
     ),
     paper_bgcolor = "#B3B3B3",
     plot_bgcolor = "#B3B3B3",
-    margin = list(t = 80),
+    legend = list(
+      orientation = "h", y = -0.15, x = 0.5, xanchor = "center",
+      font = list(color = "#1a1a1a", size = 12),
+      bgcolor = "rgba(179,179,179,0.9)", bordercolor = "#666666", borderwidth = 1
+    ),
+    margin = list(t = 80, b = 80),
     hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
   )
 ```
 
 **Caption:** Wind Speed vs [Signif Wave](#variable-definitions) relationship for observations with **wind >20 knots** (strong wind conditions). Panels ordered by regression slope. The slope indicates wave height increase (m) per knot of wind. M6 (deep Atlantic) shows steepest slope due to unlimited fetch. Filtering for high winds focuses on storm conditions where wind-wave coupling is strongest.
 
-## Summary Statistics {height=25%}
+## Summary Statistics
 
 ### Wind-Wave Details {.tabset}
 
