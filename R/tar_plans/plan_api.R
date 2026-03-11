@@ -7,7 +7,7 @@
 #' Base URL: https://johngavin.github.io/irishbuoys/api/v1/
 #'
 #' @details
-#' Targets (12 endpoints + write step):
+#' Targets (15 endpoints + write step):
 #' - api_stations       : Station metadata (stations.json)
 #' - api_stats          : Dashboard statistics (stats.json)
 #' - api_rogue_waves    : Rogue wave events (rogue-waves.json)
@@ -20,11 +20,15 @@
 #' - api_status         : Per-station operational status (status.json)
 #' - api_trends         : Mann-Kendall trends per station (trends.json)
 #' - api_extremes       : GPD + CI comparison combined (extremes.json)
+#' - api_decomposition  : STL decomposition per station (decomposition.json)
+#' - api_spatial         : Cross-station correlations (spatial.json)
+#' - api_gust_factors   : Gust factor analysis (gust-factors.json)
 #' - api_index          : Endpoint catalogue (index.json)
 #' - save_api_files     : Writes all JSON to docs/api/v1/
 #'
 #' Intermediate targets:
 #' - mk_per_station     : Mann-Kendall tests per station/variable
+#' - decomp_per_station : STL decomposition per station
 #'
 #' Vignette display targets:
 #' - api_vignette_endpoints_dt     : DT::datatable of endpoints
@@ -288,6 +292,49 @@ plan_api <- list(
     generate_api_extremes(return_levels_per_station, ci_comparison_per_station)
   ),
 
+  # ==========================================================================
+  # NEW ENDPOINTS (PR 2 / Issue #53 Tier 2)
+  # ==========================================================================
+
+  # STL decomposition per station (intermediate target)
+  targets::tar_target(
+    decomp_per_station,
+    {
+      stations <- unique(analysis_data$station_id)
+      results <- lapply(stats::setNames(stations, stations), function(st) {
+        st_data <- analysis_data[analysis_data$station_id == st, ]
+        if (nrow(st_data) < 168) return(NULL)  # Need at least 1 week
+        tryCatch(
+          decompose_stl(st_data, variable = "wave_height", frequency = "daily"),
+          error = function(e) NULL
+        )
+      })
+      results
+    }
+  ),
+
+  # Decomposition endpoint
+  targets::tar_target(
+    api_decomposition,
+    generate_api_decomposition(decomp_per_station)
+  ),
+
+  # Spatial correlations endpoint (reuses existing pair_correlations targets)
+  targets::tar_target(
+    api_spatial,
+    generate_api_spatial(
+      pair_correlations_wave,
+      pair_correlations_wind,
+      pair_correlations_hmax
+    )
+  ),
+
+  # Gust factors endpoint (reuses existing gust_factor_analysis target)
+  targets::tar_target(
+    api_gust_factors,
+    generate_api_gust_factors(gust_factor_analysis)
+  ),
+
   # API index (catalogue of all endpoints)
   targets::tar_target(
     api_index,
@@ -318,7 +365,10 @@ plan_api <- list(
         "sources.json" = api_sources,
         "status.json" = api_status,
         "trends.json" = api_trends,
-        "extremes.json" = api_extremes
+        "extremes.json" = api_extremes,
+        "decomposition.json" = api_decomposition,
+        "spatial.json" = api_spatial,
+        "gust-factors.json" = api_gust_factors
       )
 
       # Write each file

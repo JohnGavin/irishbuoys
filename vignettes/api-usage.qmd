@@ -58,6 +58,9 @@ tryCatch({
   tar_load(api_status)
   tar_load(api_trends)
   tar_load(api_extremes)
+  tar_load(api_decomposition)
+  tar_load(api_spatial)
+  tar_load(api_gust_factors)
   tar_load(code_api_curl_latest)
   tar_load(code_api_r_jsonlite)
   tar_load(code_api_python_requests)
@@ -309,6 +312,34 @@ interval comparisons (delta-method vs bootstrap) into a single resource.
 (nested by station/variable), `ci_comparison` (with `methods`, `n_rows`,
 `records`)
 
+## Decomposition {#decomposition}
+
+The `decomposition.json` endpoint provides STL decomposition results
+(seasonal, trend, remainder components) per station, downsampled to daily
+resolution to keep file size manageable.
+
+**Fields:** `resolution`, `stations` (per-station: `variable`,
+`n_daily_points`, `summary`, `components`)
+
+## Spatial Correlations {#spatial}
+
+The `spatial.json` endpoint provides cross-station pair correlations
+for wave height, wind speed, and maximum wave height including distance,
+optimal lag, and maximum correlation.
+
+**Fields:** `wave_height`, `wind_speed`, `hmax` (each a data frame with
+`station1`, `station2`, `distance_km`, `optimal_lag`, `max_correlation`,
+`expected_lag`, `n_obs`)
+
+## Gust Factors {#gust-factors}
+
+The `gust-factors.json` endpoint provides gust factor analysis per station
+including summary statistics, extreme gust events (capped at 500), and
+rogue gust thresholds.
+
+**Fields:** `summary`, `extreme_gusts`, `by_station`,
+`rogue_gust_threshold`, `n_rogue_gusts`, `pct_rogue_gusts`
+
 ## Data Sources {#data-sources}
 
 All data originates from the Marine Institute's ERDDAP server:
@@ -439,6 +470,9 @@ run_api(port = 8080)
 | `GET /status` | Per-station operational status |
 | `GET /trends` | Mann-Kendall trend tests |
 | `GET /extremes` | GPD fits and CI comparison |
+| `GET /decomposition` | STL decomposition per station |
+| `GET /spatial` | Cross-station correlations |
+| `GET /gust-factors` | Gust factor analysis |
 
 ### Programmatic Access
 

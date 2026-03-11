@@ -11,9 +11,9 @@ test_that("generate_api_index returns valid structure", {
   expect_type(idx$endpoints, "list")
 })
 
-test_that("generate_api_index has 12 endpoints", {
+test_that("generate_api_index has 15 endpoints", {
   idx <- generate_api_index()
-  expect_length(idx$endpoints, 12)
+  expect_length(idx$endpoints, 15)
 })
 
 test_that("generate_api_index includes all endpoint names", {
@@ -23,7 +23,8 @@ test_that("generate_api_index includes all endpoint names", {
     "stations.json", "stats.json", "rogue-waves.json",
     "return-levels.json", "data-dictionary.json", "latest.json",
     "seasonal.json", "correlations.json",
-    "sources.json", "status.json", "trends.json", "extremes.json"
+    "sources.json", "status.json", "trends.json", "extremes.json",
+    "decomposition.json", "spatial.json", "gust-factors.json"
   )
   for (ep in expected) {
     expect_true(ep %in% endpoint_names, info = paste("Missing endpoint:", ep))
@@ -232,4 +233,113 @@ test_that("generate_api_extremes returns valid structure", {
   expect_true("method" %in% names(data))
   expect_true("return_levels" %in% names(data))
   expect_true("ci_comparison" %in% names(data))
+})
+
+# ===========================================================================
+# generate_api_decomposition()
+# ===========================================================================
+
+test_that("generate_api_decomposition returns valid structure", {
+  # Mock STL decomposition result (per-station named list)
+  mock_decomp <- list(
+    M3 = list(
+      components = data.frame(
+        time = seq(as.POSIXct("2020-01-01", tz = "UTC"),
+                   by = "hour", length.out = 48),
+        seasonal = rnorm(48),
+        trend = cumsum(rnorm(48, 0, 0.01)),
+        remainder = rnorm(48, 0, 0.1)
+      ),
+      summary = list(
+        seasonal_var = 0.88,
+        trend_var = 0.05,
+        remainder_var = 0.07
+      ),
+      variable = "wave_height"
+    )
+  )
+  result <- generate_api_decomposition(mock_decomp)
+  expect_type(result, "list")
+  expect_true("_meta" %in% names(result))
+  expect_true("data" %in% names(result))
+  expect_equal(result[["_meta"]]$endpoint, "decomposition")
+
+  data <- result$data
+  expect_true("stations" %in% names(data))
+  expect_true("M3" %in% names(data$stations))
+})
+
+# ===========================================================================
+# generate_api_spatial()
+# ===========================================================================
+
+test_that("generate_api_spatial returns valid structure", {
+  # Mock pair correlations (data frames from analyze_station_pairs)
+  mock_wave <- data.frame(
+    station1 = c("M2", "M2", "M3"),
+    station2 = c("M3", "M4", "M4"),
+    distance_km = c(100, 200, 150),
+    optimal_lag = c(2, 5, 3),
+    max_correlation = c(0.85, 0.60, 0.72),
+    expected_lag = c(3.3, 6.7, 5.0),
+    n_obs = c(50000L, 45000L, 48000L),
+    stringsAsFactors = FALSE
+  )
+  mock_wind <- mock_wave
+  mock_wind$max_correlation <- c(0.80, 0.55, 0.68)
+  mock_hmax <- mock_wave
+  mock_hmax$max_correlation <- c(0.78, 0.52, 0.65)
+
+  result <- generate_api_spatial(mock_wave, mock_wind, mock_hmax)
+  expect_type(result, "list")
+  expect_true("_meta" %in% names(result))
+  expect_true("data" %in% names(result))
+  expect_equal(result[["_meta"]]$endpoint, "spatial")
+
+  data <- result$data
+  expect_true("wave_height" %in% names(data))
+  expect_true("wind_speed" %in% names(data))
+  expect_true("hmax" %in% names(data))
+  expect_equal(nrow(data$wave_height), 3)
+})
+
+# ===========================================================================
+# generate_api_gust_factors()
+# ===========================================================================
+
+test_that("generate_api_gust_factors returns valid structure", {
+  # Mock gust factor analysis result
+  mock_gust <- list(
+    summary = data.frame(
+      metric = c("mean", "median", "max"),
+      value = c(1.5, 1.4, 3.2)
+    ),
+    extreme_gusts = data.frame(
+      station_id = c("M2", "M3"),
+      time = as.POSIXct(c("2020-01-15", "2020-02-20"), tz = "UTC"),
+      wind_speed = c(40, 55),
+      gust = c(70, 90),
+      gust_factor = c(1.75, 1.64)
+    ),
+    by_station = data.frame(
+      station_id = c("M2", "M3"),
+      mean_gust_factor = c(1.45, 1.52),
+      max_gust_factor = c(2.8, 3.2)
+    ),
+    rogue_gust_threshold = 2.0,
+    n_rogue_gusts = 150L,
+    pct_rogue_gusts = 0.8
+  )
+  result <- generate_api_gust_factors(mock_gust)
+  expect_type(result, "list")
+  expect_true("_meta" %in% names(result))
+  expect_true("data" %in% names(result))
+  expect_equal(result[["_meta"]]$endpoint, "gust-factors")
+
+  data <- result$data
+  expect_true("summary" %in% names(data))
+  expect_true("by_station" %in% names(data))
+  expect_true("rogue_gust_threshold" %in% names(data))
+  # extreme_gusts should be capped
+  expect_true(nrow(data$extreme_gusts) <= 500)
 })
