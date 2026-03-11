@@ -250,6 +250,7 @@ generate_weekly_summary <- function(
     dplyr::arrange(dplyr::desc(.data$time))
 
   # Ingestion stats: new records per station this week
+  report_composed <- Sys.time()
   ingestion_stats <- buoy_tbl(con) |>
     dplyr::filter(
       .data$time >= !!as.POSIXct(start_date, tz = "UTC"),
@@ -263,7 +264,14 @@ generate_weekly_summary <- function(
       .groups = "drop"
     ) |>
     dplyr::arrange(.data$station_id) |>
-    dplyr::collect()
+    dplyr::collect() |>
+    dplyr::mutate(
+      report_composed = report_composed,
+      staleness_hours = round(
+        as.numeric(difftime(report_composed, .data$latest, units = "hours")), 1
+      ),
+      staleness_alert = .data$staleness_hours > 18
+    )
 
   # Validate freshness when data exists (abort if ALL stations stale, warn if some)
   if (nrow(ingestion_stats) > 0) {
@@ -385,18 +393,36 @@ create_email_summary <- function(summary) {
   }), collapse = "")
   }
 
-  # Format ingestion stats table
+  # Format ingestion stats table with staleness
   ingestion_text <- if (!is.null(summary$ingestion_stats) && nrow(summary$ingestion_stats) > 0) {
+    ing <- summary$ingestion_stats
+    ing_rows <- paste(vapply(seq_len(nrow(ing)), function(i) {
+      row <- ing[i, ]
+      stale_color <- if (isTRUE(row$staleness_alert)) "#dc3545" else "#28a745"
+      stale_label <- if (isTRUE(row$staleness_alert)) {
+        paste0("<strong style='color:", stale_color, "'>", row$staleness_hours, "h STALE</strong>")
+      } else {
+        paste0("<span style='color:", stale_color, "'>", row$staleness_hours, "h</span>")
+      }
+      paste0(
+        "<tr><td>", row$station_id, "</td>",
+        "<td>", format(row$new_records, big.mark = ","), "</td>",
+        "<td>", format(row$earliest, "%Y-%m-%d %H:%M"), "</td>",
+        "<td>", format(row$latest, "%Y-%m-%d %H:%M"), "</td>",
+        "<td>", stale_label, "</td></tr>"
+      )
+    }, character(1)), collapse = "")
+
+    composed_ts <- format(ing$report_composed[1], "%Y-%m-%d %H:%M:%S %Z")
     paste0(
       "<h2>Data Ingestion This Week</h2>",
+      "<p><small>Report composed: <strong>", composed_ts, "</strong>. ",
+      "Staleness = hours since latest observation. ",
+      "<span style='color:#dc3545'>Alert</span> if &gt; 18h.</small></p>",
       "<table border='1' style='border-collapse: collapse;'>",
-      "<tr><th>Station</th><th>New Records</th><th>Earliest</th><th>Latest</th></tr>",
-      paste(apply(summary$ingestion_stats, 1, function(row) {
-        paste0("<tr><td>", row["station_id"], "</td>",
-               "<td>", format(as.numeric(row["new_records"]), big.mark = ","), "</td>",
-               "<td>", row["earliest"], "</td>",
-               "<td>", row["latest"], "</td></tr>")
-      }), collapse = ""),
+      "<tr><th>Station</th><th>New Records</th><th>Earliest</th>",
+      "<th>Latest</th><th>Staleness</th></tr>",
+      ing_rows,
       "</table>"
     )
   } else {
@@ -513,7 +539,7 @@ create_email_summary <- function(summary) {
     station_stats,
 
     "<hr>",
-    "<p><small>Generated on ", Sys.Date(), " by the ",
+    "<p><small>Generated on ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), " by the ",
     "<a href='https://johngavin.github.io/irishbuoys/'>irishbuoys</a> R package ",
     "(<a href='https://github.com/JohnGavin/irishbuoys'>source on GitHub</a>).</small></p>",
     "<p><small>Data source: <a href='https://erddap.marine.ie/'>Marine Institute ERDDAP Server</a></small></p>",
