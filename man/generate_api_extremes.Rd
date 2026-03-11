@@ -25,9 +25,12 @@ Other api:
 \code{\link{api_plumber}},
 \code{\link{api_static}},
 \code{\link{create_api_router}()},
+\code{\link{generate_api_decomposition}()},
+\code{\link{generate_api_gust_factors}()},
 \code{\link{generate_api_index}()},
 \code{\link{generate_api_latest}()},
 \code{\link{generate_api_sources}()},
+\code{\link{generate_api_spatial}()},
 \code{\link{generate_api_status}()},
 \code{\link{generate_api_trends}()},
 \code{\link{run_api}()}

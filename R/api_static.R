@@ -126,6 +126,21 @@ generate_api_index <- function(
         endpoint = "extremes.json",
         url = paste0(base_url, "extremes.json"),
         description = "GPD fits, return levels, and CI method comparison (delta, bootstrap)"
+      ),
+      list(
+        endpoint = "decomposition.json",
+        url = paste0(base_url, "decomposition.json"),
+        description = "STL decomposition (seasonal, trend, remainder) per station"
+      ),
+      list(
+        endpoint = "spatial.json",
+        url = paste0(base_url, "spatial.json"),
+        description = "Cross-station correlation matrices for wave height, wind speed, Hmax"
+      ),
+      list(
+        endpoint = "gust-factors.json",
+        url = paste0(base_url, "gust-factors.json"),
+        description = "Gust factor analysis per station with extreme events"
       )
     )
   }
@@ -389,5 +404,137 @@ generate_api_extremes <- function(
     ),
     endpoint = "extremes",
     description = "GPD fits, return levels, and CI method comparison (delta, bootstrap)"
+  )
+}
+
+# ===========================================================================
+# PR 2: Analysis-derived endpoint generators
+# ===========================================================================
+
+#' Generate Decomposition Endpoint
+#'
+#' @description
+#' Returns STL decomposition results per station, downsampled to daily
+#' resolution to keep JSON under 1MB.
+#'
+#' @param decomp_per_station Named list of per-station decomposition results.
+#'   Each element should have `components` (data.frame with time, seasonal,
+#'   trend, remainder), `summary`, and `variable`.
+#'
+#' @return A list with `_meta` and `data` fields.
+#'
+#' @family api
+#' @export
+generate_api_decomposition <- function(decomp_per_station) {
+  stations <- lapply(
+    stats::setNames(names(decomp_per_station), names(decomp_per_station)),
+    function(st) {
+      decomp <- decomp_per_station[[st]]
+      if (is.null(decomp)) return(NULL)
+
+      comp <- decomp$components
+      # Downsample to daily: take first observation per date
+      if (is.data.frame(comp) && nrow(comp) > 0) {
+        comp$date <- as.Date(comp$time)
+        comp <- comp[!duplicated(comp$date), ]
+        comp$time <- NULL
+        # Round numeric columns
+        num_cols <- c("seasonal", "trend", "remainder")
+        for (col in intersect(num_cols, names(comp))) {
+          comp[[col]] <- round(comp[[col]], 4)
+        }
+      }
+
+      list(
+        variable = decomp$variable %||% "wave_height",
+        n_daily_points = nrow(comp),
+        summary = decomp$summary,
+        components = comp
+      )
+    }
+  )
+
+  .api_wrap(
+    data = list(
+      resolution = "daily (downsampled from hourly)",
+      stations = stations
+    ),
+    endpoint = "decomposition",
+    description = "STL decomposition (seasonal, trend, remainder) per station"
+  )
+}
+
+#' Generate Spatial Correlations Endpoint
+#'
+#' @description
+#' Returns cross-station correlation matrices for wave height,
+#' wind speed, and Hmax.
+#'
+#' @param pair_wave Data frame from `analyze_station_pairs()` for wave height.
+#' @param pair_wind Data frame from `analyze_station_pairs()` for wind speed.
+#' @param pair_hmax Data frame from `analyze_station_pairs()` for Hmax.
+#'
+#' @return A list with `_meta` and `data` fields.
+#'
+#' @family api
+#' @export
+generate_api_spatial <- function(pair_wave, pair_wind, pair_hmax) {
+  round_pairs <- function(df) {
+    if (is.null(df) || !is.data.frame(df)) return(df)
+    num_cols <- c("distance_km", "max_correlation", "expected_lag")
+    for (col in intersect(num_cols, names(df))) {
+      df[[col]] <- round(df[[col]], 4)
+    }
+    df
+  }
+
+  .api_wrap(
+    data = list(
+      wave_height = round_pairs(pair_wave),
+      wind_speed = round_pairs(pair_wind),
+      hmax = round_pairs(pair_hmax)
+    ),
+    endpoint = "spatial",
+    description = "Cross-station correlation matrices for wave height, wind speed, Hmax"
+  )
+}
+
+#' Generate Gust Factors Endpoint
+#'
+#' @description
+#' Returns gust factor analysis results per station, capped at 500
+#' extreme events to keep JSON under 1MB.
+#'
+#' @param gust_analysis List from `analyze_gust_factor()` containing
+#'   `summary`, `extreme_gusts`, `by_station`, `rogue_gust_threshold`,
+#'   `n_rogue_gusts`, `pct_rogue_gusts`.
+#'
+#' @return A list with `_meta` and `data` fields.
+#'
+#' @family api
+#' @export
+generate_api_gust_factors <- function(gust_analysis) {
+  # Cap extreme_gusts at 500 rows
+
+  extreme <- gust_analysis$extreme_gusts
+  if (is.data.frame(extreme) && nrow(extreme) > 500) {
+    # Keep highest gust factor events
+    if ("gust_factor" %in% names(extreme)) {
+      extreme <- extreme[order(-extreme$gust_factor), ]
+    }
+    extreme <- utils::head(extreme, 500)
+  }
+
+  .api_wrap(
+    data = list(
+      summary = gust_analysis$summary,
+      extreme_gusts = extreme,
+      by_station = gust_analysis$by_station,
+      rogue_gust_threshold = gust_analysis$rogue_gust_threshold,
+      n_rogue_gusts = gust_analysis$n_rogue_gusts,
+      pct_rogue_gusts = round(gust_analysis$pct_rogue_gusts, 4)
+    ),
+    endpoint = "gust-factors",
+    description = "Gust factor analysis per station with extreme events"
   )
 }
