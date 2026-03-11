@@ -141,6 +141,11 @@ generate_api_index <- function(
         endpoint = "gust-factors.json",
         url = paste0(base_url, "gust-factors.json"),
         description = "Gust factor analysis per station with extreme events"
+      ),
+      list(
+        endpoint = "methods.json",
+        url = paste0(base_url, "methods.json"),
+        description = "Statistical methods documentation: thresholds, formulas, references"
       )
     )
   }
@@ -536,5 +541,101 @@ generate_api_gust_factors <- function(gust_analysis) {
     ),
     endpoint = "gust-factors",
     description = "Gust factor analysis per station with extreme events"
+  )
+}
+
+# ===========================================================================
+# PR 3: Methods documentation endpoint
+# ===========================================================================
+
+#' Generate Methods Endpoint
+#'
+#' @description
+#' Returns statistical methods documentation: thresholds, formulas,
+#' references. Pure function with no upstream target dependency.
+#'
+#' @return A list with `_meta` and `data` fields.
+#'
+#' @family api
+#' @export
+generate_api_methods <- function() {
+  .api_wrap(
+    data = list(
+      gpd = list(
+        description = paste(
+          "Generalised Pareto Distribution fitted to exceedances above",
+          "a threshold using maximum likelihood estimation (mev::fit.gpd)."
+        ),
+        threshold = "95th percentile of the variable's distribution",
+        return_periods = c(1, 5, 10),
+        observations_per_year = 8760L,
+        ci_methods = list(
+          delta = "Delta method (asymptotic normal approximation of MLE)",
+          bootstrap = paste(
+            "Block bootstrap (block_size=48h) with 500 resamples;",
+            "percentile CIs at 95% level"
+          )
+        ),
+        references = c(
+          "Coles, S. (2001). An Introduction to Statistical Modeling of Extreme Values. Springer.",
+          "Beirlant, J. et al. (2004). Statistics of Extremes. Wiley."
+        )
+      ),
+      mann_kendall = list(
+        description = paste(
+          "Non-parametric trend test using Kendall's tau correlation",
+          "between time index and variable values."
+        ),
+        significance_level = 0.05,
+        trend_classification = list(
+          increasing = "tau > 0 and p < 0.05",
+          decreasing = "tau < 0 and p < 0.05",
+          no_trend = "p >= 0.05"
+        ),
+        references = c(
+          "Mann, H.B. (1945). Nonparametric tests against trend. Econometrica, 13, 245-259.",
+          "Kendall, M.G. (1975). Rank Correlation Methods. Griffin, London."
+        )
+      ),
+      stl_decomposition = list(
+        description = paste(
+          "Seasonal and Trend decomposition using Loess (STL).",
+          "Separates time series into seasonal, trend, and remainder components."
+        ),
+        frequency = "daily (24 observations per cycle for hourly data)",
+        references = c(
+          "Cleveland, R.B. et al. (1990). STL: A Seasonal-Trend Decomposition Procedure Based on Loess. J. Official Statistics, 6, 3-73."
+        )
+      ),
+      rogue_wave_detection = list(
+        description = "Rogue waves detected where Hmax exceeds 2x significant wave height (Hs).",
+        criterion = "Hmax / Hs > 2.0",
+        references = c(
+          "Haver, S. (2004). A possible freak wave event measured at the Draupner jacket January 1 1995.",
+          "Kharif, C. & Pelinovsky, E. (2003). Physical mechanisms of the rogue wave phenomenon. Eur. J. Mech. B/Fluids, 22, 603-634."
+        )
+      ),
+      gust_factor = list(
+        description = "Ratio of gust speed to mean wind speed. Rogue gusts exceed a threshold factor.",
+        formula = "gust_factor = gust / wind_speed",
+        min_wind_speed = 5,
+        references = c(
+          "WMO (2018). Guide to Meteorological Instruments and Methods of Observation. WMO-No. 8."
+        )
+      ),
+      cross_correlation = list(
+        description = paste(
+          "Cross-correlation between station pairs at varying lags,",
+          "used to identify wave propagation patterns."
+        ),
+        max_lag = 48,
+        expected_propagation_speed = "~30 km/h (swell)",
+        references = c(
+          "Hasselmann, K. et al. (1973). Measurements of wind-wave growth and swell decay during JONSWAP. Dt. Hydrogr. Z., A8(12), 1-95."
+        )
+      )
+    ),
+    endpoint = "methods",
+    description = "Statistical methods documentation: thresholds, formulas, references"
   )
 }

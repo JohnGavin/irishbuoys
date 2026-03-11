@@ -7,7 +7,7 @@
 #' Base URL: https://johngavin.github.io/irishbuoys/api/v1/
 #'
 #' @details
-#' Targets (15 endpoints + write step):
+#' Targets (16 endpoints + write step):
 #' - api_stations       : Station metadata (stations.json)
 #' - api_stats          : Dashboard statistics (stats.json)
 #' - api_rogue_waves    : Rogue wave events (rogue-waves.json)
@@ -23,6 +23,7 @@
 #' - api_decomposition  : STL decomposition per station (decomposition.json)
 #' - api_spatial         : Cross-station correlations (spatial.json)
 #' - api_gust_factors   : Gust factor analysis (gust-factors.json)
+#' - api_methods        : Statistical methods docs (methods.json)
 #' - api_index          : Endpoint catalogue (index.json)
 #' - save_api_files     : Writes all JSON to docs/api/v1/
 #'
@@ -335,6 +336,16 @@ plan_api <- list(
     generate_api_gust_factors(gust_factor_analysis)
   ),
 
+  # ==========================================================================
+  # NEW ENDPOINTS (PR 3 / Issue #53 Tier 3)
+  # ==========================================================================
+
+  # Methods documentation (pure constants, no upstream dependency)
+  targets::tar_target(
+    api_methods,
+    generate_api_methods()
+  ),
+
   # API index (catalogue of all endpoints)
   targets::tar_target(
     api_index,
@@ -368,7 +379,8 @@ plan_api <- list(
         "extremes.json" = api_extremes,
         "decomposition.json" = api_decomposition,
         "spatial.json" = api_spatial,
-        "gust-factors.json" = api_gust_factors
+        "gust-factors.json" = api_gust_factors,
+        "methods.json" = api_methods
       )
 
       # Write each file

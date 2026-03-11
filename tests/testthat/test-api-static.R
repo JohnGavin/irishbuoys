@@ -11,9 +11,9 @@ test_that("generate_api_index returns valid structure", {
   expect_type(idx$endpoints, "list")
 })
 
-test_that("generate_api_index has 15 endpoints", {
+test_that("generate_api_index has 16 endpoints", {
   idx <- generate_api_index()
-  expect_length(idx$endpoints, 15)
+  expect_length(idx$endpoints, 16)
 })
 
 test_that("generate_api_index includes all endpoint names", {
@@ -24,7 +24,8 @@ test_that("generate_api_index includes all endpoint names", {
     "return-levels.json", "data-dictionary.json", "latest.json",
     "seasonal.json", "correlations.json",
     "sources.json", "status.json", "trends.json", "extremes.json",
-    "decomposition.json", "spatial.json", "gust-factors.json"
+    "decomposition.json", "spatial.json", "gust-factors.json",
+    "methods.json"
   )
   for (ep in expected) {
     expect_true(ep %in% endpoint_names, info = paste("Missing endpoint:", ep))
@@ -342,4 +343,26 @@ test_that("generate_api_gust_factors returns valid structure", {
   expect_true("rogue_gust_threshold" %in% names(data))
   # extreme_gusts should be capped
   expect_true(nrow(data$extreme_gusts) <= 500)
+})
+
+# ===========================================================================
+# generate_api_methods()
+# ===========================================================================
+
+test_that("generate_api_methods returns valid structure", {
+  result <- generate_api_methods()
+  expect_type(result, "list")
+  expect_true("_meta" %in% names(result))
+  expect_true("data" %in% names(result))
+  expect_equal(result[["_meta"]]$endpoint, "methods")
+
+  data <- result$data
+  expect_true("gpd" %in% names(data))
+  expect_true("mann_kendall" %in% names(data))
+  expect_true("stl_decomposition" %in% names(data))
+  expect_true("rogue_wave_detection" %in% names(data))
+
+  # Each method should have description and references
+  expect_true("description" %in% names(data$gpd))
+  expect_true("references" %in% names(data$gpd))
 })

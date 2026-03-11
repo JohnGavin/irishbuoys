@@ -16,6 +16,7 @@ Other api:
 \code{\link{generate_api_gust_factors}()},
 \code{\link{generate_api_index}()},
 \code{\link{generate_api_latest}()},
+\code{\link{generate_api_methods}()},
 \code{\link{generate_api_sources}()},
 \code{\link{generate_api_spatial}()},
 \code{\link{generate_api_status}()},

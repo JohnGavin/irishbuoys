@@ -32,7 +32,7 @@ test_that("plumber router can be created from API file", {
   expect_s3_class(pr, "Plumber")
 })
 
-test_that("plumber router has expected endpoints", {
+test_that("plumber router has all 17 endpoints (16 data + index)", {
   skip_if_not_installed("plumber")
 
   api_file <- system.file("plumber", "api.R", package = "irishbuoys")
@@ -48,8 +48,20 @@ test_that("plumber router has expected endpoints", {
   endpoints <- pr$endpoints[[1]]
   paths <- vapply(endpoints, function(e) e$path, character(1))
 
-  expect_true("/stations" %in% paths)
-  expect_true("/rogue-waves" %in% paths)
-  expect_true("/return-levels" %in% paths)
-  expect_true("/seasonal" %in% paths)
+  expected_paths <- c(
+    # Existing endpoints
+    "/index", "/stations", "/stats", "/rogue-waves",
+    "/return-levels", "/data-dictionary", "/latest",
+    "/seasonal", "/correlations",
+    # Tier 1
+    "/sources", "/status", "/trends", "/extremes",
+    # Tier 2
+    "/decomposition", "/spatial", "/gust-factors",
+    # Tier 3
+    "/methods"
+  )
+  for (ep in expected_paths) {
+    expect_true(ep %in% paths, info = paste("Missing Plumber route:", ep))
+  }
+  expect_length(paths, 17)
 })
