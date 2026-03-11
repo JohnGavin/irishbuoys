@@ -578,11 +578,19 @@ server <- function(input, output, session) {
     }
 
     p |> layout(
-      title = paste(var_label, "- Last", input$days, "Days"),
-      xaxis = list(title = "Time (UTC)"),
-      yaxis = list(title = var_label),
+      title = list(text = paste(var_label, "- Last", input$days, "Days"),
+                   font = list(size = 14, color = "#e0e0e0")),
+      plot_bgcolor = "#1a1a1a", paper_bgcolor = "#1a1a1a",
+      xaxis = list(title = "Time (UTC)", gridcolor = "rgba(255,255,255,0.2)",
+                   tickfont = list(color = "#cccccc"), titlefont = list(color = "#e0e0e0")),
+      yaxis = list(title = var_label, gridcolor = "rgba(255,255,255,0.2)",
+                   tickfont = list(color = "#cccccc"), titlefont = list(color = "#e0e0e0")),
       hovermode = "x unified",
-      legend = list(orientation = "h", y = -0.2)
+      legend = list(orientation = "h", y = -0.15, x = 0.5, xanchor = "center",
+                    font = list(color = "#e0e0e0", size = 12),
+                    bgcolor = "rgba(40,40,40,0.8)", bordercolor = "#555555", borderwidth = 1),
+      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12)),
+      margin = list(b = 80)
     )
   })
 
@@ -652,10 +660,18 @@ server <- function(input, output, session) {
               y_label, ": %{y:.2f}<extra></extra>"
             )) |>
       layout(
-        title = paste(y_label, "vs", x_label, "- Last", input$scatter_days, "Days"),
-        xaxis = list(title = x_label),
-        yaxis = list(title = y_label),
-        legend = list(orientation = "h", y = -0.15)
+        title = list(text = paste(y_label, "vs", x_label, "- Last", input$scatter_days, "Days"),
+                     font = list(size = 14, color = "#e0e0e0")),
+        plot_bgcolor = "#1a1a1a", paper_bgcolor = "#1a1a1a",
+        xaxis = list(title = x_label, gridcolor = "rgba(255,255,255,0.2)",
+                     tickfont = list(color = "#cccccc"), titlefont = list(color = "#e0e0e0")),
+        yaxis = list(title = y_label, gridcolor = "rgba(255,255,255,0.2)",
+                     tickfont = list(color = "#cccccc"), titlefont = list(color = "#e0e0e0")),
+        legend = list(orientation = "h", y = -0.15, x = 0.5, xanchor = "center",
+                      font = list(color = "#e0e0e0", size = 12),
+                      bgcolor = "rgba(40,40,40,0.8)", bordercolor = "#555555", borderwidth = 1),
+        hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12)),
+        margin = list(b = 80)
       )
   })
 

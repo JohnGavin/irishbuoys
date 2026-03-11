@@ -4,6 +4,78 @@ format:
   dashboard:
     orientation: rows
     theme: cosmo
+    include-in-header:
+      - text: |
+          <style>
+          /* Click-to-zoom: plots and tables expand to fullscreen on click */
+          .fullscreen-overlay {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            z-index: 9999 !important;
+            background: rgba(0,0,0,0.95) !important;
+            padding: 20px !important;
+            overflow: auto !important;
+            cursor: zoom-out !important;
+            box-sizing: border-box !important;
+          }
+          .fullscreen-overlay .js-plotly-plot,
+          .fullscreen-overlay .plotly {
+            width: 100% !important;
+            height: calc(100vh - 40px) !important;
+          }
+          .fullscreen-overlay .datatables {
+            max-height: calc(100vh - 40px) !important;
+            overflow: auto !important;
+          }
+          /* Hint cursor on zoomable elements */
+          .cell-output-display:has(.js-plotly-plot),
+          .cell-output-display:has(.datatables) {
+            cursor: zoom-in;
+          }
+          /* Tab content: show full height, page scrolls instead of card body */
+          .card-body, .tab-content, .tab-pane {
+            overflow: visible !important;
+            max-height: none !important;
+          }
+          .tab-pane .cell-output-display {
+            overflow: visible !important;
+            max-height: none !important;
+          }
+          /* DT tables inside tabs: no internal scroll, show all rows */
+          .tab-pane .datatables {
+            overflow: visible !important;
+            max-height: none !important;
+          }
+          </style>
+          <script>
+          document.addEventListener('click', function(e) {
+            // Close fullscreen on click
+            var overlay = e.target.closest('.fullscreen-overlay');
+            if (overlay) {
+              overlay.classList.remove('fullscreen-overlay');
+              // Trigger plotly resize after exiting fullscreen
+              var plots = overlay.querySelectorAll('.js-plotly-plot');
+              plots.forEach(function(p) { if (window.Plotly) Plotly.Plots.resize(p); });
+              return;
+            }
+            // Open fullscreen: click on plotly plot or DT table container
+            var cell = e.target.closest('.cell-output-display');
+            if (!cell) return;
+            var hasPlot = cell.querySelector('.js-plotly-plot');
+            var hasTable = cell.querySelector('.datatables');
+            if (!hasPlot && !hasTable) return;
+            // Don't zoom if clicking plotly modebar buttons
+            if (e.target.closest('.modebar')) return;
+            cell.classList.add('fullscreen-overlay');
+            // Trigger plotly resize to fill fullscreen
+            if (hasPlot && window.Plotly) {
+              setTimeout(function() { Plotly.Plots.resize(hasPlot); }, 100);
+            }
+          });
+          </script>
 execute:
   echo: false
   warning: false
@@ -154,12 +226,19 @@ fmt_num <- function(x, digits = 0) {
   format(round(x, digits), big.mark = ",", nsmall = digits)
 }
 
-# Helper function for DT tables
+# Helper function for DT tables (caption at top for accessibility)
 create_dt <- function(data, caption = "") {
   time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp"))
 
+  # Force caption to top position
+  cap <- if (nzchar(caption)) {
+    htmltools::tags$caption(style = "caption-side: top; font-size: 0.9em;", caption)
+  } else {
+    NULL
+  }
+
   dt <- datatable(
-    data, caption = caption, filter = 'top', rownames = FALSE, extensions = 'Buttons',
+    data, caption = cap, filter = 'top', rownames = FALSE, extensions = 'Buttons',
     options = list(
       pageLength = 15, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
       order = list(list(0, 'desc')), scrollX = TRUE,
@@ -194,13 +273,8 @@ beaufort_colors <- c(
   "12 (Hurricane)" = "#67001f"
 )
 
-# Common legend styling for all plotly plots
-legend_style <- list(
-  font = list(color = "#333333", size = 12),
-  bgcolor = "rgba(255,255,255,0.9)",
-  bordercolor = "#cccccc",
-  borderwidth = 1
-)
+# Use irishbuoys_layout() for all plotly plots (dark theme, bottom legend)
+# Defined in R/plotly_helpers.R - no local legend_style needed
 
 # Compute additional metrics from analysis_data
 if (!is.null(analysis_data) && nrow(analysis_data) > 0) {
@@ -227,10 +301,15 @@ dynamic_title <- paste0("Irish Buoys Analysis (", year_start, "-", year_end, ")"
 
 **Wave Analysis Dashboard** for the [Irish Weather Buoy Network](https://www.marine.ie/site-area/infrastructure-facilities/marine-institute-buoy-network).
 
+::: {.callout-warning appearance="minimal"}
+This website is an independent open-source analysis tool and is **not** part of or affiliated with the Irish Weather Buoy Network or the Marine Institute.
+:::
+
 #### Data Structure
 
 ```{r overview-data-structure}
 #| echo: false
+#| results: asis
 if (!is.null(analysis_summary) && "data_summary" %in% names(analysis_summary)) {
   n_days <- as.numeric(difftime(
     analysis_summary$data_summary$date_range[2],
@@ -239,10 +318,11 @@ if (!is.null(analysis_summary) && "data_summary" %in% names(analysis_summary)) {
   ))
   start_date <- format(analysis_summary$data_summary$date_range[1], "%Y-%m-%d")
   end_date <- format(analysis_summary$data_summary$date_range[2], "%Y-%m-%d")
-  n_cols <- if (!is.null(analysis_data)) ncol(analysis_data) else 22
+  n_cols <- if (!is.null(analysis_data)) ncol(analysis_data) else 12
+  n_raw_cols <- nrow(get_data_dictionary())
 
-  cat(sprintf("Primary data: %s days (%s to %s), %d columns",
-              fmt_num(round(n_days)), start_date, end_date, n_cols))
+  cat(sprintf("- Primary data: %s days\n- %s to %s\n- %d of %d ERDDAP columns selected for analysis",
+              fmt_num(round(n_days)), start_date, end_date, n_cols, n_raw_cols))
 }
 ```
 
@@ -250,18 +330,47 @@ if (!is.null(analysis_summary) && "data_summary" %in% names(analysis_summary)) {
 
 #### Key Metrics
 
-| Metric | Value | Units |
-|--------|------:|-------|
-| Rogue Wave Events | `r if(has_data) fmt_num(nrow(rogue_events)) else "N/A"` | count |
-| Max Indiv Wave | `r if(has_data) fmt_num(max(rogue_events$hmax), 1) else "N/A"` | m |
-| Max Rogue Ratio | `r if(has_data) fmt_num(max(rogue_events$rogue_ratio), 2) else "N/A"` | ratio |
-| Max Mean Wave | `r fmt_num(max_mean_wave, 1)` | m |
-| Max Gust | `r fmt_num(max_gust, 1)` | m/s |
-| Max Mean Wind | `r fmt_num(max_mean_wind, 1)` | m/s |
-| Stations Analysed | `r if(has_data) fmt_num(length(unique(rogue_events$station_id))) else "N/A"` | count |
-| Number Days | `r if(has_data) fmt_num(round(as.numeric(difftime(max(rogue_events$time), min(rogue_events$time), units="days")))) else "N/A"` | days |
-| Start | `r if(has_data) format(min(rogue_events$time), "%Y-%m-%d") else "N/A"` | date |
-| End | `r if(has_data) format(max(rogue_events$time), "%Y-%m-%d") else "N/A"` | date |
+```{r key-metrics-table}
+#| echo: false
+#| results: asis
+# Build metrics table with hover tooltips linking to definitions
+metrics <- data.frame(
+  metric = c(
+    '<abbr title="Events where Max Wave / Signif Wave > 2.0">Rogue Wave Events</abbr>',
+    '<abbr title="Maximum individual wave height (Hmax) recorded across all stations">Max Indiv Wave</abbr>',
+    '<abbr title="Highest Max Wave / Signif Wave ratio observed">Max Rogue Ratio</abbr>',
+    '<abbr title="Highest hourly mean wave height (Signif Wave = 4σ)">Max Mean Wave</abbr>',
+    '<abbr title="Highest peak 3-second wind gust recorded">Max Gust</abbr>',
+    '<abbr title="Highest 10-minute mean wind speed recorded">Max Mean Wind</abbr>',
+    "Stations Analysed",
+    "Number Days",
+    "Start",
+    "End"
+  ),
+  value = c(
+    if (has_data) fmt_num(nrow(rogue_events)) else "N/A",
+    if (has_data) fmt_num(max(rogue_events$hmax), 1) else "N/A",
+    if (has_data) fmt_num(max(rogue_events$rogue_ratio), 2) else "N/A",
+    fmt_num(max_mean_wave, 1),
+    fmt_num(max_gust, 1),
+    fmt_num(max_mean_wind, 1),
+    if (has_data) fmt_num(length(unique(rogue_events$station_id))) else "N/A",
+    if (has_data) fmt_num(round(as.numeric(difftime(max(rogue_events$time), min(rogue_events$time), units = "days")))) else "N/A",
+    if (has_data) format(min(rogue_events$time), "%Y-%m-%d") else "N/A",
+    if (has_data) format(max(rogue_events$time), "%Y-%m-%d") else "N/A"
+  ),
+  units = c("count", "m", "ratio", "m", "m/s", "m/s", "count", "days", "date", "date"),
+  stringsAsFactors = FALSE
+)
+# Render as HTML table so abbr tags work
+cat('<table class="table table-sm">\n<thead><tr><th>Metric</th><th style="text-align:right">Value</th><th>Units</th></tr></thead>\n<tbody>\n')
+for (i in seq_len(nrow(metrics))) {
+  cat(sprintf('<tr><td>%s</td><td style="text-align:right">%s</td><td>%s</td></tr>\n',
+              metrics$metric[i], metrics$value[i], metrics$units[i]))
+}
+cat('</tbody></table>\n')
+cat('<p><small>Hover over metric names for definitions. See <a href="#definitions">Reference</a> for full glossary.</small></p>\n')
+```
 
 *Analysis generated `r generated_time` using irishbuoys v`r pkg_version`*
 
@@ -282,7 +391,7 @@ if (!is.null(wave_vignette_missing_summary)) {
 
 # Rogue Waves
 
-**Rogue Wave Definition:** Max Wave / Signif Wave > 2.0. See [Reference](#reference) for definitions.
+**Rogue Wave Definition:** Max Wave / Signif Wave > 2.0. See [definitions](#definitions) and [methodology](#methodology) for details.
 
 ## All Events
 
@@ -307,7 +416,7 @@ if (has_data && "M2" %in% rogue_events$station_id) {
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
                           "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      layout(title = paste0("M2 Rogue Events (n=", nrow(m2_events), ")"),
+      irishbuoys_layout(title = paste0("M2 Rogue Events (n=", nrow(m2_events), ")"),
              xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
              hovermode = "closest")
   } else {
@@ -330,7 +439,7 @@ if (has_data && "M3" %in% rogue_events$station_id) {
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
                           "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      layout(title = paste0("M3 Rogue Events (n=", nrow(m3_events), ")"),
+      irishbuoys_layout(title = paste0("M3 Rogue Events (n=", nrow(m3_events), ")"),
              xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
              hovermode = "closest")
   } else {
@@ -353,7 +462,7 @@ if (has_data && "M4" %in% rogue_events$station_id) {
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
                           "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      layout(title = paste0("M4 Rogue Events (n=", nrow(m4_events), ")"),
+      irishbuoys_layout(title = paste0("M4 Rogue Events (n=", nrow(m4_events), ")"),
              xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
              hovermode = "closest")
   } else {
@@ -376,7 +485,7 @@ if (has_data && "M5" %in% rogue_events$station_id) {
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
                           "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      layout(title = paste0("M5 Rogue Events (n=", nrow(m5_events), ")"),
+      irishbuoys_layout(title = paste0("M5 Rogue Events (n=", nrow(m5_events), ")"),
              xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
              hovermode = "closest")
   } else {
@@ -399,7 +508,7 @@ if (has_data && "M6" %in% rogue_events$station_id) {
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
                           "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      layout(title = paste0("M6 Rogue Events (n=", nrow(m6_events), ")"),
+      irishbuoys_layout(title = paste0("M6 Rogue Events (n=", nrow(m6_events), ")"),
              xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
              hovermode = "closest")
   } else {
@@ -437,7 +546,7 @@ if (!is.null(wave_vignette_rogue_table)) {
 
 # Rogue Gusts
 
-**Rogue Gust Definition:** A rogue gust has **Gust / Wind > 1.5** (ratio of peak gust to sustained wind speed). This parallels the rogue wave definition (Max Wave / Signif Wave > 2.0).
+**Rogue Gust Definition:** A rogue gust has **Gust / Wind > 1.5** (ratio of peak gust to [sustained wind](#definitions) speed). See [definitions](#definitions). This parallels the rogue wave definition (Max Wave / Signif Wave > 2.0).
 
 ## Gust Analysis
 
@@ -496,7 +605,7 @@ create_plot_gusts_vs_waves(analysis_data)
 
 # Gust Factor
 
-**Gust Factor** = Peak Gust / Sustained Wind. Typical value ~1.3.
+**[Gust Factor](#definitions)** = Peak Gust / [Sustained Wind](#definitions). Typical value ~1.3. See [methodology](#methodology) for measurement details.
 **Rogue Gust** threshold: GF > 1.5 (see [Rogue Gusts](#rogue-gusts) page for detailed analysis).
 
 ## Factor Analysis
@@ -557,7 +666,7 @@ create_plot_rogue_gusts(gust_analysis)
 
 # Hourly Max
 
-Extreme value analysis based on **hourly maximum** observations. Two approaches are compared: Model fitting (GEV/GPD) and Predictions (return levels).
+Extreme value analysis based on **hourly maximum** observations. Two approaches are compared: Model fitting ([GEV/GPD](#definitions)) and Predictions (return levels). See [extreme value methods](#extreme-value-methods) for statistical details.
 
 ## Hourly Patterns
 
@@ -717,7 +826,7 @@ Ratio = Max Wave / Signif Wave = `r if(!is.null(worked_signif_wave_example)) pas
 
 `r if(!is.null(worked_signif_wave_example) && worked_signif_wave_example$ratio > 2.0) "**Rogue Wave Detected!** Ratio > 2.0" else if(!is.null(worked_signif_wave_example)) "**Normal Sea State.** Ratio in typical range (1.5-1.9)" else ""`
 
-## Example Caption {height=20%}
+## Example Caption
 
 ### Caption
 
@@ -788,8 +897,7 @@ if (has_joint_data) {
     theme_minimal(base_size = 12) +
     coord_fixed(ratio = 1.5)
 
-  ggplotly(p) |>
-    layout(legend = list(orientation = "h", y = -0.15))
+  irishbuoys_ggplotly(p)
 }
 ```
 
@@ -985,7 +1093,7 @@ For longer period swell (T = 15s): $v_g \approx 23$ m/s $\approx 84$ km/h
 
 # Predictions {#predictions}
 
-Random Forest model predicting **significant wave height** from meteorological variables and lagged features. Model uses `ranger` with 500 trees trained on 70% of data (time-ordered split).
+Random Forest model predicting **significant wave height** from meteorological variables and lagged features. Model uses [`ranger`](https://imbs-hl.github.io/ranger/) with 500 trees trained on the first 70% of data (time-ordered split); the remaining 30% is held out as a **test set** for the metrics below. The time-ordered split ensures no future data leaks into training. See [methodology](#methodology) for measurement details and the [Model Summary](#model-summary) tab for the fitted formula and [`ranger`](https://imbs-hl.github.io/ranger/) output.
 
 ```{r predictions-setup}
 #| include: false
@@ -1009,7 +1117,7 @@ if (has_rf) {
 }
 ```
 
-## Row {height=15%}
+## Row
 
 ### Column
 
@@ -1018,7 +1126,6 @@ if (has_rf) {
 #| title: "Test R-squared"
 list(
   value = if (has_rf) round(rf_r2, 3) else "N/A",
-  icon = "bullseye",
   color = if (has_rf && rf_r2 > 0.9) "success" else if (has_rf && rf_r2 > 0.7) "primary" else "warning"
 )
 ```
@@ -1030,7 +1137,6 @@ list(
 #| title: "Test RMSE (m)"
 list(
   value = if (has_rf) paste0(round(rf_rmse, 3), " m") else "N/A",
-  icon = "activity",
   color = if (has_rf && rf_rmse < 0.5) "success" else if (has_rf && rf_rmse < 1.0) "primary" else "warning"
 )
 ```
@@ -1042,7 +1148,6 @@ list(
 #| title: "Test MAE (m)"
 list(
   value = if (has_rf) paste0(round(rf_mae, 3), " m") else "N/A",
-  icon = "bar-chart",
   color = "info"
 )
 ```
@@ -1054,12 +1159,11 @@ list(
 #| title: "Test Samples"
 list(
   value = if (has_rf) fmt_num(rf_n_test) else "N/A",
-  icon = "database",
   color = "secondary"
 )
 ```
 
-## Row {height=45%}
+## Row
 
 ### Column {.tabset}
 
@@ -1087,15 +1191,19 @@ if (has_rf) {
     add_trace(x = c(0, max(preds$actual, na.rm = TRUE)),
               y = c(0, max(preds$actual, na.rm = TRUE)),
               type = "scatter", mode = "lines",
-              line = list(dash = "dash", color = "black", width = 1),
-              name = "Perfect prediction", showlegend = TRUE,
+              line = list(dash = "dash", color = "#888888", width = 1),
+              name = "y = x (perfect)", showlegend = TRUE,
               hoverinfo = "skip", inherit = FALSE) |>
-    layout(
-      title = paste0("Actual vs Predicted Wave Height (n=",
-                     fmt_num(nrow(preds)), ", R\u00b2=", round(rf_r2, 3), ")"),
-      xaxis = list(title = "Actual Wave Height (m)"),
-      yaxis = list(title = "Predicted Wave Height (m)"),
-      legend = legend_style,
+    irishbuoys_layout(
+      title = paste0(
+        "Actual vs Predicted Signif Wave on test set (n=",
+        fmt_num(nrow(preds)), ", R\u00b2=", round(rf_r2, 3), ")<br>",
+        "<sup>Dashed line = y=x (perfect prediction, not a fit). ",
+        "Points coloured by 2m wave-height bins (Low/Moderate/High/Extreme) to show where the model struggles. ",
+        "Click a legend entry to hide that category; the y=x line remains as reference.</sup>"
+      ),
+      xaxis = list(title = "Actual Signif Wave (m)"),
+      yaxis = list(title = "Predicted Signif Wave (m)"),
       hovermode = "closest"
     )
 } else {
@@ -1112,8 +1220,13 @@ if (has_rf) {
   plot_ly(preds, y = ~residual, x = ~category, type = "box",
           color = ~category,
           boxpoints = "outliers") |>
-    layout(
-      title = "Prediction Residuals by Wave Height Category",
+    irishbuoys_layout(
+      title = paste0(
+        "Residuals by 2m Wave Height Category (test set)<br>",
+        "<sup>Categories: Low (0-2m), Moderate (2-4m), High (4-6m), Extreme (>6m). ",
+        "2m bins separate calm seas from storm conditions. ",
+        "Residual = Actual - Predicted; zero = perfect. Wider boxes = more error.</sup>"
+      ),
       xaxis = list(title = "Wave Height Category"),
       yaxis = list(title = "Residual (Actual - Predicted, m)"),
       showlegend = FALSE,
@@ -1127,7 +1240,7 @@ if (has_rf) {
 }
 ```
 
-## Row {height=40%}
+## Row
 
 ### Column {.tabset}
 
@@ -1143,11 +1256,15 @@ if (has_rf) {
   plot_ly(imp, y = ~variable, x = ~importance, type = "bar",
           orientation = "h",
           marker = list(color = "#1f77b4")) |>
-    layout(
-      title = "Top 10 Feature Importance (Impurity-based)",
+    irishbuoys_layout(
+      title = paste0(
+        "Top 10 Feature Importance (Impurity-based, <a href='https://imbs-hl.github.io/ranger/'>ranger</a>)<br>",
+        "<sup>Higher = variable contributes more to reducing prediction error. ",
+        "Lagged wave heights dominate because wave conditions persist hour-to-hour.</sup>"
+      ),
       xaxis = list(title = "Importance"),
       yaxis = list(title = ""),
-      margin = list(l = 150)
+      margin = list(l = 150, b = 80)
     )
 } else {
   plotly_empty() |> layout(title = "RF model not available")
@@ -1162,7 +1279,72 @@ if (has_rf) {
   cat_df <- wave_rf_eval$by_category
   cat_df$rmse <- round(cat_df$rmse, 3)
   cat_df$mae <- round(cat_df$mae, 3)
-  create_dt(cat_df, "Model performance by wave height category (test set)")
+  create_dt(cat_df, paste0(
+    "Model performance by 2m wave height category (test set). ",
+    "Categories: Low (0-2m calm seas), Moderate (2-4m), High (4-6m storm), Extreme (>6m). ",
+    "RMSE = root mean squared error; MAE = mean absolute error (both in metres). ",
+    "Higher errors for Extreme waves indicate the model is less accurate for rare storm events."
+  ))
+} else {
+  knitr::asis_output("RF model not available. Run targets::tar_make()")
+}
+```
+
+#### Model Summary {#model-summary}
+
+```{r rf-model-summary}
+#| echo: false
+#| results: asis
+if (has_rf) {
+  # Formula
+  cat("**Fitted formula:**\n\n")
+  cat("```\n")
+  cat(deparse(wave_rf_model$formula, width.cutoff = 120), sep = "\n")
+  cat("\n```\n\n")
+
+  # Model parameters table
+  cat("**[`ranger`](https://imbs-hl.github.io/ranger/) model parameters:**\n\n")
+  model_params <- data.frame(
+    Parameter = c("Number of trees", "Predictors used", "Training observations",
+                  "Test observations", "Training R\u00b2", "OOB RMSE (m)",
+                  "Test R\u00b2", "Test RMSE (m)", "Test MAE (m)", "Test Bias (m)"),
+    Value = c(
+      "500",
+      as.character(length(wave_rf_model$predictors)),
+      format(length(wave_rf_model$train_idx), big.mark = ","),
+      format(length(wave_rf_model$test_idx), big.mark = ","),
+      round(wave_rf_model$train_r_squared, 4),
+      round(wave_rf_model$oob_rmse, 4),
+      round(rf_r2, 4),
+      round(rf_rmse, 4),
+      round(rf_mae, 4),
+      round(wave_rf_eval$overall$value[wave_rf_eval$overall$metric == "Bias"], 4)
+    ),
+    stringsAsFactors = FALSE
+  )
+  knitr::kable(model_params, format = "pipe", align = c("l", "r"),
+               caption = paste0(
+                 "ranger Random Forest model summary. ",
+                 "OOB = out-of-bag error (internal cross-validation within training set). ",
+                 "Test metrics use the held-out 30% of data (time-ordered, no leakage)."
+               ))
+} else {
+  cat("[`ranger`](https://imbs-hl.github.io/ranger/) model not available. Run `targets::tar_make()`.\n")
+}
+```
+
+```{r rf-predictors-table}
+#| echo: false
+if (has_rf) {
+  imp_df <- wave_rf_model$importance
+  imp_df$importance <- round(imp_df$importance, 1)
+  imp_df$rank <- seq_len(nrow(imp_df))
+  imp_df <- imp_df[, c("rank", "variable", "importance")]
+  create_dt(imp_df, paste0(
+    "All predictor variables ranked by impurity-based importance (ranger). ",
+    "Higher importance = larger reduction in prediction error when splitting on this variable. ",
+    "Lagged wave heights (wave_height_lag1-3) are strongest because sea state is autocorrelated."
+  ))
 } else {
   knitr::asis_output("RF model not available. Run targets::tar_make()")
 }
@@ -1176,7 +1358,7 @@ if (has_rf) {
 if (has_rf) {
   cat("```\n", wave_rf_report, "\n```", sep = "")
 } else {
-  cat("RF model not available. Run `targets::tar_make()`")
+  cat("[`ranger`](https://imbs-hl.github.io/ranger/) model not available. Run `targets::tar_make()`.\n")
 }
 ```
 
@@ -1194,23 +1376,22 @@ if (has_rf) {
 
 **Table: Key Oceanographic and Meteorological Terms**
 
-All analysis computed via [`{targets}`](https://docs.ropensci.org/targets/) pipeline.
-
 | Term | Definition | Reference |
 |------|------------|-----------|
-| **Signif Wave = H1/3 = 4σ** | All three mean the same: significant wave height = mean of highest 1/3 of waves = 4 × standard deviation of sea surface | [Longuet-Higgins 1952](https://doi.org/10.1357/002224052806645438) |
-| **Max Wave** | Maximum individual wave height in 17.5-min measurement period | Typically Max Wave / Signif Wave ~ 1.5-1.9 |
-| **Rogue Wave** | Wave where **Max Wave / Signif Wave > 2.0** | [Dysthe 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203) |
-| **Rogue Ratio** | = Max Wave / Signif Wave. Values > 2.0 indicate a rogue wave | Used in [Rogue Waves](#rogue-waves) |
+| **Signif Wave = H1/3 = 4σ** | All three mean the same: significant wave height = mean of highest 1/3 of waves = 4 × standard deviation of sea surface. See [worked example](#how-signif-wave-is-calculated). | [Wikipedia](https://en.wikipedia.org/wiki/Significant_wave_height), [Longuet-Higgins 1952](https://doi.org/10.1357/002224052806645438) |
+| **Max Wave** | Maximum individual wave height in 17.5-min measurement period | [NOAA wave background](https://www.weather.gov/key/marine_wave_background). Typically Max Wave / Signif Wave ~ 1.5-1.9 |
+| **Rogue Wave** | Wave where **Max Wave / Signif Wave > 2.0** | [Wikipedia](https://en.wikipedia.org/wiki/Rogue_wave), [Dysthe 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203) |
+| **Rogue Ratio** | = Max Wave / Signif Wave. Values > 2.0 indicate a rogue wave | Used in [Rogue Events](#rogue-events) |
 | **Gust Ratio** | = Peak Gust / Sustained Wind. Typical value ~1.3 | Used in [Rogue Gusts](#rogue-gusts) |
 | **Rogue Gust** | Observation where **Gust / Wind > 1.5** | Used in [Rogue Gusts](#rogue-gusts) |
-| **GEV** | Generalized Extreme Value distribution for annual maxima | Used in [Hourly Max](#hourly-max) |
-| **GPD** | Generalized Pareto Distribution for peaks over threshold | Used in [Hourly Max](#hourly-max) |
+| **Sustained Wind** | 10-minute mean wind speed at ~3m height. Denominator in [gust factor](https://glossary.ametsoc.org/wiki/Gust_factor). | [WMO Guide](https://library.wmo.int/idurl/4/41650) |
+| **GEV** | Generalized Extreme Value distribution for annual maxima | [Wikipedia](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution). Used in [Hourly Max](#hourly-max) |
+| **GPD** | Generalized Pareto Distribution for peaks over threshold | [Wikipedia](https://en.wikipedia.org/wiki/Generalized_Pareto_distribution). Used in [Hourly Max](#hourly-max) |
 | **Return Level** | Value expected to be exceeded once per T years | Used in [Hourly Max](#hourly-max) |
-| **Gust Factor** | Peak Gust / Sustained Wind (~1.3 typical) | Used in [Gust Factor](#gust-factor) |
-| **STL** | Seasonal-Trend decomposition (Loess) | Used in [Trends](#trends) |
+| **Gust Factor** | Peak Gust / Sustained Wind (~1.3 typical) | [AMS Glossary](https://glossary.ametsoc.org/wiki/Gust_factor). Used in [Gust Factor](#gust-factor) |
+| **STL** | Seasonal-Trend decomposition (Loess) | [Wikipedia](https://en.wikipedia.org/wiki/Decomposition_of_time_series). Used in [Trends](#trends) |
 
-*Caption: Terminology used throughout this dashboard. Rogue events are identified when ratios exceed defined thresholds.*
+*Terminology used throughout this dashboard. Rogue events are identified when ratios exceed defined thresholds.*
 
 ###### Rogue Events
 
@@ -1257,9 +1438,9 @@ These three notations all mean the same thing:
 - **H1/3** = Mean of highest 1/3 of waves (original definition)
 - **4σ** = 4 × standard deviation of sea surface elevation
 
-The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Signif Wave = 4 × sqrt(m0)** where m0 is the variance of sea elevation.
+The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Signif Wave = 4 × sqrt(m0)** where m0 is the variance of sea elevation. See [Wikipedia: Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height) and [NOAA wave background](https://www.weather.gov/key/marine_wave_background) for further detail.
 
-See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked example.
+See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked example, and the [Methodology](#methodology) tab for measurement details.
 
 ###### Measurement Window
 
@@ -1311,12 +1492,15 @@ See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked
 | Package | Purpose | Link |
 |---------|---------|------|
 | [`targets`](https://docs.ropensci.org/targets/) | Pipeline orchestration | [CRAN](https://cran.r-project.org/package=targets) |
+| [`ranger`](https://imbs-hl.github.io/ranger/) | Fast Random Forest implementation | [CRAN](https://cran.r-project.org/package=ranger) |
 | [`mev`](https://lbelzile.github.io/mev/) | Extreme value analysis | [CRAN](https://cran.r-project.org/package=mev) |
 | [`extRemes`](https://www.ral.ucar.edu/staff/ericg/extRemes/) | GEV/GPD fitting | [CRAN](https://cran.r-project.org/package=extRemes) |
 | [`plotly`](https://plotly.com/r/) | Interactive visualisation | [CRAN](https://cran.r-project.org/package=plotly) |
 | [`DT`](https://rstudio.github.io/DT/) | Interactive tables | [CRAN](https://cran.r-project.org/package=DT) |
+| [`dygraphs`](https://rstudio.github.io/dygraphs/) | Time series widgets | [CRAN](https://cran.r-project.org/package=dygraphs) |
+| [`irishbuoys`](https://johngavin.github.io/irishbuoys/) | This package | [GitHub](https://github.com/JohnGavin/irishbuoys) |
 
-*Caption: Core R packages enabling reproducible analysis and interactive dashboards.*
+*Core R packages enabling reproducible analysis and interactive dashboards.*
 
 ###### Data Sources
 

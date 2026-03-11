@@ -26,12 +26,12 @@ plan_wave_vignette <- list(
         dplyr::group_by(.data$station_id) |>
         dplyr::summarise(
           total_days = dplyr::n(),
-          days_with_wave = sum(.data$n_wave_height > 0),
-          days_with_wind = sum(.data$n_wind_speed > 0),
-          days_with_hmax = sum(.data$n_hmax > 0),
-          pct_wave = round(100 * .data$days_with_wave / .data$total_days, 1),
-          pct_wind = round(100 * .data$days_with_wind / .data$total_days, 1),
-          pct_hmax = round(100 * .data$days_with_hmax / .data$total_days, 1),
+          days_wave_obs = sum(.data$n_wave_height > 0),
+          days_wind_obs = sum(.data$n_wind_speed > 0),
+          days_hmax_obs = sum(.data$n_hmax > 0),
+          pct_wave = round(100 * .data$days_wave_obs / .data$total_days, 1),
+          pct_wind = round(100 * .data$days_wind_obs / .data$total_days, 1),
+          pct_hmax = round(100 * .data$days_hmax_obs / .data$total_days, 1),
           .groups = "drop"
         )
     }
