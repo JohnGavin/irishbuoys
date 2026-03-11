@@ -486,17 +486,16 @@ plan_api <- list(
     api_vignette_stats_dt,
     {
       st_stats <- api_stats$data$station_stats
-      df <- dplyr::bind_rows(lapply(names(st_stats), function(nm) {
-        s <- st_stats[[nm]]
-        tibble::tibble(
-          station = nm,
-          n_records = s$n_records %||% NA_integer_,
-          mean_wave_height = round(s$mean_wave_height %||% NA_real_, 2),
-          max_wave_height = round(s$max_wave_height %||% NA_real_, 2),
-          mean_wind_speed = round(s$mean_wind_speed %||% NA_real_, 2),
-          max_wind_speed = round(s$max_wind_speed %||% NA_real_, 2)
+      # station_stats is already a data frame from dashboard_stats
+      df <- st_stats |>
+        dplyr::transmute(
+          station = .data$station_id,
+          n_records = .data$n_records,
+          mean_wave_height = round(.data$mean_wave_height, 2),
+          max_wave_height = round(.data$max_wave_height, 2),
+          mean_wind_speed = round(.data$mean_wind_speed, 2),
+          max_wind_speed = round(.data$max_wind_speed, 2)
         )
-      }))
       DT::datatable(
         df,
         caption = "Per-Station Summary Statistics",
