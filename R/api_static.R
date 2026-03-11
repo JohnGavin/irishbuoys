@@ -3,6 +3,7 @@
 #' @description
 #' Functions for generating static JSON API files served via GitHub Pages.
 #' These are written to `docs/api/v1/` and updated 6-hourly by CI.
+#' Includes metadata, analysis, and methods endpoints.
 #'
 #' @family api
 #' @name api_static
