@@ -32,7 +32,11 @@ Other api:
 \code{\link{api_plumber}},
 \code{\link{api_static}},
 \code{\link{create_api_router}()},
+\code{\link{generate_api_extremes}()},
 \code{\link{generate_api_index}()},
+\code{\link{generate_api_sources}()},
+\code{\link{generate_api_status}()},
+\code{\link{generate_api_trends}()},
 \code{\link{run_api}()}
 }
 \concept{api}
