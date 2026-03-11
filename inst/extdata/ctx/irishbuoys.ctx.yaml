@@ -1044,35 +1044,3 @@ arguments:
   ci_comparison_per_station: Tibble with columns return_period, return_level, lower, upper, station, variable, method.
   return_levels_per_station: Tibble with columns return_period, return_level, lower, upper, station, variable, variable_label.
 returns: A list with _meta and data fields.
----
-kind: function
-name: generate_api_decomposition
-exported: true
-signature: generate_api_decomposition(decomp_per_station)
-arguments:
-  decomp_per_station: Named list of per-station decomposition results.
-returns: A list with _meta and data fields.
----
-kind: function
-name: generate_api_spatial
-exported: true
-signature: generate_api_spatial(pair_wave, pair_wind, pair_hmax)
-arguments:
-  pair_hmax: Data frame from analyze_station_pairs() for Hmax.
-  pair_wave: Data frame from analyze_station_pairs() for wave height.
-  pair_wind: Data frame from analyze_station_pairs() for wind speed.
-returns: A list with _meta and data fields.
----
-kind: function
-name: generate_api_gust_factors
-exported: true
-signature: generate_api_gust_factors(gust_analysis)
-arguments:
-  gust_analysis: List from analyze_gust_factor() containing summary, extreme_gusts, by_station, rogue_gust_threshold, n_rogue_gusts, pct_rogue_gusts.
-returns: A list with _meta and data fields.
----
-kind: function
-name: generate_api_methods
-exported: true
-signature: generate_api_methods()
-returns: A list with _meta and data fields.
