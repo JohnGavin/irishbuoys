@@ -54,6 +54,10 @@ tryCatch({
   tar_load(api_return_levels)
   tar_load(api_rogue_waves)
   tar_load(api_data_dictionary)
+  tar_load(api_sources)
+  tar_load(api_status)
+  tar_load(api_trends)
+  tar_load(api_extremes)
   tar_load(code_api_curl_latest)
   tar_load(code_api_r_jsonlite)
   tar_load(code_api_python_requests)
@@ -111,13 +115,14 @@ safe_tar_read("api_vignette_stats_dt")
 ```{r stats-overall}
 #| results: asis
 stats <- safe_tar_read("api_stats")
-if (is.list(stats) && "overall" %in% names(stats)) {
+d <- if (is.list(stats) && "data" %in% names(stats)) stats$data else stats
+if (is.list(d) && "overall" %in% names(d)) {
   cat("**Overall summary:**\n\n")
-  cat(sprintf("- Total records: %s\n", format(stats$overall$total_records, big.mark = ",")))
-  cat(sprintf("- Date range: %s to %s\n", stats$overall$date_range[1], stats$overall$date_range[2]))
-  cat(sprintf("- Stations: %s\n", stats$overall$stations))
-  cat(sprintf("- Wind-wave correlation: %s\n", stats$overall$wind_wave_correlation))
-  cat(sprintf("- Wave-Hmax correlation: %s\n", stats$overall$wave_hmax_correlation))
+  cat(sprintf("- Total records: %s\n", format(d$overall$total_records, big.mark = ",")))
+  cat(sprintf("- Date range: %s to %s\n", d$overall$date_range[1], d$overall$date_range[2]))
+  cat(sprintf("- Stations: %s\n", d$overall$stations))
+  cat(sprintf("- Wind-wave correlation: %s\n", d$overall$wind_wave_correlation))
+  cat(sprintf("- Wave-Hmax correlation: %s\n", d$overall$wave_hmax_correlation))
 }
 ```
 
@@ -135,10 +140,11 @@ with linear trend per decade and significance (p-value).
 ```{r seasonal-wave}
 #| results: asis
 seasonal <- safe_tar_read("api_seasonal")
-if (is.list(seasonal) && "wave" %in% names(seasonal)) {
+d <- if (is.list(seasonal) && "data" %in% names(seasonal)) seasonal$data else seasonal
+if (is.list(d) && "wave" %in% names(d)) {
   cat("```json\n")
   cat(jsonlite::toJSON(
-    list(wave = list(monthly = head(seasonal$wave$monthly, 3))),
+    list(wave = list(monthly = head(d$wave$monthly, 3))),
     pretty = TRUE, auto_unbox = TRUE
   ))
   cat("\n```\n")
@@ -150,10 +156,11 @@ if (is.list(seasonal) && "wave" %in% names(seasonal)) {
 ```{r seasonal-wind}
 #| results: asis
 seasonal <- safe_tar_read("api_seasonal")
-if (is.list(seasonal) && "wind" %in% names(seasonal)) {
+d <- if (is.list(seasonal) && "data" %in% names(seasonal)) seasonal$data else seasonal
+if (is.list(d) && "wind" %in% names(d)) {
   cat("```json\n")
   cat(jsonlite::toJSON(
-    list(wind = list(monthly = head(seasonal$wind$monthly, 3))),
+    list(wind = list(monthly = head(d$wind$monthly, 3))),
     pretty = TRUE, auto_unbox = TRUE
   ))
   cat("\n```\n")
@@ -165,10 +172,11 @@ if (is.list(seasonal) && "wind" %in% names(seasonal)) {
 ```{r seasonal-trends}
 #| results: asis
 seasonal <- safe_tar_read("api_seasonal")
-if (is.list(seasonal) && "annual_trends" %in% names(seasonal)) {
+d <- if (is.list(seasonal) && "data" %in% names(seasonal)) seasonal$data else seasonal
+if (is.list(d) && "annual_trends" %in% names(d)) {
   cat("```json\n")
   cat(jsonlite::toJSON(
-    list(annual_trends = seasonal$annual_trends),
+    list(annual_trends = d$annual_trends),
     pretty = TRUE, auto_unbox = TRUE
   ))
   cat("\n```\n")
@@ -189,10 +197,11 @@ for wave height, wind speed, and maximum wave height.
 ```{r correlations-overall}
 #| results: asis
 corr <- safe_tar_read("api_correlations")
-if (is.list(corr) && "overall" %in% names(corr)) {
+d <- if (is.list(corr) && "data" %in% names(corr)) corr$data else corr
+if (is.list(d) && "overall" %in% names(d)) {
   cat("```json\n")
   cat(jsonlite::toJSON(
-    list(overall = corr$overall),
+    list(overall = d$overall),
     pretty = TRUE, auto_unbox = TRUE
   ))
   cat("\n```\n")
@@ -204,8 +213,9 @@ if (is.list(corr) && "overall" %in% names(corr)) {
 ```{r correlations-pairs}
 #| results: asis
 corr <- safe_tar_read("api_correlations")
-if (is.list(corr) && "station_pairs" %in% names(corr)) {
-  pairs <- corr$station_pairs$wave_height
+d <- if (is.list(corr) && "data" %in% names(corr)) corr$data else corr
+if (is.list(d) && "station_pairs" %in% names(d)) {
+  pairs <- d$station_pairs$wave_height
   if (is.data.frame(pairs)) {
     sample_pairs <- utils::head(pairs, 5)
   } else if (is.list(pairs)) {
@@ -247,8 +257,9 @@ safe_tar_read("api_vignette_rogue_waves_dt")
 ```{r rogue-waves-count}
 #| results: asis
 rw <- safe_tar_read("api_rogue_waves")
-if (is.list(rw) && "n_events" %in% names(rw)) {
-  cat(sprintf("\n**Total rogue wave events detected:** %s\n", format(rw$n_events, big.mark = ",")))
+d <- if (is.list(rw) && "data" %in% names(rw)) rw$data else rw
+if (is.list(d) && "n_events" %in% names(d)) {
+  cat(sprintf("\n**Total rogue wave events detected:** %s\n", format(d$n_events, big.mark = ",")))
 }
 ```
 
@@ -260,6 +271,43 @@ including names, descriptions, units, and data types.
 ```{r data-dict-table}
 safe_tar_read("api_vignette_data_dict_dt")
 ```
+
+## Sources {#sources}
+
+The `sources.json` endpoint provides data provenance information including
+the ERDDAP base URL, dataset ID, update frequency, license, and citation.
+This is a pure-constant endpoint with no upstream data dependency.
+
+**Fields:** `erddap_base_url`, `dataset_id`, `info_url`, `provider`,
+`update_frequency`, `license`, `citation`, `variables_measured`
+
+## Station Status {#status}
+
+The `status.json` endpoint provides per-station operational status including
+record counts, date ranges, and summary statistics.
+
+**Fields:** `n_stations`, `total_records`, `date_range`, `stations[]`
+(each with `station_id`, `n_records`, `first_date`, `last_date`,
+`mean_wave_height`, `max_wave_height`, `mean_wind_speed`, `max_wind_speed`)
+
+## Trends {#trends}
+
+The `trends.json` endpoint provides Mann-Kendall trend test results per
+station and variable, plus overall annual trend statistics for wave height
+and wind speed.
+
+**Fields:** `mann_kendall` (per-station/variable: `tau`, `p_value`,
+`trend_direction`), `annual_trends.wave`, `annual_trends.wind`
+(each with `trend_per_decade`, `p_value`, `r_squared`)
+
+## Extremes {#extremes}
+
+The `extremes.json` endpoint combines GPD return levels with confidence
+interval comparisons (delta-method vs bootstrap) into a single resource.
+
+**Fields:** `method`, `threshold`, `return_periods`, `return_levels`
+(nested by station/variable), `ci_comparison` (with `methods`, `n_rows`,
+`records`)
 
 ## Data Sources {#data-sources}
 
@@ -387,6 +435,10 @@ run_api(port = 8080)
 | `GET /rogue-waves` | Detected rogue wave events |
 | `GET /return-levels` | Extreme value return level estimates |
 | `GET /seasonal` | Monthly and seasonal statistics |
+| `GET /sources` | Data provenance and citation |
+| `GET /status` | Per-station operational status |
+| `GET /trends` | Mann-Kendall trend tests |
+| `GET /extremes` | GPD fits and CI comparison |
 
 ### Programmatic Access
 

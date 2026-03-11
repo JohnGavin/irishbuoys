@@ -7,7 +7,7 @@
 #' Base URL: https://johngavin.github.io/irishbuoys/api/v1/
 #'
 #' @details
-#' Targets:
+#' Targets (12 endpoints + write step):
 #' - api_stations       : Station metadata (stations.json)
 #' - api_stats          : Dashboard statistics (stats.json)
 #' - api_rogue_waves    : Rogue wave events (rogue-waves.json)
@@ -16,8 +16,15 @@
 #' - api_correlations   : Inter-station correlations (correlations.json)
 #' - api_data_dictionary: Variable metadata (data-dictionary.json)
 #' - api_latest         : Most recent observation per station (latest.json)
+#' - api_sources        : Data provenance constants (sources.json)
+#' - api_status         : Per-station operational status (status.json)
+#' - api_trends         : Mann-Kendall trends per station (trends.json)
+#' - api_extremes       : GPD + CI comparison combined (extremes.json)
 #' - api_index          : Endpoint catalogue (index.json)
 #' - save_api_files     : Writes all JSON to docs/api/v1/
+#'
+#' Intermediate targets:
+#' - mk_per_station     : Mann-Kendall tests per station/variable
 #'
 #' Vignette display targets:
 #' - api_vignette_endpoints_dt     : DT::datatable of endpoints
@@ -41,7 +48,8 @@ plan_api <- list(
       stations <- get_stations()
       # Remove ERDDAP header row artifacts if present
       stations <- stations[!grepl("^String$|^degrees", stations$station_id), ]
-      stations
+      .api_wrap(stations, "stations",
+        "All buoy station metadata (ID, call sign, coordinates)")
     }
   ),
 
@@ -50,16 +58,18 @@ plan_api <- list(
     api_stats,
     {
       stats <- dashboard_stats
-      list(
-        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-        station_stats = stats$station,
-        overall = list(
-          total_records = stats$overall$total_records,
-          date_range = as.character(stats$overall$date_range),
-          stations = stats$overall$stations,
-          wind_wave_correlation = round(stats$overall$wind_wave_correlation, 4),
-          wave_hmax_correlation = round(stats$overall$wave_hmax_correlation, 4)
-        )
+      .api_wrap(
+        list(
+          station_stats = stats$station,
+          overall = list(
+            total_records = stats$overall$total_records,
+            date_range = as.character(stats$overall$date_range),
+            stations = stats$overall$stations,
+            wind_wave_correlation = round(stats$overall$wind_wave_correlation, 4),
+            wave_hmax_correlation = round(stats$overall$wave_hmax_correlation, 4)
+          )
+        ),
+        "stats", "Summary statistics per station and overall"
       )
     }
   ),
@@ -69,10 +79,10 @@ plan_api <- list(
     api_rogue_waves,
     {
       events <- rogue_wave_events
-      list(
-        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-        n_events = nrow(events),
-        events = events
+      .api_wrap(
+        list(n_events = nrow(events), events = events),
+        "rogue-waves",
+        "Detected rogue wave events (Hmax > 2x significant wave height)"
       )
     }
   ),
@@ -122,13 +132,16 @@ plan_api <- list(
         })
       }, error = function(e) NULL)
 
-      list(
-        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-        method = "GPD",
-        threshold = "95th percentile",
-        return_periods = c(1, 5, 10),
-        by_station = by_station,
-        ci_methods = ci_methods
+      .api_wrap(
+        list(
+          method = "GPD",
+          threshold = "95th percentile",
+          return_periods = c(1, 5, 10),
+          by_station = by_station,
+          ci_methods = ci_methods
+        ),
+        "return-levels",
+        "GPD return levels per station for 1, 5, 10-year periods"
       )
     }
   ),
@@ -137,30 +150,33 @@ plan_api <- list(
   targets::tar_target(
     api_seasonal,
     {
-      list(
-        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-        wave = list(
-          monthly = seasonal_means_wave$monthly,
-          seasonal = seasonal_means_wave$seasonal
-        ),
-        wind = list(
-          monthly = seasonal_means_wind$monthly,
-          seasonal = seasonal_means_wind$seasonal
-        ),
-        annual_trends = list(
+      .api_wrap(
+        list(
           wave = list(
-            annual_stats = annual_trends_wave$annual_stats,
-            trend_per_decade = round(annual_trends_wave$trend_per_decade, 4),
-            p_value = round(annual_trends_wave$p_value, 4),
-            r_squared = round(annual_trends_wave$r_squared, 4)
+            monthly = seasonal_means_wave$monthly,
+            seasonal = seasonal_means_wave$seasonal
           ),
           wind = list(
-            annual_stats = annual_trends_wind$annual_stats,
-            trend_per_decade = round(annual_trends_wind$trend_per_decade, 4),
-            p_value = round(annual_trends_wind$p_value, 4),
-            r_squared = round(annual_trends_wind$r_squared, 4)
+            monthly = seasonal_means_wind$monthly,
+            seasonal = seasonal_means_wind$seasonal
+          ),
+          annual_trends = list(
+            wave = list(
+              annual_stats = annual_trends_wave$annual_stats,
+              trend_per_decade = round(annual_trends_wave$trend_per_decade, 4),
+              p_value = round(annual_trends_wave$p_value, 4),
+              r_squared = round(annual_trends_wave$r_squared, 4)
+            ),
+            wind = list(
+              annual_stats = annual_trends_wind$annual_stats,
+              trend_per_decade = round(annual_trends_wind$trend_per_decade, 4),
+              p_value = round(annual_trends_wind$p_value, 4),
+              r_squared = round(annual_trends_wind$r_squared, 4)
+            )
           )
-        )
+        ),
+        "seasonal",
+        "Monthly and seasonal statistics with annual trends"
       )
     }
   ),
@@ -169,17 +185,20 @@ plan_api <- list(
   targets::tar_target(
     api_correlations,
     {
-      list(
-        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-        overall = list(
-          wind_wave = round(dashboard_stats$overall$wind_wave_correlation, 4),
-          wave_hmax = round(dashboard_stats$overall$wave_hmax_correlation, 4)
+      .api_wrap(
+        list(
+          overall = list(
+            wind_wave = round(dashboard_stats$overall$wind_wave_correlation, 4),
+            wave_hmax = round(dashboard_stats$overall$wave_hmax_correlation, 4)
+          ),
+          station_pairs = list(
+            wave_height = pair_correlations_wave,
+            wind_speed = pair_correlations_wind,
+            hmax = pair_correlations_hmax
+          )
         ),
-        station_pairs = list(
-          wave_height = pair_correlations_wave,
-          wind_speed = pair_correlations_wind,
-          hmax = pair_correlations_hmax
-        )
+        "correlations",
+        "Inter-station correlations for wave height, wind speed, and max wave height"
       )
     }
   ),
@@ -189,10 +208,10 @@ plan_api <- list(
     api_data_dictionary,
     {
       dict <- get_data_dictionary()
-      list(
-        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-        n_variables = nrow(dict),
-        variables = dict
+      .api_wrap(
+        list(n_variables = nrow(dict), variables = dict),
+        "data-dictionary",
+        "Variable metadata: names, units, descriptions, typical ranges"
       )
     }
   ),
@@ -202,12 +221,71 @@ plan_api <- list(
     api_latest,
     {
       latest <- generate_api_latest(n = 1L)
-      list(
-        updated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"),
-        n_stations = dplyr::n_distinct(latest$station_id),
-        observations = latest
+      .api_wrap(
+        list(
+          n_stations = dplyr::n_distinct(latest$station_id),
+          observations = latest
+        ),
+        "latest", "Most recent observation per station"
       )
     }
+  ),
+
+  # ==========================================================================
+  # NEW ENDPOINTS (PR 1 / Issue #53)
+  # ==========================================================================
+
+  # Data provenance constants (no upstream dependency)
+  targets::tar_target(
+    api_sources,
+    generate_api_sources()
+  ),
+
+  # Per-station operational status (reuses dashboard_stats)
+  targets::tar_target(
+    api_status,
+    generate_api_status(dashboard_stats)
+  ),
+
+  # Mann-Kendall per station/variable (intermediate target for api_trends)
+  targets::tar_target(
+    mk_per_station,
+    {
+      stations <- unique(analysis_data$station_id)
+      variables <- c("wave_height", "wind_speed")
+
+      results <- lapply(stats::setNames(stations, stations), function(st) {
+        st_data <- analysis_data[analysis_data$station_id == st, ]
+        lapply(stats::setNames(variables, variables), function(var) {
+          if (sum(!is.na(st_data[[var]])) < 10) {
+            return(list(
+              tau = NA_real_, p_value = NA_real_,
+              trend_direction = "insufficient data"
+            ))
+          }
+          tryCatch(
+            mann_kendall_test(st_data, variable = var, time_col = "time"),
+            error = function(e) list(
+              tau = NA_real_, p_value = NA_real_,
+              trend_direction = paste("error:", e$message)
+            )
+          )
+        })
+      })
+      results
+    }
+  ),
+
+  # Trends endpoint (Mann-Kendall + annual trends)
+  targets::tar_target(
+    api_trends,
+    generate_api_trends(mk_per_station, annual_trends_wave, annual_trends_wind)
+  ),
+
+  # Extremes endpoint (GPD return levels + CI comparison)
+  targets::tar_target(
+    api_extremes,
+    generate_api_extremes(return_levels_per_station, ci_comparison_per_station)
   ),
 
   # API index (catalogue of all endpoints)
@@ -236,7 +314,11 @@ plan_api <- list(
         "data-dictionary.json" = api_data_dictionary,
         "latest.json" = api_latest,
         "seasonal.json" = api_seasonal,
-        "correlations.json" = api_correlations
+        "correlations.json" = api_correlations,
+        "sources.json" = api_sources,
+        "status.json" = api_status,
+        "trends.json" = api_trends,
+        "extremes.json" = api_extremes
       )
 
       # Write each file
@@ -305,7 +387,7 @@ plan_api <- list(
     {
       # Show first station from latest.json as example
       example <- api_latest
-      example$observations <- head(example$observations, 1)
+      example$data$observations <- head(example$data$observations, 1)
       jsonlite::toJSON(
         example,
         pretty = TRUE,
@@ -320,7 +402,7 @@ plan_api <- list(
   targets::tar_target(
     api_vignette_stations_dt,
     {
-      st <- api_stations
+      st <- api_stations$data
       # Remove rows with all-NA numeric columns
       st <- st[!is.na(st$latitude) & !is.na(st$longitude), ]
       DT::datatable(
@@ -341,7 +423,7 @@ plan_api <- list(
   targets::tar_target(
     api_vignette_stats_dt,
     {
-      st_stats <- api_stats$station_stats
+      st_stats <- api_stats$data$station_stats
       df <- dplyr::bind_rows(lapply(names(st_stats), function(nm) {
         s <- st_stats[[nm]]
         tibble::tibble(
@@ -371,7 +453,7 @@ plan_api <- list(
   targets::tar_target(
     api_vignette_return_levels_dt,
     {
-      rl <- api_return_levels$by_station
+      rl <- api_return_levels$data$by_station
       rows <- lapply(names(rl), function(station) {
         vars <- rl[[station]]
         lapply(names(vars), function(variable) {
@@ -404,16 +486,16 @@ plan_api <- list(
   targets::tar_target(
     api_vignette_rogue_waves_dt,
     {
-      events <- api_rogue_waves$events
+      events <- api_rogue_waves$data$events
       if (is.data.frame(events) && nrow(events) > 0) {
-        events <- events[order(-events$hmax_hs_ratio), ]
+        events <- events[order(-events$rogue_ratio), ]
         events <- utils::head(events, 20)
       }
       DT::datatable(
         events,
         caption = paste0(
           "Top Rogue Wave Events (showing 20 of ",
-          api_rogue_waves$n_events, " total)"
+          api_rogue_waves$data$n_events, " total)"
         ),
         options = list(
           pageLength = 10,
@@ -431,7 +513,7 @@ plan_api <- list(
   targets::tar_target(
     api_vignette_data_dict_dt,
     {
-      vars <- api_data_dictionary$variables
+      vars <- api_data_dictionary$data$variables
       DT::datatable(
         vars,
         caption = "Data Dictionary: Variable Definitions",
