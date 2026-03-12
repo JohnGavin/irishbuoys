@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-12T14:18:56Z",
+    "generated": "2026-03-12T20:10:01Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 256477
+        "value": 256507
       },
       {
         "statistic": "mean",
@@ -7541,11 +7541,11 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 43021,
+        "n": 43027,
         "mean_gf": 1.2882,
         "median_gf": 1.27,
         "sd_gf": 0.1008,
-        "p95_gf": 1.4594,
+        "p95_gf": 1.4595,
         "p99_gf": 1.6326,
         "max_gf": 2.8902,
         "n_rogue": 4,
@@ -7553,11 +7553,11 @@
       },
       {
         "station_id": "M3",
-        "n": 49020,
-        "mean_gf": 1.3306,
-        "median_gf": 1.3043,
+        "n": 49026,
+        "mean_gf": 1.3307,
+        "median_gf": 1.3044,
         "sd_gf": 0.1257,
-        "p95_gf": 1.5581,
+        "p95_gf": 1.5582,
         "p99_gf": 1.7528,
         "max_gf": 3.2127,
         "n_rogue": 6,
@@ -7565,11 +7565,11 @@
       },
       {
         "station_id": "M4",
-        "n": 49431,
+        "n": 49437,
         "mean_gf": 1.3597,
-        "median_gf": 1.3375,
+        "median_gf": 1.3376,
         "sd_gf": 0.1274,
-        "p95_gf": 1.5822,
+        "p95_gf": 1.5821,
         "p99_gf": 1.8,
         "max_gf": 3.7178,
         "n_rogue": 14,
@@ -7577,7 +7577,7 @@
       },
       {
         "station_id": "M5",
-        "n": 59954,
+        "n": 59960,
         "mean_gf": 1.346,
         "median_gf": 1.3113,
         "sd_gf": 0.1282,
@@ -7589,12 +7589,12 @@
       },
       {
         "station_id": "M6",
-        "n": 55051,
-        "mean_gf": 1.4146,
+        "n": 55057,
+        "mean_gf": 1.4147,
         "median_gf": 1.3852,
         "sd_gf": 0.1555,
         "p95_gf": 1.6897,
-        "p99_gf": 1.9402,
+        "p99_gf": 1.9401,
         "max_gf": 3.8846,
         "n_rogue": 30,
         "pct_rogue": 0.0545
