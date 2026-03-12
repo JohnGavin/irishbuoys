@@ -1,0 +1,18 @@
+{
+  "_meta": {
+    "generated": "2026-03-12T02:50:00Z",
+    "package_version": "0.2.0",
+    "endpoint": "sources",
+    "description": "Data provenance: ERDDAP source, update frequency, license, citation"
+  },
+  "data": {
+    "erddap_base_url": "https://erddap.marine.ie/erddap/tabledap/IWBNetwork",
+    "dataset_id": "IWBNetwork",
+    "info_url": "https://erddap.marine.ie/erddap/info/IWBNetwork/index.html",
+    "provider": "Marine Institute, Ireland",
+    "update_frequency": "Weekly (Sundays 2 AM UTC)",
+    "license": "Creative Commons Attribution 4.0 (CC BY 4.0)",
+    "citation": "Marine Institute (2024). Irish Weather Buoy Network. Data accessed via ERDDAP at erddap.marine.ie.",
+    "variables_measured": ["wave_height", "hmax", "wave_period", "wind_speed", "gust", "wind_direction", "atmospheric_pressure", "air_temperature", "sea_temperature"]
+  }
+}

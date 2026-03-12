@@ -94,14 +94,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
   <li><a href="#endpoints" id="toc-endpoints" class="nav-link" data-scroll-target="#endpoints">Available Endpoints</a></li>
-  <li><a href="#example-response" id="toc-example-response" class="nav-link" data-scroll-target="#example-response">Example Response</a></li>
-  <li><a href="#seasonal-endpoint" id="toc-seasonal-endpoint" class="nav-link" data-scroll-target="#seasonal-endpoint">Seasonal Endpoint</a></li>
-  <li><a href="#correlations-endpoint" id="toc-correlations-endpoint" class="nav-link" data-scroll-target="#correlations-endpoint">Correlations Endpoint</a></li>
+  <li><a href="#stations" id="toc-stations" class="nav-link" data-scroll-target="#stations">Stations</a></li>
+  <li><a href="#latest" id="toc-latest" class="nav-link" data-scroll-target="#latest">Latest Observations</a></li>
+  <li><a href="#stats" id="toc-stats" class="nav-link" data-scroll-target="#stats">Summary Statistics</a></li>
+  <li><a href="#seasonal" id="toc-seasonal" class="nav-link" data-scroll-target="#seasonal">Seasonal Patterns</a>
+  <ul class="collapse">
+  <li><a href="#wave-data-sample" id="toc-wave-data-sample" class="nav-link" data-scroll-target="#wave-data-sample">Wave data (sample)</a></li>
+  <li><a href="#wind-data-sample" id="toc-wind-data-sample" class="nav-link" data-scroll-target="#wind-data-sample">Wind data (sample)</a></li>
+  <li><a href="#annual-trends" id="toc-annual-trends" class="nav-link" data-scroll-target="#annual-trends">Annual trends</a></li>
+  </ul></li>
+  <li><a href="#correlations" id="toc-correlations" class="nav-link" data-scroll-target="#correlations">Correlations</a>
+  <ul class="collapse">
+  <li><a href="#overall-correlations" id="toc-overall-correlations" class="nav-link" data-scroll-target="#overall-correlations">Overall correlations</a></li>
+  <li><a href="#station-pair-sample-wave-height" id="toc-station-pair-sample-wave-height" class="nav-link" data-scroll-target="#station-pair-sample-wave-height">Station pair sample (wave height)</a></li>
+  </ul></li>
+  <li><a href="#return-levels" id="toc-return-levels" class="nav-link" data-scroll-target="#return-levels">Return Levels</a></li>
+  <li><a href="#rogue-waves" id="toc-rogue-waves" class="nav-link" data-scroll-target="#rogue-waves">Rogue Waves</a></li>
+  <li><a href="#data-dictionary" id="toc-data-dictionary" class="nav-link" data-scroll-target="#data-dictionary">Data Dictionary</a></li>
+  <li><a href="#sources" id="toc-sources" class="nav-link" data-scroll-target="#sources">Sources</a></li>
+  <li><a href="#status" id="toc-status" class="nav-link" data-scroll-target="#status">Station Status</a></li>
+  <li><a href="#trends" id="toc-trends" class="nav-link" data-scroll-target="#trends">Trends</a></li>
+  <li><a href="#extremes" id="toc-extremes" class="nav-link" data-scroll-target="#extremes">Extremes</a></li>
+  <li><a href="#decomposition" id="toc-decomposition" class="nav-link" data-scroll-target="#decomposition">Decomposition</a></li>
+  <li><a href="#spatial" id="toc-spatial" class="nav-link" data-scroll-target="#spatial">Spatial Correlations</a></li>
+  <li><a href="#gust-factors" id="toc-gust-factors" class="nav-link" data-scroll-target="#gust-factors">Gust Factors</a></li>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Statistical Methods</a></li>
+  <li><a href="#data-sources" id="toc-data-sources" class="nav-link" data-scroll-target="#data-sources">Data Sources</a></li>
   <li><a href="#usage-examples" id="toc-usage-examples" class="nav-link" data-scroll-target="#usage-examples">Usage Examples</a>
   <ul class="collapse">
   <li><a href="#curl-example" id="toc-curl-example" class="nav-link" data-scroll-target="#curl-example">curl</a></li>
   <li><a href="#r-example" id="toc-r-example" class="nav-link" data-scroll-target="#r-example">R (jsonlite)</a></li>
+  <li><a href="#fetching-stats-and-seasonal-data-r" id="toc-fetching-stats-and-seasonal-data-r" class="nav-link" data-scroll-target="#fetching-stats-and-seasonal-data-r">Fetching stats and seasonal data (R)</a></li>
   <li><a href="#python-example" id="toc-python-example" class="nav-link" data-scroll-target="#python-example">Python (requests)</a></li>
+  <li><a href="#fetching-stats-and-seasonal-data-python" id="toc-fetching-stats-and-seasonal-data-python" class="nav-link" data-scroll-target="#fetching-stats-and-seasonal-data-python">Fetching stats and seasonal data (Python)</a></li>
   </ul></li>
   <li><a href="#bulk-data" id="toc-bulk-data" class="nav-link" data-scroll-target="#bulk-data">Bulk Data Access</a></li>
   <li><a href="#file-summary" id="toc-file-summary" class="nav-link" data-scroll-target="#file-summary">API File Summary</a></li>
@@ -146,20 +171,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="endpoints">Available Endpoints</h2>
 <div class="cell">
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-f673778ed3c388e9d1ea" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-f673778ed3c388e9d1ea">{"x":{"filter":"none","vertical":false,"caption":"<caption>Available API Endpoints<\/caption>","data":[["stations.json","stats.json","rogue-waves.json","return-levels.json","data-dictionary.json","latest.json","seasonal.json","correlations.json"],["https://johngavin.github.io/irishbuoys/api/v1/stations.json","https://johngavin.github.io/irishbuoys/api/v1/stats.json","https://johngavin.github.io/irishbuoys/api/v1/rogue-waves.json","https://johngavin.github.io/irishbuoys/api/v1/return-levels.json","https://johngavin.github.io/irishbuoys/api/v1/data-dictionary.json","https://johngavin.github.io/irishbuoys/api/v1/latest.json","https://johngavin.github.io/irishbuoys/api/v1/seasonal.json","https://johngavin.github.io/irishbuoys/api/v1/correlations.json"],["All buoy station metadata (ID, call sign, coordinates)","Summary statistics per station and overall","Detected rogue wave events (Hmax &gt; 2x significant wave height)","GPD return levels per station for 1, 5, 10-year periods (avg wave, rogue wave, avg wind, wind gust)","Variable metadata: names, units, descriptions, typical ranges","Most recent observation per station","Monthly and seasonal statistics with annual trends (wave height, wind speed)","Inter-station correlations for wave height, wind speed, and max wave height"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>endpoint<\/th>\n      <th>url<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"dom":"Bfrtip","buttons":["csv","print"],"columnDefs":[{"width":"120px","targets":0},{"width":"300px","targets":1},{"name":"endpoint","targets":0},{"name":"url","targets":1},{"name":"description","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-1dbafe12875c2f6d9ff6" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-1dbafe12875c2f6d9ff6">{"x":{"filter":"none","vertical":false,"caption":"<caption>Available API Endpoints<\/caption>","data":[["stations.json","stats.json","rogue-waves.json","return-levels.json","data-dictionary.json","latest.json","seasonal.json","correlations.json","sources.json","status.json","trends.json","extremes.json","decomposition.json","spatial.json","gust-factors.json","methods.json"],["https://johngavin.github.io/irishbuoys/api/v1/stations.json","https://johngavin.github.io/irishbuoys/api/v1/stats.json","https://johngavin.github.io/irishbuoys/api/v1/rogue-waves.json","https://johngavin.github.io/irishbuoys/api/v1/return-levels.json","https://johngavin.github.io/irishbuoys/api/v1/data-dictionary.json","https://johngavin.github.io/irishbuoys/api/v1/latest.json","https://johngavin.github.io/irishbuoys/api/v1/seasonal.json","https://johngavin.github.io/irishbuoys/api/v1/correlations.json","https://johngavin.github.io/irishbuoys/api/v1/sources.json","https://johngavin.github.io/irishbuoys/api/v1/status.json","https://johngavin.github.io/irishbuoys/api/v1/trends.json","https://johngavin.github.io/irishbuoys/api/v1/extremes.json","https://johngavin.github.io/irishbuoys/api/v1/decomposition.json","https://johngavin.github.io/irishbuoys/api/v1/spatial.json","https://johngavin.github.io/irishbuoys/api/v1/gust-factors.json","https://johngavin.github.io/irishbuoys/api/v1/methods.json"],["All buoy station metadata (ID, call sign, coordinates)","Summary statistics per station and overall","Detected rogue wave events (Hmax &gt; 2x significant wave height)","GPD return levels per station for 1, 5, 10-year periods (avg wave, rogue wave, avg wind, wind gust)","Variable metadata: names, units, descriptions, typical ranges","Most recent observation per station","Monthly and seasonal statistics with annual trends (wave height, wind speed)","Inter-station correlations for wave height, wind speed, and max wave height","Data provenance: ERDDAP source, update frequency, license, citation","Per-station operational status, record counts, and date ranges","Mann-Kendall trend tests and Sen's slope estimates per station/variable","GPD fits, return levels, and CI method comparison (delta, bootstrap)","STL decomposition (seasonal, trend, remainder) per station","Cross-station correlation matrices for wave height, wind speed, Hmax","Gust factor analysis per station with extreme events","Statistical methods documentation: thresholds, formulas, references"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>endpoint<\/th>\n      <th>url<\/th>\n      <th>description<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"dom":"Bfrtip","buttons":["csv","print"],"columnDefs":[{"width":"120px","targets":0},{"width":"300px","targets":1},{"name":"endpoint","targets":0},{"name":"url","targets":1},{"name":"description","targets":2}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
-<section id="example-response" class="level2">
-<h2 class="anchored" data-anchor-id="example-response">Example Response</h2>
-<p>A sample response from <code>latest.json</code> (one observation per station):</p>
-<p>{ “updated_at”: “2026-03-04T09:39:10Z”, “n_stations”: 0, “observations”: [] }</p>
+<section id="stations" class="level2">
+<h2 class="anchored" data-anchor-id="stations">Stations</h2>
+<p>The <code>stations.json</code> endpoint provides metadata for each buoy in the Irish Weather Buoy Network, including station ID, name, latitude, and longitude.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-9bf60e551a154fcb2cfc" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-9bf60e551a154fcb2cfc">{"x":{"filter":"none","vertical":false,"caption":"<caption>Station Metadata<\/caption>","data":[["Belmullet-AMETS","FS1","M1","M2","M3","M4","M4-Archive","M5","M6"],["Belmullet","62023","62090","62091","62092","62093","62093","62094","62095"],[-10.14221,-7.9,-11.2,-5.4302,-10.548261,-9.999136,-9.066700000000001,-6.704336,-15.88135],[54.2659,51.4,53.1266,53.4836,51.215956,54.999967,54.6667,51.690425,53.07482]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station_id<\/th>\n      <th>CallSign<\/th>\n      <th>longitude<\/th>\n      <th>latitude<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"dom":"Bfrtip","buttons":["csv","print"],"columnDefs":[{"className":"dt-right","targets":[2,3]},{"name":"station_id","targets":0},{"name":"CallSign","targets":1},{"name":"longitude","targets":2},{"name":"latitude","targets":3}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
 </section>
-<section id="seasonal-endpoint" class="level2">
-<h2 class="anchored" data-anchor-id="seasonal-endpoint">Seasonal Endpoint</h2>
+<section id="latest" class="level2">
+<h2 class="anchored" data-anchor-id="latest">Latest Observations</h2>
+<p>The <code>latest.json</code> endpoint returns the most recent observation per station. A sample response (one station):</p>
+<p>{ “_meta”: { “generated”: “2026-03-12T02:50:06Z”, “package_version”: “0.2.0”, “endpoint”: “latest”, “description”: “Most recent observation per station” }, “data”: { “n_stations”: 5, “observations”: [ { “time”: “2026-03-12T02:00:00”, “station_id”: “M5”, “call_sign”: “62094”, “longitude”: -6.7043, “latitude”: 51.6904, “atmospheric_pressure”: 1010.303, “air_temperature”: 10.361, “dew_point”: null, “wind_direction”: 212, “wind_speed”: 22.542, “gust”: 37.342, “relative_humidity”: 78.223, “sea_temperature”: 9.939, “salinity”: 25, “wave_height”: 3.359, “wave_period”: 6.211, “mean_wave_direction”: 235, “hmax”: 4.688, “tp”: 7.266, “thtp”: 237.656, “sprtp”: 23.906, “qc_flag”: 0 } ] } }</p>
+</section>
+<section id="stats" class="level2">
+<h2 class="anchored" data-anchor-id="stats">Summary Statistics</h2>
+<p>The <code>stats.json</code> endpoint provides per-station summary statistics including record counts, mean/max wave height, and mean/max wind speed.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-eedf5866de4c6c1223ec" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-eedf5866de4c6c1223ec">{"x":{"filter":"none","vertical":false,"caption":"<caption>Per-Station Summary Statistics<\/caption>","data":[["M2","M3","M4","M5","M6"],[58830,59000,60328,63750,57814],[1.17,3.06,3.1,1.92,3.37],[6.41,14.06,15.78,9.69,15.7],[14.47,15.67,16.08,14.41,16.48],[47.93,50.09,55.33,44.17,56.58]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station<\/th>\n      <th>n_records<\/th>\n      <th>mean_wave_height<\/th>\n      <th>max_wave_height<\/th>\n      <th>mean_wind_speed<\/th>\n      <th>max_wind_speed<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"dom":"Bfrtip","buttons":["csv","print"],"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5]},{"name":"station","targets":0},{"name":"n_records","targets":1},{"name":"mean_wave_height","targets":2},{"name":"max_wave_height","targets":3},{"name":"mean_wind_speed","targets":4},{"name":"max_wind_speed","targets":5}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Overall summary:</strong></p>
+<ul>
+<li>Total records: 299,722</li>
+<li>Date range: 2018-10-11 to 2026-03-12 02:00:00</li>
+<li>Stations: M2</li>
+<li>Stations: M3</li>
+<li>Stations: M4</li>
+<li>Stations: M5</li>
+<li>Stations: M6</li>
+<li>Wind-wave correlation: 0.6083</li>
+<li>Wave-Hmax correlation: 0.9767</li>
+</ul>
+</section>
+<section id="seasonal" class="level2">
+<h2 class="anchored" data-anchor-id="seasonal">Seasonal Patterns</h2>
 <p>The <code>seasonal.json</code> endpoint provides monthly and seasonal (DJF/MAM/JJA/SON) mean statistics for wave height and wind speed, plus annual trend analysis with linear trend per decade and significance (p-value).</p>
 <p><strong>Fields:</strong> <code>wave.monthly</code>, <code>wave.seasonal</code>, <code>wind.monthly</code>, <code>wind.seasonal</code>, <code>annual_trends.wave</code>, <code>annual_trends.wind</code></p>
+<section id="wave-data-sample" class="level3">
+<h3 class="anchored" data-anchor-id="wave-data-sample">Wave data (sample)</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"wave"</span><span class="fu">:</span> <span class="fu">{</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"monthly"</span><span class="fu">:</span> <span class="ot">[</span></span>
@@ -181,81 +240,514 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
 <span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
 <span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"month"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.7689</span><span class="fu">,</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.6128</span><span class="fu">,</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.7878</span><span class="fu">,</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.6271</span><span class="fu">,</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">2.5</span><span class="fu">,</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">21086</span><span class="fu">,</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">21416</span><span class="fu">,</span></span>
 <span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"month_name"</span><span class="fu">:</span> <span class="st">"Mar"</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
 <span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="correlations-endpoint" class="level2">
-<h2 class="anchored" data-anchor-id="correlations-endpoint">Correlations Endpoint</h2>
+<section id="wind-data-sample" class="level3">
+<h3 class="anchored" data-anchor-id="wind-data-sample">Wind data (sample)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"wind"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"monthly"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"month"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">17.5198</span><span class="fu">,</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.9971</span><span class="fu">,</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">17.533</span><span class="fu">,</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">24352</span><span class="fu">,</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"month_name"</span><span class="fu">:</span> <span class="st">"Jan"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"month"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">19.0089</span><span class="fu">,</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.5457</span><span class="fu">,</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">19.013</span><span class="fu">,</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">21237</span><span class="fu">,</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"month_name"</span><span class="fu">:</span> <span class="st">"Feb"</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"month"</span><span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">16.2287</span><span class="fu">,</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.7932</span><span class="fu">,</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">16.053</span><span class="fu">,</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">21375</span><span class="fu">,</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"month_name"</span><span class="fu">:</span> <span class="st">"Mar"</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="annual-trends" class="level3">
+<h3 class="anchored" data-anchor-id="annual-trends">Annual trends</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"annual_trends"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"wave"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"annual_stats"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2018</span><span class="fu">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">3.5531</span><span class="fu">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">3.281</span><span class="fu">,</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.6551</span><span class="fu">,</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">11.094</span><span class="fu">,</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">5.781</span><span class="fu">,</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">8.62</span><span class="fu">,</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">5581</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2019</span><span class="fu">,</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.6478</span><span class="fu">,</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">2.344</span><span class="fu">,</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.6309</span><span class="fu">,</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">15.703</span><span class="fu">,</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">4.844</span><span class="fu">,</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">7.736</span><span class="fu">,</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">23498</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2020</span><span class="fu">,</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.6805</span><span class="fu">,</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">2.227</span><span class="fu">,</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.8318</span><span class="fu">,</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">15.117</span><span class="fu">,</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">5.156</span><span class="fu">,</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">8.984</span><span class="fu">,</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">26774</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2021</span><span class="fu">,</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.2887</span><span class="fu">,</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">1.875</span><span class="fu">,</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.5643</span><span class="fu">,</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">12.578</span><span class="fu">,</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">4.453</span><span class="fu">,</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">7.109</span><span class="fu">,</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">43323</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2022</span><span class="fu">,</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.4772</span><span class="fu">,</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">2.031</span><span class="fu">,</span></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.7632</span><span class="fu">,</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">15.781</span><span class="fu">,</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">4.805</span><span class="fu">,</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">8.438</span><span class="fu">,</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">39957</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2023</span><span class="fu">,</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.5258</span><span class="fu">,</span></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">2.227</span><span class="fu">,</span></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.5755</span><span class="fu">,</span></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">11.953</span><span class="fu">,</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">4.688</span><span class="fu">,</span></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">7.5</span><span class="fu">,</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">42741</span></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2024</span><span class="fu">,</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.4866</span><span class="fu">,</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">2.188</span><span class="fu">,</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.5774</span><span class="fu">,</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">12.188</span><span class="fu">,</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">4.57</span><span class="fu">,</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">7.617</span><span class="fu">,</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">42567</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2025</span><span class="fu">,</span></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">2.5231</span><span class="fu">,</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">2.109</span><span class="fu">,</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.6733</span><span class="fu">,</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">12.773</span><span class="fu">,</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">4.805</span><span class="fu">,</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">7.969</span><span class="fu">,</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">41269</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2026</span><span class="fu">,</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">3.36</span><span class="fu">,</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">3.281</span><span class="fu">,</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">1.524</span><span class="fu">,</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">9.844</span><span class="fu">,</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">5.391</span><span class="fu">,</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">7.383</span><span class="fu">,</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">8412</span></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"trend_per_decade"</span><span class="fu">:</span> <span class="fl">-0.2161</span><span class="fu">,</span></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"p_value"</span><span class="fu">:</span> <span class="fl">0.7245</span><span class="fu">,</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"r_squared"</span><span class="fu">:</span> <span class="fl">0.0189</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"wind"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"annual_stats"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2018</span><span class="fu">,</span></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">17.121</span><span class="fu">,</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">17.077</span><span class="fu">,</span></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.6237</span><span class="fu">,</span></span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="dv">38</span><span class="fu">,</span></span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">25.473</span><span class="fu">,</span></span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="dv">33</span><span class="fu">,</span></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">4585</span></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2019</span><span class="fu">,</span></span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">15.1625</span><span class="fu">,</span></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">14.943</span><span class="fu">,</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.53</span><span class="fu">,</span></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="dv">43</span><span class="fu">,</span></span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">23.794</span><span class="fu">,</span></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="dv">31</span><span class="fu">,</span></span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">23314</span></span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2020</span><span class="fu">,</span></span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">15.8785</span><span class="fu">,</span></span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">15.711</span><span class="fu">,</span></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.8127</span><span class="fu">,</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">50.207</span><span class="fu">,</span></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">24.705</span><span class="fu">,</span></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">32.333</span><span class="fu">,</span></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">24950</span></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2021</span><span class="fu">,</span></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">14.6538</span><span class="fu">,</span></span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">14.231</span><span class="fu">,</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.7396</span><span class="fu">,</span></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">48.613</span><span class="fu">,</span></span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">23.566</span><span class="fu">,</span></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">31.991</span><span class="fu">,</span></span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">43323</span></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2022</span><span class="fu">,</span></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">15.0745</span><span class="fu">,</span></span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">14.8</span><span class="fu">,</span></span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.6821</span><span class="fu">,</span></span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">50.093</span><span class="fu">,</span></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">23.794</span><span class="fu">,</span></span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">31.991</span><span class="fu">,</span></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">39957</span></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2023</span><span class="fu">,</span></span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">15.6905</span><span class="fu">,</span></span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">15.483</span><span class="fu">,</span></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.7129</span><span class="fu">,</span></span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">44.173</span><span class="fu">,</span></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">24.477</span><span class="fu">,</span></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">32.219</span><span class="fu">,</span></span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">42741</span></span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2024</span><span class="fu">,</span></span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">15.4624</span><span class="fu">,</span></span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">15.142</span><span class="fu">,</span></span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.5811</span><span class="fu">,</span></span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">47.588</span><span class="fu">,</span></span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">24.136</span><span class="fu">,</span></span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">32.674</span><span class="fu">,</span></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">42567</span></span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2025</span><span class="fu">,</span></span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">15.3419</span><span class="fu">,</span></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">14.914</span><span class="fu">,</span></span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.7905</span><span class="fu">,</span></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">56.582</span><span class="fu">,</span></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">24.363</span><span class="fu">,</span></span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">31.991</span><span class="fu">,</span></span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">41269</span></span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a>        <span class="fu">{</span></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"year"</span><span class="fu">:</span> <span class="dv">2026</span><span class="fu">,</span></span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"mean"</span><span class="fu">:</span> <span class="fl">18.0105</span><span class="fu">,</span></span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"median"</span><span class="fu">:</span> <span class="fl">18.102</span><span class="fu">,</span></span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"sd"</span><span class="fu">:</span> <span class="fl">6.8439</span><span class="fu">,</span></span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"max"</span><span class="fu">:</span> <span class="fl">40.644</span><span class="fu">,</span></span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p90"</span><span class="fu">:</span> <span class="fl">27.096</span><span class="fu">,</span></span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"p99"</span><span class="fu">:</span> <span class="fl">33.585</span><span class="fu">,</span></span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a>          <span class="dt">"n"</span><span class="fu">:</span> <span class="dv">8412</span></span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>      <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"trend_per_decade"</span><span class="fu">:</span> <span class="fl">0.7167</span><span class="fu">,</span></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"p_value"</span><span class="fu">:</span> <span class="fl">0.6377</span><span class="fu">,</span></span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"r_squared"</span><span class="fu">:</span> <span class="fl">0.0334</span></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="correlations" class="level2">
+<h2 class="anchored" data-anchor-id="correlations">Correlations</h2>
 <p>The <code>correlations.json</code> endpoint provides overall wind-wave and wave-Hmax correlations plus inter-station pair correlations (cross-correlation analysis) for wave height, wind speed, and maximum wave height.</p>
 <p><strong>Fields:</strong> <code>overall.wind_wave</code>, <code>overall.wave_hmax</code>, <code>station_pairs.wave_height</code>, <code>station_pairs.wind_speed</code>, <code>station_pairs.hmax</code></p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"overall"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"wind_wave"</span><span class="fu">:</span> <span class="fl">0.608</span><span class="fu">,</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"wave_hmax"</span><span class="fu">:</span> <span class="fl">0.9766</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="overall-correlations" class="level3">
+<h3 class="anchored" data-anchor-id="overall-correlations">Overall correlations</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"overall"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"wind_wave"</span><span class="fu">:</span> <span class="fl">0.6083</span><span class="fu">,</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"wave_hmax"</span><span class="fu">:</span> <span class="fl">0.9767</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="station-pair-sample-wave-height" class="level3">
+<h3 class="anchored" data-anchor-id="station-pair-sample-wave-height">Station pair sample (wave height)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"station_pairs"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"wave_height"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station1"</span><span class="fu">:</span> <span class="st">"M2"</span><span class="fu">,</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station2"</span><span class="fu">:</span> <span class="st">"M3"</span><span class="fu">,</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"distance_km"</span><span class="fu">:</span> <span class="dv">39</span><span class="fu">,</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"optimal_lag"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"max_correlation"</span><span class="fu">:</span> <span class="fl">0.6529</span><span class="fu">,</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"expected_lag"</span><span class="fu">:</span> <span class="fl">1.3</span><span class="fu">,</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n_obs"</span><span class="fu">:</span> <span class="dv">45575</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station1"</span><span class="fu">:</span> <span class="st">"M2"</span><span class="fu">,</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station2"</span><span class="fu">:</span> <span class="st">"M4"</span><span class="fu">,</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"distance_km"</span><span class="fu">:</span> <span class="fl">233.9</span><span class="fu">,</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"optimal_lag"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"max_correlation"</span><span class="fu">:</span> <span class="fl">0.5557</span><span class="fu">,</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"expected_lag"</span><span class="fu">:</span> <span class="fl">7.8</span><span class="fu">,</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n_obs"</span><span class="fu">:</span> <span class="dv">46590</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station1"</span><span class="fu">:</span> <span class="st">"M2"</span><span class="fu">,</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station2"</span><span class="fu">:</span> <span class="st">"M5"</span><span class="fu">,</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"distance_km"</span><span class="fu">:</span> <span class="fl">52.3</span><span class="fu">,</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"optimal_lag"</span><span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"max_correlation"</span><span class="fu">:</span> <span class="fl">0.7709</span><span class="fu">,</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"expected_lag"</span><span class="fu">:</span> <span class="fl">1.7</span><span class="fu">,</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n_obs"</span><span class="fu">:</span> <span class="dv">46486</span></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station1"</span><span class="fu">:</span> <span class="st">"M2"</span><span class="fu">,</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station2"</span><span class="fu">:</span> <span class="st">"M6"</span><span class="fu">,</span></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"distance_km"</span><span class="fu">:</span> <span class="fl">454.3</span><span class="fu">,</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"optimal_lag"</span><span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"max_correlation"</span><span class="fu">:</span> <span class="fl">0.5592</span><span class="fu">,</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"expected_lag"</span><span class="fu">:</span> <span class="fl">15.1</span><span class="fu">,</span></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n_obs"</span><span class="fu">:</span> <span class="dv">44199</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span><span class="ot">,</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>      <span class="fu">{</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station1"</span><span class="fu">:</span> <span class="st">"M3"</span><span class="fu">,</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"station2"</span><span class="fu">:</span> <span class="st">"M4"</span><span class="fu">,</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"distance_km"</span><span class="fu">:</span> <span class="fl">271.8</span><span class="fu">,</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"optimal_lag"</span><span class="fu">:</span> <span class="dv">-1</span><span class="fu">,</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"max_correlation"</span><span class="fu">:</span> <span class="fl">0.8111</span><span class="fu">,</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"expected_lag"</span><span class="fu">:</span> <span class="fl">9.1</span><span class="fu">,</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>        <span class="dt">"n_obs"</span><span class="fu">:</span> <span class="dv">50496</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="ot">]</span></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+</section>
+<section id="return-levels" class="level2">
+<h2 class="anchored" data-anchor-id="return-levels">Return Levels</h2>
+<p>The <code>return-levels.json</code> endpoint provides Generalised Pareto Distribution (GPD) return level estimates for extreme wave heights. The 95th percentile threshold is used, with return periods of 1, 5, and 10 years.</p>
+<p><strong>Method:</strong> GPD | <strong>Threshold:</strong> 95th percentile | <strong>Return periods:</strong> 1, 5, 10 years</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-f418a5a1d656c508666e" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-f418a5a1d656c508666e">{"x":{"filter":"none","vertical":false,"caption":"<caption>GPD Return Levels by Station and Variable<\/caption>","data":[["M2","M2","M2","M2","M3","M3","M3","M3","M4","M4","M4","M4","M5","M5","M5","M5","M6","M6","M6","M6"],["avg_wave","rogue_wave","avg_wind","wind_gust","avg_wave","rogue_wave","avg_wind","wind_gust","avg_wave","rogue_wave","avg_wind","wind_gust","avg_wave","rogue_wave","avg_wind","wind_gust","avg_wave","rogue_wave","avg_wind","wind_gust"],[5.66,9.300000000000001,42.32,56.87,12.61,19.53,45.13,60.35,13.31,20.67,46.63,62.21,8.94,14.12,38.37,55.19,14.09,22.3,45.28,64.72],[6.14,10.15,44.9,60.37,13.6,21.02,48.42,64.67,14.73,23.04,50.63,66.45999999999999,9.76,15.63,40.5,58.34,15.55,24.85,48.52,69.19],[6.31,10.47,45.85,61.66,13.97,21.57,49.7,66.34,15.29,24,52.25,68.09,10.07,16.23,41.29,59.5,16.13,25.88,49.78,70.92]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station<\/th>\n      <th>variable<\/th>\n      <th>1yr<\/th>\n      <th>5yr<\/th>\n      <th>10yr<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":15,"dom":"Bfrtip","buttons":["csv","print"],"columnDefs":[{"targets":2,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"targets":4,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\", null);\n  }"},{"className":"dt-right","targets":[2,3,4]},{"name":"station","targets":0},{"name":"variable","targets":1},{"name":"1yr","targets":2},{"name":"5yr","targets":3},{"name":"10yr","targets":4}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,15,25,50,100]}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render","options.columnDefs.2.render"],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="rogue-waves" class="level2">
+<h2 class="anchored" data-anchor-id="rogue-waves">Rogue Waves</h2>
+<p>The <code>rogue-waves.json</code> endpoint lists detected rogue wave events where the maximum wave height (Hmax) exceeds twice the significant wave height (Hs). Events are sorted by the Hmax/Hs ratio (most extreme first).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-ae1f5f4c08b5f9b24b58" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-ae1f5f4c08b5f9b24b58">{"x":{"filter":"none","vertical":false,"caption":"<caption>Top Rogue Wave Events (showing 20 of 1638 total)<\/caption>","data":[["M5","M4","M4","M4","M4","M5","M4","M4","M4","M4","M5","M5","M5","M4","M5","M5","M5","M4","M4","M4"],["2020-09-25T12:00:00Z","2026-02-10T03:00:00Z","2026-01-27T10:00:00Z","2026-01-26T11:00:00Z","2026-01-26T04:00:00Z","2020-10-21T21:00:00Z","2026-02-05T20:00:00Z","2026-02-03T09:00:00Z","2026-02-13T04:00:00Z","2026-01-27T11:00:00Z","2020-10-19T11:00:00Z","2020-10-20T16:00:00Z","2020-10-19T18:00:00Z","2025-12-20T05:00:00Z","2020-09-11T20:00:00Z","2020-10-20T11:00:00Z","2020-10-20T10:00:00Z","2026-01-29T11:00:00Z","2026-01-29T10:00:00Z","2025-12-11T08:00:00Z"],[2.344,2.461,3.75,3.516,3.516,2.227,2.461,2.695,3.398,3.75,2.227,2.227,2.227,4.219,2.344,2.227,2.227,3.984,3.984,5.508],[16.055,15.313,22.031,20.156,19.844,12.539,13.438,14.531,17.813,17.969,10.43,10.078,9.843999999999999,17.969,9.843999999999999,8.672000000000001,8.32,14.844,14.844,20.156],[6.849402730375427,6.222267370987404,5.874933333333333,5.732650739476678,5.643913538111491,5.630444544229906,5.460381958553434,5.391836734693878,5.24220129487934,4.791733333333334,4.68343062415806,4.525370453524921,4.420296362819937,4.259066129414554,4.199658703071672,3.894027840143691,3.735967669510553,3.725903614457831,3.725903614457831,3.659404502541757],[5.508,8.789,8.789,7.5,8.086,4.922,6.328,6.68,7.383,8.789,4.922,4.922,4.922,7.852,6.563,4.922,4.922,7.734,7.734,8.789],[5.859,18.164,16.641,12.539,14.297,7.148,11.133,6.68,8.32,16.641,7.148,7.148,7.148,12.539,24.961,7.148,7.148,13.359,13.359,12.539],[21.859,15.597,35.52,33.13,27.323,16.394,33.016,28.803,20.948,31.194,21.517,22.428,22.086,28.12,14.345,28.576,29.259,30.283,30.17,18.216],[335,123,92,127,122,334,78,92,17,101,161,198,130,141,259,192,187,104,103,214],[27.437,19.24,46.45,43.376,33.699,20.606,44.059,38.481,33.016,41.213,30.283,27.21,30.283,33.927,16.963,38.594,39.277,38.936,37.228,28.12],[1015.1,986.609,964.307,985.352,990.881,1002.478,982.532,992.725,997.314,964.465,1007.617,991.602,998.413,996.716,1014.612,988.708,987.769,985.327,985.535,996.985],[14.648,10.153,10.422,10.439,10.426,13.799,10.318,10.265,9.965,10.426,13.857,13.828,13.887,11.243,15.234,13.828,13.828,10.417,10.437,11.418]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>station_id<\/th>\n      <th>time<\/th>\n      <th>wave_height<\/th>\n      <th>hmax<\/th>\n      <th>rogue_ratio<\/th>\n      <th>wave_period<\/th>\n      <th>peak_period<\/th>\n      <th>wind_speed<\/th>\n      <th>wind_direction<\/th>\n      <th>gust<\/th>\n      <th>atmospheric_pressure<\/th>\n      <th>sea_temperature<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":10,"dom":"Bfrtip","buttons":["csv","print"],"scrollX":true,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,8,9,10,11]},{"name":"station_id","targets":0},{"name":"time","targets":1},{"name":"wave_height","targets":2},{"name":"hmax","targets":3},{"name":"rogue_ratio","targets":4},{"name":"wave_period","targets":5},{"name":"peak_period","targets":6},{"name":"wind_speed","targets":7},{"name":"wind_direction","targets":8},{"name":"gust","targets":9},{"name":"atmospheric_pressure","targets":10},{"name":"sea_temperature","targets":11}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p><strong>Total rogue wave events detected:</strong> 1,638</p>
+</section>
+<section id="data-dictionary" class="level2">
+<h2 class="anchored" data-anchor-id="data-dictionary">Data Dictionary</h2>
+<p>The <code>data-dictionary.json</code> endpoint defines all variables in the dataset, including names, descriptions, units, and data types.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="datatables html-widget html-fill-item" id="htmlwidget-2b67d50fc47185f360cf" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-2b67d50fc47185f360cf">{"x":{"filter":"none","vertical":false,"caption":"<caption>Data Dictionary: Variable Definitions<\/caption>","data":[["station_id","CallSign","longitude","latitude","time","AtmosphericPressure","AirTemperature","DewPoint","WindDirection","WindSpeed","Gust","RelativeHumidity","SeaTemperature","salinity","WaveHeight","WavePeriod","MeanWaveDirection","Hmax","Tp","ThTp","SprTp","QC_Flag"],["dimension","dimension","dimension","dimension","dimension","meteorological","meteorological","meteorological","meteorological","meteorological","meteorological","meteorological","oceanographic","oceanographic","oceanographic","oceanographic","oceanographic","oceanographic","oceanographic","oceanographic","oceanographic","quality"],[null,null,"degrees_east","degrees_north","seconds since 1970-01-01","millibars","degrees_C","degrees_C","degrees_true","knots","knots","percent","degrees_C","PSU","meters","seconds","degrees_true","meters","seconds","degrees_true","degrees",null],["character","character","numeric","numeric","POSIXct","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","numeric","integer"],["Unique identifier for each weather buoy station (M1-M6, FS1)","International radio call sign for the buoy","Geographic longitude coordinate of buoy position","Geographic latitude coordinate of buoy position","Timestamp of measurement (UTC)","Atmospheric pressure at sea level","Air temperature measured 3-4 meters above sea surface","Dew point temperature - temperature at which air becomes saturated","Direction from which wind is blowing relative to True North","Average wind speed over 10-minute period","Maximum wind speed measured over 3-second period","Relative humidity of the atmosphere","Sea surface temperature","Practical salinity of seawater (PSU scale)","Significant wave height (Hs) - mean height of highest 1/3 of waves","Mean wave period - average time between wave crests","Mean direction from which waves are coming","Maximum individual wave height observed","Peak wave period - period of waves with maximum energy","Direction of waves at spectral peak (maximum energy)","Directional spreading at spectral peak - wave direction variability","Data quality indicator: 0=unknown, 1=good, 9=missing"],["M1, M2, M3, M4, M5, M6, FS1","Various","-15.88 to -5.43","51.22 to 55.00","2002-present","970-1030","-10 to 30","-15 to 25","0-360","0-60","0-80","0-100","0-25","30-36","0-15","0-20","0-360","0-30","0-25","0-360","0-180","0, 1, 9"]],"container":"<table class=\"display compact\">\n  <thead>\n    <tr>\n      <th>variable<\/th>\n      <th>category<\/th>\n      <th>units<\/th>\n      <th>data_type<\/th>\n      <th>description<\/th>\n      <th>typical_range<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"pageLength":20,"dom":"Bfrtip","buttons":["csv","print"],"columnDefs":[{"name":"variable","targets":0},{"name":"category","targets":1},{"name":"units","targets":2},{"name":"data_type","targets":3},{"name":"description","targets":4},{"name":"typical_range","targets":5}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[10,20,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="sources" class="level2">
+<h2 class="anchored" data-anchor-id="sources">Sources</h2>
+<p>The <code>sources.json</code> endpoint provides data provenance information including the ERDDAP base URL, dataset ID, update frequency, license, and citation. This is a pure-constant endpoint with no upstream data dependency.</p>
+<p><strong>Fields:</strong> <code>erddap_base_url</code>, <code>dataset_id</code>, <code>info_url</code>, <code>provider</code>, <code>update_frequency</code>, <code>license</code>, <code>citation</code>, <code>variables_measured</code></p>
+</section>
+<section id="status" class="level2">
+<h2 class="anchored" data-anchor-id="status">Station Status</h2>
+<p>The <code>status.json</code> endpoint provides per-station operational status including record counts, date ranges, and summary statistics.</p>
+<p><strong>Fields:</strong> <code>n_stations</code>, <code>total_records</code>, <code>date_range</code>, <code>stations[]</code> (each with <code>station_id</code>, <code>n_records</code>, <code>first_date</code>, <code>last_date</code>, <code>mean_wave_height</code>, <code>max_wave_height</code>, <code>mean_wind_speed</code>, <code>max_wind_speed</code>)</p>
+</section>
+<section id="trends" class="level2">
+<h2 class="anchored" data-anchor-id="trends">Trends</h2>
+<p>The <code>trends.json</code> endpoint provides Mann-Kendall trend test results per station and variable, plus overall annual trend statistics for wave height and wind speed.</p>
+<p><strong>Fields:</strong> <code>mann_kendall</code> (per-station/variable: <code>tau</code>, <code>p_value</code>, <code>trend_direction</code>), <code>annual_trends.wave</code>, <code>annual_trends.wind</code> (each with <code>trend_per_decade</code>, <code>p_value</code>, <code>r_squared</code>)</p>
+</section>
+<section id="extremes" class="level2">
+<h2 class="anchored" data-anchor-id="extremes">Extremes</h2>
+<p>The <code>extremes.json</code> endpoint combines GPD return levels with confidence interval comparisons (delta-method vs bootstrap) into a single resource.</p>
+<p><strong>Fields:</strong> <code>method</code>, <code>threshold</code>, <code>return_periods</code>, <code>return_levels</code> (nested by station/variable), <code>ci_comparison</code> (with <code>methods</code>, <code>n_rows</code>, <code>records</code>)</p>
+</section>
+<section id="decomposition" class="level2">
+<h2 class="anchored" data-anchor-id="decomposition">Decomposition</h2>
+<p>The <code>decomposition.json</code> endpoint provides STL decomposition results (seasonal, trend, remainder components) per station, downsampled to daily resolution to keep file size manageable.</p>
+<p><strong>Fields:</strong> <code>resolution</code>, <code>stations</code> (per-station: <code>variable</code>, <code>n_daily_points</code>, <code>summary</code>, <code>components</code>)</p>
+</section>
+<section id="spatial" class="level2">
+<h2 class="anchored" data-anchor-id="spatial">Spatial Correlations</h2>
+<p>The <code>spatial.json</code> endpoint provides cross-station pair correlations for wave height, wind speed, and maximum wave height including distance, optimal lag, and maximum correlation.</p>
+<p><strong>Fields:</strong> <code>wave_height</code>, <code>wind_speed</code>, <code>hmax</code> (each a data frame with <code>station1</code>, <code>station2</code>, <code>distance_km</code>, <code>optimal_lag</code>, <code>max_correlation</code>, <code>expected_lag</code>, <code>n_obs</code>)</p>
+</section>
+<section id="gust-factors" class="level2">
+<h2 class="anchored" data-anchor-id="gust-factors">Gust Factors</h2>
+<p>The <code>gust-factors.json</code> endpoint provides gust factor analysis per station including summary statistics, extreme gust events (capped at 500), and rogue gust thresholds.</p>
+<p><strong>Fields:</strong> <code>summary</code>, <code>extreme_gusts</code>, <code>by_station</code>, <code>rogue_gust_threshold</code>, <code>n_rogue_gusts</code>, <code>pct_rogue_gusts</code></p>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Statistical Methods</h2>
+<p>The <code>methods.json</code> endpoint documents all statistical methods used in the analyses, including parameter choices, thresholds, and academic references.</p>
+<p><strong>Methods covered:</strong> GPD extreme value analysis, Mann-Kendall trend tests, STL decomposition, rogue wave detection, gust factor analysis, cross-correlation.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode json code-with-copy"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="dt">"gpd"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Generalised Pareto Distribution fitted to exceedances above a threshold using maximum likelihood estimation (mev::fit.gpd)."</span><span class="fu">,</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"threshold"</span><span class="fu">:</span> <span class="st">"95th percentile of the variable's distribution"</span><span class="fu">,</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"return_periods"</span><span class="fu">:</span> <span class="ot">[</span><span class="dv">1</span><span class="ot">,</span> <span class="dv">5</span><span class="ot">,</span> <span class="dv">10</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"observations_per_year"</span><span class="fu">:</span> <span class="dv">8760</span><span class="fu">,</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"ci_methods"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"delta"</span><span class="fu">:</span> <span class="st">"Delta method (asymptotic normal approximation of MLE)"</span><span class="fu">,</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="dt">"bootstrap"</span><span class="fu">:</span> <span class="st">"Block bootstrap (block_size=48h) with 500 resamples; percentile CIs at 95% level"</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="dt">"references"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"Coles, S. (2001). An Introduction to Statistical Modeling of Extreme Values. Springer."</span><span class="ot">,</span> <span class="st">"Beirlant, J. et al. (2004). Statistics of Extremes. Wiley."</span><span class="ot">]</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="data-sources" class="level2">
+<h2 class="anchored" data-anchor-id="data-sources">Data Sources</h2>
+<p>All data originates from the Marine Institute’s ERDDAP server:</p>
+<ul>
+<li><strong>ERDDAP base URL:</strong> <a href="https://erddap.marine.ie/erddap/tabledap/IWBNetwork" class="uri">https://erddap.marine.ie/erddap/tabledap/IWBNetwork</a></li>
+<li><strong>Dataset ID:</strong> <code>IWBNetwork</code></li>
+<li><strong>Direct data query (HTML):</strong> <a href="https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html" class="uri">https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html</a></li>
+<li><strong>Metadata (info page):</strong> <a href="https://erddap.marine.ie/erddap/info/IWBNetwork/index.html" class="uri">https://erddap.marine.ie/erddap/info/IWBNetwork/index.html</a></li>
+</ul>
+<p>Example ERDDAP queries:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Latest 100 rows as CSV</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="st">"https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?&amp;orderByLimit(%22100%22)"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Station metadata as JSON</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="st">"https://erddap.marine.ie/erddap/tabledap/IWBNetwork.json?station_id,longitude,latitude&amp;distinct()"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="usage-examples" class="level2">
 <h2 class="anchored" data-anchor-id="usage-examples">Usage Examples</h2>
 <section id="curl-example" class="level3">
 <h3 class="anchored" data-anchor-id="curl-example">curl</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Fetch latest observations (one per station)</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> https://johngavin.github.io/irishbuoys/api/v1/latest.json </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Fetch latest observations (one per station)</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> https://johngavin.github.io/irishbuoys/api/v1/latest.json </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="r-example" class="level3">
 <h3 class="anchored" data-anchor-id="r-example">R (jsonlite)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># R: Read the API index</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>index <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/index.json"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>index<span class="sc">$</span>endpoints</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Read latest observations</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>latest <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/latest.json"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>latest<span class="sc">$</span>observations </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># R: Read the API index</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>index <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/index.json"</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>index<span class="sc">$</span>endpoints</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Read latest observations</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>latest <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/latest.json"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>latest<span class="sc">$</span>observations </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="fetching-stats-and-seasonal-data-r" class="level3">
+<h3 class="anchored" data-anchor-id="fetching-stats-and-seasonal-data-r">Fetching stats and seasonal data (R)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(jsonlite)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Per-station statistics</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>stats <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/stats.json"</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>stats<span class="sc">$</span>overall</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Seasonal patterns</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>seasonal <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/seasonal.json"</span>)</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(seasonal<span class="sc">$</span>wave<span class="sc">$</span>monthly)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Return levels</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>rl <span class="ot">&lt;-</span> <span class="fu">fromJSON</span>(<span class="st">"https://johngavin.github.io/irishbuoys/api/v1/return-levels.json"</span>)</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(rl<span class="sc">$</span>by_station, <span class="at">max.level =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="python-example" class="level3">
 <h3 class="anchored" data-anchor-id="python-example">Python (requests)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Python: Read the API</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="st">"https://johngavin.github.io/irishbuoys/api/v1/"</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get latest observations</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>latest <span class="op">=</span> requests.get(base <span class="op">+</span> <span class="st">"latest.json"</span>).json()</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(latest[<span class="st">"observations"</span>])</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head()) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a> <span class="co"># Python: Read the API</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="st">"https://johngavin.github.io/irishbuoys/api/v1/"</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Get latest observations</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>latest <span class="op">=</span> requests.get(base <span class="op">+</span> <span class="st">"latest.json"</span>).json()</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame(latest[<span class="st">"observations"</span>])</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df.head()) </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="fetching-stats-and-seasonal-data-python" class="level3">
+<h3 class="anchored" data-anchor-id="fetching-stats-and-seasonal-data-python">Fetching stats and seasonal data (Python)</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>base <span class="op">=</span> <span class="st">"https://johngavin.github.io/irishbuoys/api/v1/"</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Per-station statistics</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>stats <span class="op">=</span> requests.get(base <span class="op">+</span> <span class="st">"stats.json"</span>).json()</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(stats[<span class="st">"overall"</span>])</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Seasonal wave patterns</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>seasonal <span class="op">=</span> requests.get(base <span class="op">+</span> <span class="st">"seasonal.json"</span>).json()</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>df_monthly <span class="op">=</span> pd.DataFrame(seasonal[<span class="st">"wave"</span>][<span class="st">"monthly"</span>])</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(df_monthly.head())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="bulk-data" class="level2">
 <h2 class="anchored" data-anchor-id="bulk-data">Bulk Data Access</h2>
 <p>For bulk analysis, download the full dataset as Parquet:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-O</span> https://johngavin.github.io/irishbuoys/vignettes/data/buoy_data.parquet</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-O</span> https://johngavin.github.io/irishbuoys/vignettes/data/buoy_data.parquet</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Read in R with <code>arrow::read_parquet()</code> or in Python with <code>pandas.read_parquet()</code>.</p>
 </section>
 <section id="file-summary" class="level2">
 <h2 class="anchored" data-anchor-id="file-summary">API File Summary</h2>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 4
-  file                 path                             size_bytes size_kb
-  &lt;chr&gt;                &lt;chr&gt;                                 &lt;dbl&gt;   &lt;dbl&gt;
-1 index.json           docs/api/v1/index.json                 1886     1.8
-2 stations.json        docs/api/v1/stations.json              1085     1.1
-3 stats.json           docs/api/v1/stats.json                 1959     1.9
-4 rogue-waves.json     docs/api/v1/rogue-waves.json         589891   576. 
-5 return-levels.json   docs/api/v1/return-levels.json         2141     2.1
-6 data-dictionary.json docs/api/v1/data-dictionary.json       5408     5.3
-7 latest.json          docs/api/v1/latest.json                  84     0.1
-8 seasonal.json        docs/api/v1/seasonal.json              9244     9  
-9 correlations.json    docs/api/v1/correlations.json          6565     6.4</code></pre>
+<pre><code># A tibble: 17 × 4
+   file                 path                             size_bytes size_kb
+   &lt;chr&gt;                &lt;chr&gt;                                 &lt;dbl&gt;   &lt;dbl&gt;
+ 1 index.json           docs/api/v1/index.json                 3587     3.5
+ 2 stations.json        docs/api/v1/stations.json              1416     1.4
+ 3 stats.json           docs/api/v1/stats.json                 2254     2.2
+ 4 rogue-waves.json     docs/api/v1/rogue-waves.json         635943   621  
+ 5 return-levels.json   docs/api/v1/return-levels.json         7865     7.7
+ 6 data-dictionary.json docs/api/v1/data-dictionary.json       5951     5.8
+ 7 latest.json          docs/api/v1/latest.json                3588     3.5
+ 8 seasonal.json        docs/api/v1/seasonal.json             10319    10.1
+ 9 correlations.json    docs/api/v1/correlations.json          7326     7.2
+10 sources.json         docs/api/v1/sources.json                861     0.8
+11 status.json          docs/api/v1/status.json                1837     1.8
+12 trends.json          docs/api/v1/trends.json                1976     1.9
+13 extremes.json        docs/api/v1/extremes.json             38040    37.1
+14 decomposition.json   docs/api/v1/decomposition.json      2310488  2256. 
+15 spatial.json         docs/api/v1/spatial.json               6656     6.5
+16 gust-factors.json    docs/api/v1/gust-factors.json        200991   196. 
+17 methods.json         docs/api/v1/methods.json               2960     2.9</code></pre>
 </div>
 </div>
 </section>
@@ -264,10 +756,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>In addition to the static JSON files, irishbuoys provides a live REST API powered by <a href="https://www.rplumber.io/">plumber</a>. The API serves the same pre-computed JSON data via HTTP endpoints.</p>
 <section id="starting-the-api" class="level3">
 <h3 class="anchored" data-anchor-id="starting-the-api">Starting the API</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(irishbuoys)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">run_api</span>(<span class="at">port =</span> <span class="dv">8080</span>)</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># API at http://localhost:8080</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Swagger docs at http://localhost:8080/__docs__/</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(irishbuoys)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">run_api</span>(<span class="at">port =</span> <span class="dv">8080</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># API at http://localhost:8080</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Swagger docs at http://localhost:8080/__docs__/</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="endpoints-1" class="level3">
 <h3 class="anchored" data-anchor-id="endpoints-1">Endpoints</h3>
@@ -295,13 +787,45 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td><code>GET /seasonal</code></td>
 <td>Monthly and seasonal statistics</td>
 </tr>
+<tr class="odd">
+<td><code>GET /sources</code></td>
+<td>Data provenance and citation</td>
+</tr>
+<tr class="even">
+<td><code>GET /status</code></td>
+<td>Per-station operational status</td>
+</tr>
+<tr class="odd">
+<td><code>GET /trends</code></td>
+<td>Mann-Kendall trend tests</td>
+</tr>
+<tr class="even">
+<td><code>GET /extremes</code></td>
+<td>GPD fits and CI comparison</td>
+</tr>
+<tr class="odd">
+<td><code>GET /decomposition</code></td>
+<td>STL decomposition per station</td>
+</tr>
+<tr class="even">
+<td><code>GET /spatial</code></td>
+<td>Cross-station correlations</td>
+</tr>
+<tr class="odd">
+<td><code>GET /gust-factors</code></td>
+<td>Gust factor analysis</td>
+</tr>
+<tr class="even">
+<td><code>GET /methods</code></td>
+<td>Statistical methods documentation</td>
+</tr>
 </tbody>
 </table>
 </section>
 <section id="programmatic-access" class="level3">
 <h3 class="anchored" data-anchor-id="programmatic-access">Programmatic Access</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create router without starting server (useful for testing)</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>pr <span class="ot">&lt;-</span> <span class="fu">create_api_router</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create router without starting server (useful for testing)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>pr <span class="ot">&lt;-</span> <span class="fu">create_api_router</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>The live API requires the <code>plumber</code> package (<code>install.packages("plumber")</code>).</p>
 </section>
 </section>

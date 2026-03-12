@@ -2,7 +2,7 @@
   "api": "irishbuoys",
   "version": "v1",
   "base_url": "https://johngavin.github.io/irishbuoys/api/v1/",
-  "updated_at": "2026-03-04T09:39:10Z",
+  "updated_at": "2026-03-12T02:50:05Z",
   "endpoints": [
     {
       "endpoint": "stations.json",
@@ -43,6 +43,46 @@
       "endpoint": "correlations.json",
       "url": "https://johngavin.github.io/irishbuoys/api/v1/correlations.json",
       "description": "Inter-station correlations for wave height, wind speed, and max wave height"
+    },
+    {
+      "endpoint": "sources.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/sources.json",
+      "description": "Data provenance: ERDDAP source, update frequency, license, citation"
+    },
+    {
+      "endpoint": "status.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/status.json",
+      "description": "Per-station operational status, record counts, and date ranges"
+    },
+    {
+      "endpoint": "trends.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/trends.json",
+      "description": "Mann-Kendall trend tests and Sen's slope estimates per station/variable"
+    },
+    {
+      "endpoint": "extremes.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/extremes.json",
+      "description": "GPD fits, return levels, and CI method comparison (delta, bootstrap)"
+    },
+    {
+      "endpoint": "decomposition.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/decomposition.json",
+      "description": "STL decomposition (seasonal, trend, remainder) per station"
+    },
+    {
+      "endpoint": "spatial.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/spatial.json",
+      "description": "Cross-station correlation matrices for wave height, wind speed, Hmax"
+    },
+    {
+      "endpoint": "gust-factors.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/gust-factors.json",
+      "description": "Gust factor analysis per station with extreme events"
+    },
+    {
+      "endpoint": "methods.json",
+      "url": "https://johngavin.github.io/irishbuoys/api/v1/methods.json",
+      "description": "Statistical methods documentation: thresholds, formulas, references"
     }
   ]
 }
