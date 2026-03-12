@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-12T08:11:04Z",
+    "generated": "2026-03-12T14:18:56Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,11 +9,11 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 256491
+        "value": 256477
       },
       {
         "statistic": "mean",
-        "value": 1.3507
+        "value": 1.3508
       },
       {
         "statistic": "median",
@@ -21,11 +21,11 @@
       },
       {
         "statistic": "sd",
-        "value": 0.136
+        "value": 0.1361
       },
       {
         "statistic": "p95",
-        "value": 1.5992
+        "value": 1.5999
       },
       {
         "statistic": "p99",
@@ -7541,7 +7541,7 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 43015,
+        "n": 43021,
         "mean_gf": 1.2882,
         "median_gf": 1.27,
         "sd_gf": 0.1008,
@@ -7553,11 +7553,11 @@
       },
       {
         "station_id": "M3",
-        "n": 49037,
+        "n": 49020,
         "mean_gf": 1.3306,
-        "median_gf": 1.3044,
+        "median_gf": 1.3043,
         "sd_gf": 0.1257,
-        "p95_gf": 1.558,
+        "p95_gf": 1.5581,
         "p99_gf": 1.7528,
         "max_gf": 3.2127,
         "n_rogue": 6,
@@ -7565,7 +7565,7 @@
       },
       {
         "station_id": "M4",
-        "n": 49425,
+        "n": 49431,
         "mean_gf": 1.3597,
         "median_gf": 1.3375,
         "sd_gf": 0.1274,
@@ -7577,11 +7577,11 @@
       },
       {
         "station_id": "M5",
-        "n": 59969,
+        "n": 59954,
         "mean_gf": 1.346,
         "median_gf": 1.3113,
         "sd_gf": 0.1282,
-        "p95_gf": 1.5914,
+        "p95_gf": 1.5915,
         "p99_gf": 1.7277,
         "max_gf": 2.8889,
         "n_rogue": 3,
@@ -7589,7 +7589,7 @@
       },
       {
         "station_id": "M6",
-        "n": 55045,
+        "n": 55051,
         "mean_gf": 1.4146,
         "median_gf": 1.3852,
         "sd_gf": 0.1555,
