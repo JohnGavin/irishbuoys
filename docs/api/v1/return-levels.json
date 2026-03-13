@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-13T16:58:53Z",
+    "generated": "2026-03-13T20:03:41Z",
     "package_version": "0.2.0",
     "endpoint": "return-levels",
     "description": "GPD return levels per station for 1, 5, 10-year periods"
@@ -40,8 +40,8 @@
         },
         "rogue_wave": {
           "1yr": 19.51,
-          "5yr": 20.99,
-          "10yr": 21.53
+          "5yr": 20.98,
+          "10yr": 21.52
         },
         "avg_wind": {
           "1yr": 45.15,
@@ -101,12 +101,12 @@
       "M6": {
         "avg_wave": {
           "1yr": 14.04,
-          "5yr": 15.46,
-          "10yr": 16.02
+          "5yr": 15.45,
+          "10yr": 16.01
         },
         "rogue_wave": {
           "1yr": 22.28,
-          "5yr": 24.66,
+          "5yr": 24.67,
           "10yr": 25.6
         },
         "avg_wind": {
@@ -188,13 +188,13 @@
         "rogue_wave": {
           "delta": {
             "1yr": 19.51,
-            "5yr": 20.99,
-            "10yr": 21.53
+            "5yr": 20.98,
+            "10yr": 21.52
           },
           "bootstrap": {
             "1yr": 19.51,
-            "5yr": 20.99,
-            "10yr": 21.53
+            "5yr": 20.98,
+            "10yr": 21.52
           }
         },
         "avg_wind": {
@@ -326,24 +326,24 @@
         "avg_wave": {
           "delta": {
             "1yr": 14.04,
-            "5yr": 15.46,
-            "10yr": 16.02
+            "5yr": 15.45,
+            "10yr": 16.01
           },
           "bootstrap": {
             "1yr": 14.04,
-            "5yr": 15.46,
-            "10yr": 16.02
+            "5yr": 15.45,
+            "10yr": 16.01
           }
         },
         "rogue_wave": {
           "delta": {
             "1yr": 22.28,
-            "5yr": 24.66,
+            "5yr": 24.67,
             "10yr": 25.6
           },
           "bootstrap": {
             "1yr": 22.28,
-            "5yr": 24.66,
+            "5yr": 24.67,
             "10yr": 25.6
           }
         },
