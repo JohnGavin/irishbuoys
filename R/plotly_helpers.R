@@ -3,7 +3,7 @@
 #' @description
 #' Applies consistent dark styling to all plotly plots in the irishbuoys package.
 #' Uses black background with white grid lines to match the Quarto cosmo dashboard
-#' theme. Bottom-positioned horizontal legend with white hoverlabels.
+#' theme. Bottom-positioned horizontal legend with dark hoverlabels.
 #'
 #' @param p A plotly object
 #' @param title Optional title string
@@ -50,14 +50,14 @@ irishbuoys_layout <- function(p, title = NULL, ...) {
         y = -0.15,
         x = 0.5,
         xanchor = "center",
-        font = list(color = "#e0e0e0", size = 12),
-        bgcolor = "rgba(40, 40, 40, 0.8)",
+        font = list(color = "#ffffff", size = 12),
+        bgcolor = "rgba(0, 0, 0, 0.9)",
         bordercolor = "#555555",
         borderwidth = 1
       ),
       hoverlabel = list(
-        bgcolor = "white",
-        font = list(color = "black", size = 12)
+        bgcolor = "rgba(0, 0, 0, 0.9)",
+        font = list(color = "white", size = 12)
       ),
       margin = list(b = 80)
     ),

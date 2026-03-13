@@ -518,8 +518,9 @@ create_plot_return_levels <- function(return_levels, variable = "wave", date_cap
 #' Create Per-Station Return Levels Plot
 #'
 #' @description
-#' Creates a grouped bar chart showing GPD return levels by station for a
-#' given variable, with error bars for confidence intervals.
+#' Creates a horizontal dotplot showing GPD return levels by station for a
+#' given variable, with error bars for confidence intervals. Text labels
+#' at each point replace the legend for clarity.
 #'
 #' @param return_levels_df Data frame from `return_levels_per_station` target
 #'   with columns: station, variable, return_period, return_level, lower, upper
@@ -543,40 +544,39 @@ create_plot_return_levels_per_station <- function(return_levels_df, variable_fil
 
   label <- d$variable_label[1]
 
-  # Color palette for return periods
-  period_colors <- c("1" = "#4393c3", "5" = "#f4a582", "10" = "#d6604d")
+  period_colors <- c("1-yr" = "#4393c3", "5-yr" = "#f4a582", "10-yr" = "#d6604d")
 
   d$period_label <- paste0(d$return_period, "-yr")
   d$period_label <- factor(d$period_label, levels = c("1-yr", "5-yr", "10-yr"))
 
-  plotly::plot_ly(
-    d,
-    x = ~station,
-    y = ~return_level,
-    color = ~period_label,
-    colors = c("1-yr" = "#4393c3", "5-yr" = "#f4a582", "10-yr" = "#d6604d"),
-    type = "bar",
-    error_y = list(
-      type = "data",
-      symmetric = FALSE,
-      array = ~upper - return_level,
-      arrayminus = ~return_level - lower,
-      color = "gray40"
-    ),
-    text = ~paste0(
-      "Station: ", station, "<br>",
-      "Period: ", return_period, " year<br>",
-      label, ": ", round(return_level, 2), "<br>",
-      "95% CI: [", round(lower, 2), ", ", round(upper, 2), "]"
-    ),
-    hoverinfo = "text"
-  ) |>
-    irishbuoys_layout(
-      title = paste0("Per-Station Return Levels: ", label, " (GPD, 95th pct threshold)"),
-      xaxis = list(title = "Station"),
-      yaxis = list(title = label),
-      barmode = "group"
+  p <- plotly::plot_ly()
+  for (pl in levels(d$period_label)) {
+    dp <- d[d$period_label == pl, ]
+    col <- period_colors[[pl]]
+    p <- p |> plotly::add_trace(
+      data = dp, x = ~return_level, y = ~station,
+      type = "scatter", mode = "markers+text",
+      text = pl, textposition = "middle right",
+      textfont = list(size = 11, color = col),
+      marker = list(size = 6, color = col),
+      error_x = list(
+        type = "data", symmetric = FALSE,
+        array = ~upper - return_level,
+        arrayminus = ~return_level - lower,
+        color = col, thickness = 1.5
+      ),
+      hovertext = ~paste0(
+        station, " ", pl, ": ", round(return_level, 2),
+        " [", round(lower, 2), ", ", round(upper, 2), "]"
+      ),
+      hoverinfo = "text", showlegend = FALSE
     )
+  }
+  p |> irishbuoys_layout(
+    title = paste0("Per-Station Return Levels: ", label, " (GPD, 95th pct threshold)"),
+    xaxis = list(title = label),
+    yaxis = list(title = "")
+  )
 }
 
 #' Create Gust Factor by Category Plot
