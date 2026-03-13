@@ -1,21 +1,40 @@
 # Current Work
 
 ## Branch: main
-## Last Session: 2026-03-11
+## Last Session: 2026-03-13
 
 ### What Was Done
-1. **Wave analysis vignette enhancements** (commit `da784e8`): Plotly legend/layout fixes (irishbuoys_layout), click-to-zoom CSS/JS, tab height fixes, disclaimer, glossary tooltips, external links, Model Summary tab, cross-links, column renames (days_wave_obs etc.)
-2. **API Tier 1-3 + Plumber parity** (commits `c6149e6`..`0d954cc`): 16 API routes, methods endpoint, CI comparison
-3. **CI fix: api_vignette_stats_dt** (commit `14b0a8a`): station_stats was a data frame not a named list; used dplyr::transmute() instead of $ on atomic vectors
-4. **CI fix: api_vignette_rogue_waves_dt** (in API Tier 1 commit): fixed hmax_hs_ratio → rogue_ratio column name
-5. **Email staleness feature** (commit `0eb9ad4`): Added report_composed timestamp, staleness_hours, staleness_alert (>18h) to ingestion stats table in weekly email
+1. **Vignette visual/UX improvements (17-item plan)** (commit `631fbf3`):
+   - Grid lines brighter (rgba 0.4, gridwidth 1) via `irishbuoys_layout()`
+   - Fixed deep-merge bug: callers' xaxis/yaxis no longer clobber defaults
+   - Y-axis auto-scale JS on rangeslider for all plotly timeseries
+   - Rangesliders added to `create_plot_rogue_all`/`create_plot_rogue_gusts_all`
+   - Station color palette (M2-M6) on `gust_by_category`
+   - Click-to-zoom: walk to outermost cell-output-display (includes caption)
+   - CSS: min-height 600px plotly, no DT scroll, white captions
+   - Hash nav JS for nested tab deep-linking (#extreme-value-methods)
+   - Rogue gust DT capped to top 500 rows for performance
+   - Gust summary: narrow columns, right-justified stats
+   - Predictions: larger markers, LOESS fit line, category colors
+   - All 10 copula pairs (was 3) in plan_joint_analysis.R
+   - `target="_blank"` on all external links (61 added across both vignettes)
+   - Fixed broken URLs: NOAA marine_wave_background, Longuet-Higgins DOI
+   - Fixed broken internal links: #reference -> #variable-definitions, removed #trends
+   - DT pageLength 15 -> 25, create_dt caption color white
+2. **GitHub issue #61**: Cancer InFocus comparison and possible extensions
+3. **Validation Tiers 1-3 + partial 5**: All checks pass
 
 ### CI Status
-- Run `22978696222` in progress (commit `14b0a8a`), includes api_vignette_stats_dt fix
-- Email staleness commit (`0eb9ad4`) is on main but not yet in this CI run — will be picked up next scheduled run or manual trigger
+- All CI jobs pass: Test R-universe, API Drift Detection, R-CMD-check (on re-run)
 
-### Next Steps
-- Verify CI run `22978696222` passes (monitor or check next session)
-- If CI passes, trigger new run with latest commit to verify email staleness feature
-- Continue plan items from `noble-humming-charm.md` (A1 metric hover tooltips, A11 cross-links, A4+B5 caption audit)
-- Review remaining 79 test warnings
+### Remaining Validation Tiers
+- **Tier 4**: Local pkgdown build + visual rendering check
+- **Tier 6**: Post-deploy validation table
+- **Tier 7-8**: Quality gate scoring + adversarial QA
+- **Tier 9-11**: Final sign-off
+
+### Known Issues
+- `pointblank` not in nix env (prevents local devtools::document/check)
+- R-CMD-check occasionally cancelled due to nix ICU build issue (intermittent, re-run fixes)
+- `safe_tar_read()` pattern not yet adopted (vignettes use direct tar_load)
+- wave_analysis.qmd: 7 inline `r expr` references (acceptable — simple variable lookups)

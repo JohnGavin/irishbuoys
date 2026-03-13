@@ -5,7 +5,7 @@
 \title{Static API Generation Functions}
 \description{
 Functions for generating static JSON API files served via GitHub Pages.
-These are written to \verb{docs/api/v1/} and updated weekly by CI.
+These are written to \verb{docs/api/v1/} and updated 6-hourly by CI.
 }
 \seealso{
 Other api: 

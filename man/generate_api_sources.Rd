@@ -4,7 +4,12 @@
 \alias{generate_api_sources}
 \title{Generate Data Sources Endpoint}
 \usage{
-generate_api_sources()
+generate_api_sources(update_frequency = NULL)
+}
+\arguments{
+\item{update_frequency}{Character, human-readable update schedule.
+If NULL (default), uses "Every 6 hours (0:00, 6:00, 12:00, 18:00 UTC)".
+Typically supplied dynamically from the \code{api_update_schedule} target.}
 }
 \value{
 A list with \verb{_meta} and \code{data} fields suitable for
@@ -12,8 +17,7 @@ A list with \verb{_meta} and \code{data} fields suitable for
 }
 \description{
 Returns data provenance constants: ERDDAP URL, dataset ID,
-update frequency, license, and citation. Pure function with no
-upstream target dependency.
+update frequency, license, and citation.
 }
 \examples{
 \dontrun{
