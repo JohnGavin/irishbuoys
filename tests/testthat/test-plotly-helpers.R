@@ -39,6 +39,21 @@ test_that("irishbuoys_layout passes extra arguments", {
   expect_s3_class(result, "plotly")
 })
 
+test_that("irishbuoys_layout deep-merges caller xaxis/yaxis with defaults", {
+  skip_if_not_installed("plotly")
+  p <- plotly::plot_ly(x = 1:3, y = 1:3, type = "scatter", mode = "markers")
+  # Caller passes yaxis title — grid settings must survive
+
+  result <- irishbuoys_layout(p, yaxis = list(title = "Custom Y"))
+  attrs <- unlist(result$x$layoutAttrs, recursive = TRUE)
+  # Grid color should still be present (not clobbered by caller's yaxis)
+  expect_true(any(grepl("rgba\\(255, 255, 255, 0\\.4\\)", attrs)),
+              info = "Grid color must survive when caller passes yaxis overrides")
+  # Caller's title should also be present
+  expect_true(any(grepl("Custom Y", attrs)),
+              info = "Caller's yaxis title must be applied")
+})
+
 test_that("irishbuoys_ggplotly converts ggplot to plotly", {
   skip_if_not_installed("plotly")
   skip_if_not_installed("ggplot2")
