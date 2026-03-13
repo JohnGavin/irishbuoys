@@ -262,9 +262,17 @@ plan_api <- list(
     api_update_schedule,
     {
       force(src_ci_workflow) # file dependency
+      # yaml::read_yaml() converts YAML `on:` key to TRUE (boolean),
+      # so use yml[["TRUE"]] instead of yml$on
       yml <- yaml::read_yaml(".github/workflows/data-update.yml")
-      cron_expr <- yml$on$schedule[[1]]$cron # e.g. "0 0,6,12,18 * * *"
-      hours <- strsplit(strsplit(cron_expr, " ")[[1]][2], ",")[[1]]
+      sched <- yml[["TRUE"]]$schedule[[1]]$cron # e.g. "0 0,6,12,18 * * *"
+      if (is.null(sched)) {
+        # Fallback: grep the cron expression directly from the file
+        lines <- readLines(".github/workflows/data-update.yml")
+        cron_line <- grep("^\\s*- cron:", lines, value = TRUE)[1]
+        sched <- gsub(".*cron:\\s*['\"]?([^'\"]+)['\"]?\\s*$", "\\1", cron_line)
+      }
+      hours <- strsplit(strsplit(trimws(sched), " ")[[1]][2], ",")[[1]]
       paste0(
         "Every ", 24 / length(hours), " hours (",
         paste(paste0(hours, ":00"), collapse = ", "), " UTC)"
