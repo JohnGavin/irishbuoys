@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-13T07:13:57Z",
+    "generated": "2026-03-13T08:55:33Z",
     "package_version": "0.2.0",
     "endpoint": "rogue-waves",
     "description": "Detected rogue wave events (Hmax > 2x significant wave height)"
