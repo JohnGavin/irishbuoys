@@ -126,14 +126,64 @@ plan_joint_analysis <- list(
     fit_bivariate_copula(analysis_data, "M2", "M3", "wave_height", "gumbel")
   ),
 
-  # Copula summary
+  # All remaining C(5,2)=10 unique pairs
+  # M6-M3: offshore to southwest coast (alternative path)
+  targets::tar_target(
+    copula_m6_m3_wave,
+    fit_bivariate_copula(analysis_data, "M6", "M3", "wave_height", "gumbel")
+  ),
+
+  # M6-M4: offshore to southeast coast (longest path)
+  targets::tar_target(
+    copula_m6_m4_wave,
+    fit_bivariate_copula(analysis_data, "M6", "M4", "wave_height", "gumbel")
+  ),
+
+  # M2-M4: southwest to southeast
+  targets::tar_target(
+    copula_m2_m4_wave,
+    fit_bivariate_copula(analysis_data, "M2", "M4", "wave_height", "gumbel")
+  ),
+
+  # M2-M5: southwest to west
+  targets::tar_target(
+    copula_m2_m5_wave,
+    fit_bivariate_copula(analysis_data, "M2", "M5", "wave_height", "gumbel")
+  ),
+
+  # M3-M4: southwest to southeast (coastal pair)
+  targets::tar_target(
+    copula_m3_m4_wave,
+    fit_bivariate_copula(analysis_data, "M3", "M4", "wave_height", "gumbel")
+  ),
+
+  # M3-M5: southwest to west
+  targets::tar_target(
+    copula_m3_m5_wave,
+    fit_bivariate_copula(analysis_data, "M3", "M5", "wave_height", "gumbel")
+  ),
+
+  # M4-M5: southeast to west (most geographically distant coastal pair)
+  targets::tar_target(
+    copula_m4_m5_wave,
+    fit_bivariate_copula(analysis_data, "M4", "M5", "wave_height", "gumbel")
+  ),
+
+  # Copula summary — all 10 unique pairs
   targets::tar_target(
     copula_summary,
     {
       copulas <- list(
         `M6-M2` = copula_m6_m2_wave,
+        `M6-M3` = copula_m6_m3_wave,
+        `M6-M4` = copula_m6_m4_wave,
         `M6-M5` = copula_m6_m5_wave,
-        `M2-M3` = copula_m2_m3_wave
+        `M2-M3` = copula_m2_m3_wave,
+        `M2-M4` = copula_m2_m4_wave,
+        `M2-M5` = copula_m2_m5_wave,
+        `M3-M4` = copula_m3_m4_wave,
+        `M3-M5` = copula_m3_m5_wave,
+        `M4-M5` = copula_m4_m5_wave
       )
 
       data.frame(

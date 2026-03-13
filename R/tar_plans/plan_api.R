@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Generates static JSON files for the GitHub Pages API at `docs/api/v1/`.
-#' Updated weekly by CI (weekly-update.yml).
+#' Updated 6-hourly by CI (data-update.yml).
 #'
 #' Base URL: https://johngavin.github.io/irishbuoys/api/v1/
 #'
@@ -31,14 +31,24 @@
 #' - mk_per_station     : Mann-Kendall tests per station/variable
 #' - decomp_per_station : STL decomposition per station
 #'
+#' Dynamic schedule targets:
+#' - src_ci_workflow               : File dep on data-update.yml
+#' - api_update_schedule           : Human-readable schedule from CI YAML
+#'
+#' Bulk data targets:
+#' - api_bulk_parquet              : Parquet export of full dataset
+#' - api_bulk_validate             : Validates parquet row/column counts
+#'
 #' Vignette display targets:
-#' - api_vignette_endpoints_dt     : DT::datatable of endpoints
+#' - api_vignette_endpoints_dt     : DT::datatable of endpoints (clickable URLs)
 #' - api_vignette_example_response : Sample JSON snippet
 #' - api_vignette_stations_dt      : DT::datatable of station metadata
 #' - api_vignette_stats_dt         : DT::datatable of per-station statistics
-#' - api_vignette_return_levels_dt : DT::datatable of return levels (wide)
+#' - api_vignette_return_levels_dt : DT::datatable of return levels (wide, with units)
 #' - api_vignette_rogue_waves_dt   : DT::datatable of top rogue wave events
 #' - api_vignette_data_dict_dt     : DT::datatable of variable definitions
+#' - api_derived_metadata          : Derived statistics metadata tibble
+#' - api_vignette_derived_dict_dt  : DT::datatable of derived statistics
 
 plan_api <- list(
 
@@ -240,10 +250,32 @@ plan_api <- list(
   # NEW ENDPOINTS (PR 1 / Issue #53)
   # ==========================================================================
 
-  # Data provenance constants (no upstream dependency)
+  # CI workflow file dependency (triggers rebuild when schedule changes)
+  targets::tar_target(
+    src_ci_workflow,
+    ".github/workflows/data-update.yml",
+    format = "file"
+  ),
+
+  # Dynamic update schedule parsed from CI workflow YAML
+  targets::tar_target(
+    api_update_schedule,
+    {
+      force(src_ci_workflow) # file dependency
+      yml <- yaml::read_yaml(".github/workflows/data-update.yml")
+      cron_expr <- yml$on$schedule[[1]]$cron # e.g. "0 0,6,12,18 * * *"
+      hours <- strsplit(strsplit(cron_expr, " ")[[1]][2], ",")[[1]]
+      paste0(
+        "Every ", 24 / length(hours), " hours (",
+        paste(paste0(hours, ":00"), collapse = ", "), " UTC)"
+      )
+    }
+  ),
+
+  # Data provenance (update_frequency from CI workflow)
   targets::tar_target(
     api_sources,
-    generate_api_sources()
+    generate_api_sources(update_frequency = api_update_schedule)
   ),
 
   # Per-station operational status (reuses dashboard_stats)
@@ -416,25 +448,86 @@ plan_api <- list(
   ),
 
   # ==========================================================================
+  # BULK PARQUET EXPORT + VALIDATION
+  # ==========================================================================
+
+  # Export full dataset as Parquet for bulk access
+  targets::tar_target(
+    api_bulk_parquet,
+    {
+      parquet_dir <- "docs/vignettes/data"
+      dir.create(parquet_dir, recursive = TRUE, showWarnings = FALSE)
+      parquet_path <- file.path(parquet_dir, "buoy_data.parquet")
+
+      con <- connect_duckdb()
+      on.exit(DBI::dbDisconnect(con), add = TRUE)
+
+      df <- buoy_tbl(con) |>
+        dplyr::filter(.data$qc_flag %in% c(0L, 1L)) |>
+        dplyr::collect()
+
+      arrow::write_parquet(df, parquet_path)
+      cli::cli_alert_success(
+        "Wrote {nrow(df)} rows to {parquet_path} ({round(file.info(parquet_path)$size / 1024, 1)} KB)"
+      )
+      parquet_path
+    },
+    format = "file"
+  ),
+
+  # Validate exported Parquet
+  targets::tar_target(
+    api_bulk_validate,
+    {
+      df <- arrow::read_parquet(api_bulk_parquet)
+      required_cols <- c("station_id", "time", "wave_height", "wind_speed")
+      missing_cols <- setdiff(required_cols, names(df))
+      if (length(missing_cols) > 0) {
+        cli::cli_abort("Parquet missing required columns: {missing_cols}")
+      }
+      if (nrow(df) == 0) {
+        cli::cli_abort("Parquet file has zero rows")
+      }
+      list(
+        n_rows = nrow(df),
+        n_stations = dplyr::n_distinct(df$station_id),
+        n_cols = ncol(df),
+        size_kb = round(file.info(api_bulk_parquet)$size / 1024, 1),
+        validated_at = format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")
+      )
+    }
+  ),
+
+  # ==========================================================================
   # VIGNETTE DISPLAY TARGETS
   # ==========================================================================
 
-  # Endpoints table for the API usage vignette
+  # Endpoints table for the API usage vignette (clickable URLs)
   targets::tar_target(
     api_vignette_endpoints_dt,
     {
       idx <- api_index
       endpoints_df <- dplyr::bind_rows(idx$endpoints)
+      # Make URLs clickable (open in new window)
+      endpoints_df$url <- paste0(
+        '<a href="', endpoints_df$url, '" target="_blank">',
+        endpoints_df$url, '</a>'
+      )
       DT::datatable(
         endpoints_df,
-        caption = "Available API Endpoints",
+        caption = htmltools::tags$caption(
+          style = "caption-side: top;",
+          "Available API Endpoints"
+        ),
+        escape = FALSE, # allow HTML in url column
         options = list(
-          pageLength = 10,
+          pageLength = 17,
           dom = "Bfrtip",
           buttons = c("csv", "print"),
           columnDefs = list(
-            list(width = "120px", targets = 0),
-            list(width = "300px", targets = 1)
+            list(width = "100px", targets = 0), # endpoint
+            list(width = "35%", targets = 1),   # url (half-width)
+            list(width = "55%", targets = 2)    # description (wider)
           )
         ),
         rownames = FALSE,
@@ -510,11 +603,15 @@ plan_api <- list(
     }
   ),
 
-  # Return levels table for vignette (wide format)
+  # Return levels table for vignette (wide format with units)
   targets::tar_target(
     api_vignette_return_levels_dt,
     {
       rl <- api_return_levels$data$by_station
+      unit_map <- c(
+        wave_height = "m", hmax = "m",
+        wind_speed = "kn", gust = "kn"
+      )
       rows <- lapply(names(rl), function(station) {
         vars <- rl[[station]]
         lapply(names(vars), function(variable) {
@@ -522,6 +619,7 @@ plan_api <- list(
           tibble::tibble(
             station = station,
             variable = variable,
+            unit = unit_map[variable] %||% "\u2014",
             `1yr` = periods[["1yr"]] %||% NA_real_,
             `5yr` = periods[["5yr"]] %||% NA_real_,
             `10yr` = periods[["10yr"]] %||% NA_real_
@@ -531,7 +629,10 @@ plan_api <- list(
       df <- dplyr::bind_rows(unlist(rows, recursive = FALSE))
       DT::datatable(
         df,
-        caption = "GPD Return Levels by Station and Variable",
+        caption = htmltools::tags$caption(
+          style = "caption-side: top;",
+          "GPD Return Levels by Station and Variable (with units)"
+        ),
         options = list(
           pageLength = 15,
           dom = "Bfrtip",
@@ -582,6 +683,58 @@ plan_api <- list(
           pageLength = 20,
           dom = "Bfrtip",
           buttons = c("csv", "print")
+        ),
+        rownames = FALSE,
+        class = "display compact"
+      )
+    }
+  ),
+
+  # Derived statistics metadata (units for computed/estimated quantities)
+  targets::tar_target(
+    api_derived_metadata,
+    {
+      tibble::tribble(
+        ~statistic,                ~unit,           ~description,                                        ~source_endpoint,
+        "Return level (wave)",     "m",             "GPD return level for wave height",                  "return-levels.json",
+        "Return level (Hmax)",     "m",             "GPD return level for max wave height",              "return-levels.json",
+        "Return level (wind)",     "kn",            "GPD return level for wind speed",                   "return-levels.json",
+        "Return level (gust)",     "kn",            "GPD return level for gust speed",                   "return-levels.json",
+        "Seasonal mean (wave)",    "m",             "Monthly/seasonal mean wave height",                 "seasonal.json",
+        "Seasonal mean (wind)",    "kn",            "Monthly/seasonal mean wind speed",                  "seasonal.json",
+        "Trend per decade (wave)", "m/decade",      "Linear trend in annual mean wave height",           "trends.json",
+        "Trend per decade (wind)", "kn/decade",     "Linear trend in annual mean wind speed",            "trends.json",
+        "Mann-Kendall tau",        "dimensionless", "Kendall rank correlation coefficient (-1 to 1)",    "trends.json",
+        "Mann-Kendall p-value",    "dimensionless", "Significance of monotonic trend",                   "trends.json",
+        "Rogue ratio",             "dimensionless", "Hmax / significant wave height (>2.0 = rogue)",     "rogue-waves.json",
+        "Gust factor",             "dimensionless", "Gust / mean wind speed",                            "gust-factors.json",
+        "Pair correlation",        "dimensionless", "Cross-station correlation (Pearson r, -1 to 1)",    "spatial.json",
+        "STL seasonal component",  "same as input", "Seasonal component from STL decomposition",        "decomposition.json",
+        "STL trend component",     "same as input", "Trend component from STL decomposition",           "decomposition.json",
+        "STL remainder",           "same as input", "Remainder (residual) from STL decomposition",      "decomposition.json"
+      )
+    }
+  ),
+
+  # DT display of derived metadata for vignette
+  targets::tar_target(
+    api_vignette_derived_dict_dt,
+    {
+      DT::datatable(
+        api_derived_metadata,
+        caption = htmltools::tags$caption(
+          style = "caption-side: top;",
+          "Derived Statistics: Units and Definitions"
+        ),
+        options = list(
+          pageLength = 20,
+          dom = "Bfrtip",
+          buttons = c("csv", "print"),
+          columnDefs = list(
+            list(width = "180px", targets = 0),
+            list(width = "100px", targets = 1),
+            list(width = "140px", targets = 3)
+          )
         ),
         rownames = FALSE,
         class = "display compact"
