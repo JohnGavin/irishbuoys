@@ -65,6 +65,9 @@ tryCatch({
   tar_load(code_api_curl_latest)
   tar_load(code_api_r_jsonlite)
   tar_load(code_api_python_requests)
+  tar_load(api_vignette_derived_dict_dt)
+  tar_load(api_bulk_validate)
+  tar_load(api_update_schedule)
   targets_loaded <- TRUE
 }, error = function(e) {
   targets_loaded <<- FALSE
@@ -74,13 +77,14 @@ tryCatch({
 ## Overview {#overview}
 
 The irishbuoys package provides a **static JSON API** served via GitHub Pages.
-All endpoints are pre-computed by the targets pipeline and updated weekly
-(Sundays 2 AM UTC).
+All endpoints are pre-computed by the targets pipeline and updated on a regular
+schedule (see [Update Schedule](#update-schedule)).
 
-**Base URL:** `https://johngavin.github.io/irishbuoys/api/v1/`
+**Base URL:** [https://johngavin.github.io/irishbuoys/api/v1/](https://johngavin.github.io/irishbuoys/api/v1/){target="_blank"}
 
-No authentication required. All responses are JSON. Data is updated weekly
-from the Marine Institute's ERDDAP server.
+No authentication required. All responses are JSON. Data is updated regularly
+from the [Marine Institute](https://www.marine.ie/){target="_blank"}'s
+[ERDDAP server](https://erddap.marine.ie/erddap/index.html){target="_blank"}.
 
 ## Available Endpoints {#endpoints}
 
@@ -276,6 +280,16 @@ including names, descriptions, units, and data types.
 safe_tar_read("api_vignette_data_dict_dt")
 ```
 
+## Derived Statistics Metadata {#derived-metadata}
+
+The API includes several computed statistics (return levels, trend estimates,
+gust factors, etc.) derived from the raw ERDDAP data. The table below
+documents units and definitions for each derived quantity.
+
+```{r derived-dict-table}
+safe_tar_read("api_vignette_derived_dict_dt")
+```
+
 ## Sources {#sources}
 
 The `sources.json` endpoint provides data provenance information including
@@ -365,7 +379,8 @@ if (is.list(d) && "gpd" %in% names(d)) {
 
 ## Data Sources {#data-sources}
 
-All data originates from the Marine Institute's ERDDAP server:
+All data originates from the [Marine Institute](https://www.marine.ie/){target="_blank"}'s
+[ERDDAP server](https://erddap.marine.ie/erddap/index.html){target="_blank"}:
 
 - **ERDDAP base URL:** <https://erddap.marine.ie/erddap/tabledap/IWBNetwork>
 - **Dataset ID:** `IWBNetwork`
@@ -458,7 +473,22 @@ For bulk analysis, download the full dataset as Parquet:
 curl -O https://johngavin.github.io/irishbuoys/vignettes/data/buoy_data.parquet
 ```
 
-Read in R with `arrow::read_parquet()` or in Python with `pandas.read_parquet()`.
+Read in R with [`arrow::read_parquet()`](https://arrow.apache.org/docs/r/){target="_blank"}
+or in Python with `pandas.read_parquet()`.
+
+```{r bulk-validate}
+#| results: asis
+bv <- safe_tar_read("api_bulk_validate")
+if (is.list(bv) && "n_rows" %in% names(bv)) {
+  cat(sprintf("**Bulk dataset summary:** %s rows, %s stations, %s columns (%s KB).\n",
+    format(bv$n_rows, big.mark = ","),
+    bv$n_stations,
+    bv$n_cols,
+    bv$size_kb
+  ))
+  cat(sprintf("Last validated: %s\n", bv$validated_at))
+}
+```
 
 ## API File Summary {#file-summary}
 
@@ -505,14 +535,22 @@ run_api(port = 8080)
 pr <- create_api_router()
 ```
 
-The live API requires the `plumber` package (`install.packages("plumber")`).
+The live API requires the [`plumber`](https://www.rplumber.io/){target="_blank"} package (`install.packages("plumber")`).
 
 ## Update Schedule {#update-schedule}
 
-- **Frequency:** Weekly (Sundays 2 AM UTC)
-- **Source:** Marine Institute ERDDAP server
-- **Pipeline:** `targets::tar_make()` with incremental DuckDB updates
-- **CI:** [weekly-update.yml](https://github.com/JohnGavin/irishbuoys/actions/workflows/weekly-update.yml)
+```{r update-schedule}
+#| results: asis
+schedule <- safe_tar_read("api_update_schedule")
+if (is.character(schedule)) {
+  cat(sprintf("- **Frequency:** %s\n", schedule))
+} else {
+  cat("- **Frequency:** Every 6 hours (0:00, 6:00, 12:00, 18:00 UTC)\n")
+}
+cat("- **Source:** [Marine Institute](https://www.marine.ie/){target=\"_blank\"} [ERDDAP server](https://erddap.marine.ie/erddap/index.html){target=\"_blank\"}\n")
+cat("- **Pipeline:** `targets::tar_make()` with incremental DuckDB updates\n")
+cat("- **CI:** [data-update.yml](https://github.com/JohnGavin/irishbuoys/actions/workflows/data-update.yml)\n")
+```
 
 Data freshness depends on the ERDDAP server. The pipeline downloads the
 latest 72 hours of observations each run to catch any late-arriving data.

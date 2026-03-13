@@ -49,6 +49,25 @@ format:
             overflow: visible !important;
             max-height: none !important;
           }
+          /* Increase default plotly plot height */
+          .js-plotly-plot, .plotly {
+            min-height: 600px !important;
+          }
+          /* DT tables: remove internal scroll, show more content */
+          .dataTables_scrollBody {
+            max-height: none !important;
+            overflow: visible !important;
+          }
+          /* Cards expand to fit content */
+          .card, .card-body {
+            min-height: auto !important;
+            overflow: visible !important;
+            max-height: none !important;
+          }
+          /* White captions on dark theme */
+          caption, .table caption, table caption {
+            color: white !important;
+          }
           </style>
           <script>
           document.addEventListener('click', function(e) {
@@ -61,9 +80,17 @@ format:
               plots.forEach(function(p) { if (window.Plotly) Plotly.Plots.resize(p); });
               return;
             }
-            // Open fullscreen: click on plotly plot or DT table container
+            // Open fullscreen: walk to outermost .cell-output-display (includes caption)
             var cell = e.target.closest('.cell-output-display');
             if (!cell) return;
+            // Walk up to outermost container that holds plot or table
+            var parent = cell.parentElement ? cell.parentElement.closest('.cell-output-display') : null;
+            while (parent) {
+              if (parent.querySelector('.js-plotly-plot') || parent.querySelector('.datatables')) {
+                cell = parent;
+              }
+              parent = parent.parentElement ? parent.parentElement.closest('.cell-output-display') : null;
+            }
             var hasPlot = cell.querySelector('.js-plotly-plot');
             var hasTable = cell.querySelector('.datatables');
             if (!hasPlot && !hasTable) return;
@@ -75,6 +102,80 @@ format:
               setTimeout(function() { Plotly.Plots.resize(hasPlot); }, 100);
             }
           });
+          // Y-axis auto-scale: recompute y-range when rangeslider changes x-range
+          (function() {
+            function attachAutoScale(plot) {
+              // Only attach to plots that have a rangeslider
+              if (!plot.layout || !plot.layout.xaxis || !plot.layout.xaxis.rangeslider) return;
+              plot.on('plotly_relayout', function(ed) {
+                if (plot._yAutoScaling) return;
+                var xRange;
+                if (ed['xaxis.range[0]'] != null) {
+                  xRange = [ed['xaxis.range[0]'], ed['xaxis.range[1]']];
+                } else if (ed['xaxis.range']) {
+                  xRange = ed['xaxis.range'];
+                } else if (ed['xaxis.autorange']) {
+                  plot._yAutoScaling = true;
+                  Plotly.relayout(plot, {'yaxis.autorange': true}).then(function() {
+                    plot._yAutoScaling = false;
+                  });
+                  return;
+                } else {
+                  return;
+                }
+                var xMin = new Date(xRange[0]).getTime();
+                var xMax = new Date(xRange[1]).getTime();
+                if (isNaN(xMin) || isNaN(xMax)) return;
+                var yMin = Infinity, yMax = -Infinity;
+                plot.data.forEach(function(trace) {
+                  if (!trace.x || !trace.y) return;
+                  if (trace.x.length <= 3 && trace.mode === 'lines') return;
+                  for (var i = 0; i < trace.x.length; i++) {
+                    var t = new Date(trace.x[i]).getTime();
+                    if (t >= xMin && t <= xMax && trace.y[i] != null && isFinite(trace.y[i])) {
+                      if (trace.y[i] < yMin) yMin = trace.y[i];
+                      if (trace.y[i] > yMax) yMax = trace.y[i];
+                    }
+                  }
+                });
+                if (yMin !== Infinity && yMax !== -Infinity) {
+                  var pad = (yMax - yMin) * 0.05 || 0.1;
+                  plot._yAutoScaling = true;
+                  Plotly.relayout(plot, {'yaxis.range': [yMin - pad, yMax + pad]}).then(function() {
+                    plot._yAutoScaling = false;
+                  });
+                }
+              });
+            }
+            // Attach to all plotly plots once they render
+            setTimeout(function() {
+              document.querySelectorAll('.js-plotly-plot').forEach(function(p) {
+                if (p.on && !p._yAutoScaleAttached) {
+                  p._yAutoScaleAttached = true;
+                  attachAutoScale(p);
+                }
+              });
+            }, 3000);
+          })();
+          // Auto-activate parent tabs on hash navigation (fixes #extreme-value-methods etc.)
+          function activateHashTarget() {
+            if (!location.hash) return;
+            var target = document.getElementById(location.hash.slice(1));
+            if (!target) return;
+            var pane = target.closest('.tab-pane');
+            while (pane) {
+              var tabId = pane.getAttribute('id');
+              var tabTrigger = document.querySelector('[data-bs-target="#' + tabId + '"], [href="#' + tabId + '"]');
+              if (tabTrigger) {
+                var tab = new bootstrap.Tab(tabTrigger);
+                tab.show();
+              }
+              pane = pane.parentElement ? pane.parentElement.closest('.tab-pane') : null;
+            }
+            setTimeout(function() { target.scrollIntoView({behavior: 'smooth'}); }, 200);
+          }
+          window.addEventListener('hashchange', activateHashTarget);
+          document.addEventListener('DOMContentLoaded', activateHashTarget);
           </script>
 execute:
   echo: false
@@ -230,9 +331,9 @@ fmt_num <- function(x, digits = 0) {
 create_dt <- function(data, caption = "") {
   time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp"))
 
-  # Force caption to top position
+  # Force caption to top position with white text on dark theme
   cap <- if (nzchar(caption)) {
-    htmltools::tags$caption(style = "caption-side: top; font-size: 0.9em;", caption)
+    htmltools::tags$caption(style = "caption-side: top; font-size: 0.9em; color: white;", caption)
   } else {
     NULL
   }
@@ -240,7 +341,7 @@ create_dt <- function(data, caption = "") {
   dt <- datatable(
     data, caption = cap, filter = 'top', rownames = FALSE, extensions = 'Buttons',
     options = list(
-      pageLength = 15, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
+      pageLength = 25, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
       order = list(list(0, 'desc')), scrollX = TRUE,
       columnDefs = if (length(time_cols) > 0) list(list(width = '120px', targets = time_cols - 1)) else NULL
     ),
@@ -299,10 +400,10 @@ dynamic_title <- paste0("Irish Buoys Analysis (", year_start, "-", year_end, ")"
 
 ### Data Overview
 
-**Wave Analysis Dashboard** for the [Irish Weather Buoy Network](https://www.marine.ie/site-area/infrastructure-facilities/marine-institute-buoy-network).
+**Wave Analysis Dashboard** for the [Irish Weather Buoy Network](https://www.marine.ie/site-area/infrastructure-facilities/marine-institute-buoy-network){target="_blank"}.
 
 ::: {.callout-warning appearance="minimal"}
-This website is an independent open-source analysis tool and is **not** part of or affiliated with the Irish Weather Buoy Network or the Marine Institute.
+This website is an independent open-source analysis tool and is **not** part of or affiliated with the Irish Weather Buoy Network or the [Marine Institute](https://www.marine.ie/){target="_blank"}.
 :::
 
 #### Data Structure
@@ -581,13 +682,17 @@ if (!is.null(rogue_gust_events) && nrow(rogue_gust_events) > 0) {
 ```{r rogue-gusts-table}
 targets::tar_load(rogue_gust_events)
 if (!is.null(rogue_gust_events) && nrow(rogue_gust_events) > 0) {
+  n_total <- nrow(rogue_gust_events)
   rogue_gust_events |>
     arrange(desc(gust_ratio)) |>
+    head(500) |>
     mutate(
       time = format(time, "%Y-%m-%d %H:%M"),
       across(where(is.numeric), ~round(., 2))
     ) |>
-    create_dt(paste0("Rogue Gust Events (gust_ratio > 1.5). ",
+    create_dt(paste0("Top 500 Rogue Gust Events of ",
+                     format(n_total, big.mark = ","),
+                     " total (gust_ratio > 1.5). ",
                      format(min(rogue_gust_events$time), "%Y-%m-%d"), " to ",
                      format(max(rogue_gust_events$time), "%Y-%m-%d")))
 }
@@ -616,9 +721,25 @@ create_plot_gusts_vs_waves(analysis_data)
 
 ```{r gust-overall}
 if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
-  gust_analysis$summary |>
-    mutate(across(where(is.numeric), ~round(., 2))) |>
-    create_dt("Gust Factor Statistics (All Stations Combined)")
+  summary_df <- gust_analysis$summary |>
+    mutate(across(where(is.numeric), ~round(., 2)))
+  # Right-justify numeric columns and narrow layout
+  numeric_cols <- which(vapply(summary_df, is.numeric, logical(1))) - 1L
+  DT::datatable(
+    summary_df,
+    caption = htmltools::tags$caption(
+      style = "caption-side: top; font-size: 0.9em; color: white;",
+      "Gust Factor Statistics (All Stations Combined)"
+    ),
+    rownames = FALSE, class = "cell-border stripe hover compact",
+    options = list(
+      pageLength = 25, dom = "t",
+      columnDefs = list(
+        list(width = "200px", targets = 0),
+        list(className = "dt-right", targets = as.list(numeric_cols))
+      )
+    )
+  )
 } else {
   htmltools::div(class = "alert alert-warning", "Gust analysis not available. Run targets::tar_make()")
 }
@@ -747,7 +868,7 @@ $$z_T = u + \frac{\sigma}{\xi}\left[(n_y \lambda T)^\xi - 1\right]$$
 
 where $n_y$ = observations per year, $\lambda$ = exceedance rate.
 
-**Threshold sensitivity:** GPD results depend on threshold choice. Lower thresholds give more data but may violate asymptotic theory. The [mev](https://cran.r-project.org/package=mev) package provides diagnostics.
+**Threshold sensitivity:** GPD results depend on threshold choice. Lower thresholds give more data but may violate asymptotic theory. The [mev](https://cran.r-project.org/package=mev){target="_blank"} package provides diagnostics.
 
 ```{r eva-threshold-sensitivity}
 if (!is.null(wave_vignette_threshold_sens) && nrow(wave_vignette_threshold_sens) > 0) {
@@ -767,7 +888,7 @@ if (!is.null(wave_vignette_gev_pooled_params)) {
 }
 ```
 
-**Bayesian approaches:** The [mev](https://cran.r-project.org/package=mev) package supports profile likelihood and Bayesian methods for improved uncertainty quantification.
+**Bayesian approaches:** The [mev](https://cran.r-project.org/package=mev){target="_blank"} package supports profile likelihood and Bayesian methods for improved uncertainty quantification.
 
 **Storm propagation:** Cross-correlation lag analysis between stations could enable offshore-to-nearshore prediction with lead times.
 
@@ -1093,7 +1214,7 @@ For longer period swell (T = 15s): $v_g \approx 23$ m/s $\approx 84$ km/h
 
 # Predictions {#predictions}
 
-Random Forest model predicting **significant wave height** from meteorological variables and lagged features. Model uses [`ranger`](https://imbs-hl.github.io/ranger/) with 500 trees trained on the first 70% of data (time-ordered split); the remaining 30% is held out as a **test set** for the metrics below. The time-ordered split ensures no future data leaks into training. See [methodology](#methodology) for measurement details and the [Model Summary](#model-summary) tab for the fitted formula and [`ranger`](https://imbs-hl.github.io/ranger/) output.
+Random Forest model predicting **significant wave height** from meteorological variables and lagged features. Model uses [`ranger`](https://imbs-hl.github.io/ranger/){target="_blank"} with 500 trees trained on the first 70% of data (time-ordered split); the remaining 30% is held out as a **test set** for the metrics below. The time-ordered split ensures no future data leaks into training. See [methodology](#methodology) for measurement details and the [Model Summary](#model-summary) tab for the fitted formula and [`ranger`](https://imbs-hl.github.io/ranger/){target="_blank"} output.
 
 ```{r predictions-setup}
 #| include: false
@@ -1181,9 +1302,15 @@ if (has_rf) {
     preds_plot <- preds
   }
 
+  # LOESS fit line for actual model performance
+  preds_sorted <- preds_plot[order(preds_plot$actual), ]
+  loess_fit <- loess(predicted ~ actual, data = preds_sorted, span = 0.3)
+  preds_sorted$fitted <- predict(loess_fit)
+
   plot_ly(preds_plot, x = ~actual, y = ~predicted, type = "scatter", mode = "markers",
           color = ~category,
-          marker = list(size = 4, opacity = 0.5),
+          colors = c(Low = "#2196F3", Moderate = "#4CAF50", High = "#FF9800", Extreme = "#F44336"),
+          marker = list(size = 6, opacity = 0.7),
           text = ~paste0("Actual: ", round(actual, 2), " m",
                          "<br>Predicted: ", round(predicted, 2), " m",
                          "<br>Residual: ", round(residual, 2), " m",
@@ -1193,6 +1320,11 @@ if (has_rf) {
               type = "scatter", mode = "lines",
               line = list(dash = "dash", color = "#888888", width = 1),
               name = "y = x (perfect)", showlegend = TRUE,
+              hoverinfo = "skip", inherit = FALSE) |>
+    add_trace(data = preds_sorted, x = ~actual, y = ~fitted,
+              type = "scatter", mode = "lines",
+              line = list(color = "#00ff88", width = 2),
+              name = "LOESS fit", showlegend = TRUE,
               hoverinfo = "skip", inherit = FALSE) |>
     irishbuoys_layout(
       title = paste0(
@@ -1378,18 +1510,18 @@ if (has_rf) {
 
 | Term | Definition | Reference |
 |------|------------|-----------|
-| **Signif Wave = H1/3 = 4σ** | All three mean the same: significant wave height = mean of highest 1/3 of waves = 4 × standard deviation of sea surface. See [worked example](#how-signif-wave-is-calculated). | [Wikipedia](https://en.wikipedia.org/wiki/Significant_wave_height), [Longuet-Higgins 1952](https://doi.org/10.1357/002224052806645438) |
-| **Max Wave** | Maximum individual wave height in 17.5-min measurement period | [NOAA wave background](https://www.weather.gov/key/marine_wave_background). Typically Max Wave / Signif Wave ~ 1.5-1.9 |
-| **Rogue Wave** | Wave where **Max Wave / Signif Wave > 2.0** | [Wikipedia](https://en.wikipedia.org/wiki/Rogue_wave), [Dysthe 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203) |
+| **Signif Wave = H1/3 = 4σ** | All three mean the same: significant wave height = mean of highest 1/3 of waves = 4 × standard deviation of sea surface. See [worked example](#how-signif-wave-is-calculated). | [Wikipedia](https://en.wikipedia.org/wiki/Significant_wave_height){target="_blank"}, [Longuet-Higgins 1952](https://elischolar.library.yale.edu/journal_of_marine_research/774/){target="_blank"} |
+| **Max Wave** | Maximum individual wave height in 17.5-min measurement period | [NOAA wave background](https://www.weather.gov/key/marine_sigwave){target="_blank"}. Typically Max Wave / Signif Wave ~ 1.5-1.9 |
+| **Rogue Wave** | Wave where **Max Wave / Signif Wave > 2.0** | [Wikipedia](https://en.wikipedia.org/wiki/Rogue_wave){target="_blank"}, [Dysthe 2008](https://doi.org/10.1146/annurev.fluid.40.111406.102203){target="_blank"} |
 | **Rogue Ratio** | = Max Wave / Signif Wave. Values > 2.0 indicate a rogue wave | Used in [Rogue Events](#rogue-events) |
 | **Gust Ratio** | = Peak Gust / Sustained Wind. Typical value ~1.3 | Used in [Rogue Gusts](#rogue-gusts) |
 | **Rogue Gust** | Observation where **Gust / Wind > 1.5** | Used in [Rogue Gusts](#rogue-gusts) |
-| **Sustained Wind** | 10-minute mean wind speed at ~3m height. Denominator in [gust factor](https://glossary.ametsoc.org/wiki/Gust_factor). | [WMO Guide](https://library.wmo.int/idurl/4/41650) |
-| **GEV** | Generalized Extreme Value distribution for annual maxima | [Wikipedia](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution). Used in [Hourly Max](#hourly-max) |
-| **GPD** | Generalized Pareto Distribution for peaks over threshold | [Wikipedia](https://en.wikipedia.org/wiki/Generalized_Pareto_distribution). Used in [Hourly Max](#hourly-max) |
+| **Sustained Wind** | 10-minute mean wind speed at ~3m height. Denominator in [gust factor](https://glossary.ametsoc.org/wiki/Gust_factor){target="_blank"}. | [WMO Guide](https://library.wmo.int/idurl/4/41650){target="_blank"} |
+| **GEV** | Generalized Extreme Value distribution for annual maxima | [Wikipedia](https://en.wikipedia.org/wiki/Generalized_extreme_value_distribution){target="_blank"}. Used in [Hourly Max](#hourly-max) |
+| **GPD** | Generalized Pareto Distribution for peaks over threshold | [Wikipedia](https://en.wikipedia.org/wiki/Generalized_Pareto_distribution){target="_blank"}. Used in [Hourly Max](#hourly-max) |
 | **Return Level** | Value expected to be exceeded once per T years | Used in [Hourly Max](#hourly-max) |
-| **Gust Factor** | Peak Gust / Sustained Wind (~1.3 typical) | [AMS Glossary](https://glossary.ametsoc.org/wiki/Gust_factor). Used in [Gust Factor](#gust-factor) |
-| **STL** | Seasonal-Trend decomposition (Loess) | [Wikipedia](https://en.wikipedia.org/wiki/Decomposition_of_time_series). Used in [Trends](#trends) |
+| **Gust Factor** | Peak Gust / Sustained Wind (~1.3 typical) | [AMS Glossary](https://glossary.ametsoc.org/wiki/Gust_factor){target="_blank"}. Used in [Gust Factor](#gust-factor) |
+| **STL** | Seasonal-Trend decomposition (Loess) | [Wikipedia](https://en.wikipedia.org/wiki/Decomposition_of_time_series){target="_blank"} |
 
 *Terminology used throughout this dashboard. Rogue events are identified when ratios exceed defined thresholds.*
 
@@ -1438,7 +1570,7 @@ These three notations all mean the same thing:
 - **H1/3** = Mean of highest 1/3 of waves (original definition)
 - **4σ** = 4 × standard deviation of sea surface elevation
 
-The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution) of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Signif Wave = 4 × sqrt(m0)** where m0 is the variance of sea elevation. See [Wikipedia: Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height) and [NOAA wave background](https://www.weather.gov/key/marine_wave_background) for further detail.
+The equivalence arises from the [Rayleigh distribution](https://en.wikipedia.org/wiki/Rayleigh_distribution){target="_blank"} of wave heights. For a narrow-banded wave spectrum, the theoretical relationship is **Signif Wave = 4 × sqrt(m0)** where m0 is the variance of sea elevation. See [Wikipedia: Significant wave height](https://en.wikipedia.org/wiki/Significant_wave_height){target="_blank"} and [NOAA wave background](https://www.weather.gov/key/marine_sigwave){target="_blank"} for further detail.
 
 See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked example, and the [Methodology](#methodology) tab for measurement details.
 
@@ -1455,7 +1587,7 @@ See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked
 
 *Caption: Measurement window balances statistical requirements with temporal resolution.*
 
-**Data source:** [Marine Institute ERDDAP](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html)
+**Data source:** [Marine Institute ERDDAP](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html){target="_blank"}
 
 ###### Extreme Value Methods
 
@@ -1479,8 +1611,8 @@ See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked
 
 | Author | Year | Title | DOI |
 |--------|------|-------|-----|
-| Longuet-Higgins, M.S. | 1952 | Statistical distribution of sea waves | [10.1357/002224052806645438](https://doi.org/10.1357/002224052806645438) |
-| Dysthe, K. et al. | 2008 | Oceanic rogue waves | [10.1146/annurev.fluid.40.111406.102203](https://doi.org/10.1146/annurev.fluid.40.111406.102203) |
+| Longuet-Higgins, M.S. | 1952 | Statistical distribution of sea waves | [Yale archive](https://elischolar.library.yale.edu/journal_of_marine_research/774/){target="_blank"} |
+| Dysthe, K. et al. | 2008 | Oceanic rogue waves | [10.1146/annurev.fluid.40.111406.102203](https://doi.org/10.1146/annurev.fluid.40.111406.102203){target="_blank"} |
 | Coles, S. | 2001 | *Statistical Modeling of Extreme Values* (Springer) | — |
 
 *Caption: Foundational papers for wave statistics and extreme value theory.*
@@ -1491,14 +1623,14 @@ See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked
 
 | Package | Purpose | Link |
 |---------|---------|------|
-| [`targets`](https://docs.ropensci.org/targets/) | Pipeline orchestration | [CRAN](https://cran.r-project.org/package=targets) |
-| [`ranger`](https://imbs-hl.github.io/ranger/) | Fast Random Forest implementation | [CRAN](https://cran.r-project.org/package=ranger) |
-| [`mev`](https://lbelzile.github.io/mev/) | Extreme value analysis | [CRAN](https://cran.r-project.org/package=mev) |
-| [`extRemes`](https://www.ral.ucar.edu/staff/ericg/extRemes/) | GEV/GPD fitting | [CRAN](https://cran.r-project.org/package=extRemes) |
-| [`plotly`](https://plotly.com/r/) | Interactive visualisation | [CRAN](https://cran.r-project.org/package=plotly) |
-| [`DT`](https://rstudio.github.io/DT/) | Interactive tables | [CRAN](https://cran.r-project.org/package=DT) |
-| [`dygraphs`](https://rstudio.github.io/dygraphs/) | Time series widgets | [CRAN](https://cran.r-project.org/package=dygraphs) |
-| [`irishbuoys`](https://johngavin.github.io/irishbuoys/) | This package | [GitHub](https://github.com/JohnGavin/irishbuoys) |
+| [`targets`](https://docs.ropensci.org/targets/){target="_blank"} | Pipeline orchestration | [CRAN](https://cran.r-project.org/package=targets){target="_blank"} |
+| [`ranger`](https://imbs-hl.github.io/ranger/){target="_blank"} | Fast Random Forest implementation | [CRAN](https://cran.r-project.org/package=ranger){target="_blank"} |
+| [`mev`](https://lbelzile.github.io/mev/){target="_blank"} | Extreme value analysis | [CRAN](https://cran.r-project.org/package=mev){target="_blank"} |
+| [`extRemes`](https://www.ral.ucar.edu/staff/ericg/extRemes/){target="_blank"} | GEV/GPD fitting | [CRAN](https://cran.r-project.org/package=extRemes){target="_blank"} |
+| [`plotly`](https://plotly.com/r/){target="_blank"} | Interactive visualisation | [CRAN](https://cran.r-project.org/package=plotly){target="_blank"} |
+| [`DT`](https://rstudio.github.io/DT/){target="_blank"} | Interactive tables | [CRAN](https://cran.r-project.org/package=DT){target="_blank"} |
+| [`dygraphs`](https://rstudio.github.io/dygraphs/){target="_blank"} | Time series widgets | [CRAN](https://cran.r-project.org/package=dygraphs){target="_blank"} |
+| [`irishbuoys`](https://johngavin.github.io/irishbuoys/){target="_blank"} | This package | [GitHub](https://github.com/JohnGavin/irishbuoys){target="_blank"} |
 
 *Core R packages enabling reproducible analysis and interactive dashboards.*
 
@@ -1508,11 +1640,11 @@ See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked
 
 | Source | Description | URL |
 |--------|-------------|-----|
-| Marine Institute Ireland | Buoy network operator | [marine.ie](https://www.marine.ie/) |
-| ERDDAP Data Portal | Raw buoy data access | [erddap.marine.ie](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html) |
-| ERDDAP Metadata | Dataset documentation | [info/IWBNetwork](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html) |
+| Marine Institute Ireland | Buoy network operator | [marine.ie](https://www.marine.ie/){target="_blank"} |
+| ERDDAP Data Portal | Raw buoy data access | [erddap.marine.ie](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html){target="_blank"} |
+| ERDDAP Metadata | Dataset documentation | [info/IWBNetwork](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html){target="_blank"} |
 
-*Caption: All buoy data sourced from Marine Institute Ireland via ERDDAP protocol.*
+*Caption: All buoy data sourced from [Marine Institute Ireland](https://www.marine.ie/){target="_blank"} via ERDDAP protocol.*
 
 ---
 
@@ -1521,5 +1653,5 @@ See [How Signif Wave is Calculated](#how-signif-wave-is-calculated) for a worked
 ---
 
 ::: {.callout-note appearance="minimal"}
-**Disclaimer:** `irishbuoys` is an independent open-source project ([website](https://johngavin.github.io/irishbuoys/), [GitHub](https://github.com/JohnGavin/irishbuoys)). It is not affiliated with, endorsed by, or part of the [Marine Institute](https://www.marine.ie/) or the Irish Weather Buoy Network. For official marine weather warnings, consult [Met Eireann](https://www.met.ie/warnings).
+**Disclaimer:** `irishbuoys` is an independent open-source project ([website](https://johngavin.github.io/irishbuoys/){target="_blank"}, [GitHub](https://github.com/JohnGavin/irishbuoys){target="_blank"}). It is not affiliated with, endorsed by, or part of the [Marine Institute](https://www.marine.ie/){target="_blank"} or the Irish Weather Buoy Network. For official marine weather warnings, consult [Met Eireann](https://www.met.ie/warnings){target="_blank"}.
 :::

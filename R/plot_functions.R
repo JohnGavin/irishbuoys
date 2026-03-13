@@ -40,7 +40,10 @@ create_plot_rogue_all <- function(rogue_events) {
         format(min(rogue_events$time), "%Y-%m-%d"), " to ",
         format(max(rogue_events$time), "%Y-%m-%d"), ")"
       ),
-      xaxis = list(title = "Time"),
+      xaxis = list(
+        title = "Time",
+        rangeslider = list(type = "date", thickness = 0.05)
+      ),
       yaxis = list(title = "Hmax / Hs Ratio"),
       shapes = list(
         list(
@@ -591,8 +594,14 @@ create_plot_gust_by_category <- function(gust_analysis, date_caption = NULL) {
   if ("by_station_category" %in% names(gust_analysis) && !is.null(gust_analysis$by_station_category)) {
     gust_sc <- gust_analysis$by_station_category
 
+    station_colors <- c(
+      M2 = "#e41a1c", M3 = "#377eb8", M4 = "#4daf4a",
+      M5 = "#984ea3", M6 = "#ff7f00"
+    )
+
     plotly::plot_ly(
       gust_sc, x = ~wind_category, y = ~mean_gf, color = ~station_id,
+      colors = station_colors,
       type = "bar",
       text = ~paste0(
         "Station: ", station_id, "<br>",
@@ -775,7 +784,10 @@ create_plot_rogue_gusts_all <- function(rogue_gust_events) {
         format(min(rogue_gust_events$time), "%Y-%m-%d"), " to ",
         format(max(rogue_gust_events$time), "%Y-%m-%d"), ")"
       ),
-      xaxis = list(title = "Time"),
+      xaxis = list(
+        title = "Time",
+        rangeslider = list(type = "date", thickness = 0.05)
+      ),
       yaxis = list(title = "Gust / Wind Ratio"),
       shapes = list(
         list(

@@ -248,7 +248,9 @@ ui <- navbarPage(
           h2("About This Dashboard"),
           p("This interactive dashboard displays data from the ",
             tags$b("Irish Weather Buoy Network"),
-            ", operated by the Marine Institute of Ireland."),
+            ", operated by the ",
+            tags$a(href = "https://www.marine.ie/", "Marine Institute of Ireland", target = "_blank"),
+            "."),
           h4("Features"),
           tags$ul(
             tags$li(tags$b("Time Series Tab:"), " View any variable over time for one or more stations"),
@@ -260,7 +262,9 @@ ui <- navbarPage(
           p("Data sourced from the ",
             tags$a(href = "https://erddap.marine.ie/erddap/index.html",
                    "Marine Institute ERDDAP Server", target = "_blank")),
-          p("The Irish Weather Buoy Network is operated by the Marine Institute of Ireland."),
+          p("The Irish Weather Buoy Network is operated by the ",
+            tags$a(href = "https://www.marine.ie/", "Marine Institute of Ireland", target = "_blank"),
+            "."),
           p("Historical data available from 2001 to present.")
         ),
         column(6,
@@ -294,7 +298,9 @@ ui <- navbarPage(
 
       hr(),
       h2("Variable Definitions"),
-      p("Variables from the Marine Institute ERDDAP server. ",
+      p("Variables from the ",
+        tags$a(href = "https://erddap.marine.ie/erddap/index.html",
+               "Marine Institute ERDDAP server", target = "_blank"), ". ",
         tags$a(href = "https://erddap.marine.ie/erddap/info/IWBNetwork/index.html",
                "Full metadata", target = "_blank")),
 
@@ -404,7 +410,7 @@ ui <- navbarPage(
       h2("Technical Notes"),
       p("This dashboard runs entirely in your browser using WebR (R compiled to WebAssembly)."),
       p("Built with: Shiny, Plotly, Shinylive, Quarto"),
-      p("Data updates: Weekly via GitHub Actions")
+      p("Data updates: Every 6 hours via GitHub Actions")
     )
   )
 )

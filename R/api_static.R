@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Functions for generating static JSON API files served via GitHub Pages.
-#' These are written to `docs/api/v1/` and updated weekly by CI.
+#' These are written to `docs/api/v1/` and updated 6-hourly by CI.
 #'
 #' @family api
 #' @name api_static
@@ -223,8 +223,11 @@ generate_api_latest <- function(
 #'
 #' @description
 #' Returns data provenance constants: ERDDAP URL, dataset ID,
-#' update frequency, license, and citation. Pure function with no
-#' upstream target dependency.
+#' update frequency, license, and citation.
+#'
+#' @param update_frequency Character, human-readable update schedule.
+#'   If NULL (default), uses "Every 6 hours (0:00, 6:00, 12:00, 18:00 UTC)".
+#'   Typically supplied dynamically from the `api_update_schedule` target.
 #'
 #' @return A list with `_meta` and `data` fields suitable for
 #'   `jsonlite::toJSON()`.
@@ -236,14 +239,17 @@ generate_api_latest <- function(
 #' src <- generate_api_sources()
 #' jsonlite::toJSON(src, pretty = TRUE, auto_unbox = TRUE)
 #' }
-generate_api_sources <- function() {
+generate_api_sources <- function(update_frequency = NULL) {
+  if (is.null(update_frequency)) {
+    update_frequency <- "Every 6 hours (0:00, 6:00, 12:00, 18:00 UTC)"
+  }
   .api_wrap(
     data = list(
       erddap_base_url = "https://erddap.marine.ie/erddap/tabledap/IWBNetwork",
       dataset_id = "IWBNetwork",
       info_url = "https://erddap.marine.ie/erddap/info/IWBNetwork/index.html",
       provider = "Marine Institute, Ireland",
-      update_frequency = "Weekly (Sundays 2 AM UTC)",
+      update_frequency = update_frequency,
       license = "Creative Commons Attribution 4.0 (CC BY 4.0)",
       citation = paste(
         "Marine Institute (2024). Irish Weather Buoy Network.",

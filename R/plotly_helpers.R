@@ -19,45 +19,50 @@
 #' p |> irishbuoys_layout(title = "Weight vs MPG")
 #' }
 irishbuoys_layout <- function(p, title = NULL, ...) {
+  dots <- list(...)
 
-  p |> plotly::layout(
-    title = list(
-      text = title,
-      font = list(size = 14, color = "#e0e0e0")
-    ),
-    plot_bgcolor = "#1a1a1a",
-    paper_bgcolor = "#1a1a1a",
-    xaxis = list(
-      gridcolor = "rgba(255, 255, 255, 0.2)",
-      gridwidth = 0.5,
-      zerolinecolor = "rgba(255, 255, 255, 0.3)",
-      tickfont = list(color = "#cccccc"),
-      titlefont = list(color = "#e0e0e0")
-    ),
-    yaxis = list(
-      gridcolor = "rgba(255, 255, 255, 0.2)",
-      gridwidth = 0.5,
-      zerolinecolor = "rgba(255, 255, 255, 0.3)",
-      tickfont = list(color = "#cccccc"),
-      titlefont = list(color = "#e0e0e0")
-    ),
-    legend = list(
-      orientation = "h",
-      y = -0.15,
-      x = 0.5,
-      xanchor = "center",
-      font = list(color = "#e0e0e0", size = 12),
-      bgcolor = "rgba(40, 40, 40, 0.8)",
-      bordercolor = "#555555",
-      borderwidth = 1
-    ),
-    hoverlabel = list(
-      bgcolor = "white",
-      font = list(color = "black", size = 12)
-    ),
-    margin = list(b = 80),  # Extra bottom margin for legend
-    ...
+  # Default axis styling — deep-merged with caller overrides so grid lines
+  # survive when callers pass xaxis/yaxis with title, rangeslider, etc.
+  axis_theme <- list(
+    gridcolor = "rgba(255, 255, 255, 0.4)",
+    gridwidth = 1,
+    zerolinecolor = "rgba(255, 255, 255, 0.3)",
+    tickfont = list(color = "#cccccc"),
+    titlefont = list(color = "#e0e0e0")
   )
+
+  xaxis <- utils::modifyList(axis_theme, if (!is.null(dots$xaxis)) dots$xaxis else list())
+  yaxis <- utils::modifyList(axis_theme, if (!is.null(dots$yaxis)) dots$yaxis else list())
+
+  # Remove xaxis/yaxis from extra args to prevent duplication
+  extra <- dots[!names(dots) %in% c("xaxis", "yaxis")]
+
+  do.call(plotly::layout, c(
+    list(
+      p = p,
+      title = list(text = title, font = list(size = 14, color = "#e0e0e0")),
+      plot_bgcolor = "#1a1a1a",
+      paper_bgcolor = "#1a1a1a",
+      xaxis = xaxis,
+      yaxis = yaxis,
+      legend = list(
+        orientation = "h",
+        y = -0.15,
+        x = 0.5,
+        xanchor = "center",
+        font = list(color = "#e0e0e0", size = 12),
+        bgcolor = "rgba(40, 40, 40, 0.8)",
+        bordercolor = "#555555",
+        borderwidth = 1
+      ),
+      hoverlabel = list(
+        bgcolor = "white",
+        font = list(color = "black", size = 12)
+      ),
+      margin = list(b = 80)
+    ),
+    extra
+  ))
 }
 
 
