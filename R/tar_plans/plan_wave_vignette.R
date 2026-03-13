@@ -25,7 +25,7 @@ plan_wave_vignette <- list(
       missing_data_grid |>
         dplyr::group_by(.data$station_id) |>
         dplyr::summarise(
-          total_days = dplyr::n(),
+          total_days = as.numeric(max(.data$date) - min(.data$date)) + 1L,
           days_wave_obs = sum(.data$n_wave_height > 0),
           days_wind_obs = sum(.data$n_wind_speed > 0),
           days_hmax_obs = sum(.data$n_hmax > 0),

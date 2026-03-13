@@ -348,8 +348,11 @@ create_dt <- function(data, caption = "") {
     class = 'cell-border stripe hover compact'
   )
 
+  # No text wrapping in any column — horizontal scroll preferred
+  dt <- dt %>% DT::formatStyle(columns = seq_len(ncol(data)), whiteSpace = 'nowrap')
+
   if (length(time_cols) > 0) {
-    dt <- dt %>% DT::formatStyle(columns = time_cols, fontSize = '10px', whiteSpace = 'nowrap')
+    dt <- dt %>% DT::formatStyle(columns = time_cols, fontSize = '10px')
   }
   dt
 }
@@ -947,11 +950,7 @@ Ratio = Max Wave / Signif Wave = `r if(!is.null(worked_signif_wave_example)) pas
 
 `r if(!is.null(worked_signif_wave_example) && worked_signif_wave_example$ratio > 2.0) "**Rogue Wave Detected!** Ratio > 2.0" else if(!is.null(worked_signif_wave_example)) "**Normal Sea State.** Ratio in typical range (1.5-1.9)" else ""`
 
-## Example Caption
-
-### Caption
-
-`r if(!is.null(worked_signif_wave_example)) worked_signif_wave_example$caption else "Worked example not available. Run targets::tar_make()"`
+*`r if(!is.null(worked_signif_wave_example)) worked_signif_wave_example$caption else "Worked example not available. Run targets::tar_make()"`*
 
 # Joint Analysis
 
