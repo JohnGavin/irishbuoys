@@ -430,17 +430,17 @@ mann_kendall_test <- function(data, variable = "wave_height", time_col = "time")
 
   test <- kendallknight::kendall_cor_test(time_index, values)
 
-  direction <- if (test$p_value > 0.05) {
+  direction <- if (test$p.value > 0.05) {
     "no trend"
-  } else if (test$statistic > 0) {
+  } else if (test$estimate > 0) {
     "increasing"
   } else {
     "decreasing"
   }
 
   list(
-    tau = as.numeric(test$statistic),
-    p_value = test$p_value,
+    tau = as.numeric(test$estimate),
+    p_value = test$p.value,
     trend_direction = direction
   )
 }
