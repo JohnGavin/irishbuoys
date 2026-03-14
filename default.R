@@ -39,6 +39,7 @@ analysis_pkgs <- c(
   "SpatialExtremes",# Spatial extreme value modelling
   "quantreg",       # Quantile regression
   "copula",         # Copula models for dependence
+  "kendallknight",  # O(n log n) Kendall correlation
   "zoo",            # Time series infrastructure
   "xts",            # Extensible time series
   "pointblank"      # Data validation

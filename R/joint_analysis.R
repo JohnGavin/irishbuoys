@@ -683,13 +683,8 @@ compute_extremal_dependence <- function(
     }, numeric(1))
     names(chi_vals) <- paste0("q", threshold_quantile)
 
-    # Kendall's tau (subsample for speed)
-    if (nrow(joined) > 10000) {
-      tau_idx <- sample(nrow(joined), 10000)
-      tau <- stats::cor(joined$v1[tau_idx], joined$v2[tau_idx], method = "kendall")
-    } else {
-      tau <- stats::cor(joined$v1, joined$v2, method = "kendall")
-    }
+    # Kendall's tau — O(n log n) via kendallknight, no subsampling needed
+    tau <- kendallknight::kendall_cor(joined$v1, joined$v2)
 
     # Fit Gumbel copula for upper tail dependence
     cop_result <- tryCatch({
