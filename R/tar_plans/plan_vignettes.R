@@ -44,6 +44,14 @@ plan_vignettes <- list(
     vignette_api_usage,
     path = "vignettes/api-usage.qmd",
     quiet = FALSE
+  ),
+
+  # Spatial Extremes - Max-stable processes and spatial EVT
+  # Dependencies: spatial_extremal_dependence, spatial_maxstable_fit, spatial_evt_results
+  tarchetypes::tar_quarto(
+    vignette_spatial_extremes,
+    path = "inst/articles/spatial_extremes.qmd",
+    quiet = FALSE
   )
 
   # NOTE: dashboard_shinylive.qmd is NOT included as a target because:
