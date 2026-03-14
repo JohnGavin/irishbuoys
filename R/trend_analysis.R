@@ -424,19 +424,23 @@ mann_kendall_test <- function(data, variable = "wave_height", time_col = "time")
     cli::cli_abort("Need at least 3 non-NA observations for Mann-Kendall test.")
   }
 
-  test <- stats::cor.test(time_index, values, method = "kendall")
+  if (!requireNamespace("kendallknight", quietly = TRUE)) {
+    cli::cli_abort("Package {.pkg kendallknight} is required for O(n log n) Kendall tau.")
+  }
 
-  direction <- if (test$p.value > 0.05) {
+  test <- kendallknight::kendall_cor_test(time_index, values)
+
+  direction <- if (test$p_value > 0.05) {
     "no trend"
-  } else if (test$estimate > 0) {
+  } else if (test$statistic > 0) {
     "increasing"
   } else {
     "decreasing"
   }
 
   list(
-    tau = as.numeric(test$estimate),
-    p_value = test$p.value,
+    tau = as.numeric(test$statistic),
+    p_value = test$p_value,
     trend_direction = direction
   )
 }
