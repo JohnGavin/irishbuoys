@@ -579,7 +579,8 @@ server <- function(input, output, session) {
         type = "scatter", mode = "lines+markers",
         name = stn,
         marker = list(size = 3),
-        hovertemplate = paste0("<b>", stn, "</b><br>%{x}<br>", var_label, ": %{y:.2f}<extra></extra>")
+        hoverinfo = "text",
+        text = ~paste0("<b>", stn, "</b><br>", format(time, "%Y-%m-%d %H:%M"), "<br>", var_label, ": ", round(get(var), 2))
       )
     }
 
@@ -595,7 +596,7 @@ server <- function(input, output, session) {
       legend = list(orientation = "h", y = -0.15, x = 0.5, xanchor = "center",
                     font = list(color = "#e0e0e0", size = 12),
                     bgcolor = "rgba(40,40,40,0.8)", bordercolor = "#555555", borderwidth = 1),
-      hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12)),
+      hoverlabel = list(bgcolor = "rgba(0,0,0,0.9)", font = list(color = "white", size = 12)),
       margin = list(b = 80)
     )
   })
@@ -660,10 +661,11 @@ server <- function(input, output, session) {
             color = ~station_id,
             type = "scatter", mode = "markers",
             marker = list(size = 6, opacity = 0.6),
-            hovertemplate = paste0(
-              "<b>%{data.name}</b><br>",
-              x_label, ": %{x:.2f}<br>",
-              y_label, ": %{y:.2f}<extra></extra>"
+            hoverinfo = "text",
+            text = ~paste0(
+              "<b>", station_id, "</b><br>",
+              x_label, ": ", round(get(var_x), 2), "<br>",
+              y_label, ": ", round(get(var_y), 2)
             )) |>
       layout(
         title = list(text = paste(y_label, "vs", x_label, "- Last", input$scatter_days, "Days"),
@@ -676,7 +678,7 @@ server <- function(input, output, session) {
         legend = list(orientation = "h", y = -0.15, x = 0.5, xanchor = "center",
                       font = list(color = "#e0e0e0", size = 12),
                       bgcolor = "rgba(40,40,40,0.8)", bordercolor = "#555555", borderwidth = 1),
-        hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12)),
+        hoverlabel = list(bgcolor = "rgba(0,0,0,0.9)", font = list(color = "white", size = 12)),
         margin = list(b = 80)
       )
   })
