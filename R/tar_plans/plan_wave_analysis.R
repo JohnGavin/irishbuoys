@@ -67,15 +67,12 @@ plan_wave_analysis <- list(
   ),
 
   # Missing data grid: daily observation counts by station
+  # Derives from analysis_data (full 6-year history) instead of DuckDB
+  # (which may only have recent data depending on when tar_make() last ran)
   targets::tar_target(
     missing_data_grid,
     {
-      con <- connect_duckdb()
-      on.exit(DBI::dbDisconnect(con))
-
-      # Use dplyr/dbplyr - count observations per day per station for key variables
-      result <- dplyr::tbl(con, "buoy_data") |>
-        dplyr::collect() |>
+      result <- analysis_data |>
         dplyr::mutate(date = as.Date(time)) |>
         dplyr::group_by(station_id, date) |>
         dplyr::summarise(

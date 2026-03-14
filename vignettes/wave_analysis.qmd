@@ -68,6 +68,11 @@ format:
           caption, .table caption, table caption {
             color: white !important;
           }
+          /* Abbr tags: keep default cursor, remove underline */
+          abbr {
+            cursor: default;
+            text-decoration: none;
+          }
           </style>
           <script>
           document.addEventListener('click', function(e) {
@@ -516,6 +521,7 @@ if (has_data && "M2" %in% rogue_events$station_id) {
   if (nrow(m2_events) > 0) {
     plot_ly(m2_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
             marker = list(size = 8, color = "#d62728"),
+            hoverinfo = "text",
             text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
@@ -539,6 +545,7 @@ if (has_data && "M3" %in% rogue_events$station_id) {
   if (nrow(m3_events) > 0) {
     plot_ly(m3_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
             marker = list(size = 8, color = "#1f77b4"),
+            hoverinfo = "text",
             text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
@@ -562,6 +569,7 @@ if (has_data && "M4" %in% rogue_events$station_id) {
   if (nrow(m4_events) > 0) {
     plot_ly(m4_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
             marker = list(size = 8, color = "#2ca02c"),
+            hoverinfo = "text",
             text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
@@ -585,6 +593,7 @@ if (has_data && "M5" %in% rogue_events$station_id) {
   if (nrow(m5_events) > 0) {
     plot_ly(m5_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
             marker = list(size = 8, color = "#ff7f0e"),
+            hoverinfo = "text",
             text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
@@ -608,6 +617,7 @@ if (has_data && "M6" %in% rogue_events$station_id) {
   if (nrow(m6_events) > 0) {
     plot_ly(m6_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
             marker = list(size = 8, color = "#9467bd"),
+            hoverinfo = "text",
             text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
                           "<br>Ratio: ", round(rogue_ratio, 2),
                           "<br>Max Wave: ", round(hmax, 1), "m",
@@ -738,8 +748,7 @@ if (!is.null(gust_analysis) && "summary" %in% names(gust_analysis)) {
     options = list(
       pageLength = 25, dom = "t",
       columnDefs = list(
-        list(width = "200px", targets = 0),
-        list(className = "dt-right", targets = as.list(numeric_cols))
+        list(className = "dt-right", targets = numeric_cols)
       )
     )
   )
@@ -1310,6 +1319,7 @@ if (has_rf) {
           color = ~category,
           colors = c(Low = "#2196F3", Moderate = "#4CAF50", High = "#FF9800", Extreme = "#F44336"),
           marker = list(size = 6, opacity = 0.7),
+          hoverinfo = "text",
           text = ~paste0("Actual: ", round(actual, 2), " m",
                          "<br>Predicted: ", round(predicted, 2), " m",
                          "<br>Residual: ", round(residual, 2), " m",
@@ -1350,7 +1360,9 @@ if (has_rf) {
   preds <- wave_rf_eval$predictions
   plot_ly(preds, y = ~residual, x = ~category, type = "box",
           color = ~category,
-          boxpoints = "outliers") |>
+          boxpoints = "outliers",
+          hoverinfo = "text",
+          text = ~paste0("Category: ", category, "<br>Residual: ", round(residual, 2), " m")) |>
     irishbuoys_layout(
       title = paste0(
         "Residuals by 2m Wave Height Category (test set)<br>",
