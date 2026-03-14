@@ -1,0 +1,40 @@
+name: Seed Cachix
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'  # Mondays 3am UTC (after rstats-on-nix builds)
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Setup magic Nix cache
+        uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Setup Cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: johngavin
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: rstats-on-nix
+
+      - name: Build and push dev shell
+        run: |
+          RESULT=$(nix-build default.nix -A shell --no-out-link)
+          R_PKGS=$(nix-store -qR "$RESULT" | grep -c "/nix/store/[a-z0-9]*-r-" || echo 0)
+          echo "Dev shell: $RESULT ($R_PKGS R packages)"
+          echo "$RESULT" | cachix push johngavin
+
+      - name: Build and push package
+        run: |
+          RESULT=$(nix-build package.nix --no-out-link)
+          echo "Package: $RESULT"
+          echo "$RESULT" | cachix push johngavin
