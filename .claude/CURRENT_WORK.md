@@ -4,36 +4,38 @@
 ## Last Session: 2026-03-14
 
 ### What Was Done
-1. **Wave analysis visual fixes (7 issues)** (commits `ec56be5`, `979ab91`):
-   - Legend: black bg (`rgba(0,0,0,0.9)`) + white text in `irishbuoys_layout()`
-   - Hoverlabel: black bg + white text (was white bg/black text)
-   - Return levels: barplots → horizontal dotplots with text labels + error bars
-   - `total_days` fix: calendar span (`max-min+1`) not row count (`n()`)
-   - DT tables: `whiteSpace: 'nowrap'` on ALL columns (both vignettes)
-   - Caption fix: removed `## Example Caption` heading, italic inline text
-   - Updated `visualization-rules.md` with 4 new mandatory rules
-2. **Merged 3 API tier PRs** (#58, #59, #60) for issue #53
-3. **Full mandatory local workflow completed**:
-   - `devtools::document()` → updated 2 .Rd files
-   - `pkgload::load_all()` → OK
-   - `devtools::test()` → 878 PASS, 0 FAIL (77s)
-   - `devtools::check()` → 0 errors, 1 WARNING (spatial_extremes.qmd VignetteBuilder), 2 NOTEs
-   - `tar_make()` → 136 completed, 0 errors (33m 46s)
-   - Vignettes re-rendered locally (wave_analysis + dashboard_static + api-usage + telemetry)
+1. **Live site bug fixes** (commit `8c9dc7d`):
+   - `hoverinfo = "text"` added to 7 inline plots in wave_analysis.qmd (M2-M6 rogue events, RF scatter, RF residuals)
+   - Dashboard hoverlabel: replaced `hovertemplate` with `text`+`hoverinfo`, `bgcolor` white→`rgba(0,0,0,0.9)`
+   - `missing_data_grid` target: now derives from `analysis_data` (full 6-yr history) instead of DuckDB (was only 31 days)
+   - CSS: `abbr { cursor: default; text-decoration: none; }` — metric column no longer looks clickable
+   - Gust factor table: `targets = numeric_cols` (was `as.list()`), removed fixed `width = "200px"`
+2. **9-step workflow validation**:
+   - `devtools::document()` → OK (pure nix-shell)
+   - `devtools::test()` → 878 PASS, 0 FAIL, 15 SKIP (53.7s)
+   - `devtools::check()` → 0 errors, 0 warnings, 1 NOTE (inst dir, pre-existing)
+   - Cachix push: irishbuoys pushed (74.54 MiB) + fontconfig-2.17.1-lib (377 KiB) — strict limit is 1, fontconfig was new dep
+3. Previous session fixes (commits `ec56be5`, `979ab91`): legend/hoverlabel theme, return level dotplots, DT nowrap, captions
 
 ### CI Status
-- Pushed `979ab91` to main
-- Data Update workflow triggered manually
-- API Drift Detection: passing on main (stale failure was from merged PR branch)
-- `wave_rf_model` (731MB) excluded from git — too large for GitHub
+- Pushed `8c9dc7d` to main
+- R-CMD-check: cancelled (exceeded 20min CI timeout — nix build time, not code failure)
+- API Drift Detection: success
+- Test R-universe: in-progress
+- Next data-update (6-hourly) will deploy vignette changes to live site
 
 ### Known Issues
-- `wave_rf_model` target (731MB) not committed — needs LFS or CI-only rebuild
-- `pointblank` not in nix env (prevents local devtools::document/check in pure shell)
-- `spatial_extremes.qmd` WARNING: missing VignetteBuilder (pre-existing)
-- 143 targets still marked "outdated" in targets metadata (package hash cascade from source changes)
+- R-CMD-check CI timeout (20min) — nix env build takes too long on fresh runners
+- `pointblank` available in nix env but nix-shell needs rebuild for current derivation
+- `wave_rf_model` (731MB) not committed — needs LFS or CI-only rebuild
+- Cachix push_to_cachix.sh strict=1 path violated by fontconfig dep — update script or pre-cache
 
 ### Next Steps
-- Verify 7 visual fixes on live site after CI deploys
-- Consider adding `wave_rf_model` to `.gitignore` permanently
-- Coverage improvement for Silver quality gate
+- [ ] Verify live site after next data-update deploy:
+  - Hover rogue wave plots → black hoverlabel bg
+  - Hover dashboard plots → black hoverlabel bg
+  - total_days → ~2700 (not 31)
+  - Metric names → default cursor (not pointer)
+  - Gust factor table → right-justified, auto-width
+- [ ] Fix R-CMD-check CI timeout (cache nix env, or increase timeout)
+- [ ] Coverage improvement for Silver quality gate
