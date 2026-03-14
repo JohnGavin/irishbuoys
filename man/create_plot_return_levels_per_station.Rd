@@ -17,6 +17,7 @@ with columns: station, variable, return_period, return_level, lower, upper}
 plotly object, or NULL if no data for the requested variable
 }
 \description{
-Creates a grouped bar chart showing GPD return levels by station for a
-given variable, with error bars for confidence intervals.
+Creates a horizontal dotplot showing GPD return levels by station for a
+given variable, with error bars for confidence intervals. Text labels
+at each point replace the legend for clarity.
 }

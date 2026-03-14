@@ -19,7 +19,7 @@ A styled plotly object
 \description{
 Applies consistent dark styling to all plotly plots in the irishbuoys package.
 Uses black background with white grid lines to match the Quarto cosmo dashboard
-theme. Bottom-positioned horizontal legend with white hoverlabels.
+theme. Bottom-positioned horizontal legend with dark hoverlabels.
 }
 \examples{
 \dontrun{
