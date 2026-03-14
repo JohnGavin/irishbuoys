@@ -209,20 +209,29 @@ main() {
   fi
 
   # Post-check: verify push count
-  # Count only lines with /nix/store/ - the "Pushing N paths..." summary line is excluded
-  PUSHED_COUNT=$(grep -c "^Pushing /nix/store/" "$PUSH_LOG" 2>/dev/null || echo 0)
+  # Count R package paths pushed (pattern: /nix/store/...-r-<name>)
+  # System library deps (fontconfig, curl, etc.) are harmless — they're small
+  # and get pushed when nixpkgs updates introduce new derivation hashes.
+  PUSHED_TOTAL=$(grep -c "^Pushing /nix/store/" "$PUSH_LOG" 2>/dev/null || echo 0)
+  PUSHED_RPKGS=$(grep "^Pushing /nix/store/" "$PUSH_LOG" 2>/dev/null | grep -c "/nix/store/[a-z0-9]*-r-" || echo 0)
+  PUSHED_SYSLIBS=$((PUSHED_TOTAL - PUSHED_RPKGS))
 
-  if [ "$PUSHED_COUNT" -gt 1 ]; then
-    log_error "ABORT: Pushed $PUSHED_COUNT paths (strict limit is 1)!"
-    log_error "The pre-check passed but cachix still pushed dependencies."
-    log_error "Paths pushed:"
-    grep "^Pushing /nix/store/" "$PUSH_LOG"
+  if [ "$PUSHED_RPKGS" -gt 1 ]; then
+    log_error "ABORT: Pushed $PUSHED_RPKGS R package paths (strict limit is 1)!"
+    log_error "The pre-check passed but cachix still pushed R dependencies."
+    log_error "R package paths pushed:"
+    grep "^Pushing /nix/store/" "$PUSH_LOG" | grep "/nix/store/[a-z0-9]*-r-"
     log_info "Push log preserved at: $PUSH_LOG"
     exit 4
-  elif [ "$PUSHED_COUNT" -eq 1 ]; then
-    log_success "Pushed exactly 1 path (correct)"
+  elif [ "$PUSHED_RPKGS" -eq 1 ]; then
+    log_success "Pushed exactly 1 R package path (correct)"
   else
-    log_info "Package already in cache (0 new paths pushed)"
+    log_info "R package already in cache (0 new R package paths pushed)"
+  fi
+
+  if [ "$PUSHED_SYSLIBS" -gt 0 ]; then
+    log_warning "Also pushed $PUSHED_SYSLIBS system library paths (harmless, from nixpkgs updates):"
+    grep "^Pushing /nix/store/" "$PUSH_LOG" | grep -v "/nix/store/[a-z0-9]*-r-"
   fi
 
   rm -f "$PUSH_LOG"
