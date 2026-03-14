@@ -432,14 +432,14 @@ mann_kendall_test <- function(data, variable = "wave_height", time_col = "time")
 
   direction <- if (test$p.value > 0.05) {
     "no trend"
-  } else if (test$estimate > 0) {
+  } else if (test$statistic > 0) {
     "increasing"
   } else {
     "decreasing"
   }
 
   list(
-    tau = as.numeric(test$estimate),
+    tau = as.numeric(test$statistic),
     p_value = test$p.value,
     trend_direction = direction
   )
