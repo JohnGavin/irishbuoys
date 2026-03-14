@@ -222,6 +222,191 @@ test_that("test_rogue_propagation skips pairs with too few rogues", {
   expect_true(is.na(h3$p_value))
 })
 
+# --- Tests for detect_rogue_waves actual logic ---
+
+test_that("detect_rogue_waves finds rogue events in test DB", {
+  tmp_db <- file.path(tempdir(), "test_rogue_detect.duckdb")
+  on.exit(unlink(tmp_db), add = TRUE)
+
+  con <- connect_duckdb(db_path = tmp_db, create_new = TRUE)
+  on.exit(DBI::dbDisconnect(con), add = TRUE, after = FALSE)
+
+  data <- data.frame(
+    time = as.POSIXct(c("2024-01-01 00:00", "2024-01-01 01:00", "2024-01-01 02:00")),
+    station_id = c("M2", "M2", "M2"),
+    wave_height = c(3.0, 4.0, 3.0),
+    hmax = c(7.0, 6.0, 5.0),  # ratios: 2.33, 1.5, 1.67
+    wave_period = c(8, 9, 10),
+    wind_speed = c(15, 20, 10),
+    wind_direction = c(180, 200, 160),
+    gust = c(20, 30, 15),
+    atmospheric_pressure = c(1013, 1010, 1015),
+    sea_temperature = c(10, 11, 10),
+    tp = c(10, 11, 12),
+    qc_flag = c(1L, 1L, 1L),
+    stringsAsFactors = FALSE
+  )
+  load_to_duckdb(data, con, update_metadata = FALSE)
+
+  rogues <- detect_rogue_waves(con, threshold = 2.0, min_wave_height = 2.0)
+  expect_s3_class(rogues, "data.frame")
+  # Only row 1 has ratio > 2.0: 7.0/3.0 = 2.33
+  expect_equal(nrow(rogues), 1)
+  expect_equal(rogues$station_id, "M2")
+  expect_true("rogue_ratio" %in% names(rogues))
+  expect_true(rogues$rogue_ratio > 2.0)
+})
+
+test_that("detect_rogue_waves filters by station and date", {
+  tmp_db <- file.path(tempdir(), "test_rogue_filter.duckdb")
+  on.exit(unlink(tmp_db), add = TRUE)
+
+  con <- connect_duckdb(db_path = tmp_db, create_new = TRUE)
+  on.exit(DBI::dbDisconnect(con), add = TRUE, after = FALSE)
+
+  data <- data.frame(
+    time = as.POSIXct(c("2024-01-01 00:00", "2024-06-01 00:00")),
+    station_id = c("M2", "M3"),
+    wave_height = c(3.0, 4.0),
+    hmax = c(7.0, 9.0),  # both rogue (ratio > 2)
+    wave_period = c(8, 10),
+    wind_speed = c(15, 20),
+    wind_direction = c(180, 200),
+    gust = c(20, 30),
+    atmospheric_pressure = c(1013, 1010),
+    sea_temperature = c(10, 12),
+    tp = c(10, 12),
+    qc_flag = c(1L, 1L),
+    stringsAsFactors = FALSE
+  )
+  load_to_duckdb(data, con, update_metadata = FALSE)
+
+  # Filter by station
+  rogues_m2 <- detect_rogue_waves(con, stations = "M2")
+  expect_equal(nrow(rogues_m2), 1)
+  expect_equal(rogues_m2$station_id, "M2")
+
+  # Filter by date
+  rogues_recent <- detect_rogue_waves(con, start_date = as.POSIXct("2024-03-01"))
+  expect_equal(nrow(rogues_recent), 1)
+  expect_equal(rogues_recent$station_id, "M3")
+})
+
+test_that("detect_rogue_waves returns empty for no rogues", {
+  tmp_db <- file.path(tempdir(), "test_rogue_none.duckdb")
+  on.exit(unlink(tmp_db), add = TRUE)
+
+  con <- connect_duckdb(db_path = tmp_db, create_new = TRUE)
+  on.exit(DBI::dbDisconnect(con), add = TRUE, after = FALSE)
+
+  data <- data.frame(
+    time = as.POSIXct("2024-01-01 00:00"),
+    station_id = "M2",
+    wave_height = 3.0,
+    hmax = 4.0,  # ratio 1.33 < 2.0
+    wave_period = 8,
+    wind_speed = 15,
+    wind_direction = 180,
+    gust = 20,
+    atmospheric_pressure = 1013,
+    sea_temperature = 10,
+    tp = 10,
+    qc_flag = 1L,
+    stringsAsFactors = FALSE
+  )
+  load_to_duckdb(data, con, update_metadata = FALSE)
+
+  rogues <- detect_rogue_waves(con)
+  expect_equal(nrow(rogues), 0)
+})
+
+test_that("detect_rogue_waves rejects invalid threshold", {
+  tmp_db <- file.path(tempdir(), "test_rogue_thresh.duckdb")
+  on.exit(unlink(tmp_db), add = TRUE)
+
+  con <- connect_duckdb(db_path = tmp_db, create_new = TRUE)
+  on.exit(DBI::dbDisconnect(con), add = TRUE, after = FALSE)
+
+  expect_error(detect_rogue_waves(con, threshold = -1), "positive number")
+  expect_error(detect_rogue_waves(con, threshold = "bad"), "positive number")
+})
+
+# --- Tests for analyze_rogue_statistics ---
+
+test_that("analyze_rogue_statistics returns expected structure", {
+  tmp_db <- file.path(tempdir(), "test_rogue_stats.duckdb")
+  on.exit(unlink(tmp_db), add = TRUE)
+
+  con <- connect_duckdb(db_path = tmp_db, create_new = TRUE)
+  on.exit(DBI::dbDisconnect(con), add = TRUE, after = FALSE)
+
+  # 10 observations, 2 are rogue
+  data <- data.frame(
+    time = as.POSIXct("2024-01-01") + 3600 * (0:9),
+    station_id = rep(c("M2", "M3"), each = 5),
+    wave_height = rep(3.0, 10),
+    hmax = c(7.0, 4.0, 4.0, 4.0, 4.0,  # M2: 1 rogue (7/3=2.33)
+             8.0, 4.0, 4.0, 4.0, 4.0),  # M3: 1 rogue (8/3=2.67)
+    wave_period = rep(8, 10),
+    wind_speed = rep(15, 10),
+    gust = rep(20, 10),
+    atmospheric_pressure = rep(1013, 10),
+    sea_temperature = rep(10, 10),
+    qc_flag = rep(1L, 10),
+    stringsAsFactors = FALSE
+  )
+  load_to_duckdb(data, con, update_metadata = FALSE)
+
+  stats <- analyze_rogue_statistics(con, threshold = 2.0, min_wave_height = 2.0)
+
+  expect_type(stats, "list")
+  expect_true("overall" %in% names(stats))
+  expect_true("by_station" %in% names(stats))
+  expect_true("conditions" %in% names(stats))
+  expect_true("hourly_distribution" %in% names(stats))
+
+  # Overall: 10 observations, 2 rogue
+  expect_equal(stats$overall$total_observations, 10)
+  expect_equal(stats$overall$rogue_count, 2)
+  expect_equal(stats$overall$rogue_pct, 20)
+
+  # By station
+  expect_equal(nrow(stats$by_station), 2)
+  expect_true(all(stats$by_station$rogue_count == 1))
+})
+
+# --- Tests for rogue_wave_report ---
+
+test_that("rogue_wave_report returns character string", {
+  tmp_db <- file.path(tempdir(), "test_rogue_report.duckdb")
+  on.exit(unlink(tmp_db), add = TRUE)
+
+  con <- connect_duckdb(db_path = tmp_db, create_new = TRUE)
+  on.exit(DBI::dbDisconnect(con), add = TRUE, after = FALSE)
+
+  data <- data.frame(
+    time = as.POSIXct("2024-01-01") + 3600 * (0:4),
+    station_id = rep("M2", 5),
+    wave_height = rep(3.0, 5),
+    hmax = c(7.0, 4.0, 4.0, 4.0, 4.0),
+    wave_period = rep(8, 5),
+    wind_speed = rep(15, 5),
+    wind_direction = rep(180, 5),
+    gust = rep(20, 5),
+    atmospheric_pressure = rep(1013, 5),
+    sea_temperature = rep(10, 5),
+    tp = rep(10, 5),
+    qc_flag = rep(1L, 5),
+    stringsAsFactors = FALSE
+  )
+  load_to_duckdb(data, con, update_metadata = FALSE)
+
+  report <- rogue_wave_report(con, days = 365 * 10)
+  expect_type(report, "character")
+  expect_true(grepl("ROGUE WAVE ANALYSIS REPORT", report))
+  expect_true(grepl("Rogue wave events detected", report))
+})
+
 test_that("test_rogue_propagation filters to valid station pairs", {
   set.seed(42)
   n <- 200
