@@ -399,7 +399,7 @@ fit_bivariate_copula <- function(
   )
 
   # Fit copula
-  fit <- copula::fitCopula(cop, pseudo_obs, method = "ml")
+  fit <- copula::fitCopula(cop, pseudo_obs, method = "itau")
 
   # Extract parameters
   params <- copula::coef(fit)
@@ -695,7 +695,7 @@ compute_extremal_dependence <- function(
     cop_result <- tryCatch({
       u_obs <- copula::pobs(cbind(joined$v1, joined$v2))
       gumbel_fit <- copula::fitCopula(
-        copula::gumbelCopula(dim = 2), u_obs, method = "ml"
+        copula::gumbelCopula(dim = 2), u_obs, method = "itau"
       )
       alpha <- copula::coef(gumbel_fit)
       lambda_U <- 2 - 2^(1 / alpha)
@@ -706,7 +706,7 @@ compute_extremal_dependence <- function(
         idx <- sample(nrow(u_obs), boot_n, replace = TRUE)
         tryCatch({
           fit_b <- copula::fitCopula(
-            copula::gumbelCopula(dim = 2), u_obs[idx, ], method = "ml"
+            copula::gumbelCopula(dim = 2), u_obs[idx, ], method = "itau"
           )
           2 - 2^(1 / copula::coef(fit_b))
         }, error = function(e) NA_real_)

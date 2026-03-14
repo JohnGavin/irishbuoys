@@ -263,7 +263,7 @@ train_wave_model <- function(
    formula = formula,
    data = train_data,
    importance = "impurity",
-   num.trees = 500,
+   num.trees = 250,
    seed = seed,
    ...
  )
