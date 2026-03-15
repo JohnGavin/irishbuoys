@@ -38,7 +38,7 @@ plan_predictions <- list(
   targets::tar_target(
     telemetry_predictions_stored,
     {
-      db_path <- file.path("data", "irishbuoys.duckdb")
+      db_path <- file.path("inst", "extdata", "irish_buoys.duckdb")
       store_predictions_duckdb(telemetry_predictions_raw, db_path)
     }
   ),
