@@ -78,6 +78,12 @@ irishbuoys_layout <- function(p, title = NULL, ...) {
 #'
 #' @return A styled plotly object
 #'
+#' @examples
+#' \dontrun{
+#' p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+#'   ggplot2::geom_point()
+#' irishbuoys_ggplotly(p)
+#' }
 #' @export
 irishbuoys_ggplotly <- function(gg, title = NULL, ...) {
   p <- plotly::ggplotly(gg, ...)

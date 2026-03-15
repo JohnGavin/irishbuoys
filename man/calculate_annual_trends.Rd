@@ -25,3 +25,14 @@ List with:
 Calculates annual statistics and fits a linear trend to detect
 long-term changes in the data.
 }
+\examples{
+set.seed(1)
+data <- data.frame(
+  time = seq(as.POSIXct("2020-01-01"), by = "hour", length.out = 1000),
+  wave_height = 2 + sin(seq(0, 20, length.out = 1000)) + rnorm(1000, 0, 0.3)
+)
+result <- calculate_annual_trends(data)
+result$trend_per_decade
+result$p_value
+
+}

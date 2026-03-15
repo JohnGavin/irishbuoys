@@ -12,6 +12,17 @@ NULL
 #'
 #' @param rogue_events Data frame of rogue wave events
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' rogue <- data.frame(
+#'   time = as.POSIXct("2024-01-01") + (1:10) * 3600,
+#'   station_id = rep(c("M2", "M3"), 5),
+#'   rogue_ratio = runif(10, 2.0, 2.5),
+#'   hmax = runif(10, 8, 15), wave_height = runif(10, 3, 6),
+#'   wind_speed = runif(10, 10, 30), gust = runif(10, 15, 45)
+#' )
+#' create_plot_rogue_all(rogue)
+#' }
 #' @export
 create_plot_rogue_all <- function(rogue_events) {
   if (is.null(rogue_events) || nrow(rogue_events) == 0) {
@@ -81,6 +92,17 @@ create_plot_rogue_all <- function(rogue_events) {
 #' @param rogue_events Data frame of rogue wave events
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' rogue <- data.frame(
+#'   time = as.POSIXct("2024-01-01") + (1:10) * 3600,
+#'   station_id = rep(c("M2", "M3"), 5),
+#'   rogue_ratio = runif(10, 2.0, 2.5),
+#'   hmax = runif(10, 8, 15), wave_height = runif(10, 3, 6),
+#'   wind_speed = runif(10, 10, 30)
+#' )
+#' create_plot_rogue_by_station(rogue)
+#' }
 #' @export
 create_plot_rogue_by_station <- function(rogue_events, date_caption = NULL) {
   if (is.null(rogue_events) || nrow(rogue_events) == 0) {
@@ -151,6 +173,17 @@ create_plot_rogue_by_station <- function(rogue_events, date_caption = NULL) {
 #' @param rogue_conditions Data frame with rogue wave conditions
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' conditions <- data.frame(
+#'   time = as.POSIXct("2024-01-01") + (1:10) * 3600,
+#'   station_id = rep(c("M2", "M3"), 5),
+#'   wind_speed = runif(10, 5, 35),
+#'   rogue_ratio = runif(10, 2.0, 2.5),
+#'   hmax = runif(10, 8, 15), wave_height = runif(10, 3, 6)
+#' )
+#' create_plot_wind_beaufort(conditions)
+#' }
 #' @export
 create_plot_wind_beaufort <- function(rogue_conditions, date_caption = NULL) {
   if (is.null(rogue_conditions) || !"wind_speed" %in% names(rogue_conditions)) {
@@ -225,6 +258,15 @@ create_plot_wind_beaufort <- function(rogue_conditions, date_caption = NULL) {
 #' @param rogue_conditions Data frame with rogue wave conditions
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' conditions <- data.frame(
+#'   time = as.POSIXct("2024-01-01") + (1:30) * 86400,
+#'   rogue_ratio = runif(30, 2.0, 2.5),
+#'   hmax = runif(30, 8, 15)
+#' )
+#' create_plot_week_of_year(conditions)
+#' }
 #' @export
 create_plot_week_of_year <- function(rogue_conditions, date_caption = NULL) {
   if (is.null(rogue_conditions)) {
@@ -284,6 +326,15 @@ create_plot_week_of_year <- function(rogue_conditions, date_caption = NULL) {
 #' @param rogue_conditions Data frame with rogue wave conditions
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' conditions <- data.frame(
+#'   time = as.POSIXct("2024-01-01") + (1:20) * 3600,
+#'   time_of_day = rep(c("Morning", "Afternoon", "Evening", "Night"), 5),
+#'   rogue_ratio = runif(20, 2.0, 2.5)
+#' )
+#' create_plot_time_of_day(conditions)
+#' }
 #' @export
 create_plot_time_of_day <- function(rogue_conditions, date_caption = NULL) {
   if (is.null(rogue_conditions) || !"time_of_day" %in% names(rogue_conditions)) {
@@ -357,6 +408,17 @@ create_plot_time_of_day <- function(rogue_conditions, date_caption = NULL) {
 #' @param seasonal_means_wave Seasonal means from calculate_seasonal_means
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' seasonal <- list(
+#'   monthly = data.frame(
+#'     month_name = month.abb,
+#'     mean = runif(12, 1, 4),
+#'     sd = runif(12, 0.3, 1.0)
+#'   )
+#' )
+#' create_plot_monthly_wave(seasonal)
+#' }
 #' @export
 create_plot_monthly_wave <- function(seasonal_means_wave, date_caption = NULL) {
   if (is.null(seasonal_means_wave) || !"monthly" %in% names(seasonal_means_wave)) {
@@ -390,6 +452,17 @@ create_plot_monthly_wave <- function(seasonal_means_wave, date_caption = NULL) {
 #' @param seasonal_means_wind Seasonal means from calculate_seasonal_means
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' seasonal <- list(
+#'   monthly = data.frame(
+#'     month_name = month.abb,
+#'     mean = runif(12, 5, 15),
+#'     sd = runif(12, 1, 4)
+#'   )
+#' )
+#' create_plot_monthly_wind(seasonal)
+#' }
 #' @export
 create_plot_monthly_wind <- function(seasonal_means_wind, date_caption = NULL) {
   if (is.null(seasonal_means_wind) || !"monthly" %in% names(seasonal_means_wind)) {
@@ -423,6 +496,17 @@ create_plot_monthly_wind <- function(seasonal_means_wind, date_caption = NULL) {
 #' @param annual_trends Annual trends from calculate_annual_trends
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' trends <- list(
+#'   annual_stats = data.frame(
+#'     year = 2018:2024,
+#'     mean = runif(7, 1.5, 3.5),
+#'     sd = runif(7, 0.3, 1.0)
+#'   )
+#' )
+#' create_plot_annual_trends(trends)
+#' }
 #' @export
 create_plot_annual_trends <- function(annual_trends, date_caption = NULL) {
   if (is.null(annual_trends) || !"annual_stats" %in% names(annual_trends)) {
@@ -457,6 +541,16 @@ create_plot_annual_trends <- function(annual_trends, date_caption = NULL) {
 #' @param variable Variable name for title ("wave", "wind", or "hmax")
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' rl <- data.frame(
+#'   return_period = c(1, 5, 10, 25, 50, 100),
+#'   return_level = c(5.2, 7.1, 8.3, 9.8, 11.0, 12.5),
+#'   lower = c(4.8, 6.3, 7.2, 8.1, 8.9, 9.6),
+#'   upper = c(5.6, 7.9, 9.4, 11.5, 13.1, 15.4)
+#' )
+#' create_plot_return_levels(rl, variable = "wave")
+#' }
 #' @export
 create_plot_return_levels <- function(return_levels, variable = "wave", date_caption = NULL) {
   if (is.null(return_levels)) {
@@ -529,6 +623,19 @@ create_plot_return_levels <- function(return_levels, variable = "wave", date_cap
 #'
 #' @return plotly object, or NULL if no data for the requested variable
 #'
+#' @examples
+#' \dontrun{
+#' rl_df <- data.frame(
+#'   station = rep(c("M2", "M3", "M4"), each = 3),
+#'   variable = "avg_wave",
+#'   variable_label = "Avg Wave Height (m)",
+#'   return_period = rep(c(1, 5, 10), 3),
+#'   return_level = runif(9, 4, 12),
+#'   lower = runif(9, 3, 8),
+#'   upper = runif(9, 9, 16)
+#' )
+#' create_plot_return_levels_per_station(rl_df, "avg_wave")
+#' }
 #' @export
 create_plot_return_levels_per_station <- function(return_levels_df, variable_filter) {
   if (is.null(return_levels_df) || nrow(return_levels_df) == 0) {
@@ -584,6 +691,19 @@ create_plot_return_levels_per_station <- function(return_levels_df, variable_fil
 #' @param gust_analysis Gust factor analysis results
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' gust <- list(
+#'   by_station_category = data.frame(
+#'     station_id = rep(c("M2", "M3"), each = 3),
+#'     wind_category = rep(c("0-10", "10-20", "20+"), 2),
+#'     mean_gf = runif(6, 1.1, 1.8),
+#'     p95_gf = runif(6, 1.5, 2.5),
+#'     n = sample(50:500, 6)
+#'   )
+#' )
+#' create_plot_gust_by_category(gust)
+#' }
 #' @export
 create_plot_gust_by_category <- function(gust_analysis, date_caption = NULL) {
   if (is.null(gust_analysis)) {
@@ -672,6 +792,21 @@ create_plot_gust_by_category <- function(gust_analysis, date_caption = NULL) {
 #'
 #' @param gust_analysis Gust factor analysis results
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' gust <- list(
+#'   rogue_gust_threshold = 1.5,
+#'   by_station = data.frame(
+#'     station_id = c("M2", "M3", "M4"),
+#'     n = c(1000, 800, 600),
+#'     n_rogue = c(15, 12, 8),
+#'     pct_rogue = c(1.5, 1.5, 1.3),
+#'     mean_gf = c(1.25, 1.30, 1.22),
+#'     max_gf = c(2.8, 3.1, 2.5)
+#'   )
+#' )
+#' create_plot_rogue_gusts(gust)
+#' }
 #' @export
 create_plot_rogue_gusts <- function(gust_analysis) {
   if (is.null(gust_analysis) ||
@@ -716,6 +851,19 @@ create_plot_rogue_gusts <- function(gust_analysis) {
 #' @param wave_stl STL decomposition from calculate_wave_seasonality
 #' @param date_caption Date range caption
 #' @return ggplot2 object
+#' @examples
+#' \dontrun{
+#' stl_data <- list(
+#'   components = data.frame(
+#'     time = as.POSIXct("2024-01-01") + (1:100) * 86400,
+#'     original = sin(1:100 / 10) + rnorm(100, 0, 0.2) + 2,
+#'     seasonal = sin(1:100 / 10),
+#'     trend = seq(1.8, 2.2, length.out = 100),
+#'     remainder = rnorm(100, 0, 0.2)
+#'   )
+#' )
+#' create_plot_stl(stl_data)
+#' }
 #' @export
 create_plot_stl <- function(wave_stl, date_caption = NULL) {
   if (is.null(wave_stl) || !"components" %in% names(wave_stl)) {
@@ -757,6 +905,18 @@ create_plot_stl <- function(wave_stl, date_caption = NULL) {
 #'
 #' @param rogue_gust_events Data frame of rogue gust events
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' gusts <- data.frame(
+#'   time = as.POSIXct("2024-01-01") + (1:10) * 3600,
+#'   station_id = rep(c("M2", "M3"), 5),
+#'   gust_ratio = runif(10, 1.5, 3.0),
+#'   gust = runif(10, 20, 50),
+#'   wind_speed = runif(10, 10, 25),
+#'   wave_height = runif(10, 2, 6)
+#' )
+#' create_plot_rogue_gusts_all(gusts)
+#' }
 #' @export
 create_plot_rogue_gusts_all <- function(rogue_gust_events) {
   if (is.null(rogue_gust_events) || nrow(rogue_gust_events) == 0) {
@@ -813,6 +973,17 @@ create_plot_rogue_gusts_all <- function(rogue_gust_events) {
 #' @param rogue_gust_events Data frame of rogue gust events
 #' @param date_caption Date range caption
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' gusts <- data.frame(
+#'   time = as.POSIXct("2024-01-01") + (1:10) * 3600,
+#'   station_id = rep(c("M2", "M3"), 5),
+#'   gust_ratio = runif(10, 1.5, 3.0),
+#'   gust = runif(10, 20, 50),
+#'   wind_speed = runif(10, 10, 25)
+#' )
+#' create_plot_rogue_gusts_by_station(gusts)
+#' }
 #' @export
 create_plot_rogue_gusts_by_station <- function(rogue_gust_events, date_caption = NULL) {
   if (is.null(rogue_gust_events) || nrow(rogue_gust_events) == 0) {
@@ -881,6 +1052,18 @@ create_plot_rogue_gusts_by_station <- function(rogue_gust_events, date_caption =
 #'
 #' @param analysis_data Full analysis data with both ratios computed
 #' @return plotly object
+#' @examples
+#' \dontrun{
+#' data <- data.frame(
+#'   time = as.POSIXct("2024-01-01") + (1:20) * 3600,
+#'   station_id = rep(c("M2", "M3"), 10),
+#'   gust = runif(20, 15, 50),
+#'   wind_speed = runif(20, 8, 25),
+#'   hmax = runif(20, 5, 15),
+#'   wave_height = runif(20, 2, 6)
+#' )
+#' create_plot_gusts_vs_waves(data)
+#' }
 #' @export
 create_plot_gusts_vs_waves <- function(analysis_data) {
   if (is.null(analysis_data)) {

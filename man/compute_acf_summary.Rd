@@ -20,3 +20,13 @@ A tibble with columns \code{lag} and \code{acf}.
 Computes autocorrelation function values and returns them as a tibble.
 Useful for examining temporal dependence structure in buoy data.
 }
+\examples{
+set.seed(1)
+data <- data.frame(
+  time = seq(as.POSIXct("2020-01-01"), by = "hour", length.out = 1000),
+  wave_height = 2 + sin(seq(0, 20, length.out = 1000)) + rnorm(1000, 0, 0.3)
+)
+acf_result <- compute_acf_summary(data)
+head(acf_result)
+
+}

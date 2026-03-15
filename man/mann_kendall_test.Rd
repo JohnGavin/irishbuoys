@@ -21,3 +21,13 @@ List with tau, p_value, and trend_direction ("increasing",
 Performs a non-parametric Mann-Kendall trend test on a time series variable.
 Uses Kendall's tau via \code{stats::cor.test(method = "kendall")}.
 }
+\examples{
+\dontrun{
+data <- data.frame(
+  time = seq(as.POSIXct("2020-01-01"), by = "day", length.out = 365),
+  wave_height = seq(2, 3, length.out = 365) + rnorm(365, 0, 0.2)
+)
+mann_kendall_test(data)
+}
+
+}

@@ -84,6 +84,22 @@ with columns: station, variable, return_period, return_level, lower, upper</p></
     <p>plotly object, or NULL if no data for the requested variable</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">rl_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  station <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M2"</span>, <span class="st">"M3"</span>, <span class="st">"M4"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  variable <span class="op">=</span> <span class="st">"avg_wave"</span>,</span></span>
+<span class="r-in"><span>  variable_label <span class="op">=</span> <span class="st">"Avg Wave Height (m)"</span>,</span></span>
+<span class="r-in"><span>  return_period <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">5</span>, <span class="fl">10</span><span class="op">)</span>, <span class="fl">3</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  return_level <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">9</span>, <span class="fl">4</span>, <span class="fl">12</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  lower <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">9</span>, <span class="fl">3</span>, <span class="fl">8</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  upper <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">9</span>, <span class="fl">9</span>, <span class="fl">16</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">create_plot_return_levels_per_station</span><span class="op">(</span><span class="va">rl_df</span>, <span class="st">"avg_wave"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

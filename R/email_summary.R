@@ -80,6 +80,12 @@ compute_data_coverage <- function(con, start_date, end_date) {
 #' @param max_stale_hours Maximum acceptable age of data in hours (default: 96)
 #'
 #' @return ingestion_stats (invisibly), or aborts if ALL stations are stale
+#' @examples
+#' stats <- tibble::tibble(
+#'   station_id = c("M2", "M3"),
+#'   latest = Sys.time() - c(1, 2) * 3600
+#' )
+#' validate_email_freshness(stats)
 #' @export
 validate_email_freshness <- function(ingestion_stats, max_stale_hours = 96) {
   if (is.null(ingestion_stats) || nrow(ingestion_stats) == 0) {

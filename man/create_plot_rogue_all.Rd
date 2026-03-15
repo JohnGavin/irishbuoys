@@ -15,3 +15,15 @@ plotly object
 \description{
 Create Rogue Wave All Stations Plot
 }
+\examples{
+\dontrun{
+rogue <- data.frame(
+  time = as.POSIXct("2024-01-01") + (1:10) * 3600,
+  station_id = rep(c("M2", "M3"), 5),
+  rogue_ratio = runif(10, 2.0, 2.5),
+  hmax = runif(10, 8, 15), wave_height = runif(10, 3, 6),
+  wind_speed = runif(10, 10, 30), gust = runif(10, 15, 45)
+)
+create_plot_rogue_all(rogue)
+}
+}

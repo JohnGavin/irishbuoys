@@ -16,3 +16,12 @@ Data frame comparing occurrence rates
 Compares the occurrence rates of rogue waves (Hmax/Hs > 2) and
 extreme gusts (gust/wind > 2.6).
 }
+\examples{
+data <- data.frame(
+  wave_height = c(3, 4, 5, 2.5),
+  hmax = c(5, 9, 8, 4),
+  wind_speed = c(10, 15, 20, 8),
+  gust = c(15, 40, 30, 12)
+)
+compare_rogue_wave_gust(data)
+}

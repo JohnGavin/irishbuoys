@@ -133,6 +133,16 @@ estimated as <code>n_exceed / n_total</code>.</p></dd>
 has an error or missing parameters.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>u <span class="op">=</span> <span class="fl">5.0</span>, scale <span class="op">=</span> <span class="fl">1.2</span>, shape <span class="op">=</span> <span class="fl">0.1</span>, n_exceed <span class="op">=</span> <span class="fl">500</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">calculate_gpd_return_levels</span><span class="op">(</span><span class="va">fit</span>, return_periods <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">50</span>, <span class="fl">100</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   return_period return_level lower upper threshold_value method</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1            10     20.75420    NA    NA               5    GPD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2            50     25.60060    NA    NA               5    GPD</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3           100     27.94046    NA    NA               5    GPD</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

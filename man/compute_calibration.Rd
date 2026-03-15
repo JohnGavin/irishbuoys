@@ -16,3 +16,14 @@ rolling_brier, n_total, n_resolved
 \description{
 Compute calibration metrics for predictions
 }
+\examples{
+preds <- tibble::tibble(
+  prediction_id = paste0("pred_", 1:5),
+  p_success = c(0.9, 0.7, 0.3, 0.8, 0.5),
+  outcome = c(TRUE, TRUE, FALSE, TRUE, FALSE),
+  outcome_binary = c(1, 1, 0, 1, 0),
+  recorded_at = as.character(Sys.time() - (5:1) * 86400)
+)
+cal <- compute_calibration(preds)
+cal$brier_score
+}

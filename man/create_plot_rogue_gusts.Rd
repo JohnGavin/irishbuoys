@@ -15,3 +15,19 @@ plotly object
 \description{
 Create Rogue Gusts by Station Plot
 }
+\examples{
+\dontrun{
+gust <- list(
+  rogue_gust_threshold = 1.5,
+  by_station = data.frame(
+    station_id = c("M2", "M3", "M4"),
+    n = c(1000, 800, 600),
+    n_rogue = c(15, 12, 8),
+    pct_rogue = c(1.5, 1.5, 1.3),
+    mean_gf = c(1.25, 1.30, 1.22),
+    max_gf = c(2.8, 3.1, 2.5)
+  )
+)
+create_plot_rogue_gusts(gust)
+}
+}

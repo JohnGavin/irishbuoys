@@ -23,3 +23,14 @@ List with:
 \description{
 Calculates mean values by month and season for a variable.
 }
+\examples{
+set.seed(1)
+data <- data.frame(
+  time = seq(as.POSIXct("2020-01-01"), by = "hour", length.out = 1000),
+  wave_height = 2 + sin(seq(0, 20, length.out = 1000)) + rnorm(1000, 0, 0.3)
+)
+result <- calculate_seasonal_means(data)
+result$monthly
+result$seasonal
+
+}

@@ -13,6 +13,10 @@ A list with \verb{_meta} and \code{data} fields.
 Returns statistical methods documentation: thresholds, formulas,
 references. Pure function with no upstream target dependency.
 }
+\examples{
+methods <- generate_api_methods()
+names(methods)
+}
 \seealso{
 Other api: 
 \code{\link{api_plumber}},

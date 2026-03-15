@@ -36,3 +36,13 @@ List with:
 Uses one station to predict another at the optimal lag.
 Particularly useful for M6 (offshore) predicting coastal stations.
 }
+\examples{
+\dontrun{
+data <- data.frame(
+  time = rep(seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 200), 2),
+  station_id = rep(c("M6", "M2"), each = 200),
+  wave_height = c(rnorm(200, 3, 1), rnorm(200, 2.5, 0.8))
+)
+predict_station_lagged(data, "M6", "M2", lag_hours = 6)
+}
+}

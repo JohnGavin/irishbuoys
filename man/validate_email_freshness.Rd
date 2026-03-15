@@ -18,3 +18,10 @@ ingestion_stats (invisibly), or aborts if ALL stations are stale
 Checks that the latest observation timestamps in ingestion_stats
 are within an acceptable window of the current time.
 }
+\examples{
+stats <- tibble::tibble(
+  station_id = c("M2", "M3"),
+  latest = Sys.time() - c(1, 2) * 3600
+)
+validate_email_freshness(stats)
+}

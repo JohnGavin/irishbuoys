@@ -20,3 +20,8 @@ The input data frame with an additional \code{is_outlier} logical column.
 Identifies outliers using the interquartile range (IQR) method.
 Values beyond Q1 - multiplier\emph{IQR or Q3 + multiplier}IQR are flagged.
 }
+\examples{
+data <- data.frame(x = c(1:20, 100))
+detect_outliers_iqr(data, variable = "x")
+
+}

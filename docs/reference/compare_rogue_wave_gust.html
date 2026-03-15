@@ -14,7 +14,7 @@ main { padding-top: 1rem; }
 
     <a class="navbar-brand me-2" href="../index.html">irishbuoys</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,14 +26,14 @@ main { padding-top: 1rem; }
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Dashboards</h6></li>
-    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Buoys</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Analysis</h6></li>
+    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Buoys Explorer</a></li>
     <li><a class="dropdown-item" href="../articles/wave_analysis.html">Irish Buoys Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Monitoring</h6></li>
+    <li><h6 class="dropdown-header" data-toc-skip>API</h6></li>
+    <li><a class="dropdown-item" href="../articles/api-usage.html">Static Data API</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Data Quality</h6></li>
     <li><a class="dropdown-item" href="../articles/telemetry.html">Telemetry</a></li>
-    <li><a class="dropdown-item" href="../articles/debug.html">Debug</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -75,6 +75,20 @@ extreme gusts (gust/wind &gt; 2.6).</p>
     <p>Data frame comparing occurrence rates</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  wave_height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span>, <span class="fl">2.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  hmax <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">5</span>, <span class="fl">9</span>, <span class="fl">8</span>, <span class="fl">4</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  wind_speed <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">15</span>, <span class="fl">20</span>, <span class="fl">8</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  gust <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">15</span>, <span class="fl">40</span>, <span class="fl">30</span>, <span class="fl">12</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">compare_rogue_wave_gust</span><span class="op">(</span><span class="va">data</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   phenomenon      definition n_events n_eligible occurrence_pct</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Rogue Wave   Hmax/Hs &gt; 2.0        1          4             25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Rogue Gust Gust/Wind &gt; 2.6        1          4             25</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

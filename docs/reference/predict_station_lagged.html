@@ -14,7 +14,7 @@ main { padding-top: 1rem; }
 
     <a class="navbar-brand me-2" href="../index.html">irishbuoys</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -26,14 +26,14 @@ main { padding-top: 1rem; }
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Dashboards</h6></li>
-    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Buoys</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Analysis</h6></li>
+    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Buoys Explorer</a></li>
     <li><a class="dropdown-item" href="../articles/wave_analysis.html">Irish Buoys Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Monitoring</h6></li>
+    <li><h6 class="dropdown-header" data-toc-skip>API</h6></li>
+    <li><a class="dropdown-item" href="../articles/api-usage.html">Static Data API</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Data Quality</h6></li>
     <li><a class="dropdown-item" href="../articles/telemetry.html">Telemetry</a></li>
-    <li><a class="dropdown-item" href="../articles/debug.html">Debug</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
   </ul></li>
@@ -100,6 +100,18 @@ Particularly useful for M6 (offshore) predicting coastal stations.</p>
 <li><p>predictions: data frame with actual and predicted values</p></li>
 </ul></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2024-01-01"</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"hour"</span>, length.out <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  station_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"M6"</span>, <span class="st">"M2"</span><span class="op">)</span>, each <span class="op">=</span> <span class="fl">200</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  wave_height <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span>, <span class="fl">2.5</span>, <span class="fl">0.8</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">predict_station_lagged</span><span class="op">(</span><span class="va">data</span>, <span class="st">"M6"</span>, <span class="st">"M2"</span>, lag_hours <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

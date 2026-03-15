@@ -17,3 +17,13 @@ plotly object
 \description{
 Create Time of Day Bar Plot
 }
+\examples{
+\dontrun{
+conditions <- data.frame(
+  time = as.POSIXct("2024-01-01") + (1:20) * 3600,
+  time_of_day = rep(c("Morning", "Afternoon", "Evening", "Night"), 5),
+  rogue_ratio = runif(20, 2.0, 2.5)
+)
+create_plot_time_of_day(conditions)
+}
+}
