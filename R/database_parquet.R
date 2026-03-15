@@ -78,7 +78,7 @@ save_to_parquet <- function(
 
   # Ensure arrow is available
   if (!requireNamespace("arrow", quietly = TRUE)) {
-    stop("Package 'arrow' required for Parquet operations")
+    cli::cli_abort("Package {.pkg arrow} required for Parquet operations.")
   }
 
   # Add partition columns if needed
@@ -410,7 +410,7 @@ convert_duckdb_to_parquet <- function(
 ) {
 
   if (!file.exists(db_path)) {
-    stop("Database file not found: ", db_path)
+    cli::cli_abort("Database file not found: {.path {db_path}}")
   }
 
   cli::cli_h1("Converting DuckDB to Parquet Format")
