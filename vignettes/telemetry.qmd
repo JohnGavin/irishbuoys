@@ -86,6 +86,17 @@ tryCatch({
   tar_load(table_telemetry_top_time)
   tar_load(table_telemetry_ci_workflows)
 
+  tar_load(telemetry_predictions_raw)
+  tar_load(telemetry_predictions_calibration)
+  tar_load(telemetry_predictions_summary)
+  tar_load(table_telemetry_predictions_all)
+  tar_load(table_telemetry_predictions_calibration)
+  tar_load(table_telemetry_predictions_summary)
+  tar_load(plot_telemetry_predictions_calibration)
+  tar_load(plot_telemetry_predictions_rolling_brier)
+  tar_load(plot_telemetry_predictions_outcomes)
+  tar_load(plot_telemetry_predictions_confidence_dist)
+
   targets_loaded <- TRUE
 }, error = function(e) {
   targets_loaded <<- FALSE
@@ -517,6 +528,89 @@ if (exists("table_telemetry_llm_daily") && !is.null(table_telemetry_llm_daily)) 
 | Haiku 3.5 | $0.80/M | $4/M | $1/M | $0.08/M |
 
 Data source: Claude Code session files in `~/.claude/projects/`.
+
+:::
+
+## Prediction Tracking {#predictions}
+
+Calibration metrics for Claude Code probability assessments during development sessions.
+Brier score: 0 = perfect, 0.25 = uninformative baseline.
+
+### Summary {#prediction-summary}
+
+```{r}
+if (exists("table_telemetry_predictions_summary") && !is.null(table_telemetry_predictions_summary)) {
+  table_telemetry_predictions_summary
+} else {
+  not_available_msg("table_telemetry_predictions_summary")
+}
+```
+
+::: {.panel-tabset}
+
+### Calibration Curve {#calibration-curve}
+
+```{r}
+#| fig-height: 5
+if (exists("plot_telemetry_predictions_calibration") && !is.null(plot_telemetry_predictions_calibration)) {
+  plot_telemetry_predictions_calibration
+} else {
+  not_available_msg("plot_telemetry_predictions_calibration")
+}
+```
+
+### Rolling Brier Score {#rolling-brier}
+
+```{r}
+#| fig-height: 4
+if (exists("plot_telemetry_predictions_rolling_brier") && !is.null(plot_telemetry_predictions_rolling_brier)) {
+  plot_telemetry_predictions_rolling_brier
+} else {
+  not_available_msg("plot_telemetry_predictions_rolling_brier")
+}
+```
+
+### Outcome Distribution {#outcome-dist}
+
+```{r}
+#| fig-height: 4
+if (exists("plot_telemetry_predictions_outcomes") && !is.null(plot_telemetry_predictions_outcomes)) {
+  plot_telemetry_predictions_outcomes
+} else {
+  not_available_msg("plot_telemetry_predictions_outcomes")
+}
+```
+
+### Confidence Distribution {#confidence-dist}
+
+```{r}
+#| fig-height: 4
+if (exists("plot_telemetry_predictions_confidence_dist") && !is.null(plot_telemetry_predictions_confidence_dist)) {
+  plot_telemetry_predictions_confidence_dist
+} else {
+  not_available_msg("plot_telemetry_predictions_confidence_dist")
+}
+```
+
+### Full History {#prediction-history}
+
+```{r}
+if (exists("table_telemetry_predictions_all") && !is.null(table_telemetry_predictions_all)) {
+  table_telemetry_predictions_all
+} else {
+  not_available_msg("table_telemetry_predictions_all")
+}
+```
+
+### Calibration by Bucket {#calibration-buckets}
+
+```{r}
+if (exists("table_telemetry_predictions_calibration") && !is.null(table_telemetry_predictions_calibration)) {
+  table_telemetry_predictions_calibration
+} else {
+  not_available_msg("table_telemetry_predictions_calibration")
+}
+```
 
 :::
 
