@@ -28,3 +28,13 @@ List with:
 \description{
 Analyzes how often extreme events co-occur at multiple stations.
 }
+\examples{
+\dontrun{
+data <- data.frame(
+  time = rep(seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 100), 2),
+  station_id = rep(c("M2", "M3"), each = 100),
+  wave_height = c(rnorm(100, 3, 1), rnorm(100, 2.5, 0.8))
+)
+analyze_joint_extremes(data)
+}
+}

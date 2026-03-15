@@ -17,3 +17,15 @@ plotly object
 \description{
 Create Monthly Wave Height Bar Plot
 }
+\examples{
+\dontrun{
+seasonal <- list(
+  monthly = data.frame(
+    month_name = month.abb,
+    mean = runif(12, 1, 4),
+    sd = runif(12, 0.3, 1.0)
+  )
+)
+create_plot_monthly_wave(seasonal)
+}
+}

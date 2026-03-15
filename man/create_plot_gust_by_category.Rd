@@ -17,3 +17,17 @@ plotly object
 \description{
 Create Gust Factor by Category Plot
 }
+\examples{
+\dontrun{
+gust <- list(
+  by_station_category = data.frame(
+    station_id = rep(c("M2", "M3"), each = 3),
+    wind_category = rep(c("0-10", "10-20", "20+"), 2),
+    mean_gf = runif(6, 1.1, 1.8),
+    p95_gf = runif(6, 1.5, 2.5),
+    n = sample(50:500, 6)
+  )
+)
+create_plot_gust_by_category(gust)
+}
+}

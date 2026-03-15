@@ -50,4 +50,8 @@ return period in years.
 When shape is approximately zero, the exponential fallback is used:
 \deqn{z_T = u + \sigma \log(\lambda T)}
 }
+\examples{
+fit <- list(u = 5.0, scale = 1.2, shape = 0.1, n_exceed = 500)
+calculate_gpd_return_levels(fit, return_periods = c(10, 50, 100))
+}
 \concept{extreme-values}

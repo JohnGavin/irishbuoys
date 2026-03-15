@@ -19,3 +19,15 @@ Character string with formatted report
 \description{
 Generates a formatted summary of trend analysis results.
 }
+\examples{
+\dontrun{
+data <- data.frame(
+  time = seq(as.POSIXct("2015-01-01"), by = "hour", length.out = 5000),
+  wave_height = 2 + sin(seq(0, 40, length.out = 5000)) + rnorm(5000, 0, 0.3)
+)
+seasonal <- calculate_seasonal_means(data)
+annual <- calculate_annual_trends(data)
+trend_summary_report(seasonal, annual)
+}
+
+}

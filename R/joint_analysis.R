@@ -121,6 +121,15 @@ station_distance_matrix <- function(station_info = NULL) {
 #'   - max_correlation: correlation at optimal lag
 #'   - lag_hours: vector of lag values
 #'
+#' @examples
+#' \dontrun{
+#' data <- data.frame(
+#'   time = rep(seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 100), 2),
+#'   station_id = rep(c("M2", "M3"), each = 100),
+#'   wave_height = c(rnorm(100, 3, 1), rnorm(100, 2.5, 0.8))
+#' )
+#' cross_correlation_stations(data, "M2", "M3")
+#' }
 #' @export
 cross_correlation_stations <- function(
     data,
@@ -201,6 +210,15 @@ cross_correlation_stations <- function(
 #'   - max_correlation: correlation at optimal lag
 #'   - expected_lag: expected lag based on wave propagation (~30 km/h)
 #'
+#' @examples
+#' \dontrun{
+#' data <- data.frame(
+#'   time = rep(seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 100), 2),
+#'   station_id = rep(c("M2", "M3"), each = 100),
+#'   wave_height = c(rnorm(100, 3, 1), rnorm(100, 2.5, 0.8))
+#' )
+#' analyze_station_pairs(data)
+#' }
 #' @export
 analyze_station_pairs <- function(
     data,
@@ -258,6 +276,15 @@ analyze_station_pairs <- function(
 #'   - rmse: Root mean squared error
 #'   - predictions: data frame with actual and predicted values
 #'
+#' @examples
+#' \dontrun{
+#' data <- data.frame(
+#'   time = rep(seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 200), 2),
+#'   station_id = rep(c("M6", "M2"), each = 200),
+#'   wave_height = c(rnorm(200, 3, 1), rnorm(200, 2.5, 0.8))
+#' )
+#' predict_station_lagged(data, "M6", "M2", lag_hours = 6)
+#' }
 #' @export
 predict_station_lagged <- function(
     data,
@@ -448,6 +475,15 @@ fit_bivariate_copula <- function(
 #'   - conditional_probs: P(station j extreme | station i extreme)
 #'   - extreme_events: data frame of all extreme events
 #'
+#' @examples
+#' \dontrun{
+#' data <- data.frame(
+#'   time = rep(seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 100), 2),
+#'   station_id = rep(c("M2", "M3"), each = 100),
+#'   wave_height = c(rnorm(100, 3, 1), rnorm(100, 2.5, 0.8))
+#' )
+#' analyze_joint_extremes(data)
+#' }
 #' @export
 analyze_joint_extremes <- function(
     data,
@@ -531,6 +567,15 @@ analyze_joint_extremes <- function(
 #' @param variable Variable to analyze (default: "wave_height")
 #'
 #' @return List containing all joint analysis results
+#' @examples
+#' \dontrun{
+#' data <- data.frame(
+#'   time = rep(seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 100), 2),
+#'   station_id = rep(c("M2", "M3"), each = 100),
+#'   wave_height = c(rnorm(100, 3, 1), rnorm(100, 2.5, 0.8))
+#' )
+#' joint_analysis_summary(data)
+#' }
 #' @export
 joint_analysis_summary <- function(data, variable = "wave_height") {
   cli::cli_h1("Joint Distribution Analysis")

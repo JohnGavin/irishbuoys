@@ -17,3 +17,15 @@ plotly object
 \description{
 Create Monthly Wind Speed Bar Plot
 }
+\examples{
+\dontrun{
+seasonal <- list(
+  monthly = data.frame(
+    month_name = month.abb,
+    mean = runif(12, 5, 15),
+    sd = runif(12, 1, 4)
+  )
+)
+create_plot_monthly_wind(seasonal)
+}
+}

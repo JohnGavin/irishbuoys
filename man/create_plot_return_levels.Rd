@@ -23,3 +23,14 @@ plotly object
 \description{
 Create Return Levels Plot
 }
+\examples{
+\dontrun{
+rl <- data.frame(
+  return_period = c(1, 5, 10, 25, 50, 100),
+  return_level = c(5.2, 7.1, 8.3, 9.8, 11.0, 12.5),
+  lower = c(4.8, 6.3, 7.2, 8.1, 8.9, 9.6),
+  upper = c(5.6, 7.9, 9.4, 11.5, 13.1, 15.4)
+)
+create_plot_return_levels(rl, variable = "wave")
+}
+}

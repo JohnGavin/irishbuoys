@@ -17,3 +17,13 @@ plotly object
 \description{
 Create Week of Year Stacked Bar Plot
 }
+\examples{
+\dontrun{
+conditions <- data.frame(
+  time = as.POSIXct("2024-01-01") + (1:30) * 86400,
+  rogue_ratio = runif(30, 2.0, 2.5),
+  hmax = runif(30, 8, 15)
+)
+create_plot_week_of_year(conditions)
+}
+}

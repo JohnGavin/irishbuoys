@@ -18,3 +18,9 @@ Reads a project's prediction JSONL file and reconciles outcomes.
 When multiple records share the same \code{prediction_id}, the latest
 non-null outcome wins (allows appending outcome updates).
 }
+\examples{
+\dontrun{
+preds <- read_predictions("my-project-slug")
+head(preds)
+}
+}

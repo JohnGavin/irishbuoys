@@ -132,6 +132,16 @@ decompose_stl <- function(
 #'   - monthly: mean values by month
 #'   - seasonal: mean values by season (DJF, MAM, JJA, SON)
 #'
+#' @examples
+#' set.seed(1)
+#' data <- data.frame(
+#'   time = seq(as.POSIXct("2020-01-01"), by = "hour", length.out = 1000),
+#'   wave_height = 2 + sin(seq(0, 20, length.out = 1000)) + rnorm(1000, 0, 0.3)
+#' )
+#' result <- calculate_seasonal_means(data)
+#' result$monthly
+#' result$seasonal
+#'
 #' @export
 calculate_seasonal_means <- function(
     data,
@@ -225,6 +235,16 @@ calculate_seasonal_means <- function(
 #'   - trend_model: linear model for trend
 #'   - trend_per_decade: change per decade with significance
 #'
+#' @examples
+#' set.seed(1)
+#' data <- data.frame(
+#'   time = seq(as.POSIXct("2020-01-01"), by = "hour", length.out = 1000),
+#'   wave_height = 2 + sin(seq(0, 20, length.out = 1000)) + rnorm(1000, 0, 0.3)
+#' )
+#' result <- calculate_annual_trends(data)
+#' result$trend_per_decade
+#' result$p_value
+#'
 #' @export
 calculate_annual_trends <- function(
     data,
@@ -313,6 +333,16 @@ calculate_annual_trends <- function(
 #'   - seasonal_norms: monthly mean and sd used as baseline
 #'   - summary: count of anomalies by month
 #'
+#' @examples
+#' set.seed(1)
+#' data <- data.frame(
+#'   time = seq(as.POSIXct("2020-01-01"), by = "hour", length.out = 1000),
+#'   wave_height = 2 + sin(seq(0, 20, length.out = 1000)) + rnorm(1000, 0, 0.3)
+#' )
+#' result <- detect_anomalies(data)
+#' nrow(result$anomalies)
+#' result$summary
+#'
 #' @export
 detect_anomalies <- function(
     data,
@@ -390,6 +420,10 @@ detect_anomalies <- function(
 #'
 #' @return The input data frame with an additional `is_outlier` logical column.
 #'
+#' @examples
+#' data <- data.frame(x = c(1:20, 100))
+#' detect_outliers_iqr(data, variable = "x")
+#'
 #' @export
 detect_outliers_iqr <- function(data, variable = "wave_height", multiplier = 1.5) {
   values <- data[[variable]]
@@ -413,6 +447,15 @@ detect_outliers_iqr <- function(data, variable = "wave_height", multiplier = 1.5
 #'
 #' @return List with tau, p_value, and trend_direction ("increasing",
 #'   "decreasing", or "no trend").
+#'
+#' @examples
+#' \dontrun{
+#' data <- data.frame(
+#'   time = seq(as.POSIXct("2020-01-01"), by = "day", length.out = 365),
+#'   wave_height = seq(2, 3, length.out = 365) + rnorm(365, 0, 0.2)
+#' )
+#' mann_kendall_test(data)
+#' }
 #'
 #' @export
 mann_kendall_test <- function(data, variable = "wave_height", time_col = "time") {
@@ -457,6 +500,15 @@ mann_kendall_test <- function(data, variable = "wave_height", time_col = "time")
 #'
 #' @return A tibble with columns `lag` and `acf`.
 #'
+#' @examples
+#' set.seed(1)
+#' data <- data.frame(
+#'   time = seq(as.POSIXct("2020-01-01"), by = "hour", length.out = 1000),
+#'   wave_height = 2 + sin(seq(0, 20, length.out = 1000)) + rnorm(1000, 0, 0.3)
+#' )
+#' acf_result <- compute_acf_summary(data)
+#' head(acf_result)
+#'
 #' @export
 compute_acf_summary <- function(data, variable = "wave_height", max_lag = 48) {
   values <- data[[variable]]
@@ -484,6 +536,17 @@ compute_acf_summary <- function(data, variable = "wave_height", max_lag = 48) {
 #' @param anomalies Result from detect_anomalies (optional)
 #'
 #' @return Character string with formatted report
+#'
+#' @examples
+#' \dontrun{
+#' data <- data.frame(
+#'   time = seq(as.POSIXct("2015-01-01"), by = "hour", length.out = 5000),
+#'   wave_height = 2 + sin(seq(0, 40, length.out = 5000)) + rnorm(5000, 0, 0.3)
+#' )
+#' seasonal <- calculate_seasonal_means(data)
+#' annual <- calculate_annual_trends(data)
+#' trend_summary_report(seasonal, annual)
+#' }
 #'
 #' @export
 trend_summary_report <- function(

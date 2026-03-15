@@ -17,3 +17,15 @@ plotly object
 \description{
 Create Annual Trends Line Plot
 }
+\examples{
+\dontrun{
+trends <- list(
+  annual_stats = data.frame(
+    year = 2018:2024,
+    mean = runif(7, 1.5, 3.5),
+    sd = runif(7, 0.3, 1.0)
+  )
+)
+create_plot_annual_trends(trends)
+}
+}

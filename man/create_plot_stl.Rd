@@ -17,3 +17,17 @@ ggplot2 object
 \description{
 Create STL Decomposition Plot
 }
+\examples{
+\dontrun{
+stl_data <- list(
+  components = data.frame(
+    time = as.POSIXct("2024-01-01") + (1:100) * 86400,
+    original = sin(1:100 / 10) + rnorm(100, 0, 0.2) + 2,
+    seasonal = sin(1:100 / 10),
+    trend = seq(1.8, 2.2, length.out = 100),
+    remainder = rnorm(100, 0, 0.2)
+  )
+)
+create_plot_stl(stl_data)
+}
+}

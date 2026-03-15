@@ -21,3 +21,17 @@ Creates a horizontal dotplot showing GPD return levels by station for a
 given variable, with error bars for confidence intervals. Text labels
 at each point replace the legend for clarity.
 }
+\examples{
+\dontrun{
+rl_df <- data.frame(
+  station = rep(c("M2", "M3", "M4"), each = 3),
+  variable = "avg_wave",
+  variable_label = "Avg Wave Height (m)",
+  return_period = rep(c(1, 5, 10), 3),
+  return_level = runif(9, 4, 12),
+  lower = runif(9, 3, 8),
+  upper = runif(9, 9, 16)
+)
+create_plot_return_levels_per_station(rl_df, "avg_wave")
+}
+}

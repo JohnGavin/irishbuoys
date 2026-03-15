@@ -17,3 +17,11 @@ Data frame with additional columns: rogue_ratio, is_rogue, steepness, danger_lev
 \description{
 Adds calculated wave metrics including rogue wave flag and steepness.
 }
+\examples{
+data <- data.frame(
+  wave_height = c(2.5, 3.0, 1.8),
+  hmax = c(4.5, 6.5, 3.2),
+  wave_period = c(8, 10, 7)
+)
+add_wave_metrics(data)
+}

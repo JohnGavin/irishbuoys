@@ -390,6 +390,9 @@ create_return_level_plot_data <- function(
 #'   has an error or missing parameters.
 #'
 #' @family extreme-values
+#' @examples
+#' fit <- list(u = 5.0, scale = 1.2, shape = 0.1, n_exceed = 500)
+#' calculate_gpd_return_levels(fit, return_periods = c(10, 50, 100))
 #' @export
 calculate_gpd_return_levels <- function(
     gpd_fit,
@@ -661,6 +664,14 @@ analyze_gust_factor <- function(data, min_wind_speed = 5) {
 #'
 #' @return Data frame comparing occurrence rates
 #'
+#' @examples
+#' data <- data.frame(
+#'   wave_height = c(3, 4, 5, 2.5),
+#'   hmax = c(5, 9, 8, 4),
+#'   wind_speed = c(10, 15, 20, 8),
+#'   gust = c(15, 40, 30, 12)
+#' )
+#' compare_rogue_wave_gust(data)
 #' @export
 compare_rogue_wave_gust <- function(data) {
 

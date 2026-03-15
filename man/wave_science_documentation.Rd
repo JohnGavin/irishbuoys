@@ -13,3 +13,7 @@ Character string with markdown-formatted documentation
 Returns a comprehensive markdown document explaining wave measurement
 science, suitable for inclusion in vignettes.
 }
+\examples{
+docs <- wave_science_documentation()
+names(docs)
+}

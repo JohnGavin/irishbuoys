@@ -20,6 +20,14 @@ A list with \verb{_meta} and \code{data} fields.
 Returns cross-station correlation matrices for wave height,
 wind speed, and Hmax.
 }
+\examples{
+\dontrun{
+dm <- data.frame(station1 = "M2", station2 = "M3", distance_km = 150)
+cr <- data.frame(station1 = "M2", station2 = "M3", correlation = 0.85)
+ed <- data.frame(station1 = "M2", station2 = "M3", chi = 0.3)
+generate_api_spatial(dm, cr, ed)
+}
+}
 \seealso{
 Other api: 
 \code{\link{api_plumber}},

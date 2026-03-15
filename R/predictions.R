@@ -59,6 +59,11 @@ empty_predictions_tibble <- function() {
 #' @param project_slug Character project slug. If NULL, reads all files
 #'   in `~/.claude/predictions/`.
 #' @return Tibble of predictions with one row per unique prediction_id
+#' @examples
+#' \dontrun{
+#' preds <- read_predictions("my-project-slug")
+#' head(preds)
+#' }
 #' @export
 read_predictions <- function(project_slug = NULL) {
   if (is.null(project_slug)) {
@@ -131,6 +136,16 @@ read_single_jsonl <- function(path) {
 #' @param predictions Tibble from `read_predictions()`
 #' @return List with: brier_score, accuracy, calibration_by_bucket,
 #'   rolling_brier, n_total, n_resolved
+#' @examples
+#' preds <- tibble::tibble(
+#'   prediction_id = paste0("pred_", 1:5),
+#'   p_success = c(0.9, 0.7, 0.3, 0.8, 0.5),
+#'   outcome = c(TRUE, TRUE, FALSE, TRUE, FALSE),
+#'   outcome_binary = c(1, 1, 0, 1, 0),
+#'   recorded_at = as.character(Sys.time() - (5:1) * 86400)
+#' )
+#' cal <- compute_calibration(preds)
+#' cal$brier_score
 #' @export
 compute_calibration <- function(predictions) {
   empty_result <- list(

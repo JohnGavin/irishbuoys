@@ -32,3 +32,14 @@ List with:
 Identifies anomalous values using standard deviation thresholds
 relative to seasonal norms.
 }
+\examples{
+set.seed(1)
+data <- data.frame(
+  time = seq(as.POSIXct("2020-01-01"), by = "hour", length.out = 1000),
+  wave_height = 2 + sin(seq(0, 20, length.out = 1000)) + rnorm(1000, 0, 0.3)
+)
+result <- detect_anomalies(data)
+nrow(result$anomalies)
+result$summary
+
+}

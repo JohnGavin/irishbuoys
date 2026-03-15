@@ -513,6 +513,9 @@ REFERENCES
 #'
 #' @return Character string with markdown-formatted documentation
 #'
+#' @examples
+#' docs <- wave_science_documentation()
+#' names(docs)
 #' @export
 wave_science_documentation <- function() {
   doc <- paste0(

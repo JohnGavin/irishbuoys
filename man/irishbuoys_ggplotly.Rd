@@ -20,3 +20,10 @@ A styled plotly object
 Wrapper for ggplotly that applies the standard irishbuoys theme.
 Useful when converting ggplot2 plots to plotly.
 }
+\examples{
+\dontrun{
+p <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+  ggplot2::geom_point()
+irishbuoys_ggplotly(p)
+}
+}

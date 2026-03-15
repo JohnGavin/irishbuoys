@@ -488,6 +488,13 @@ generate_api_decomposition <- function(decomp_per_station) {
 #' @return A list with `_meta` and `data` fields.
 #'
 #' @family api
+#' @examples
+#' \dontrun{
+#' dm <- data.frame(station1 = "M2", station2 = "M3", distance_km = 150)
+#' cr <- data.frame(station1 = "M2", station2 = "M3", correlation = 0.85)
+#' ed <- data.frame(station1 = "M2", station2 = "M3", chi = 0.3)
+#' generate_api_spatial(dm, cr, ed)
+#' }
 #' @export
 generate_api_spatial <- function(pair_wave, pair_wind, pair_hmax) {
   round_pairs <- function(df) {
@@ -563,6 +570,9 @@ generate_api_gust_factors <- function(gust_analysis) {
 #' @return A list with `_meta` and `data` fields.
 #'
 #' @family api
+#' @examples
+#' methods <- generate_api_methods()
+#' names(methods)
 #' @export
 generate_api_methods <- function() {
   .api_wrap(
