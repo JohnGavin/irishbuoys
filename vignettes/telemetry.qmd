@@ -70,7 +70,6 @@ tryCatch({
   tar_load(table_telemetry_llm_daily)
   tar_load(table_telemetry_llm_by_model)
 
-  tar_load(plot_telemetry_coverage_timeline)
   tar_load(plot_telemetry_qc_trends)
   tar_load(plot_telemetry_rogue_frequency)
   tar_load(plot_telemetry_commit_frequency)
@@ -133,17 +132,6 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
 ## Data Coverage {#data-coverage}
 
 Station data availability and freshness across the full historical period (2019-present).
-
-### Coverage Timeline {#coverage-timeline}
-
-```{r}
-#| fig-height: 6
-if (exists("plot_telemetry_coverage_timeline") && !is.null(plot_telemetry_coverage_timeline)) {
-  plot_telemetry_coverage_timeline
-} else {
-  not_available_msg("plot_telemetry_coverage_timeline")
-}
-```
 
 ### Coverage by Station {#coverage-by-station}
 
