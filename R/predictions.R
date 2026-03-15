@@ -1,11 +1,18 @@
-#' Prediction Calibration Tracking
-#'
-#' @description
-#' Functions for reading prediction JSONL files, computing calibration metrics
-#' (Brier score, reliability diagrams), and storing to DuckDB.
-#'
-#' JSONL files live in `~/.claude/predictions/{project_slug}.jsonl` and are
-#' the source of truth. DuckDB tables are derived materialised copies.
+# Prediction Calibration Tracking
+#
+# Functions for reading prediction JSONL files, computing calibration metrics
+# (Brier score, reliability diagrams), and storing to DuckDB.
+#
+# JSONL files live in ~/.claude/predictions/{project_slug}.jsonl and are
+# the source of truth. DuckDB tables are derived materialised copies.
+
+# NSE global variables
+utils::globalVariables(c(
+  "prediction_id", "recorded_at", "project_slug", "project_name",
+  "task_type", "task_description", "approach_summary", "p_success",
+  "confidence_bucket", "outcome", "outcome_recorded_at", "outcome_notes",
+  "outcome_binary", "sq_error", "cumulative_brier", "predicted_success"
+))
 
 # ============================================================================
 # HELPERS
