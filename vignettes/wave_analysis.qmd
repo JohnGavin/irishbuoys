@@ -441,7 +441,6 @@ if (!is.null(analysis_summary) && "data_summary" %in% names(analysis_summary)) {
 
 ```{r key-metrics-table}
 #| echo: false
-#| results: asis
 # Build metrics table with hover tooltips linking to definitions
 metrics <- data.frame(
   metric = c(
@@ -471,14 +470,30 @@ metrics <- data.frame(
   units = c("count", "m", "ratio", "m", "m/s", "m/s", "count", "days", "date", "date"),
   stringsAsFactors = FALSE
 )
-# Render as HTML table so abbr tags work
-cat('<table class="table table-sm">\n<thead><tr><th>Metric</th><th style="text-align:right">Value</th><th>Units</th></tr></thead>\n<tbody>\n')
-for (i in seq_len(nrow(metrics))) {
-  cat(sprintf('<tr><td>%s</td><td style="text-align:right">%s</td><td>%s</td></tr>\n',
-              metrics$metric[i], metrics$value[i], metrics$units[i]))
-}
-cat('</tbody></table>\n')
-cat('<p><small>Hover over metric names for definitions. See <a href="#definitions">Reference</a> for full glossary.</small></p>\n')
+# Interactive DT table with caption, sortable columns, hover tooltips
+DT::datatable(
+  metrics,
+  caption = htmltools::tags$caption(
+    style = "caption-side: top; font-size: 1.1em; font-weight: bold;",
+    "Key Metrics — Rogue wave events, extremes, and analysis period. ",
+    "Hover over metric names for definitions. ",
+    "See ", htmltools::tags$a(href = "#definitions", "Reference"),
+    " for full glossary."
+  ),
+  escape = FALSE,
+  colnames = c("Metric", "Value", "Units"),
+  options = list(
+    dom = "t",
+    pageLength = 10,
+    ordering = TRUE,
+    columnDefs = list(
+      list(className = "dt-right", targets = 1)
+    )
+  ),
+  rownames = FALSE,
+  class = "display compact"
+) |>
+  DT::formatStyle(columns = seq_len(ncol(metrics)), `white-space` = "nowrap")
 ```
 
 *Analysis generated `r generated_time` using irishbuoys v`r pkg_version`*
