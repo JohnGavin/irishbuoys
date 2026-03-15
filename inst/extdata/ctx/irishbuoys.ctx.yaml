@@ -10,6 +10,22 @@ language: R
 description: Analyze Irish Weather Buoy Network Data
 ---
 kind: function
+name: read_predictions
+exported: true
+signature: read_predictions(project_slug = NULL)
+arguments:
+  project_slug: Character project slug.
+returns: Tibble of predictions with one row per unique prediction_id
+---
+kind: function
+name: compute_calibration
+exported: true
+signature: compute_calibration(predictions)
+arguments:
+  predictions: Tibble from read_predictions()
+returns: 'List with: brier_score, accuracy, calibration_by_bucket, rolling_brier, n_total, n_resolved'
+---
+kind: function
 name: wave_glossary
 exported: true
 signature: wave_glossary()
