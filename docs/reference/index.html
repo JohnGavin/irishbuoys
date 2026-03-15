@@ -12,7 +12,7 @@ main { padding-top: 1rem; }
 
     <a class="navbar-brand me-2" href="../index.html">irishbuoys</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,12 +24,13 @@ main { padding-top: 1rem; }
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>Dashboards</h6></li>
-    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Buoys</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Analysis</h6></li>
+    <li><a class="dropdown-item" href="../articles/dashboard_static.html">Irish Buoys Explorer</a></li>
     <li><a class="dropdown-item" href="../articles/wave_analysis.html">Irish Buoys Analysis</a></li>
     <li><hr class="dropdown-divider"></li>
-    <li><h6 class="dropdown-header" data-toc-skip>Monitoring</h6></li>
+    <li><h6 class="dropdown-header" data-toc-skip>API</h6></li>
+    <li><a class="dropdown-item" href="../articles/api-usage.html">Static Data API</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Data Quality</h6></li>
     <li><a class="dropdown-item" href="../articles/telemetry.html">Telemetry</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/index.html">More articles...</a></li>
@@ -291,6 +292,13 @@ main { padding-top: 1rem; }
 
         </dt>
         <dd>Get Rogue Wave Summary Report</dd>
+
+        <dt>
+
+          <code><a href="test_rogue_propagation.html">test_rogue_propagation()</a></code>
+
+        </dt>
+        <dd>Test Spatial Propagation of Rogue Wave Events</dd>
       </dl></div><div class="section level2">
       <h2 id="extreme-value-analysis">Extreme Value Analysis<a class="anchor" aria-label="anchor" href="#extreme-value-analysis"></a></h2>
 
@@ -324,10 +332,38 @@ main { padding-top: 1rem; }
 
         <dt>
 
+          <code><a href="calculate_gpd_return_levels.html">calculate_gpd_return_levels()</a></code>
+
+        </dt>
+        <dd>Calculate GPD Return Levels from Per-Station Fits</dd>
+
+        <dt>
+
           <code><a href="create_return_level_plot_data.html">create_return_level_plot_data()</a></code>
 
         </dt>
         <dd>Create Return Level Plot Data</dd>
+
+        <dt>
+
+          <code><a href="ci_bootstrap_return_levels.html">ci_bootstrap_return_levels()</a></code>
+
+        </dt>
+        <dd>Bootstrap Confidence Intervals for GPD Return Levels</dd>
+
+        <dt>
+
+          <code><a href="ci_order_statistics.html">ci_order_statistics()</a></code>
+
+        </dt>
+        <dd>Order-Statistics Confidence Intervals for Quantiles</dd>
+
+        <dt>
+
+          <code><a href="ci_parametric_bootstrap.html">ci_parametric_bootstrap()</a></code>
+
+        </dt>
+        <dd>Parametric Bootstrap CIs for GPD Return Levels</dd>
 
         <dt>
 
@@ -379,6 +415,20 @@ main { padding-top: 1rem; }
 
         </dt>
         <dd>Detect Anomalies</dd>
+
+        <dt>
+
+          <code><a href="compute_acf_summary.html">compute_acf_summary()</a></code>
+
+        </dt>
+        <dd>Compute ACF Summary</dd>
+
+        <dt>
+
+          <code><a href="mann_kendall_test.html">mann_kendall_test()</a></code>
+
+        </dt>
+        <dd>Mann-Kendall Trend Test</dd>
 
         <dt>
 
@@ -526,6 +576,13 @@ main { padding-top: 1rem; }
 
         <dt>
 
+          <code><a href="create_plot_return_levels_per_station.html">create_plot_return_levels_per_station()</a></code>
+
+        </dt>
+        <dd>Create Per-Station Return Levels Plot</dd>
+
+        <dt>
+
           <code><a href="create_plot_gust_by_category.html">create_plot_gust_by_category()</a></code>
 
         </dt>
@@ -595,6 +652,13 @@ main { padding-top: 1rem; }
 
         </dt>
         <dd>Generate and Send Summary Email</dd>
+
+        <dt>
+
+          <code><a href="validate_email_freshness.html">validate_email_freshness()</a></code>
+
+        </dt>
+        <dd>Validate Email Data Freshness</dd>
       </dl></div><div class="section level2">
       <h2 id="data-validation">Data Validation<a class="anchor" aria-label="anchor" href="#data-validation"></a></h2>
 
@@ -632,6 +696,20 @@ main { padding-top: 1rem; }
 
         </dt>
         <dd>Create a validation summary for the pipeline</dd>
+
+        <dt>
+
+          <code><a href="detect_outliers_iqr.html">detect_outliers_iqr()</a></code>
+
+        </dt>
+        <dd>Detect Outliers using IQR Method</dd>
+
+        <dt>
+
+          <code><a href="compute_data_coverage.html">compute_data_coverage()</a></code>
+
+        </dt>
+        <dd>Compute Data Coverage and Gaps</dd>
       </dl></div><div class="section level2">
       <h2 id="joint-analysis">Joint Analysis<a class="anchor" aria-label="anchor" href="#joint-analysis"></a></h2>
 
@@ -665,10 +743,24 @@ main { padding-top: 1rem; }
 
         <dt>
 
+          <code><a href="compute_extremal_dependence.html">compute_extremal_dependence()</a></code>
+
+        </dt>
+        <dd>Compute Pairwise Extremal Dependence Across Stations</dd>
+
+        <dt>
+
           <code><a href="fit_bivariate_copula.html">fit_bivariate_copula()</a></code>
 
         </dt>
         <dd>Fit Bivariate Copula for Joint Extremes</dd>
+
+        <dt>
+
+          <code><a href="fit_spatial_maxstable.html">fit_spatial_maxstable()</a></code>
+
+        </dt>
+        <dd>Fit a Max-Stable Process to Station Annual Maxima</dd>
 
         <dt>
 
@@ -704,6 +796,201 @@ main { padding-top: 1rem; }
 
         </dt>
         <dd>Calculate Distance Matrix Between All Stations</dd>
+      </dl></div><div class="section level2">
+      <h2 id="api">API<a class="anchor" aria-label="anchor" href="#api"></a></h2>
+
+      <div class="section-desc"><p>Functions for REST and static JSON API endpoints</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="api_plumber.html">api_plumber</a></code>
+
+        </dt>
+        <dd>Plumber API for irishbuoys</dd>
+
+        <dt>
+
+          <code><a href="api_static.html">api_static</a></code>
+
+        </dt>
+        <dd>Static API Generation Functions</dd>
+
+        <dt>
+
+          <code><a href="create_api_router.html">create_api_router()</a></code>
+
+        </dt>
+        <dd>Create the irishbuoys Plumber Router</dd>
+
+        <dt>
+
+          <code><a href="run_api.html">run_api()</a></code>
+
+        </dt>
+        <dd>Run the irishbuoys REST API</dd>
+
+        <dt>
+
+          <code><a href="generate_api_index.html">generate_api_index()</a></code>
+
+        </dt>
+        <dd>Generate API Index</dd>
+
+        <dt>
+
+          <code><a href="generate_api_latest.html">generate_api_latest()</a></code>
+
+        </dt>
+        <dd>Generate Latest Observations</dd>
+
+        <dt>
+
+          <code><a href="generate_api_status.html">generate_api_status()</a></code>
+
+        </dt>
+        <dd>Generate Station Status Endpoint</dd>
+
+        <dt>
+
+          <code><a href="generate_api_sources.html">generate_api_sources()</a></code>
+
+        </dt>
+        <dd>Generate Data Sources Endpoint</dd>
+
+        <dt>
+
+          <code><a href="generate_api_trends.html">generate_api_trends()</a></code>
+
+        </dt>
+        <dd>Generate Trends Endpoint</dd>
+
+        <dt>
+
+          <code><a href="generate_api_spatial.html">generate_api_spatial()</a></code>
+
+        </dt>
+        <dd>Generate Spatial Correlations Endpoint</dd>
+
+        <dt>
+
+          <code><a href="generate_api_extremes.html">generate_api_extremes()</a></code>
+
+        </dt>
+        <dd>Generate Extremes Endpoint</dd>
+
+        <dt>
+
+          <code><a href="generate_api_decomposition.html">generate_api_decomposition()</a></code>
+
+        </dt>
+        <dd>Generate Decomposition Endpoint</dd>
+
+        <dt>
+
+          <code><a href="generate_api_gust_factors.html">generate_api_gust_factors()</a></code>
+
+        </dt>
+        <dd>Generate Gust Factors Endpoint</dd>
+
+        <dt>
+
+          <code><a href="generate_api_methods.html">generate_api_methods()</a></code>
+
+        </dt>
+        <dd>Generate Methods Endpoint</dd>
+      </dl></div><div class="section level2">
+      <h2 id="storm-alerts">Storm Alerts<a class="anchor" aria-label="anchor" href="#storm-alerts"></a></h2>
+
+      <div class="section-desc"><p>Storm forecast monitoring and email alerts</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="send_storm_alert.html">send_storm_alert()</a></code>
+
+        </dt>
+        <dd>Send Storm Alert Email</dd>
+
+        <dt>
+
+          <code><a href="fetch_open_meteo_forecast.html">fetch_open_meteo_forecast()</a></code>
+
+        </dt>
+        <dd>Fetch Wind Forecast from Open-Meteo for a Single Station</dd>
+
+        <dt>
+
+          <code><a href="fetch_all_forecasts.html">fetch_all_forecasts()</a></code>
+
+        </dt>
+        <dd>Fetch Forecasts for All Buoy Stations</dd>
+
+        <dt>
+
+          <code><a href="detect_storm_events.html">detect_storm_events()</a></code>
+
+        </dt>
+        <dd>Detect Storm Events from Forecast Data</dd>
+
+        <dt>
+
+          <code><a href="create_storm_alert_email.html">create_storm_alert_email()</a></code>
+
+        </dt>
+        <dd>Create Storm Alert Email</dd>
+
+        <dt>
+
+          <code><a href="fetch_met_eireann_warnings.html">fetch_met_eireann_warnings()</a></code>
+
+        </dt>
+        <dd>Fetch Met Eireann Marine Warnings</dd>
+
+        <dt>
+
+          <code><a href="knots_to_beaufort.html">knots_to_beaufort()</a></code>
+
+        </dt>
+        <dd>Convert Wind Speed in Knots to Beaufort Scale</dd>
+
+        <dt>
+
+          <code><a href="beaufort_to_description.html">beaufort_to_description()</a></code>
+
+        </dt>
+        <dd>Convert Beaufort Number to Description</dd>
+      </dl></div><div class="section level2">
+      <h2 id="prediction-calibration">Prediction Calibration<a class="anchor" aria-label="anchor" href="#prediction-calibration"></a></h2>
+
+      <div class="section-desc"><p>Track and calibrate prediction accuracy</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="read_predictions.html">read_predictions()</a></code>
+
+        </dt>
+        <dd>Read and reconcile predictions from JSONL</dd>
+
+        <dt>
+
+          <code><a href="compute_calibration.html">compute_calibration()</a></code>
+
+        </dt>
+        <dd>Compute calibration metrics for predictions</dd>
       </dl></div><div class="section level2">
       <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a></h2>
 

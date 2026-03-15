@@ -105,6 +105,7 @@ reference:
       - calculate_wave_steepness
       - add_wave_metrics
       - rogue_wave_report
+      - test_rogue_propagation
 
   - title: "Extreme Value Analysis"
     desc: "Functions for fitting extreme value models"
@@ -112,7 +113,11 @@ reference:
       - fit_gev_annual_maxima
       - fit_gpd_threshold
       - calculate_return_levels
+      - calculate_gpd_return_levels
       - create_return_level_plot_data
+      - ci_bootstrap_return_levels
+      - ci_order_statistics
+      - ci_parametric_bootstrap
       - analyze_gust_factor
       - compare_rogue_wave_gust
 
@@ -123,6 +128,8 @@ reference:
       - calculate_seasonal_means
       - calculate_annual_trends
       - detect_anomalies
+      - compute_acf_summary
+      - mann_kendall_test
       - trend_summary_report
 
   - title: "Wave Modeling"
@@ -149,6 +156,7 @@ reference:
       - create_plot_monthly_wind
       - create_plot_annual_trends
       - create_plot_return_levels
+      - create_plot_return_levels_per_station
       - create_plot_gust_by_category
       - create_plot_rogue_gusts
       - create_plot_stl
@@ -162,6 +170,7 @@ reference:
       - generate_weekly_summary
       - create_email_summary
       - generate_and_send_summary
+      - validate_email_freshness
 
   - title: "Data Validation"
     desc: "Functions for validating data quality with pointblank"
@@ -170,6 +179,8 @@ reference:
       - validate_rogue_events
       - generate_validation_reports
       - create_validation_summary
+      - detect_outliers_iqr
+      - compute_data_coverage
 
   - title: "Joint Analysis"
     desc: "Functions for multi-station spatial analysis"
@@ -177,18 +188,32 @@ reference:
       - analyze_joint_extremes
       - analyze_station_pairs
       - cross_correlation_stations
+      - compute_extremal_dependence
       - fit_bivariate_copula
+      - fit_spatial_maxstable
       - get_station_info
       - haversine_distance
       - joint_analysis_summary
       - predict_station_lagged
       - station_distance_matrix
 
-  - title: "Static API"
-    desc: "Functions for generating static JSON API files"
+  - title: "API"
+    desc: "Functions for REST and static JSON API endpoints"
     contents:
+      - api_plumber
+      - api_static
+      - create_api_router
+      - run_api
       - generate_api_index
       - generate_api_latest
+      - generate_api_status
+      - generate_api_sources
+      - generate_api_trends
+      - generate_api_spatial
+      - generate_api_extremes
+      - generate_api_decomposition
+      - generate_api_gust_factors
+      - generate_api_methods
 
   - title: "Storm Alerts"
     desc: "Storm forecast monitoring and email alerts"
@@ -201,6 +226,12 @@ reference:
       - fetch_met_eireann_warnings
       - knots_to_beaufort
       - beaufort_to_description
+
+  - title: "Prediction Calibration"
+    desc: "Track and calibrate prediction accuracy"
+    contents:
+      - read_predictions
+      - compute_calibration
 
   - title: "Documentation"
     desc: "Data dictionary and variable documentation"
