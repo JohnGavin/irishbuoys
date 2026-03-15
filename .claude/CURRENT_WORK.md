@@ -10,33 +10,33 @@
    - `vignettes/telemetry.qmd` — Prediction Tracking section (7 subsections)
    - `~/.claude/hooks/record_prediction.sh` — CLI for recording predictions/outcomes
    - All 6 acceptance criteria verified, issue updated
-2. **9-step workflow completed**:
-   - `devtools::document()` — OK (new man pages for predictions exports)
+2. **9-step workflow completed** (×2):
+   - `devtools::document()` — OK
    - `pkgload::load_all()` — OK (132 exports)
-   - `devtools::test()` — **1071 passed**, 0 failed, 65 warned, 7 skipped
+   - `devtools::test()` — **1074 passed**, 0 failed, 65 warned, 7 skipped
    - `devtools::check()` — **0 errors, 0 warnings, 2 notes** (pre-existing)
    - `covr::package_coverage()` — **85.8%** overall coverage
    - `tar_validate()` — **299 targets** valid
-   - `tar_make(predictions)` — all 11 prediction targets built successfully
    - Committed and pushed
-3. **Test coverage improvements** (82.3% → 85.8%):
-   - `test-predictions.R` — 55 new tests
-   - `test-wave-model.R` — 29 new tests (prepare_wave_features)
-   - `test-coverage-boost.R` — 49 new tests targeting uncovered branches:
-     - `email_summary.R`: synthetic summary objects (week-over-week, staleness, coverage+gaps, extremes, missing_hours)
-     - `extreme_values.R`: GPD lambda paths (exceedance_rate, n_total), decluster=TRUE, single return period
-     - `validation.R`: create_validation_summary, generate_validation_reports
-     - `database_parquet.R`: incremental_update_parquet dedup branch
-     - `database.R`: load_to_duckdb with update_metadata=TRUE, log_update with notes
-   - Total: 473 test blocks, 1071 expectations
-4. **Defensive programming**:
-   - Converted 2 `stop()` → `cli::cli_abort()` in `database_parquet.R`
-   - Added `utils::globalVariables()` for predictions NSE
-   - Score: 100% (was 96.7%)
+3. **Test coverage improvements** (82.3% → 85.8%, Gold):
+   - `test-predictions.R` — 55 tests
+   - `test-wave-model.R` — 29 tests
+   - `test-coverage-boost.R` — 52 tests (email_summary, extreme_values, validation, database, database_parquet)
+   - Total: 1074 expectations
+4. **Email summary fixes** (closes #63):
+   - Extreme event values rounded to 1 decimal place
+   - Station statistics sorted by missing_hours desc, then max_wave_height desc
+   - Per-column formatting with vapply
 5. **CI fixes**:
-   - Created `data-freshness` label (freshness monitor was failing)
-   - Bumped `github-install-test` timeout 45→60min
-   - R-CMD-check passing (24 min), all other workflows green
+   - Root cause: `setup-r-dependencies` was installing all 34 Suggests (SpatialExtremes, copula, mev compile from source, ~30min)
+   - Fix: Replaced with direct `remotes::install_github(dependencies = "Imports")`
+   - Created `data-freshness` label
+6. **Website/pkgdown fixes**:
+   - Added 27 missing topics to `_pkgdown.yml` reference index
+   - Rebuilt reference pages (133 pages for 117 exports)
+   - New sections: Prediction Calibration, API (12 endpoints)
+7. **Git cleanup**:
+   - Removed `_targets/meta/meta` from git index (was tracked despite `.gitignore`)
 
 ### Quality Gate Score
 | Component | Score | Weight | Weighted |
@@ -47,31 +47,20 @@
 | Defensive | 100% | 15% | 15.0 |
 | **Total** | **95.7** | | **Gold** |
 
-### Coverage by File (lowest first)
-- 0.0% api_plumber.R (Plumber router — needs running server)
-- 3.8% erddap_client.R (network-dependent)
-- 20.3% update.R (DB-dependent)
-- 30.9% storm_alert.R (mostly network tests)
-- 61.3% joint_analysis.R (DB-dependent)
-- 75.8% spatial_maxstable.R
-- 80.0% validation.R
-- 83.3% predictions.R
-- 84.1% wave_model.R
-- 86.5% email_summary.R
-- 86.7% database_parquet.R
-- 89.5% extreme_values.R
-- 100.0% database.R
-
 ### CI Status
-- R-CMD-check: passing (24 min), 0E/0W/2N
-- github-install-test: timeout bumped to 60min
+- R-CMD-check: passing, 0E/0W/2N
+- github-install-test: reworked to skip setup-r-dependencies (monitoring)
 - Data Update / Storm Alert / R-universe: all passing
 - Data Freshness Monitor: fixed (label created)
 
 ### Known Issues
-- `wave_rf_model` (731MB) not committed — needs LFS or CI-only rebuild
-- `_targets/meta/meta` tracked by git despite `.gitignore` entry
+- `wave_rf_model` (731MB) in `_targets/objects/` — already gitignored, safe
+- github-install-test: `arrow`+`duckdb` compilation still slow even with Imports-only
 
 ### Next Steps
 - [x] Push coverage from 82.3% → 83.2% for Gold (achieved 85.8%)
-- [ ] Monitor github-install-test with 60min timeout
+- [x] Fix `_targets/meta/meta` tracked by git
+- [x] Fix email formatting (#63)
+- [x] Rebuild pkgdown with 27 missing reference topics
+- [ ] Monitor github-install-test with new direct-remotes approach
+- [ ] Render telemetry.qmd to update prediction tracking section on site
