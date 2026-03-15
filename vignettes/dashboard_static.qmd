@@ -4,164 +4,6 @@ format:
   dashboard:
     orientation: rows
     theme: cosmo
-    include-in-header:
-      - text: |
-          <style>
-          .fullscreen-overlay {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            z-index: 9999 !important;
-            background: rgba(0,0,0,0.95) !important;
-            padding: 20px !important;
-            overflow: auto !important;
-            cursor: zoom-out !important;
-            box-sizing: border-box !important;
-          }
-          .fullscreen-overlay .js-plotly-plot,
-          .fullscreen-overlay .plotly {
-            width: 100% !important;
-            height: calc(100vh - 40px) !important;
-          }
-          .fullscreen-overlay .datatables {
-            max-height: calc(100vh - 40px) !important;
-            overflow: auto !important;
-          }
-          .fullscreen-overlay .dygraph-label,
-          .fullscreen-overlay .dygraphs {
-            width: 100% !important;
-            height: calc(100vh - 40px) !important;
-          }
-          .cell-output-display:has(.js-plotly-plot),
-          .cell-output-display:has(.datatables),
-          .cell-output-display:has(.dygraphs) {
-            cursor: zoom-in;
-          }
-          /* Tab content: show full height, page scrolls instead of card body */
-          .card-body, .tab-content, .tab-pane {
-            overflow: visible !important;
-            max-height: none !important;
-          }
-          .tab-pane .cell-output-display {
-            overflow: visible !important;
-            max-height: none !important;
-          }
-          .tab-pane .datatables {
-            overflow: visible !important;
-            max-height: none !important;
-          }
-          /* Increase default plotly plot height */
-          .js-plotly-plot, .plotly {
-            min-height: 600px !important;
-          }
-          /* DT tables: remove internal scroll, show more content */
-          .dataTables_scrollBody {
-            max-height: none !important;
-            overflow: visible !important;
-          }
-          /* Cards expand to fit content */
-          .card, .card-body {
-            min-height: auto !important;
-            overflow: visible !important;
-            max-height: none !important;
-          }
-          /* White captions on dark theme */
-          caption, .table caption, table caption {
-            color: white !important;
-          }
-          </style>
-          <script>
-          document.addEventListener('click', function(e) {
-            var overlay = e.target.closest('.fullscreen-overlay');
-            if (overlay) {
-              overlay.classList.remove('fullscreen-overlay');
-              var plots = overlay.querySelectorAll('.js-plotly-plot');
-              plots.forEach(function(p) { if (window.Plotly) Plotly.Plots.resize(p); });
-              var dygraphs = overlay.querySelectorAll('.dygraph-graph');
-              dygraphs.forEach(function(d) { if (d.dygraph) d.dygraph.resize(); });
-              return;
-            }
-            // Walk to outermost .cell-output-display (includes caption)
-            var cell = e.target.closest('.cell-output-display');
-            if (!cell) return;
-            var parent = cell.parentElement ? cell.parentElement.closest('.cell-output-display') : null;
-            while (parent) {
-              if (parent.querySelector('.js-plotly-plot') || parent.querySelector('.datatables') || parent.querySelector('.dygraphs')) {
-                cell = parent;
-              }
-              parent = parent.parentElement ? parent.parentElement.closest('.cell-output-display') : null;
-            }
-            var hasPlot = cell.querySelector('.js-plotly-plot');
-            var hasTable = cell.querySelector('.datatables');
-            var hasDygraph = cell.querySelector('.dygraphs');
-            if (!hasPlot && !hasTable && !hasDygraph) return;
-            if (e.target.closest('.modebar')) return;
-            if (e.target.closest('.dygraph-rangesel-fgcanvas')) return;
-            cell.classList.add('fullscreen-overlay');
-            if (hasPlot && window.Plotly) {
-              setTimeout(function() { Plotly.Plots.resize(hasPlot); }, 100);
-            }
-            if (hasDygraph) {
-              var dg = cell.querySelector('.dygraph-graph');
-              if (dg && dg.dygraph) setTimeout(function() { dg.dygraph.resize(); }, 100);
-            }
-          });
-          // Y-axis auto-scale: recompute y-range when rangeslider changes x-range
-          (function() {
-            function attachAutoScale(plot) {
-              if (!plot.layout || !plot.layout.xaxis || !plot.layout.xaxis.rangeslider) return;
-              plot.on('plotly_relayout', function(ed) {
-                if (plot._yAutoScaling) return;
-                var xRange;
-                if (ed['xaxis.range[0]'] != null) {
-                  xRange = [ed['xaxis.range[0]'], ed['xaxis.range[1]']];
-                } else if (ed['xaxis.range']) {
-                  xRange = ed['xaxis.range'];
-                } else if (ed['xaxis.autorange']) {
-                  plot._yAutoScaling = true;
-                  Plotly.relayout(plot, {'yaxis.autorange': true}).then(function() {
-                    plot._yAutoScaling = false;
-                  });
-                  return;
-                } else {
-                  return;
-                }
-                var xMin = new Date(xRange[0]).getTime();
-                var xMax = new Date(xRange[1]).getTime();
-                if (isNaN(xMin) || isNaN(xMax)) return;
-                var yMin = Infinity, yMax = -Infinity;
-                plot.data.forEach(function(trace) {
-                  if (!trace.x || !trace.y) return;
-                  if (trace.x.length <= 3 && trace.mode === 'lines') return;
-                  for (var i = 0; i < trace.x.length; i++) {
-                    var t = new Date(trace.x[i]).getTime();
-                    if (t >= xMin && t <= xMax && trace.y[i] != null && isFinite(trace.y[i])) {
-                      if (trace.y[i] < yMin) yMin = trace.y[i];
-                      if (trace.y[i] > yMax) yMax = trace.y[i];
-                    }
-                  }
-                });
-                if (yMin !== Infinity && yMax !== -Infinity) {
-                  var pad = (yMax - yMin) * 0.05 || 0.1;
-                  plot._yAutoScaling = true;
-                  Plotly.relayout(plot, {'yaxis.range': [yMin - pad, yMax + pad]}).then(function() {
-                    plot._yAutoScaling = false;
-                  });
-                }
-              });
-            }
-            setTimeout(function() {
-              document.querySelectorAll('.js-plotly-plot').forEach(function(p) {
-                if (p.on && !p._yAutoScaleAttached) {
-                  p._yAutoScaleAttached = true;
-                  attachAutoScale(p);
-                }
-              });
-            }, 3000);
-          })();
-          </script>
 execute:
   echo: false
   warning: false
@@ -287,22 +129,15 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
     dyLegend(show = "always", width = 400)
 }
 
-# DT display helper (creates widget from pre-computed table, caption at top)
+# DT display helper (creates widget from pre-computed table)
 create_dt <- function(data, caption = "", time_width = "140px") {
   time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp", "datetime", "Time (UTC)", "First", "Last"))
 
-  # Force caption to top position with white text on dark theme
-  cap <- if (nzchar(caption)) {
-    htmltools::tags$caption(style = "caption-side: top; font-size: 0.9em; color: white;", caption)
-  } else {
-    NULL
-  }
-
   dt <- datatable(
-    data, caption = cap, filter = 'top', rownames = FALSE,
+    data, caption = caption, filter = 'top', rownames = FALSE,
     extensions = c('Buttons', 'FixedHeader'),
     options = list(
-      pageLength = 25, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
+      pageLength = 15, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
       order = list(list(0, 'desc')), scrollX = TRUE, fixedHeader = TRUE,
       columnDefs = if (length(time_cols) > 0) {
         list(list(width = time_width, targets = time_cols - 1))
@@ -311,11 +146,9 @@ create_dt <- function(data, caption = "", time_width = "140px") {
     class = 'cell-border stripe hover compact'
   )
 
-  # No text wrapping in any column — horizontal scroll preferred
-  dt <- dt %>% DT::formatStyle(columns = seq_len(ncol(data)), whiteSpace = 'nowrap')
-
   if (length(time_cols) > 0) {
-    dt <- dt %>% DT::formatStyle(columns = time_cols, fontSize = '10px')
+    dt <- dt %>%
+      DT::formatStyle(columns = time_cols, fontSize = '10px', whiteSpace = 'nowrap')
   }
   dt
 }
@@ -345,7 +178,7 @@ station_info <- data.frame(
 create_dygraph(buoy_hourly, "hmax", paste0("Max Wave (m) - Hourly Data (", date_caption, ")"))
 ```
 
-**Caption:** Time series of [Max Wave](#variable-definitions) (m) showing the tallest individual wave recorded during each hourly 17.5-min measurement window. **Hourly data (`r n_hourly_display` observations)** - no daily averaging to preserve full detail. The highest Max Wave (**`r max_hmax` m**) was recorded at **`r max_station_hmax`** on **`r max_hmax_date` UTC** (zoom to this date to see it). M6 (deep Atlantic, 3000m depth) typically shows larger waves due to open ocean exposure.
+**Caption:** Time series of [Max Wave](#reference) (m) showing the tallest individual wave recorded during each hourly 17.5-min measurement window. **Hourly data (`r n_hourly_display` observations)** - no daily averaging to preserve full detail. The highest Max Wave (**`r max_hmax` m**) was recorded at **`r max_station_hmax`** on **`r max_hmax_date` UTC** (zoom to this date to see it). M6 (deep Atlantic, 3000m depth) typically shows larger waves due to open ocean exposure.
 
 #### M2
 
@@ -382,7 +215,7 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "hmax", "Max Wave (m) - M5 H
 create_dygraph(get_station_data(buoy_hourly, "M6"), "hmax", "Max Wave (m) - M6 Hourly", by_station = FALSE)
 ```
 
-## Station Comparison
+## Station Comparison {height=35%}
 
 ### Max Wave Details {.tabset}
 
@@ -421,7 +254,7 @@ create_dt(dash_vignette_data_tables$hmax_data, paste0(
 create_dygraph(buoy_hourly, "wave_height", paste0("Signif Wave (m) - Hourly Data (", date_caption, ")"))
 ```
 
-**Caption:** Time series of [Signif Wave](#variable-definitions) (m) showing the mean of the highest 1/3 of waves measured during each hourly 17.5-min window. **Hourly data (`r n_hourly_display` observations)** - no daily averaging to preserve full detail. This metric smooths out individual wave variability while capturing sea state severity. Max Signif Wave: **`r max_signif` m** at **`r max_station_signif`** on **`r max_signif_date` UTC** (zoom to this date). Clear seasonal pattern with higher values in winter (Oct-Mar).
+**Caption:** Time series of [Signif Wave](#reference) (m) showing the mean of the highest 1/3 of waves measured during each hourly 17.5-min window. **Hourly data (`r n_hourly_display` observations)** - no daily averaging to preserve full detail. This metric smooths out individual wave variability while capturing sea state severity. Max Signif Wave: **`r max_signif` m** at **`r max_station_signif`** on **`r max_signif_date` UTC** (zoom to this date). Clear seasonal pattern with higher values in winter (Oct-Mar).
 
 #### M2
 
@@ -458,7 +291,7 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "wave_height", "Signif Wave 
 create_dygraph(get_station_data(buoy_hourly, "M6"), "wave_height", "Signif Wave (m) - M6 Hourly", by_station = FALSE)
 ```
 
-## Station Comparison
+## Station Comparison {height=35%}
 
 ### Signif Wave Details {.tabset}
 
@@ -496,7 +329,7 @@ create_dt(dash_vignette_data_tables$wave_data, paste0(
 create_dygraph(buoy_hourly, "wind_speed", paste0("Wind Speed (knots) - Hourly Data (", date_caption, ")"))
 ```
 
-**Caption:** Time series of [Wind Speed](#variable-definitions) (knots) showing the 10-minute average wind speed recorded each hour. **Hourly data (`r n_hourly_display` observations)** - no daily averaging to preserve full detail. Wind measurements are taken at ~3m above sea level. Gust speeds (not shown here) can be 40-60% higher. Strong correlation with [Signif Wave](#variable-definitions) (r = `r cor_wind_wave`).
+**Caption:** Time series of [Wind Speed](#reference) (knots) showing the 10-minute average wind speed recorded each hour. **Hourly data (`r n_hourly_display` observations)** - no daily averaging to preserve full detail. Wind measurements are taken at ~3m above sea level. Gust speeds (not shown here) can be 40-60% higher. Strong correlation with [Signif Wave](#reference) (r = `r cor_wind_wave`).
 
 #### M2
 
@@ -533,7 +366,7 @@ create_dygraph(get_station_data(buoy_hourly, "M5"), "wind_speed", "Wind Speed (k
 create_dygraph(get_station_data(buoy_hourly, "M6"), "wind_speed", "Wind Speed (kn) - M6 Hourly", by_station = FALSE)
 ```
 
-## Station Comparison
+## Station Comparison {height=35%}
 
 ### Wind Details {.tabset}
 
@@ -618,19 +451,14 @@ ggplotly(p, tooltip = "text") |>
     ),
     paper_bgcolor = "#B3B3B3",
     plot_bgcolor = "#B3B3B3",
-    legend = list(
-      orientation = "h", y = -0.15, x = 0.5, xanchor = "center",
-      font = list(color = "#1a1a1a", size = 12),
-      bgcolor = "rgba(179,179,179,0.9)", bordercolor = "#666666", borderwidth = 1
-    ),
-    margin = list(t = 80, b = 80),
+    margin = list(t = 80),
     hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
   )
 ```
 
 **Caption:** Wind Speed vs [Signif Wave](#variable-definitions) relationship for observations with **wind >20 knots** (strong wind conditions). Panels ordered by regression slope. The slope indicates wave height increase (m) per knot of wind. M6 (deep Atlantic) shows steepest slope due to unlimited fetch. Filtering for high winds focuses on storm conditions where wind-wave coupling is strongest.
 
-## Summary Statistics
+## Summary Statistics {height=25%}
 
 ### Wind-Wave Details {.tabset}
 
@@ -833,9 +661,9 @@ datatable(
 
 | Variable | Display Name | Units | Definition |
 |----------|--------------|-------|------------|
-| `hmax` | **Max Wave** | m | Tallest individual wave (crest-to-trough) during each [17.5-min hourly measurement window](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html){target="_blank"} |
-| `wave_height` | **Signif Wave** | m | Mean height of the highest 1/3 of waves (~35 of ~105 waves) during each 17.5-min hourly window. [NOAA definition](https://www.weather.gov/key/marine_sigwave){target="_blank"} |
-| `wave_period` | **Wave Period** | s | Average time between successive wave crests via [zero-crossing analysis](https://www.nortekgroup.com/knowledge-center/wiki/new-to-waves){target="_blank"} |
+| `hmax` | **Max Wave** | m | Tallest individual wave (crest-to-trough) during each [17.5-min hourly measurement window](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html) |
+| `wave_height` | **Signif Wave** | m | Mean height of the highest 1/3 of waves (~35 of ~105 waves) during each 17.5-min hourly window. [NOAA definition](https://www.weather.gov/key/marine_sigwave) |
+| `wave_period` | **Wave Period** | s | Average time between successive wave crests via [zero-crossing analysis](https://www.nortekgroup.com/knowledge-center/wiki/new-to-waves) |
 
 **Key distinction:** Max Wave is a single wave; Signif Wave is an average of the top ~35 waves (highest 1/3). Both come from the same 17.5-min measurement window each hour.
 
@@ -917,15 +745,15 @@ This dashboard uses "Signif Wave" and "Max Wave" consistently instead of technic
 
 ###### Measurement Window
 
-Each buoy samples the sea surface **once per hour**. At the top of each hour, a [**17.5-minute measurement period**](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html){target="_blank"} begins. During this window, the buoy measures approximately 105 individual wave heights (assuming ~10s wave period).
+Each buoy samples the sea surface **once per hour**. At the top of each hour, a [**17.5-minute measurement period**](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html) begins. During this window, the buoy measures approximately 105 individual wave heights (assuming ~10s wave period).
 
-**Sampling limitation:** The buoy does NOT measure continuously. Only the 17.5-min window is sampled; waves occurring in the remaining 42.5 minutes of each hour are not recorded. Source: [Marine Institute ERDDAP metadata](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html){target="_blank"} states *"The sensor measures this for 17.5 minutes and then takes an average."*
+**Sampling limitation:** The buoy does NOT measure continuously. Only the 17.5-min window is sampled; waves occurring in the remaining 42.5 minutes of each hour are not recorded. Source: [Marine Institute ERDDAP metadata](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html) states *"The sensor measures this for 17.5 minutes and then takes an average."*
 
 From this 17.5-min sample:
 
 1. Waves are sorted by height, tallest first
 2. **Max Wave**: The single tallest wave = `hmax`
-3. **Signif Wave**: Mean of the highest 1/3 (~35 waves) = `wave_height` ([NOAA definition](https://www.weather.gov/key/marine_sigwave){target="_blank"})
+3. **Signif Wave**: Mean of the highest 1/3 (~35 waves) = `wave_height` ([NOAA definition](https://www.weather.gov/key/marine_sigwave))
 
 Both Max Wave and Signif Wave come from the SAME 17.5-min window, reported at the same timestamp.
 
@@ -965,18 +793,18 @@ create_dt(station_info, paste0(
 
 **Primary Data:**
 
-- [Marine Institute Ireland](https://www.marine.ie/){target="_blank"} - Irish Weather Buoy Network operator
-- [ERDDAP Data Portal](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html){target="_blank"} - Access raw buoy data
-- [ERDDAP Metadata](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html){target="_blank"} - Dataset documentation
+- [Marine Institute Ireland](https://www.marine.ie/) - Irish Weather Buoy Network operator
+- [ERDDAP Data Portal](https://erddap.marine.ie/erddap/tabledap/IWBNetwork.html) - Access raw buoy data
+- [ERDDAP Metadata](https://erddap.marine.ie/erddap/info/IWBNetwork/index.html) - Dataset documentation
 
 **Reference Documentation:**
 
-- [NOAA Significant Wave Height Definition](https://www.weather.gov/key/marine_sigwave){target="_blank"}
-- [Nortek Wave Measurement Guide](https://www.nortekgroup.com/knowledge-center/wiki/new-to-waves){target="_blank"} - Zero-crossing analysis explanation
+- [NOAA Significant Wave Height Definition](https://www.weather.gov/key/marine_sigwave)
+- [Nortek Wave Measurement Guide](https://www.nortekgroup.com/knowledge-center/wiki/new-to-waves) - Zero-crossing analysis explanation
 
 **Code & Analysis:**
 
-- [irishbuoys R Package](https://github.com/JohnGavin/irishbuoys){target="_blank"} - Data processing and dashboard code
+- [irishbuoys R Package](https://github.com/JohnGavin/irishbuoys) - Data processing and dashboard code
 
 ---
 
@@ -1018,5 +846,5 @@ data_end_iso <- if (!is.null(sc$data_end_time)) {
 ---
 
 ::: {.callout-note appearance="minimal"}
-**Disclaimer:** `irishbuoys` is an independent open-source project ([website](https://johngavin.github.io/irishbuoys/){target="_blank"}, [GitHub](https://github.com/JohnGavin/irishbuoys){target="_blank"}). It is not affiliated with, endorsed by, or part of the [Marine Institute](https://www.marine.ie/){target="_blank"} or the Irish Weather Buoy Network. For official marine weather warnings, consult [Met Eireann](https://www.met.ie/warnings){target="_blank"}.
+**Disclaimer:** `irishbuoys` is an independent open-source project ([website](https://johngavin.github.io/irishbuoys/), [GitHub](https://github.com/JohnGavin/irishbuoys)). It is not affiliated with, endorsed by, or part of the [Marine Institute](https://www.marine.ie/) or the Irish Weather Buoy Network. For official marine weather warnings, consult [Met Eireann](https://www.met.ie/warnings).
 :::
