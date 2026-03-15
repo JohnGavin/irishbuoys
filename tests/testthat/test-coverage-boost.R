@@ -116,13 +116,13 @@ test_that("create_email_summary renders coverage section with gaps", {
   expect_match(html, "Significant Gaps")
 })
 
-test_that("create_email_summary renders extreme events table", {
+test_that("create_email_summary renders extreme events with rounded values", {
   summary_obj <- list(
     extreme_events = data.frame(
       station_id = "M2",
       time = as.character(Sys.time()),
       event_type = "wave_height",
-      value = 12.5,
+      value = 12.5678,
       stringsAsFactors = FALSE
     ),
     current_week = data.frame(
@@ -142,7 +142,52 @@ test_that("create_email_summary renders extreme events table", {
   email <- create_email_summary(summary_obj)
   html <- paste(as.character(email), collapse = "\n")
   expect_match(html, "Extreme Events")
-  expect_match(html, "12.5")
+  # Value rounded to 1 decimal place
+  expect_match(html, "12.6")
+  expect_no_match(html, "12.5678")
+})
+
+test_that("create_email_summary sorts stations by missing_hours then max_wave_height", {
+  summary_obj <- list(
+    extreme_events = data.frame(
+      station_id = character(0), time = as.POSIXct(character(0)),
+      event_type = character(0), value = numeric(0)
+    ),
+    current_week = data.frame(
+      station_id = c("M2", "M3", "M4"), n_observations = c(100L, 80L, 90L),
+      max_wave_height = c(5.2, 4.1, 7.0), avg_wave_height = c(2.1, 1.8, 3.0),
+      avg_wind_speed = c(12.3, 10.5, 15.0), avg_air_temp = c(10.1, 9.8, 8.5),
+      avg_sea_temp = c(11.5, 11.0, 10.5),
+      stringsAsFactors = FALSE
+    ),
+    data_coverage = list(
+      coverage = data.frame(
+        station_id = c("M2", "M3", "M4"),
+        expected_hours = c(168L, 168L, 168L),
+        actual_hours = c(160L, 100L, 100L),
+        coverage_pct = c(95.2, 59.5, 59.5),
+        missing_hours = c(8L, 68L, 68L),
+        stringsAsFactors = FALSE
+      ),
+      gaps = data.frame(
+        station_id = character(0), gap_start = as.POSIXct(character(0)),
+        gap_end = as.POSIXct(character(0)), gap_hours = numeric(0)
+      )
+    ),
+    ingestion_stats = NULL, db_stats = NULL, update_result = NULL,
+    report_date = Sys.Date(),
+    period = list(start = Sys.Date() - 7, end = Sys.Date() - 1),
+    week_over_week = NULL
+  )
+  email <- create_email_summary(summary_obj)
+  html <- paste(as.character(email), collapse = "\n")
+  # M3 and M4 both have 68 missing hours; M4 has higher max_wave (7.0 > 4.1)
+  # So order should be M4, M3, M2
+  m4_pos <- regexpr("Station M4", html)
+  m3_pos <- regexpr("Station M3", html)
+  m2_pos <- regexpr("Station M2", html)
+  expect_true(m4_pos < m3_pos)
+  expect_true(m3_pos < m2_pos)
 })
 
 test_that("create_email_summary renders station stats with missing_hours", {
