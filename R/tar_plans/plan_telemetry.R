@@ -606,33 +606,6 @@ plan_telemetry <- list(
   # PLOTS
   # ==========================================================================
 
-  # Station coverage timeline
-  targets::tar_target(
-    plot_telemetry_coverage_timeline,
-    {
-      data <- telemetry_station_coverage
-      if (nrow(data) == 0) return(NULL)
-
-      data |>
-        ggplot2::ggplot(ggplot2::aes(
-          x = station_id,
-          ymin = earliest_observation,
-          ymax = latest_observation,
-          color = station_id
-        )) +
-        ggplot2::geom_linerange(linewidth = 8) +
-        ggplot2::coord_flip() +
-        ggplot2::labs(
-          title = "Data Coverage by Station",
-          subtitle = "Time range of available observations",
-          x = "Station",
-          y = "Date"
-        ) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(legend.position = "none")
-    }
-  ),
-
   # QC trends plot (with seasonal coloring)
   targets::tar_target(
     plot_telemetry_qc_trends,
