@@ -345,13 +345,26 @@ create_email_summary <- function(summary) {
 
   # Format extreme events table
   extreme_text <- if (nrow(summary$extreme_events) > 0) {
+    evt <- summary$extreme_events
+    evt_rows <- paste(vapply(seq_len(nrow(evt)), function(i) {
+      row <- evt[i, ]
+      val <- tryCatch(
+        round(as.numeric(row$value), 1),
+        warning = function(w) row$value
+      )
+      paste0(
+        "<tr><td>", row$station_id, "</td>",
+        "<td>", row$time, "</td>",
+        "<td>", row$event_type, "</td>",
+        "<td>", val, "</td></tr>"
+      )
+    }, character(1)), collapse = "")
+
     paste0(
       "<h3>[!] Extreme Events This Week</h3>",
       "<table border='1' style='border-collapse: collapse;'>",
       "<tr><th>Station</th><th>Time</th><th>Event</th><th>Value</th></tr>",
-      paste(apply(summary$extreme_events, 1, function(row) {
-        paste0("<tr><td>", paste(row, collapse = "</td><td>"), "</td></tr>")
-      }), collapse = ""),
+      evt_rows,
       "</table>"
     )
   } else {
@@ -364,7 +377,7 @@ create_email_summary <- function(summary) {
       "coverage" %in% names(summary$data_coverage)) {
     cov_df <- summary$data_coverage$coverage[, c("station_id", "missing_hours")]
     stats_df <- merge(stats_df, cov_df, by = "station_id", all.x = TRUE)
-    stats_df <- stats_df[order(-stats_df$missing_hours), ]
+    stats_df <- stats_df[order(-stats_df$missing_hours, -stats_df$max_wave_height), ]
   } else if (nrow(stats_df) > 0) {
     stats_df$missing_hours <- NA_real_
   }
