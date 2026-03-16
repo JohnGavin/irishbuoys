@@ -141,8 +141,18 @@ create_dygraph <- function(data, variable = "wave_height", title = "", by_statio
 create_dt <- function(data, caption = "", time_width = "140px") {
   time_cols <- which(names(data) %in% c("time", "Time", "timestamp", "Timestamp", "datetime", "Time (UTC)", "First", "Last"))
 
+  # Caption at top with white text for dark theme
+  cap <- if (nzchar(caption)) {
+    htmltools::tags$caption(
+      style = "caption-side: top; font-size: 0.9em; color: white;",
+      caption
+    )
+  } else {
+    NULL
+  }
+
   dt <- datatable(
-    data, caption = caption, filter = 'top', rownames = FALSE,
+    data, caption = cap, filter = 'top', rownames = FALSE,
     extensions = c('Buttons', 'FixedHeader'),
     options = list(
       pageLength = 15, dom = 'Bfrtip', buttons = c('copy', 'csv', 'excel'),
