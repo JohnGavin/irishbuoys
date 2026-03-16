@@ -35,34 +35,15 @@ format:
           .cell-output-display:has(.datatables) {
             cursor: zoom-in;
           }
-          /* Tab content: show full height, page scrolls instead of card body */
-          .card-body, .tab-content, .tab-pane {
-            overflow: visible !important;
-            max-height: none !important;
+          /* Tab content: allow vertical scrolling so tables/plots aren't squashed.
+             MUST NOT use overflow:visible on .card-body — breaks dygraphs. */
+          .tab-pane {
+            overflow-y: auto !important;
+            max-height: 80vh;
           }
+          .tab-pane .datatables,
           .tab-pane .cell-output-display {
-            overflow: visible !important;
-            max-height: none !important;
-          }
-          /* DT tables inside tabs: no internal scroll, show all rows */
-          .tab-pane .datatables {
-            overflow: visible !important;
-            max-height: none !important;
-          }
-          /* Increase default plotly plot height */
-          .js-plotly-plot, .plotly {
-            min-height: 600px !important;
-          }
-          /* DT tables: remove internal scroll, show more content */
-          .dataTables_scrollBody {
-            max-height: none !important;
-            overflow: visible !important;
-          }
-          /* Cards expand to fit content */
-          .card, .card-body {
-            min-height: auto !important;
-            overflow: visible !important;
-            max-height: none !important;
+            overflow: auto !important;
           }
           /* White captions on dark theme */
           caption, .table caption, table caption {
