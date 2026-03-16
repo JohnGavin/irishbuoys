@@ -4,6 +4,14 @@ format:
   dashboard:
     orientation: rows
     theme: cosmo
+    include-in-header:
+      - text: |
+          <style>
+          /* White captions on dark theme */
+          caption, .table caption, table caption {
+            color: white !important;
+          }
+          </style>
 execute:
   echo: false
   warning: false
