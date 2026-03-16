@@ -11,6 +11,16 @@ format:
           caption, .table caption, table caption {
             color: white !important;
           }
+          /* Tab content: allow vertical scrolling so tables/plots aren't squashed.
+             MUST NOT use overflow:visible on .card-body — breaks dygraphs. */
+          .tab-pane {
+            overflow-y: auto !important;
+            max-height: 80vh;
+          }
+          .tab-pane .datatables,
+          .tab-pane .cell-output-display {
+            overflow: auto !important;
+          }
           /* Click-to-zoom fullscreen overlay */
           .fullscreen-overlay {
             position: fixed !important;
@@ -632,13 +642,12 @@ if (!is.null(rl_data)) {
 
 **GPD Return Level Methodology:**
 
-- **Method:** Generalized Pareto Distribution (GPD) via `mev::fit.gpd()`
+- **Method:** Generalized Pareto Distribution (GPD) via [`mev::fit.gpd()`](https://lbelzile.github.io/mev/)
 - **Threshold:** 95th percentile of each variable per station
 - **Variables:** Avg Wave (m), Rogue Wave (m), Avg Wind (kn), Wind Gust (kn)
 - **Return periods:** 1, 5, and 10 years
-- **Confidence intervals:** 95% via delta method
 
-For detailed methodology and threshold sensitivity analysis, see the [Wave Analysis](wave_analysis.html) vignette.
+For confidence intervals and threshold sensitivity analysis, see the [Wave Analysis](wave_analysis.html) vignette.
 
 # Data
 
