@@ -238,9 +238,11 @@ create_dt <- function(data, caption = "", time_width = "140px") {
     class = 'cell-border stripe hover compact'
   )
 
+  # No text wrapping in any column — horizontal scroll preferred
+  dt <- dt %>% DT::formatStyle(columns = seq_len(ncol(data)), whiteSpace = 'nowrap')
+
   if (length(time_cols) > 0) {
-    dt <- dt %>%
-      DT::formatStyle(columns = time_cols, fontSize = '10px', whiteSpace = 'nowrap')
+    dt <- dt %>% DT::formatStyle(columns = time_cols, fontSize = '10px')
   }
   dt
 }
