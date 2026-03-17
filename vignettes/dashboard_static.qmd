@@ -49,10 +49,15 @@ format:
             width: 100% !important;
             height: calc(100vh - 40px) !important;
           }
-          .cell-output-display:has(.js-plotly-plot),
-          .cell-output-display:has(.datatables),
-          .cell-output-display:has(.dygraphs) {
+          .card:has(.js-plotly-plot),
+          .card:has(.datatables),
+          .card:has(.dygraphs) {
             cursor: zoom-in;
+          }
+          /* Hide Quarto's inner expand button — keep only the outer card expand.
+             Our click-to-zoom JS handles fullscreen for the entire cell+caption. */
+          .cell-output-display .bslib-full-screen-enter {
+            display: none !important;
           }
           </style>
           <script>
@@ -67,31 +72,25 @@ format:
               dygraphs.forEach(function(d) { if (d.dygraph) d.dygraph.resize(); });
               return;
             }
-            // Walk to outermost .cell-output-display (includes caption)
-            var cell = e.target.closest('.cell-output-display');
-            if (!cell) return;
-            var parent = cell.parentElement ? cell.parentElement.closest('.cell-output-display') : null;
-            while (parent) {
-              if (parent.querySelector('.js-plotly-plot') || parent.querySelector('.datatables') || parent.querySelector('.dygraphs')) {
-                cell = parent;
-              }
-              parent = parent.parentElement ? parent.parentElement.closest('.cell-output-display') : null;
-            }
-            var hasPlot = cell.querySelector('.js-plotly-plot');
-            var hasTable = cell.querySelector('.datatables');
-            var hasDygraph = cell.querySelector('.dygraphs');
-            if (!hasPlot && !hasTable && !hasDygraph) return;
-            // Don't intercept plotly modebar or dygraph rangeslider clicks
+            // Don't intercept plotly modebar, dygraph rangeslider, or Quarto expand buttons
             if (e.target.closest('.modebar')) return;
             if (e.target.closest('.dygraph-rangesel-fgcanvas')) return;
             if (e.target.closest('.dygraph-rangesel-bgcanvas')) return;
             if (e.target.closest('.dygraph-rangesel-zoomhandle')) return;
-            cell.classList.add('fullscreen-overlay');
+            if (e.target.closest('.bslib-full-screen-enter')) return;
+            // Walk up to the .card element (includes title + caption + content)
+            var card = e.target.closest('.card');
+            if (!card) return;
+            var hasPlot = card.querySelector('.js-plotly-plot');
+            var hasTable = card.querySelector('.datatables');
+            var hasDygraph = card.querySelector('.dygraphs');
+            if (!hasPlot && !hasTable && !hasDygraph) return;
+            card.classList.add('fullscreen-overlay');
             if (hasPlot && window.Plotly) {
               setTimeout(function() { Plotly.Plots.resize(hasPlot); }, 100);
             }
             if (hasDygraph) {
-              var dg = cell.querySelector('.dygraph-graph');
+              var dg = card.querySelector('.dygraph-graph');
               if (dg && dg.dygraph) setTimeout(function() { dg.dygraph.resize(); }, 100);
             }
           });
@@ -528,7 +527,7 @@ p <- ggplot(plot_data, aes(x = wind_speed, y = wave_height)) +
                   "Signif Wave: ", round(wave_height, 2), " m<br>",
                   "Time: ", format(time, "%Y-%m-%d %H:%M"))
   ), color = "#00bfff", alpha = 0.7, size = 1.5) +
-  geom_smooth(method = "lm", se = TRUE, color = "#ff4444", linewidth = 1) +
+  geom_smooth(method = "lm", se = TRUE, color = "#ff4444", fill = "#ff444433", linewidth = 1) +
   facet_wrap(~station_label, ncol = 1) +
   labs(
     x = "Wind Speed (knots) - 10-min average",
@@ -536,27 +535,27 @@ p <- ggplot(plot_data, aes(x = wind_speed, y = wave_height)) +
   ) +
   theme_minimal(base_size = 12) +
   theme(
-    strip.text = element_text(face = "bold", size = 14, color = "#1a1a1a"),
-    strip.background = element_rect(fill = "#999999", color = NA),
-    panel.background = element_rect(fill = "#B3B3B3", color = NA),
-    plot.background = element_rect(fill = "#B3B3B3", color = NA),
-    panel.grid.major = element_line(color = "#666666", linewidth = 0.3),
-    panel.grid.minor = element_line(color = "#808080", linewidth = 0.1),
-    axis.text = element_text(color = "#1a1a1a"),
-    axis.title = element_text(color = "#1a1a1a")
+    strip.text = element_text(face = "bold", size = 14, color = "#ffffff"),
+    strip.background = element_rect(fill = "#333333", color = NA),
+    panel.background = element_rect(fill = "#1a1a1a", color = NA),
+    plot.background = element_rect(fill = "#1a1a1a", color = NA),
+    panel.grid.major = element_line(color = "rgba(255,255,255,0.2)", linewidth = 0.3),
+    panel.grid.minor = element_line(color = "rgba(255,255,255,0.1)", linewidth = 0.1),
+    axis.text = element_text(color = "#cccccc"),
+    axis.title = element_text(color = "#cccccc")
   )
 
 ggplotly(p, tooltip = "text") |>
   layout(
     title = list(
       text = paste0("Wind Speed vs Signif Wave (wind >20 kn, n=", format_k(n_strong_wind), ", ", date_caption, ")"),
-      font = list(size = 14, color = "#1a1a1a"),
+      font = list(size = 14, color = "#ffffff"),
       y = 0.98
     ),
-    paper_bgcolor = "#B3B3B3",
-    plot_bgcolor = "#B3B3B3",
+    paper_bgcolor = "#1a1a1a",
+    plot_bgcolor = "#1a1a1a",
     margin = list(t = 80),
-    hoverlabel = list(bgcolor = "white", font = list(color = "black", size = 12))
+    hoverlabel = list(bgcolor = "rgba(0,0,0,0.9)", font = list(color = "white", size = 12))
   )
 ```
 
