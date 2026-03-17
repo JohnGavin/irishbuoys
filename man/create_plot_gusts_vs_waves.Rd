@@ -15,3 +15,16 @@ plotly object
 \description{
 Create Rogue Gusts vs Rogue Waves Scatter Plot
 }
+\examples{
+\dontrun{
+data <- data.frame(
+  time = as.POSIXct("2024-01-01") + (1:20) * 3600,
+  station_id = rep(c("M2", "M3"), 10),
+  gust = runif(20, 15, 50),
+  wind_speed = runif(20, 8, 25),
+  hmax = runif(20, 5, 15),
+  wave_height = runif(20, 2, 6)
+)
+create_plot_gusts_vs_waves(data)
+}
+}

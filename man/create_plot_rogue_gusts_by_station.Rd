@@ -17,3 +17,15 @@ plotly object
 \description{
 Create Rogue Gusts By Station Subplot
 }
+\examples{
+\dontrun{
+gusts <- data.frame(
+  time = as.POSIXct("2024-01-01") + (1:10) * 3600,
+  station_id = rep(c("M2", "M3"), 5),
+  gust_ratio = runif(10, 1.5, 3.0),
+  gust = runif(10, 20, 50),
+  wind_speed = runif(10, 10, 25)
+)
+create_plot_rogue_gusts_by_station(gusts)
+}
+}
