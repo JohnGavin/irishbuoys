@@ -2,7 +2,7 @@
 #'
 #' @description
 #' Functions for fetching wind forecasts from Open-Meteo, detecting storm events,
-#' and sending email alerts when gale-force winds (Beaufort 8+) are forecast.
+#' and sending email alerts when strong gale winds (Beaufort 9+, >= 41 knots) are forecast.
 #'
 #' @name storm_alert
 #' @keywords internal
@@ -168,10 +168,10 @@ fetch_all_forecasts <- function(station_info = get_station_info(),
 #' @description
 #' Filters forecast data for wind speeds at or above the storm threshold.
 #' Threshold is resolved in order: `threshold_knots` parameter, then
-#' `STORM_ALERT_THRESHOLD_KNOTS` env var, then default of 34 knots (Beaufort 8).
+#' `STORM_ALERT_THRESHOLD_KNOTS` env var, then default of 41 knots (Beaufort 9).
 #'
 #' @param forecasts Tibble from [fetch_all_forecasts()] or [fetch_open_meteo_forecast()].
-#' @param threshold_knots Numeric threshold in knots (default NULL, uses env var or 34).
+#' @param threshold_knots Numeric threshold in knots (default NULL, uses env var or 41).
 #' @param use_gusts Logical; if TRUE (default), also flag rows where gusts exceed threshold.
 #'
 #' @return Tibble with columns: station_id, time, wind_speed_kn, wind_gust_kn,
@@ -200,20 +200,20 @@ detect_storm_events <- function(forecasts, threshold_knots = NULL,
 
   if (nrow(forecasts) == 0) return(empty_result)
 
-  # Resolve threshold: param > env var > default 34
+  # Resolve threshold: param > env var > default 41 (Beaufort 9, Strong Gale)
 
-if (is.null(threshold_knots)) {
+  if (is.null(threshold_knots)) {
     env_val <- Sys.getenv("STORM_ALERT_THRESHOLD_KNOTS", unset = "")
     if (nzchar(env_val)) {
       threshold_knots <- suppressWarnings(as.numeric(env_val))
       if (is.na(threshold_knots)) {
         cli::cli_warn(
-          "Invalid STORM_ALERT_THRESHOLD_KNOTS={.val {env_val}}, using default 34 knots"
+          "Invalid STORM_ALERT_THRESHOLD_KNOTS={.val {env_val}}, using default 41 knots"
         )
-        threshold_knots <- 34
+        threshold_knots <- 41
       }
     } else {
-      threshold_knots <- 34
+      threshold_knots <- 41
     }
   }
 
@@ -357,7 +357,7 @@ create_storm_alert_email <- function(storm_events,
   email_body <- paste0(
     "<div style='font-family:Arial,sans-serif;max-width:700px;margin:auto;'>",
     "<div style='background:#d32f2f;color:white;padding:16px;text-align:center;'>",
-    "<h1 style='margin:0;'>Storm Alert: Gale Force Winds Forecast</h1>",
+    "<h1 style='margin:0;'>Storm Alert: Strong Gale Force Winds Forecast</h1>",
     "<p style='margin:4px 0 0;font-size:1.2em;'>",
     "<a href='https://johngavin.github.io/irishbuoys/articles/dashboard_static.html' style='color:#ffcdd2;font-weight:bold;'>Dashboard</a>",
     " | <a href='https://johngavin.github.io/irishbuoys/articles/wave_analysis.html#rogue-waves' style='color:#ffcdd2;font-weight:bold;'>Rogue Waves</a>",
@@ -408,7 +408,7 @@ create_storm_alert_email <- function(storm_events,
     "(<a href='https://github.com/JohnGavin/irishbuoys'>source on GitHub</a>).<br>",
     "Forecast data: <a href='https://open-meteo.com/'>Open-Meteo</a> | ",
     "Buoy observations: <a href='https://erddap.marine.ie/'>Marine Institute ERDDAP</a><br>",
-    "Schedule: storm alerts daily at 08:00 UTC | buoy data updates Sundays at 02:00 UTC",
+    "Schedule: storm alerts daily at 08:00 UTC (Beaufort 9+ threshold) | buoy data updates every 6 hours",
     "</p>",
     "<p style='color:#999;font-size:0.8em;font-style:italic;'>",
     "Disclaimer: irishbuoys is an independent open-source project. ",
@@ -438,10 +438,10 @@ create_storm_alert_email <- function(storm_events,
 #'
 #' @description
 #' Main orchestrator: fetches forecasts, detects storms, and sends an email alert
-#' if gale-force winds are forecast. If no storms are detected, no email is sent.
+#' if strong gale winds (Beaufort 9+) are forecast. If no storms are detected, no email is sent.
 #' Uses the same Gmail SMTP pattern as the weekly email report.
 #'
-#' @param threshold_knots Numeric threshold in knots (default NULL, uses env var or 34).
+#' @param threshold_knots Numeric threshold in knots (default NULL, uses env var or 41).
 #' @param recipient Email recipient (default from `GMAIL_USERNAME` env var).
 #' @param sender Email sender (default from `GMAIL_USERNAME` env var).
 #' @param dry_run Logical; if TRUE, saves HTML preview to tempdir instead of sending.
