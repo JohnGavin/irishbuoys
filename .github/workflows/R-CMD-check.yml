@@ -83,7 +83,7 @@ jobs:
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
 
       - name: Install remotes
-        run: Rscript -e 'install.packages("remotes")'
+        run: Rscript -e 'install.packages("remotes", repos = "https://cloud.r-project.org")'
 
       - name: Test install from GitHub
         run: |
