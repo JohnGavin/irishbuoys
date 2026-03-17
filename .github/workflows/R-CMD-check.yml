@@ -85,12 +85,20 @@ jobs:
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
 
       - name: Install remotes
-        run: Rscript -e 'install.packages("remotes", repos = "https://cloud.r-project.org")'
+        run: |
+          Rscript -e '
+            # Use RSPM for pre-compiled Linux binaries (set by setup-r)
+            rspm <- Sys.getenv("RSPM", "https://cloud.r-project.org")
+            options(repos = c(CRAN = rspm))
+            install.packages("remotes")
+          '
 
       - name: Test install from GitHub
         run: |
           Rscript -e '
-            options(repos = c(CRAN = "https://cloud.r-project.org"))
+            # Use RSPM binaries — avoids compiling arrow/duckdb from source (~45min)
+            rspm <- Sys.getenv("RSPM", "https://cloud.r-project.org")
+            options(repos = c(CRAN = rspm))
             remotes::install_github(
               "${{ github.repository }}",
               ref = "${{ github.sha }}",
