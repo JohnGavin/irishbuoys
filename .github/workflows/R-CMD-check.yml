@@ -68,6 +68,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     needs: R-CMD-check
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v6
