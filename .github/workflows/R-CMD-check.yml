@@ -90,10 +90,12 @@ jobs:
       - name: Test install from GitHub
         run: |
           Rscript -e '
+            options(repos = c(CRAN = "https://cloud.r-project.org"))
             remotes::install_github(
               "${{ github.repository }}",
               ref = "${{ github.sha }}",
-              dependencies = "Imports"
+              dependencies = "Imports",
+              auth_token = Sys.getenv("GITHUB_PAT")
             )
             library(irishbuoys)
             cat("Version:", as.character(packageVersion("irishbuoys")), "\n")
