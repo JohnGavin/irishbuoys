@@ -43,3 +43,5 @@ _output/
 !docs/
 !docs/**
 .DS_Store
+tests/testthat/_problems/
+tests/testthat/testthat-problems.rds
