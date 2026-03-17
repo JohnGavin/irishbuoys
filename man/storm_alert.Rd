@@ -5,6 +5,6 @@
 \title{Storm Alert Functions}
 \description{
 Functions for fetching wind forecasts from Open-Meteo, detecting storm events,
-and sending email alerts when gale-force winds (Beaufort 8+) are forecast.
+and sending email alerts when strong gale winds (Beaufort 9+, >= 41 knots) are forecast.
 }
 \keyword{internal}

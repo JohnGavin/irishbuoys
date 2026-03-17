@@ -12,7 +12,7 @@ send_storm_alert(
 )
 }
 \arguments{
-\item{threshold_knots}{Numeric threshold in knots (default NULL, uses env var or 34).}
+\item{threshold_knots}{Numeric threshold in knots (default NULL, uses env var or 41).}
 
 \item{recipient}{Email recipient (default from \code{GMAIL_USERNAME} env var).}
 
@@ -26,7 +26,7 @@ n_storms, stations_affected, preview_file (if dry_run), error (if failed).
 }
 \description{
 Main orchestrator: fetches forecasts, detects storms, and sends an email alert
-if gale-force winds are forecast. If no storms are detected, no email is sent.
+if strong gale winds (Beaufort 9+) are forecast. If no storms are detected, no email is sent.
 Uses the same Gmail SMTP pattern as the weekly email report.
 }
 \examples{

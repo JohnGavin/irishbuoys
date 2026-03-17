@@ -123,7 +123,8 @@ if (exists("telemetry_summary") && !is.null(telemetry_summary)) {
     ),
     stringsAsFactors = FALSE
   )
-  knitr::kable(metrics, align = c("l", "r"))
+  knitr::kable(metrics, align = c("l", "r"),
+    caption = "Project Overview \u2014 key metrics including station count, observation totals, database size (MB), and coverage period. Source: DuckDB + git log.")
 } else {
   not_available_msg("telemetry_summary")
 }
@@ -208,7 +209,8 @@ if (exists("telemetry_db_file_size") && nrow(telemetry_db_file_size) > 0) {
               format(df$last_modified, "%Y-%m-%d %H:%M")),
     stringsAsFactors = FALSE
   )
-  knitr::kable(storage, align = c("l", "r"))
+  knitr::kable(storage, align = c("l", "r"),
+    caption = "DuckDB Storage \u2014 database file path, size (MB), and last modified timestamp.")
 } else {
   not_available_msg("telemetry_db_file_size")
 }
@@ -225,6 +227,10 @@ Targets pipeline status, timing metrics, and execution history.
 ```{r}
 if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$status_summary)) {
   DT::datatable(telemetry_pipeline_status$status_summary,
+    caption = htmltools::tags$caption(
+      style = "caption-side: top; font-size: 0.9em; color: white;",
+      "Pipeline Execution Status \u2014 target counts by status (completed/skipped/errored) per plan. Source: targets::tar_meta()."
+    ),
     extensions = "Buttons",
     options = list(dom = "Bfrtip", buttons = c("csv", "excel", "print"),
                    pageLength = 10, scrollX = TRUE),
@@ -250,7 +256,8 @@ if (exists("telemetry_pipeline_status") && !is.null(telemetry_pipeline_status$ti
     ),
     stringsAsFactors = FALSE
   )
-  knitr::kable(perf, align = c("l", "r"))
+  knitr::kable(perf, align = c("l", "r"),
+    caption = "Pipeline Performance \u2014 total runtime (seconds), average per target, slowest target, and last run timestamp.")
 } else {
   not_available_msg("telemetry_pipeline_status")
 }

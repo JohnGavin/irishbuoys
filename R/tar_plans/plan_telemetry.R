@@ -24,9 +24,17 @@
 #' @param pageLength Number of rows per page
 #' @noRd
 create_telemetry_dt <- function(data, caption = NULL, pageLength = 10) {
+  cap <- if (!is.null(caption) && nzchar(caption)) {
+    htmltools::tags$caption(
+      style = "caption-side: top; font-size: 0.9em; color: white;",
+      caption
+    )
+  } else {
+    NULL
+  }
   DT::datatable(
     data,
-    caption = caption,
+    caption = cap,
     extensions = "Buttons",
     options = list(
       dom = "Bfrtip",
@@ -565,7 +573,7 @@ plan_telemetry <- list(
     table_telemetry_station_coverage,
     create_telemetry_dt(
       telemetry_station_coverage,
-      caption = "Station Data Coverage Summary"
+      caption = "Station Data Coverage — observation count, date range, and completeness per station. Source: DuckDB buoy_data table."
     )
   ),
 
@@ -573,7 +581,7 @@ plan_telemetry <- list(
     table_telemetry_db_info,
     create_telemetry_dt(
       telemetry_db_info,
-      caption = "Database Tables"
+      caption = "DuckDB Tables — row counts and schema for buoy_data, stations, and update_log tables."
     )
   ),
 
@@ -581,7 +589,7 @@ plan_telemetry <- list(
     table_telemetry_freshness,
     create_telemetry_dt(
       telemetry_data_freshness,
-      caption = "Data Freshness by Station"
+      caption = "Data Freshness — latest observation timestamp per station. Staleness (hours) since most recent record. Alert if >18h."
     )
   ),
 
@@ -589,7 +597,7 @@ plan_telemetry <- list(
     table_telemetry_commits,
     create_telemetry_dt(
       telemetry_git_commits,
-      caption = "Recent Git Commits",
+      caption = "Recent Git Commits — author, message, and timestamp. Source: gert::git_log().",
       pageLength = 15
     )
   ),
@@ -598,7 +606,7 @@ plan_telemetry <- list(
     table_telemetry_file_types,
     create_telemetry_dt(
       telemetry_file_types,
-      caption = "Project File Types"
+      caption = "Project File Types — count and total lines of code by file extension (R, qmd, yml, etc.)."
     )
   ),
 
@@ -1029,7 +1037,7 @@ plan_telemetry <- list(
     table_telemetry_llm_summary,
     create_telemetry_dt(
       telemetry_llm_summary,
-      caption = "LLM Usage Summary (irishbuoys project)"
+      caption = "LLM Usage Summary — total tokens (input/output/cache), estimated cost (USD), and session count. Source: Claude Code JSONL logs."
     )
   ),
 
@@ -1041,7 +1049,7 @@ plan_telemetry <- list(
           estimated_cost_usd = round(estimated_cost_usd, 4),
           model = gsub("claude-", "", model)
         ),
-      caption = "Daily LLM Usage"
+      caption = "Daily LLM Usage — tokens and estimated cost (USD) per day by model. Cache tokens reduce costs via prompt caching."
     )
   ),
 
@@ -1052,7 +1060,7 @@ plan_telemetry <- list(
         dplyr::select(-model) |>
         dplyr::rename(model = model_clean) |>
         dplyr::mutate(total_cost = round(total_cost, 2)),
-      caption = "Usage by Model"
+      caption = "Usage by Claude Model — sessions, total tokens, and cost (USD) per model variant (opus, sonnet, haiku)."
     )
   ),
 
@@ -1147,7 +1155,7 @@ plan_telemetry <- list(
     table_telemetry_test_stats,
     create_telemetry_dt(
       telemetry_test_stats,
-      caption = "Test Files by Type"
+      caption = "Test Files by Type — file name, category (unit/adversarial/integration), test count, and expectation count per file."
     )
   ),
 
@@ -1157,7 +1165,10 @@ plan_telemetry <- list(
       data <- telemetry_test_summary
       DT::datatable(
         data,
-        caption = "Test Summary by Category",
+        caption = htmltools::tags$caption(
+          style = "caption-side: top; font-size: 0.9em; color: white;",
+          "Test Summary by Category \u2014 files, tests, expectations, and snapshot counts aggregated by test type. TOTAL row highlighted."
+        ),
         extensions = "Buttons",
         options = list(
           dom = "Bfrtip",
@@ -1212,7 +1223,7 @@ plan_telemetry <- list(
         ) |>
         create_telemetry_dt(
           caption = htmltools::tags$caption(
-            style = "caption-side: bottom; text-align: left;",
+            style = "caption-side: top; font-size: 0.9em; color: white;",
             "Weekly commit counts. ",
             "Columns: week start date, ISO week label, commit count, cumulative total. ",
             "Key: Shows development velocity over full project history. ",
@@ -1342,7 +1353,7 @@ plan_telemetry <- list(
       create_telemetry_dt(
         summary_df,
         caption = htmltools::tags$caption(
-          style = "caption-side: bottom; text-align: left;",
+          style = "caption-side: top; font-size: 0.9em; color: white;",
           "GitHub issues and pull requests summary. ",
           "Source: GitHub API via gh::gh(). ",
           "Fetched: ", format(ga$fetched_at, "%Y-%m-%d %H:%M UTC"), "."
@@ -1401,7 +1412,7 @@ plan_telemetry <- list(
     create_telemetry_dt(
       telemetry_codebase_metrics,
       caption = htmltools::tags$caption(
-        style = "caption-side: bottom; text-align: left;",
+        style = "caption-side: top; font-size: 0.9em; color: white;",
         "Codebase size and structure metrics. ",
         "LOC excludes blank lines and comments. ",
         "Exports counted from NAMESPACE file. ",
@@ -1438,7 +1449,7 @@ plan_telemetry <- list(
       create_telemetry_dt(
         top,
         caption = htmltools::tags$caption(
-          style = "caption-side: bottom; text-align: left;",
+          style = "caption-side: top; font-size: 0.9em; color: white;",
           "Top 5 targets by stored object size. ",
           "Columns: plan source, target name, human-readable size, size in MB. ",
           "Key: Largest targets dominate _targets/ storage. ",
@@ -1470,7 +1481,7 @@ plan_telemetry <- list(
       create_telemetry_dt(
         top,
         caption = htmltools::tags$caption(
-          style = "caption-side: bottom; text-align: left;",
+          style = "caption-side: top; font-size: 0.9em; color: white;",
           "Top 5 targets by computation time. ",
           "Columns: plan source, target name, human-readable duration, seconds. ",
           "Key: Slowest targets are optimization candidates. ",
@@ -1494,7 +1505,7 @@ plan_telemetry <- list(
       create_telemetry_dt(
         wf,
         caption = htmltools::tags$caption(
-          style = "caption-side: bottom; text-align: left;",
+          style = "caption-side: top; font-size: 0.9em; color: white;",
           "Recent CI workflow runs (last 5). ",
           "Columns: workflow name, conclusion/status, created timestamp. ",
           "Source: GitHub Actions API."

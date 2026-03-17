@@ -9,7 +9,7 @@ detect_storm_events(forecasts, threshold_knots = NULL, use_gusts = TRUE)
 \arguments{
 \item{forecasts}{Tibble from \code{\link[=fetch_all_forecasts]{fetch_all_forecasts()}} or \code{\link[=fetch_open_meteo_forecast]{fetch_open_meteo_forecast()}}.}
 
-\item{threshold_knots}{Numeric threshold in knots (default NULL, uses env var or 34).}
+\item{threshold_knots}{Numeric threshold in knots (default NULL, uses env var or 41).}
 
 \item{use_gusts}{Logical; if TRUE (default), also flag rows where gusts exceed threshold.}
 }
@@ -20,7 +20,7 @@ beaufort, description, is_gust_driven. Empty tibble if no storms detected.
 \description{
 Filters forecast data for wind speeds at or above the storm threshold.
 Threshold is resolved in order: \code{threshold_knots} parameter, then
-\code{STORM_ALERT_THRESHOLD_KNOTS} env var, then default of 34 knots (Beaufort 8).
+\code{STORM_ALERT_THRESHOLD_KNOTS} env var, then default of 41 knots (Beaufort 9).
 }
 \examples{
 forecasts <- tibble::tibble(

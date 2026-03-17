@@ -93,7 +93,7 @@ plan_predictions <- list(
           p_success, confidence_bucket, outcome, outcome_notes
         ) |>
         dplyr::arrange(dplyr::desc(recorded_at))
-      create_telemetry_dt(display, caption = "Prediction History")
+      create_telemetry_dt(display, caption = "Prediction History \u2014 all recorded predictions with probability (p_success), confidence bucket, and outcome. Source: ~/.claude/predictions/ JSONL.")
     }
   ),
 
@@ -109,7 +109,7 @@ plan_predictions <- list(
           mean_observed = sprintf("%.1f%%", mean_observed * 100),
           gap = sprintf("%+.1f pp", gap * 100)
         )
-      create_telemetry_dt(display, caption = "Calibration by Confidence Bucket")
+      create_telemetry_dt(display, caption = "Calibration by Confidence Bucket \u2014 mean predicted vs observed success rate per bucket (low/medium/high). Gap = predicted minus observed (positive = overconfident).")
     }
   ),
 
@@ -120,7 +120,7 @@ plan_predictions <- list(
       if (nrow(telemetry_predictions_summary) == 0) return(NULL)
       create_telemetry_dt(
         telemetry_predictions_summary,
-        caption = "Prediction Calibration Summary"
+        caption = "Prediction Calibration Summary \u2014 Brier score (0=perfect, 0.25=uninformative), accuracy at 0.5 threshold, and prediction counts."
       )
     }
   ),
