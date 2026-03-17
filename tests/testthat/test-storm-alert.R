@@ -98,7 +98,7 @@ test_that("detect_storm_events respects env var threshold", {
     expect_equal(nrow(result), 1)
   })
 
-  # Default (34 kn) — should not detect
+  # Default (41 kn) — should not detect (25 < 41)
   withr::with_envvar(c(STORM_ALERT_THRESHOLD_KNOTS = NA), {
     result <- detect_storm_events(forecasts)
     expect_equal(nrow(result), 0)
@@ -109,11 +109,11 @@ test_that("detect_storm_events handles invalid env var gracefully", {
   forecasts <- tibble::tibble(
     station_id = "M2",
     time = Sys.time() + 3600,
-    wind_speed_kn = 35,
-    wind_gust_kn = 40
+    wind_speed_kn = 45,
+    wind_gust_kn = 50
   )
 
-  # Invalid env var falls back to 34
+  # Invalid env var falls back to 41 (Beaufort 9)
   withr::with_envvar(c(STORM_ALERT_THRESHOLD_KNOTS = "not_a_number"), {
     expect_warning(
       detect_storm_events(forecasts),
@@ -121,7 +121,7 @@ test_that("detect_storm_events handles invalid env var gracefully", {
     )
     # Run again to check the actual result (warning already tested above)
     result <- suppressWarnings(detect_storm_events(forecasts))
-    expect_equal(nrow(result), 1)  # 35 >= 34 (default)
+    expect_equal(nrow(result), 1)  # 45 >= 41 (default)
   })
 })
 
