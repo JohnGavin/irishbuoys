@@ -392,6 +392,7 @@ test_that("generate_validation_reports creates HTML files", {
 
 test_that("incremental_update_parquet deduplicates on second call", {
   skip_if_not_installed("arrow")
+  skip_on_os("windows")  # Windows file locking prevents overwriting open parquet
   tmp <- tempfile("parquet_inc_dedup_")
   on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   dir.create(file.path(tmp, "by_year_month"), recursive = TRUE)
