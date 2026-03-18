@@ -278,10 +278,14 @@ fetch_met_eireann_warnings <- function(timeout = 10) {
 #' Create Storm Alert Email
 #'
 #' @description
-#' Composes an HTML email with storm event details for all affected stations.
+#' Composes an HTML email showing forecasts for ALL stations, with
+#' storm stations highlighted. Stations sorted by max Beaufort descending.
 #'
-#' @param storm_events Tibble from [detect_storm_events()].
+#' @param storm_events Tibble from [detect_storm_events()] (above-threshold events).
 #' @param station_info Data frame from [get_station_info()] (default).
+#' @param all_forecasts Full forecast tibble from [fetch_all_forecasts()] for all
+#'   stations (used to show context for calm stations). If NULL, only storm stations shown.
+#' @param threshold_knots Numeric threshold used for triggering (default 41).
 #' @param met_warnings Character vector from [fetch_met_eireann_warnings()], or NULL.
 #'
 #' @return A blastula email object.
@@ -298,43 +302,88 @@ fetch_met_eireann_warnings <- function(timeout = 10) {
 #' }
 create_storm_alert_email <- function(storm_events,
                                      station_info = get_station_info(),
+                                     all_forecasts = NULL,
+                                     threshold_knots = 41,
                                      met_warnings = NULL) {
   rlang::check_installed("blastula", reason = "to compose storm alert emails")
 
-  # Build per-station summary
-  station_summary <- storm_events |>
+  threshold_beaufort <- knots_to_beaufort(threshold_knots)
+  threshold_desc <- beaufort_to_description(threshold_beaufort)
+
+  # Build ALL-station summary from full forecasts (or fall back to storm_events only)
+  forecast_data <- if (!is.null(all_forecasts) && nrow(all_forecasts) > 0) {
+    all_forecasts
+  } else {
+    storm_events
+  }
+
+  station_summary <- forecast_data |>
+    dplyr::mutate(
+      beaufort = knots_to_beaufort(.data$wind_speed_kn)
+    ) |>
     dplyr::group_by(.data$station_id) |>
     dplyr::summarise(
-      first_storm = min(.data$time),
-      max_wind_kn = max(.data$wind_speed_kn),
-      max_gust_kn = max(.data$wind_gust_kn),
-      max_beaufort = max(.data$beaufort),
-      hours_affected = dplyr::n(),
+      max_wind_kn = max(.data$wind_speed_kn, na.rm = TRUE),
+      max_gust_kn = max(.data$wind_gust_kn, na.rm = TRUE),
+      max_beaufort = max(.data$beaufort, na.rm = TRUE),
       .groups = "drop"
     ) |>
     dplyr::left_join(
       station_info[, c("station_id", "location")],
       by = "station_id"
-    )
+    ) |>
+    dplyr::arrange(dplyr::desc(.data$max_beaufort), dplyr::desc(.data$max_gust_kn))
 
-  # Station table rows (avoid apply which coerces POSIXct)
+  # Mark which stations exceed the threshold
+  storm_station_ids <- unique(storm_events$station_id)
+  station_summary$exceeds_threshold <- station_summary$station_id %in% storm_station_ids
+
+  # Add storm-specific columns (first storm time, hours) for stations above threshold
+  storm_detail <- storm_events |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      first_storm = min(.data$time),
+      hours_affected = dplyr::n(),
+      .groups = "drop"
+    )
+  station_summary <- dplyr::left_join(station_summary, storm_detail, by = "station_id")
+
+  # Station table rows — ALL stations, storm rows highlighted
   table_rows <- paste(vapply(seq_len(nrow(station_summary)), function(i) {
     r <- station_summary[i, ]
-    bf_color <- if (r$max_beaufort >= 10) "color:darkred;" else "color:darkorange;"
+    is_storm <- isTRUE(r$exceeds_threshold)
+    row_bg <- if (is_storm) "background:#fff3cd;" else ""
+    name_style <- if (is_storm) "font-weight:bold;color:#d32f2f;" else ""
+    bf_color <- if (r$max_beaufort >= 10) {
+      "color:darkred;font-weight:bold;"
+    } else if (r$max_beaufort >= threshold_beaufort) {
+      "color:darkorange;font-weight:bold;"
+    } else {
+      "color:#666;"
+    }
+    first_storm_text <- if (is_storm && !is.na(r$first_storm)) {
+      format(r$first_storm, "%a %d %b %H:%M UTC")
+    } else {
+      "<span style='color:#999;'>—</span>"
+    }
+    hours_text <- if (is_storm && !is.na(r$hours_affected)) {
+      as.character(r$hours_affected)
+    } else {
+      "<span style='color:#999;'>0</span>"
+    }
     paste0(
-      "<tr>",
-      "<td style='padding:6px;border:1px solid #ddd;'><strong>", r$station_id, "</strong></td>",
+      "<tr style='", row_bg, "'>",
+      "<td style='padding:6px;border:1px solid #ddd;", name_style, "'>", r$station_id, "</td>",
       "<td style='padding:6px;border:1px solid #ddd;'>", r$location, "</td>",
-      "<td style='padding:6px;border:1px solid #ddd;'>",
-      format(r$first_storm, "%a %d %b %H:%M UTC"), "</td>",
+      "<td style='padding:6px;border:1px solid #ddd;'>", first_storm_text, "</td>",
       "<td style='padding:6px;border:1px solid #ddd;text-align:center;'>",
       round(r$max_wind_kn, 1), "</td>",
       "<td style='padding:6px;border:1px solid #ddd;text-align:center;'>",
       round(r$max_gust_kn, 1), "</td>",
-      "<td style='padding:6px;border:1px solid #ddd;text-align:center;font-weight:bold;",
+      "<td style='padding:6px;border:1px solid #ddd;text-align:center;",
       bf_color,
       "'>", r$max_beaufort, " (", beaufort_to_description(r$max_beaufort), ")</td>",
-      "<td style='padding:6px;border:1px solid #ddd;text-align:center;'>", r$hours_affected, "</td>",
+      "<td style='padding:6px;border:1px solid #ddd;text-align:center;'>", hours_text, "</td>",
       "</tr>"
     )
   }, character(1)), collapse = "")
@@ -351,6 +400,7 @@ create_storm_alert_email <- function(storm_events,
     ""
   }
 
+  n_storm_stations <- sum(station_summary$exceeds_threshold)
   n_stations <- nrow(station_summary)
   max_beaufort <- max(station_summary$max_beaufort)
 
@@ -365,7 +415,8 @@ create_storm_alert_email <- function(storm_events,
     " | <a href='https://github.com/JohnGavin/irishbuoys' style='color:#ffcdd2;'>GitHub</a>",
     "</p>",
     "<p style='margin:4px 0 0;font-size:1.1em;'>",
-    n_stations, " station", if (n_stations > 1) "s", " affected | ",
+    n_storm_stations, " of ", n_stations, " station",
+    if (n_stations > 1) "s", " above threshold | ",
     "Max Beaufort ", max_beaufort, " (",
     beaufort_to_description(max_beaufort), ")</p>",
     "</div>",
@@ -380,7 +431,8 @@ create_storm_alert_email <- function(storm_events,
     "<a href='https://en.wikipedia.org/wiki/Beaufort_scale'>Beaufort</a> ",
     "classifies sea state (8 = Gale, 10 = Storm, 12 = Hurricane Force).<br>\n",
     "This alert triggers when sustained wind or gusts reach ",
-    "<strong>Beaufort 8 (34 knots)</strong> or above.<br>\n",
+    "<strong>Beaufort ", threshold_beaufort, " (", threshold_knots, " knots)</strong> or above. ",
+    "Stations exceeding the threshold are highlighted.<br>\n",
     "Hours = forecast hours exceeding the threshold in the next 7 days.<br>\n",
     "Source: <a href='https://open-meteo.com/'>Open-Meteo</a> hourly forecasts.<br>\n",
     "Storm alerts run daily at 08:00 UTC; ",
@@ -464,6 +516,18 @@ send_storm_alert <- function(threshold_knots = NULL,
                              dry_run = FALSE) {
   cli::cli_h1("Storm Alert Check")
 
+  # Resolve threshold once: param > env var > default 41 (Beaufort 9)
+  if (is.null(threshold_knots)) {
+    env_val <- Sys.getenv("STORM_ALERT_THRESHOLD_KNOTS", unset = "")
+    if (nzchar(env_val)) {
+      threshold_knots <- suppressWarnings(as.numeric(env_val))
+      if (is.na(threshold_knots)) threshold_knots <- 41
+    } else {
+      threshold_knots <- 41
+    }
+  }
+  cli::cli_alert_info("Threshold: {threshold_knots} knots (Beaufort {knots_to_beaufort(threshold_knots)})")
+
   # Step 1: Fetch forecasts
   cli::cli_alert_info("Fetching forecasts for all stations...")
   forecasts <- fetch_all_forecasts()
@@ -474,7 +538,7 @@ send_storm_alert <- function(threshold_knots = NULL,
   }
   cli::cli_alert_success("Retrieved {nrow(forecasts)} forecast hours across {length(unique(forecasts$station_id))} stations")
 
-  # Step 2: Detect storms
+  # Step 2: Detect storms (threshold already resolved)
   storm_events <- detect_storm_events(forecasts, threshold_knots = threshold_knots)
 
   if (nrow(storm_events) == 0) {
@@ -491,9 +555,14 @@ send_storm_alert <- function(threshold_knots = NULL,
   # Step 3: Fetch Met Eireann warnings (best-effort)
   met_warnings <- fetch_met_eireann_warnings()
 
-  # Step 4: Create email
+  # Step 4: Create email (pass all forecasts for full station context)
   rlang::check_installed("blastula", reason = "to send storm alert emails")
-  email <- create_storm_alert_email(storm_events, met_warnings = met_warnings)
+  email <- create_storm_alert_email(
+    storm_events,
+    all_forecasts = forecasts,
+    threshold_knots = threshold_knots,
+    met_warnings = met_warnings
+  )
 
   subject <- paste0(
     "STORM ALERT: Beaufort ", max(storm_events$beaufort),
