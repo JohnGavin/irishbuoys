@@ -1,7 +1,7 @@
 name: Daily Storm Alert
 
 # Checks Open-Meteo wind forecasts for all Irish buoy stations.
-# Sends email alert ONLY when Beaufort 8+ (gale force) winds are forecast.
+# Sends email alert ONLY when Beaufort 9+ (strong gale) winds are forecast.
 # No email on calm days.
 #
 # When storms are detected, directly triggers the data update workflow
@@ -23,7 +23,7 @@ jobs:
     env:
       GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
       GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-      STORM_ALERT_THRESHOLD_KNOTS: '34'
+      STORM_ALERT_THRESHOLD_KNOTS: '41'
 
     steps:
       - uses: actions/checkout@v6
