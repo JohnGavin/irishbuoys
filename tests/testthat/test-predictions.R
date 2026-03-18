@@ -42,7 +42,8 @@ test_that("empty_predictions_tibble returns zero-row tibble with correct schema"
 test_that("prediction_jsonl_path constructs correct path", {
   path <- prediction_jsonl_path("my-project")
   expect_true(grepl("predictions/my-project\\.jsonl$", path))
-  expect_true(grepl("^\\/", path))  # absolute path
+  # Absolute path: starts with / on Unix or drive letter on Windows
+  expect_true(grepl("^\\/|^[A-Za-z]:", path))
 })
 
 # ===========================================================================
