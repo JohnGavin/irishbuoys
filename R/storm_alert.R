@@ -172,7 +172,8 @@ fetch_all_forecasts <- function(station_info = get_station_info(),
 #'
 #' @param forecasts Tibble from [fetch_all_forecasts()] or [fetch_open_meteo_forecast()].
 #' @param threshold_knots Numeric threshold in knots (default NULL, uses env var or 41).
-#' @param use_gusts Logical; if TRUE (default), also flag rows where gusts exceed threshold.
+#' @param use_gusts Logical; if TRUE, also flag rows where gusts exceed threshold.
+#'   Default FALSE — only sustained wind speed triggers alerts.
 #'
 #' @return Tibble with columns: station_id, time, wind_speed_kn, wind_gust_kn,
 #'   beaufort, description, is_gust_driven. Empty tibble if no storms detected.
@@ -187,7 +188,7 @@ fetch_all_forecasts <- function(station_info = get_station_info(),
 #' )
 #' detect_storm_events(forecasts)
 detect_storm_events <- function(forecasts, threshold_knots = NULL,
-                                use_gusts = TRUE) {
+                                use_gusts = FALSE) {
   empty_result <- tibble::tibble(
     station_id = character(),
     time = as.POSIXct(character()),
@@ -436,7 +437,7 @@ create_storm_alert_email <- function(storm_events,
     "Hours = forecast hours exceeding the threshold in the next 7 days.<br>\n",
     "Source: <a href='https://open-meteo.com/'>Open-Meteo</a> hourly forecasts.<br>\n",
     "Storm alerts run daily at 08:00 UTC; ",
-    "buoy observation data updates weekly (Sundays 02:00 UTC).",
+    "buoy observation data updates every 6 hours.",
     "</p>",
     "<table style='border-collapse:collapse;width:100%;'>",
     "<tr style='background:#f5f5f5;'>",
