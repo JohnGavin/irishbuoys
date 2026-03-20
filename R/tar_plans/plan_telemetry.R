@@ -24,7 +24,11 @@
 #' @param pageLength Number of rows per page
 #' @noRd
 create_telemetry_dt <- function(data, caption = NULL, pageLength = 10) {
-  cap <- if (!is.null(caption) && nzchar(caption)) {
+  cap <- if (inherits(caption, "shiny.tag")) {
+    # Already an htmltools tag (e.g., htmltools::tags$caption()) — use as-is
+    caption
+  } else if (!is.null(caption) && is.character(caption) && nzchar(caption)) {
+    # Plain string — wrap in styled caption tag
     htmltools::tags$caption(
       style = "caption-side: top; font-size: 0.9em; color: white;",
       caption
