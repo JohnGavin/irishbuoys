@@ -526,12 +526,19 @@ create_email_summary <- function(summary) {
     "<p><strong>Report Period:</strong> ",
     summary$period$start, " to ", summary$period$end, "</p>",
 
+    "<details open>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Data Ingestion</summary>",
     ingestion_text,
     db_totals_text,
+    "</details>",
 
+    "<details>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Data Coverage &amp; Gaps</summary>",
     coverage_text,
+    "</details>",
 
-    "<h2>Week-over-Week Changes</h2>",
+    "<details>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Week-over-Week Changes</summary>",
     if (!is.null(summary$week_over_week)) {
       paste0(
         "<table border='1' style='border-collapse: collapse;'>",
@@ -552,10 +559,17 @@ create_email_summary <- function(summary) {
       "<p>Previous week data not available for comparison.</p>"
     },
 
-    extreme_text,
+    "</details>",
 
-    "<h2>Station Statistics</h2>",
+    "<details>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Extreme Events</summary>",
+    extreme_text,
+    "</details>",
+
+    "<details>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Station Statistics</summary>",
     station_stats,
+    "</details>",
 
     "<hr>",
     "<p><small>Generated on ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), " by the ",
