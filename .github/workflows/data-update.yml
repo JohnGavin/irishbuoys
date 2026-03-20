@@ -174,9 +174,9 @@ jobs:
             max_age <- max(as.numeric(difftime(Sys.time(), stats\$latest, units = \"hours\")))
             cat(\"Max data age:\", round(max_age, 1), \"hours\\n\")
             # ERDDAP delayed mode has ~10h lag; with 6-hourly runs max expected ~16h.
-            # Use 36h hard threshold to allow for ERDDAP outages/delays.
+            # Warn at 36h, but do NOT abort — allow pipeline to recover from outages.
             if (max_age > 36) {
-              stop(\"STALE EMAIL DATA: \", round(max_age), \"h old (threshold: 36h)\")
+              warning(\"STALE EMAIL DATA: \", round(max_age), \"h old (threshold: 36h). Continuing to allow recovery.\")
             }
             if (max_age > 18) {
               warning(\"Email data is \", round(max_age), \"h old (> 18h, possible ERDDAP delay)\")
