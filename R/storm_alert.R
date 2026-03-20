@@ -392,10 +392,12 @@ create_storm_alert_email <- function(storm_events,
   # Met Eireann section
   met_section <- if (!is.null(met_warnings) && length(met_warnings) > 0) {
     paste0(
-      "<h2 style='color:#333;'>Met Eireann Marine Warnings</h2>",
+      "<details style='margin-top:20px;'>",
+      "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;color:#333;'>Met Eireann Marine Warnings</summary>",
       "<div style='background:#fff3cd;padding:12px;border-left:4px solid #ffc107;'>",
       paste0("<p>", met_warnings, "</p>", collapse = ""),
-      "</div>"
+      "</div>",
+      "</details>"
     )
   } else {
     ""
@@ -422,7 +424,8 @@ create_storm_alert_email <- function(storm_events,
     beaufort_to_description(max_beaufort), ")</p>",
     "</div>",
 
-    "<h2 style='color:#333;margin-top:20px;'>Station Summary</h2>",
+    "<details open style='margin-top:20px;'>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;color:#333;'>Station Summary</summary>",
     "<p style='color:#555;font-size:0.9em;margin-bottom:8px;'>",
     "Forecast wind conditions at ",
     "<a href='https://www.marine.ie/site-area/data-services/real-time-observations/irish-weather-buoy-network'>Irish Weather Buoy Network</a> ",
@@ -451,6 +454,7 @@ create_storm_alert_email <- function(storm_events,
     "</tr>",
     table_rows,
     "</table>",
+    "</details>",
 
     met_section,
 
