@@ -2,7 +2,7 @@
   "api": "irishbuoys",
   "version": "v1",
   "base_url": "https://johngavin.github.io/irishbuoys/api/v1/",
-  "updated_at": "2026-03-21T14:51:42Z",
+  "updated_at": "2026-03-21T18:49:54Z",
   "endpoints": [
     {
       "endpoint": "stations.json",

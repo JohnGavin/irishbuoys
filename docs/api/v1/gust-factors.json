@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-21T15:10:55Z",
+    "generated": "2026-03-21T19:09:31Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 256963
+        "value": 256971
       },
       {
         "statistic": "mean",
@@ -29,7 +29,7 @@
       },
       {
         "statistic": "p99",
-        "value": 1.7974
+        "value": 1.7973
       },
       {
         "statistic": "max",
@@ -7565,7 +7565,7 @@
       },
       {
         "station_id": "M4",
-        "n": 49636,
+        "n": 49640,
         "mean_gf": 1.3598,
         "median_gf": 1.3376,
         "sd_gf": 0.1273,
@@ -7589,7 +7589,7 @@
       },
       {
         "station_id": "M6",
-        "n": 55267,
+        "n": 55271,
         "mean_gf": 1.4148,
         "median_gf": 1.3854,
         "sd_gf": 0.1553,
