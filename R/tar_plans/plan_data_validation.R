@@ -55,13 +55,15 @@ plan_data_validation <- list(
           missing_hours = expected_hours - actual_hours
         )
 
-      # Fail if any station below abort threshold
+      # Warn (not abort) if any station below critical threshold.
+      # A single station ERDDAP outage should not block the entire pipeline.
       low_cov <- dplyr::filter(coverage, coverage_pct < MIN_COVERAGE_ABORT)
       if (nrow(low_cov) > 0) {
-        cli::cli_abort(c(
-          "x" = "Data validation FAILED: critically low temporal coverage",
+        cli::cli_warn(c(
+          "!" = "Critically low temporal coverage detected",
           "i" = "Stations below {MIN_COVERAGE_ABORT}%: {paste(low_cov$station_id, collapse = ', ')}",
-          "i" = "Expected {expected_hours} hourly observations per station"
+          "i" = "Expected {expected_hours} hourly observations per station",
+          "i" = "Pipeline continues with available data"
         ))
       }
 
