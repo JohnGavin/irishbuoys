@@ -349,9 +349,11 @@ generate_weekly_summary <- function(
 #' @export
 create_email_summary <- function(summary) {
 
-  # Format extreme events table
+  # Format extreme events table (top half, reverse time order)
   extreme_text <- if (nrow(summary$extreme_events) > 0) {
     evt <- summary$extreme_events
+    evt <- evt[order(evt$time, decreasing = TRUE), ]
+    evt <- utils::head(evt, ceiling(nrow(evt) / 2))
     evt_rows <- paste(vapply(seq_len(nrow(evt)), function(i) {
       row <- evt[i, ]
       val <- tryCatch(
@@ -367,7 +369,7 @@ create_email_summary <- function(summary) {
     }, character(1)), collapse = "")
 
     paste0(
-      "<h3>[!] Extreme Events This Week</h3>",
+      "<h3>Rogue and high waves (last week, reverse time order)</h3>",
       "<table border='1' style='border-collapse: collapse;'>",
       "<tr><th>Station</th><th>Time</th><th>Event</th><th>Value</th></tr>",
       evt_rows,
@@ -393,7 +395,19 @@ create_email_summary <- function(summary) {
   } else {
     paste(apply(stats_df, 1, function(row) {
     missing_li <- if (!is.na(row["missing_hours"])) {
-      paste0("<li>Missing Hours: ", row["missing_hours"], "</li>")
+      mh <- as.numeric(row["missing_hours"])
+      mh_style <- if (mh > 150) {
+        "color:#dc3545;font-size:1.4em;font-weight:bold;"
+      } else if (mh > 100) {
+        "color:#dc3545;font-size:1.2em;font-weight:bold;"
+      } else if (mh > 50) {
+        "color:#ff8800;font-size:1.1em;font-weight:bold;"
+      } else if (mh > 0) {
+        "color:#ffc107;font-weight:bold;"
+      } else {
+        "color:#28a745;"
+      }
+      paste0("<li style='", mh_style, "'>Missing Hours: ", row["missing_hours"], "</li>")
     } else {
       ""
     }
@@ -434,7 +448,6 @@ create_email_summary <- function(summary) {
 
     composed_ts <- format(ing$report_composed[1], "%Y-%m-%d %H:%M:%S %Z")
     paste0(
-      "<h2>Data Ingestion This Week</h2>",
       "<p><small>Report composed: <strong>", composed_ts, "</strong>. ",
       "Staleness = hours since latest observation. ",
       "<span style='color:#dc3545'>Alert</span> if &gt; 18h.</small></p>",
@@ -445,7 +458,7 @@ create_email_summary <- function(summary) {
       "</table>"
     )
   } else {
-    "<h2>Data Ingestion This Week</h2><p>No new records ingested.</p>"
+    "<p>No new records ingested.</p>"
   }
 
   # Format database totals
@@ -481,7 +494,6 @@ create_email_summary <- function(summary) {
     }, character(1)), collapse = "")
 
     cov_table <- paste0(
-      "<h2>Data Coverage &amp; Gaps</h2>",
       "<p><small>Coverage = distinct hours with observations / expected ",
       "<a href='https://en.wikipedia.org/wiki/Hourly'>hourly</a> observations. ",
       "Source: <a href='https://erddap.marine.ie/'>Marine Institute ERDDAP</a></small></p>",
@@ -522,12 +534,13 @@ create_email_summary <- function(summary) {
 
   # Create email body
   email_body <- paste0(
+    "<div style='font-size:18px;'>",
     "<h1>Irish Weather Buoy Network - Weekly Summary</h1>",
     "<p><strong>Report Period:</strong> ",
     summary$period$start, " to ", summary$period$end, "</p>",
 
     "<details open>",
-    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Data Ingestion</summary>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Data Ingestion This Week</summary>",
     ingestion_text,
     db_totals_text,
     "</details>",
@@ -562,7 +575,7 @@ create_email_summary <- function(summary) {
     "</details>",
 
     "<details>",
-    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Extreme Events</summary>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Rogue &amp; High Waves</summary>",
     extreme_text,
     "</details>",
 
@@ -571,6 +584,7 @@ create_email_summary <- function(summary) {
     station_stats,
     "</details>",
 
+    "</div>",
     "<hr>",
     "<p><small>Generated on ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), " by the ",
     "<a href='https://johngavin.github.io/irishbuoys/'>irishbuoys</a> R package ",
