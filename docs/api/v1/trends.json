@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-21T19:09:42Z",
+    "generated": "2026-03-22T03:13:23Z",
     "package_version": "0.2.0",
     "endpoint": "trends",
     "description": "Mann-Kendall trend tests and Sen's slope estimates per station/variable"
@@ -9,13 +9,13 @@
     "mann_kendall": {
       "M2": {
         "wave_height": {
-          "tau": 0.0553,
-          "p_value": 1.0454e-69,
+          "tau": 0.0549,
+          "p_value": 6.6484e-69,
           "trend_direction": "increasing"
         },
         "wind_speed": {
-          "tau": 0.0535,
-          "p_value": 1.6718e-67,
+          "tau": 0.0533,
+          "p_value": 5.0535e-67,
           "trend_direction": "increasing"
         }
       },
@@ -33,51 +33,51 @@
       },
       "M4": {
         "wave_height": {
-          "tau": 0.0308,
-          "p_value": 4.0505e-26,
+          "tau": 0.0309,
+          "p_value": 2.6635e-26,
           "trend_direction": "increasing"
         },
         "wind_speed": {
-          "tau": 0.0199,
-          "p_value": 1.1108e-11,
+          "tau": 0.0201,
+          "p_value": 7.3892e-12,
           "trend_direction": "increasing"
         }
       },
       "M5": {
         "wave_height": {
-          "tau": -0.0029,
-          "p_value": 0.2825,
+          "tau": -0.0031,
+          "p_value": 0.2481,
           "trend_direction": "no trend"
         },
         "wind_speed": {
-          "tau": -0.0038,
-          "p_value": 0.1547,
+          "tau": -0.0039,
+          "p_value": 0.1365,
           "trend_direction": "no trend"
         }
       },
       "M6": {
         "wave_height": {
-          "tau": 0.0311,
-          "p_value": 4.5156e-29,
+          "tau": 0.0312,
+          "p_value": 3.1556e-29,
           "trend_direction": "increasing"
         },
         "wind_speed": {
-          "tau": 0.0538,
-          "p_value": 4.0938e-83,
+          "tau": 0.0539,
+          "p_value": 2.0378e-83,
           "trend_direction": "increasing"
         }
       }
     },
     "annual_trends": {
       "wave": {
-        "trend_per_decade": -0.2331,
-        "p_value": 0.711,
-        "r_squared": 0.0208
+        "trend_per_decade": -0.2359,
+        "p_value": 0.7071,
+        "r_squared": 0.0214
       },
       "wind": {
-        "trend_per_decade": 0.3898,
-        "p_value": 0.8116,
-        "r_squared": 0.0087
+        "trend_per_decade": 0.382,
+        "p_value": 0.8149,
+        "r_squared": 0.0084
       }
     }
   }
