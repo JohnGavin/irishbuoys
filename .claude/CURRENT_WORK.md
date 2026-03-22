@@ -1,36 +1,39 @@
 # Current Work
 
 ## Branch: main
-## Last Session: 2026-03-20
+## Last Session: 2026-03-22
 
 ### What Was Done
-1. **4-day data-update outage fixed** (20 consecutive failures since March 18):
-   - Bug 1: `create_telemetry_dt()` — `nzchar()` on htmltools tag object returned length-3 vector → pipeline crash. Fixed: check `inherits(caption, "shiny.tag")` first.
-   - Bug 2: Freshness check `stop()` at 36h blocked recovery after pipeline fixed. Changed to `warning()` so pipeline can self-heal.
-   - Dashboard now current (2026-03-20)
+1. **Email formatting improvements**:
+   - Missing hours color-coded by severity (>150h large red, >100h red, >50h orange, >0h amber, 0 green)
+   - Extreme events renamed "Rogue and high waves (last week, reverse time order)", limited to top half
+   - Removed duplicate section headings (inner `<h2>` when `<details><summary>` already has title)
+   - Default email font size 18px
+   - Fixed test in both test-coverage-boost.R and test-adversarial-email.R
 
-2. **Collapsible email sections** (`<details>/<summary>`):
-   - Storm alert: Station Summary open, Met Eireann collapsed
-   - Weekly summary: Data Ingestion open, 4 other sections collapsed
-   - Fallback: Gmail strips `<details>`, shows all expanded
+2. **Data-update pipeline fix** (from previous session):
+   - M3 ERDDAP outage (<30% coverage) was aborting entire pipeline
+   - Changed `cli_abort()` → `cli_warn()` so pipeline continues with available stations
+   - Downgraded email freshness check from `stop()` → `warning()` for recovery
 
-3. **Storm alert gust fix** (previous session, verified):
-   - `use_gusts` default changed TRUE→FALSE
-   - `all_forecasts` passed to email for all-station table
-   - March 19/20 storm runs were cancelled; next run (tomorrow 08:00) will show all 5 stations
+3. **deslop skill installed** (global, ~/.claude/skills/deslop/):
+   - 10 core rules for removing AI writing patterns from prose
+   - 4 project-specific overrides: captions MUST have units/source, values MUST be dynamic in captions AND prose, code quality paramount, plain bullets allowed
+   - Reference catalogs: 215 phrases, 257 structures, 326 tropes, 179 examples
+   - New rule: `dynamic-prose-values` (mandatory, no exceptions)
+   - CLAUDE.md updated: 61 skills, new "Prose Quality" category
 
 ### CI Status
-- R-CMD-check: passing ✓
-- github-install-test: 2 min (RSPM) ✓
-- R-universe: all platforms passing ✓
-- Data Update: **passing again** ✓ (was broken 4 days)
-- Storm Alert: March 19/20 cancelled, fix deployed for next run
+- R-CMD-check: passing (after test fix for renamed heading)
+- github-install-test: transient GitHub API download failures
+- R-universe: all platforms passing
+- Data Update: passing (M3 outage handled gracefully)
 
 ### Quality Gate: Gold (95.7)
 - Coverage: 85.8%, Check: 0E/0W, Tests: 1074 pass
 
 ### Next Steps
-- [ ] Verify storm alert shows all 5 stations (tomorrow 08:00 UTC)
 - [ ] Add captions to api-usage.qmd (8 tables, 0 captions)
 - [ ] Add source attribution to all captions
+- [ ] Apply deslop skill to existing vignette prose
 - [ ] Open issues: #61 (Cancer InFocus), llm#46, llm#47
