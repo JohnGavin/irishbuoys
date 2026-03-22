@@ -141,7 +141,7 @@ test_that("create_email_summary renders extreme events with rounded values", {
   )
   email <- create_email_summary(summary_obj)
   html <- paste(as.character(email), collapse = "\n")
-  expect_match(html, "Extreme Events")
+  expect_match(html, "Rogue and high waves")
   # Value rounded to 1 decimal place
   expect_match(html, "12.6")
   expect_no_match(html, "12.5678")
