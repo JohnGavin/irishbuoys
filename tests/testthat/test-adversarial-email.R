@@ -325,7 +325,7 @@ test_that("create_email_summary: summary with extreme events", {
   email <- create_email_summary(summary)
   expect_s3_class(email, "email_message")
   email_html <- paste(as.character(email), collapse = "\n")
-  expect_match(email_html, "Extreme Events This Week")
+  expect_match(email_html, "Rogue and high waves")
   expect_match(email_html, "High Waves")
 })
 
