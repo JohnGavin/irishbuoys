@@ -1,4 +1,4 @@
-name: Data Update (6-hourly)
+name: Data Update (daily)
 
 # Incremental pipeline using targets-runs branch pattern
 # (inspired by https://github.com/b-rodrigues/nix_targets_pipeline)
@@ -12,9 +12,9 @@ name: Data Update (6-hourly)
 #   6. Save _targets/ state to targets-runs branch for next run
 #
 # Schedule:
-#   - Runs every 6 hours (0:00, 6:00, 12:00, 18:00 UTC)
+#   - Runs daily at 06:00 UTC
 #   - ERDDAP data is hourly with ~10h lag (data_mode=M / delayed mode)
-#   - 6-hourly runs keep the dashboard within ~16h of real-time
+#   - Daily runs keep the dashboard within ~30h of real-time
 #   - Also triggered by storm-alert.yml when storms are detected
 #   - Can always be triggered manually via workflow_dispatch
 #
@@ -22,7 +22,7 @@ name: Data Update (6-hourly)
 
 on:
   schedule:
-    - cron: '0 0,6,12,18 * * *'  # Every 6 hours
+    - cron: '0 6 * * *'  # Every 6 hours
   workflow_dispatch:
 
 permissions:
