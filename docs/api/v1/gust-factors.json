@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-22T19:11:34Z",
+    "generated": "2026-03-23T03:13:30Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 257013
+        "value": 257035
       },
       {
         "statistic": "mean",
@@ -21,15 +21,15 @@
       },
       {
         "statistic": "sd",
-        "value": 0.1361
+        "value": 0.1362
       },
       {
         "statistic": "p95",
-        "value": 1.5991
+        "value": 1.5999
       },
       {
         "statistic": "p99",
-        "value": 1.7974
+        "value": 1.7978
       },
       {
         "statistic": "max",
@@ -1356,6 +1356,21 @@
         "sea_temperature": 11.169,
         "qc_flag": 0,
         "gust_factor": 2.4807
+      },
+      {
+        "station_id": "M4",
+        "time": "2026-03-23T02:00:00",
+        "wave_height": 3.984,
+        "hmax": 6.563,
+        "wave_period": 9.375,
+        "tp": 12.539,
+        "wind_speed": 5.692,
+        "wind_direction": 191,
+        "gust": 14.117,
+        "atmospheric_pressure": 1019.519,
+        "sea_temperature": 10.571,
+        "qc_flag": 0,
+        "gust_factor": 2.4801
       },
       {
         "station_id": "M4",
@@ -6143,6 +6158,21 @@
         "gust_factor": 2.1351
       },
       {
+        "station_id": "M4",
+        "time": "2026-03-22T23:00:00",
+        "wave_height": 4.219,
+        "hmax": 6.25,
+        "wave_period": 10.078,
+        "tp": 14.063,
+        "wind_speed": 5.92,
+        "wind_direction": 274,
+        "gust": 12.637,
+        "atmospheric_pressure": 1023.584,
+        "sea_temperature": 10.616,
+        "qc_flag": 0,
+        "gust_factor": 2.1346
+      },
+      {
         "station_id": "M3",
         "time": "2025-09-08T03:00:00",
         "wave_height": 3.398,
@@ -7506,47 +7536,17 @@
         "sea_temperature": 10.3,
         "qc_flag": 0,
         "gust_factor": 2.0909
-      },
-      {
-        "station_id": "M3",
-        "time": "2026-02-25T12:00:00",
-        "wave_height": 4.102,
-        "hmax": 6.406,
-        "wave_period": 9.375,
-        "tp": 16.641,
-        "wind_speed": 6.262,
-        "wind_direction": 214,
-        "gust": 13.092,
-        "atmospheric_pressure": 1009.705,
-        "sea_temperature": 10.289,
-        "qc_flag": 0,
-        "gust_factor": 2.0907
-      },
-      {
-        "station_id": "M6",
-        "time": "2020-11-28T05:00:00",
-        "wave_height": 4.766,
-        "hmax": 7.852,
-        "wave_period": 9.844,
-        "tp": 16.055,
-        "wind_speed": 8.88,
-        "wind_direction": 139,
-        "gust": 18.557,
-        "atmospheric_pressure": 1009.957,
-        "sea_temperature": 10.898,
-        "qc_flag": 0,
-        "gust_factor": 2.0898
       }
     ],
     "by_station": [
       {
         "station_id": "M2",
-        "n": 43228,
+        "n": 43236,
         "mean_gf": 1.2881,
         "median_gf": 1.2699,
         "sd_gf": 0.1008,
         "p95_gf": 1.4593,
-        "p99_gf": 1.6325,
+        "p99_gf": 1.6326,
         "max_gf": 2.8902,
         "n_rogue": 4,
         "pct_rogue": 0.0093
@@ -7565,19 +7565,19 @@
       },
       {
         "station_id": "M4",
-        "n": 49664,
+        "n": 49671,
         "mean_gf": 1.3598,
-        "median_gf": 1.3376,
-        "sd_gf": 0.1273,
-        "p95_gf": 1.5818,
-        "p99_gf": 1.7999,
+        "median_gf": 1.3377,
+        "sd_gf": 0.1274,
+        "p95_gf": 1.5823,
+        "p99_gf": 1.8,
         "max_gf": 3.7178,
         "n_rogue": 14,
         "pct_rogue": 0.0282
       },
       {
         "station_id": "M5",
-        "n": 59953,
+        "n": 59955,
         "mean_gf": 1.3462,
         "median_gf": 1.3115,
         "sd_gf": 0.1282,
@@ -7589,9 +7589,9 @@
       },
       {
         "station_id": "M6",
-        "n": 55293,
+        "n": 55298,
         "mean_gf": 1.4148,
-        "median_gf": 1.3854,
+        "median_gf": 1.3855,
         "sd_gf": 0.1553,
         "p95_gf": 1.6891,
         "p99_gf": 1.9401,
