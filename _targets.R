@@ -66,5 +66,6 @@ list(
   plan_qa_gates,  # MANDATORY: Adversarial QA, quality gates, coverage (cannot be skipped)
   plan_nix_sync,  # DESCRIPTION/default.nix drift detection
   plan_email_report,  # Weekly email summary via Gmail
-  plan_storm_alert  # Daily storm forecast alerts via Open-Meteo + Gmail
+  plan_storm_alert  # Daily storm forecast alerts via Open-Meteo + Gmail,
+  plan_pkgdown()       # pkgdown site build + stage docs/
 )
