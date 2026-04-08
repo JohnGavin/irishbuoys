@@ -761,6 +761,33 @@ arguments:
 returns: 'A data.frame with columns: return_period, return_level, lower, upper, n_success, method.'
 ---
 kind: function
+name: compute_obs_confidence
+exported: true
+signature: compute_obs_confidence(age_hours)
+arguments:
+  age_hours: Numeric vector of ages in hours.
+returns: Numeric vector in [0.1, 1], same length as age_hours.
+---
+kind: function
+name: obs_status_label
+exported: true
+signature: obs_status_label(confidence)
+arguments:
+  confidence: Numeric vector of confidence values in [0.1, 1].
+returns: List with label (character) and color (character hex), both the same length as confidence.
+---
+kind: function
+name: widen_ci
+exported: true
+signature: widen_ci(point, lower, upper, confidence)
+arguments:
+  confidence: Numeric multiplier in (0, 1] (e.g.
+  lower: Numeric vector of original CI lower bounds.
+  point: Numeric vector of point estimates.
+  upper: Numeric vector of original CI upper bounds.
+returns: List with lower and upper numeric vectors, widened symmetrically about point.
+---
+kind: function
 name: prepare_wave_features
 exported: true
 signature: prepare_wave_features(data, lags = 1:3)
