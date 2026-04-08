@@ -272,3 +272,156 @@ test_that("send_storm_alert dry_run with low threshold produces preview", {
   # Could also be no_storms in very rare calm conditions
   expect_true(result$status %in% c("preview", "no_storms"))
 })
+
+# ── p_hmax_exceedance (Forristall short-term distribution) ───────
+
+test_that("p_hmax_exceedance returns probabilities in [0, 1]", {
+  p <- p_hmax_exceedance(c(10, 15, 20, 25), hs = 10, tz = 9)
+  expect_length(p, 4)
+  expect_true(all(p >= 0 & p <= 1))
+  # Probability of exceedance is monotonically decreasing in h
+  expect_true(all(diff(p) <= 0))
+})
+
+test_that("p_hmax_exceedance returns NA for invalid inputs", {
+  expect_true(is.na(p_hmax_exceedance(20, hs = 0, tz = 9)))
+  expect_true(is.na(p_hmax_exceedance(20, hs = 10, tz = 0)))
+  expect_true(is.na(p_hmax_exceedance(20, hs = NA_real_, tz = 9)))
+  expect_true(is.na(p_hmax_exceedance(NA_real_, hs = 10, tz = 9)))
+})
+
+test_that("p_hmax_exceedance scales with duration", {
+  # Longer window = more independent waves = higher P(Hmax > h)
+  p_1h <- p_hmax_exceedance(20, hs = 10, tz = 9, duration_s = 3600)
+  p_6h <- p_hmax_exceedance(20, hs = 10, tz = 9, duration_s = 6 * 3600)
+  expect_gt(p_6h, p_1h)
+})
+
+test_that("p_hmax_exceedance is essentially zero for h >> Hs", {
+  # H = 4 * Hs is far into the tail
+  p <- p_hmax_exceedance(40, hs = 10, tz = 9)
+  expect_lt(p, 1e-6)
+})
+
+# ── summarise_forecast_rogue_risk ────────────────────────────────
+
+test_that("summarise_forecast_rogue_risk returns empty tibble for empty input", {
+  empty <- tibble::tibble(
+    station_id = character(),
+    time = as.POSIXct(character()),
+    wave_height_m = numeric(),
+    wave_period_s = numeric(),
+    wind_wave_height_m = numeric(),
+    swell_wave_height_m = numeric(),
+    forecast_fetched_at = as.POSIXct(character())
+  )
+  result <- summarise_forecast_rogue_risk(empty)
+  expect_s3_class(result, "tbl_df")
+  expect_equal(nrow(result), 0)
+  expect_true(all(c("station_id", "peak_hs_m", "p_hmax_gt_20", "p_hmax_gt_25") %in% names(result)))
+})
+
+test_that("summarise_forecast_rogue_risk computes per-station peaks", {
+  fake <- tibble::tibble(
+    station_id = c("M2", "M2", "M2", "M6", "M6"),
+    time = as.POSIXct(c(
+      "2026-04-10 00:00", "2026-04-10 12:00", "2026-04-10 18:00",
+      "2026-04-10 06:00", "2026-04-10 18:00"
+    ), tz = "UTC"),
+    wave_height_m = c(3, 5, 4, 8, 12),
+    wave_period_s = c(7, 9, 8, 10, 11),
+    wind_wave_height_m = c(2, 3, 2.5, 5, 7),
+    swell_wave_height_m = c(2, 3, 2.5, 5, 7),
+    forecast_fetched_at = as.POSIXct("2026-04-08 08:00", tz = "UTC")
+  )
+  result <- summarise_forecast_rogue_risk(fake)
+  expect_equal(nrow(result), 2)
+  # M6 (peak Hs 12m) should sort first
+  expect_equal(result$station_id[1], "M6")
+  expect_equal(result$peak_hs_m[1], 12)
+  expect_equal(result$peak_period_s[1], 11)
+  # M6 P(Hmax > 20m) should be much higher than M2's
+  m6 <- result[result$station_id == "M6", ]
+  m2 <- result[result$station_id == "M2", ]
+  expect_gt(m6$p_hmax_gt_20, m2$p_hmax_gt_20)
+  # All probabilities in [0, 1]
+  expect_true(all(result$p_hmax_gt_20 >= 0 & result$p_hmax_gt_20 <= 1))
+  expect_true(all(result$p_hmax_gt_25 >= 0 & result$p_hmax_gt_25 <= 1))
+  # P(Hmax>25) <= P(Hmax>20) always
+  expect_true(all(result$p_hmax_gt_25 <= result$p_hmax_gt_20))
+})
+
+# ── fetch_open_meteo_marine (network) ────────────────────────────
+
+test_that("fetch_open_meteo_marine returns empty tibble for invalid coords", {
+  skip_if_offline()
+  # Lat 999 is invalid; API should error and the function should return empty
+  result <- suppressWarnings(
+    fetch_open_meteo_marine(999, 999, "BAD", forecast_days = 1, timeout = 10)
+  )
+  expect_s3_class(result, "tbl_df")
+  expect_equal(nrow(result), 0)
+})
+
+test_that("fetch_open_meteo_marine returns expected schema for valid coords", {
+  skip_if_offline()
+  result <- fetch_open_meteo_marine(51.22, -9.99, "M2", forecast_days = 1, timeout = 15)
+  skip_if(nrow(result) == 0, "Open-Meteo Marine API unreachable")
+  expect_named(result, c(
+    "station_id", "time", "wave_height_m", "wave_period_s",
+    "wind_wave_height_m", "swell_wave_height_m", "forecast_fetched_at"
+  ))
+  expect_equal(unique(result$station_id), "M2")
+  expect_s3_class(result$time, "POSIXct")
+})
+
+# ── create_storm_alert_email with forecast_rogue_summary ─────────
+
+test_that("create_storm_alert_email renders the wave section when summary provided", {
+  skip_if_not_installed("blastula")
+  events <- tibble::tibble(
+    station_id = "M6",
+    time = as.POSIXct("2026-04-10 18:00", tz = "UTC"),
+    wind_speed_kn = 50, wind_gust_kn = 70,
+    beaufort = 10L, description = "Storm", is_gust_driven = FALSE
+  )
+  rogue <- tibble::tibble(
+    station_id = "M6",
+    peak_time = as.POSIXct("2026-04-10 18:00", tz = "UTC"),
+    peak_hs_m = 12,
+    peak_period_s = 11,
+    p_hmax_gt_20 = 0.08,
+    p_hmax_gt_25 = 0.005,
+    n_forecast_hours = 168L
+  )
+  email <- create_storm_alert_email(events, forecast_rogue_summary = rogue)
+  html <- paste(as.character(email), collapse = "\n")
+  expect_true(grepl("Forecast Wave Conditions", html, fixed = TRUE))
+  expect_true(grepl("Forristall", html, fixed = TRUE))
+  expect_true(grepl("P(Hmax &gt; 20 m)", html, fixed = TRUE))
+  # M6 row with peak Hs 12.0 must appear
+  expect_true(grepl(">12.0<", html, fixed = TRUE))
+})
+
+test_that("create_storm_alert_email omits wave section when summary is NULL or empty", {
+  skip_if_not_installed("blastula")
+  events <- tibble::tibble(
+    station_id = "M6",
+    time = as.POSIXct("2026-04-10 18:00", tz = "UTC"),
+    wind_speed_kn = 50, wind_gust_kn = 70,
+    beaufort = 10L, description = "Storm", is_gust_driven = FALSE
+  )
+  email_null <- create_storm_alert_email(events, forecast_rogue_summary = NULL)
+  html_null <- paste(as.character(email_null), collapse = "\n")
+  expect_false(grepl("Forecast Wave Conditions", html_null, fixed = TRUE))
+
+  empty_rogue <- summarise_forecast_rogue_risk(tibble::tibble(
+    station_id = character(), time = as.POSIXct(character()),
+    wave_height_m = numeric(), wave_period_s = numeric(),
+    wind_wave_height_m = numeric(), swell_wave_height_m = numeric(),
+    forecast_fetched_at = as.POSIXct(character())
+  ))
+  email_empty <- create_storm_alert_email(events, forecast_rogue_summary = empty_rogue)
+  html_empty <- paste(as.character(email_empty), collapse = "\n")
+  expect_false(grepl("Forecast Wave Conditions", html_empty, fixed = TRUE))
+})
