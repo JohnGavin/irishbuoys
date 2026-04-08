@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-24T07:30:26Z",
+    "generated": "2026-04-08T09:43:39Z",
     "package_version": "0.2.0",
     "endpoint": "stats",
     "description": "Summary statistics per station and overall"
@@ -9,71 +9,71 @@
     "station_stats": [
       {
         "station_id": "M2",
-        "n_records": 58836,
-        "first_date": "2018-10-23T00:00:00",
-        "last_date": "2026-03-24T06:00:00",
-        "mean_wave_height": 1.174,
+        "n_records": 57528,
+        "first_date": "2019-01-01T00:00:00",
+        "last_date": "2026-04-08T08:00:00",
+        "mean_wave_height": 1.1751,
         "max_wave_height": 6.406,
         "max_hmax": 10.156,
-        "mean_wind_speed": 14.4816,
+        "mean_wind_speed": 14.4132,
         "max_wind_speed": 47.93,
         "max_gust": 61.933
       },
       {
         "station_id": "M3",
-        "n_records": 58832,
-        "first_date": "2018-10-23T00:00:00",
-        "last_date": "2026-03-24T06:00:00",
-        "mean_wave_height": 3.0619,
+        "n_records": 57532,
+        "first_date": "2019-01-01T00:00:00",
+        "last_date": "2026-04-08T08:00:00",
+        "mean_wave_height": 3.0391,
         "max_wave_height": 14.063,
         "max_hmax": 21.875,
-        "mean_wind_speed": 15.6912,
+        "mean_wind_speed": 15.676,
         "max_wind_speed": 50.093,
         "max_gust": 68.422
       },
       {
         "station_id": "M4",
-        "n_records": 60340,
-        "first_date": "2018-10-23T00:00:00",
-        "last_date": "2026-03-24T06:00:00",
-        "mean_wave_height": 3.0986,
+        "n_records": 59743,
+        "first_date": "2019-04-17T09:00:00",
+        "last_date": "2026-03-29T04:00:00",
+        "mean_wave_height": 3.0943,
         "max_wave_height": 15.781,
         "max_hmax": 28.125,
-        "mean_wind_speed": 16.1013,
+        "mean_wind_speed": 16.1159,
         "max_wind_speed": 55.33,
         "max_gust": 73.204
       },
       {
         "station_id": "M5",
-        "n_records": 63761,
-        "first_date": "2018-10-23T00:00:00",
-        "last_date": "2026-03-24T06:00:00",
-        "mean_wave_height": 1.9174,
+        "n_records": 62468,
+        "first_date": "2019-01-01T00:00:00",
+        "last_date": "2026-04-08T08:00:00",
+        "mean_wave_height": 1.8965,
         "max_wave_height": 9.688,
         "max_hmax": 16.406,
-        "mean_wind_speed": 14.4129,
+        "mean_wind_speed": 14.3398,
         "max_wind_speed": 44.173,
         "max_gust": 61.819
       },
       {
         "station_id": "M6",
-        "n_records": 58106,
-        "first_date": "2018-11-23T10:00:00",
-        "last_date": "2026-03-24T06:00:00",
-        "mean_wave_height": 3.3844,
+        "n_records": 57759,
+        "first_date": "2019-01-01T00:00:00",
+        "last_date": "2026-04-08T08:00:00",
+        "mean_wave_height": 3.3798,
         "max_wave_height": 15.703,
         "max_hmax": 29.883,
-        "mean_wind_speed": 16.4982,
+        "mean_wind_speed": 16.4787,
         "max_wind_speed": 56.582,
         "max_gust": 84.93
       }
     ],
     "overall": {
-      "total_records": 299875,
-      "date_range": ["2018-10-23", "2026-03-24 06:00:00"],
+      "total_records": 295030,
+      "date_range": ["2019-01-01", "2026-04-08 08:00:00"],
       "stations": ["M2", "M3", "M4", "M5", "M6"],
-      "wind_wave_correlation": 0.6094,
-      "wave_hmax_correlation": 0.9768
+      "wind_wave_correlation": 0.6093,
+      "wave_hmax_correlation": 0.9769
     }
   }
 }

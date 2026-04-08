@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-03-24T07:27:40Z",
+    "generated": "2026-04-08T09:41:48Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,27 +9,27 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 257117
+        "value": 254735
       },
       {
         "statistic": "mean",
-        "value": 1.3508
+        "value": 1.3505
       },
       {
         "statistic": "median",
-        "value": 1.322
+        "value": 1.3219
       },
       {
         "statistic": "sd",
-        "value": 0.1361
+        "value": 0.1358
       },
       {
         "statistic": "p95",
-        "value": 1.5992
+        "value": 1.5983
       },
       {
         "statistic": "p99",
-        "value": 1.7975
+        "value": 1.7956
       },
       {
         "statistic": "max",
@@ -81,21 +81,6 @@
         "sea_temperature": 10.421,
         "qc_flag": 0,
         "gust_factor": 3.5998
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-11T13:00:00",
-        "wave_height": 6.3,
-        "hmax": null,
-        "wave_period": 10,
-        "tp": null,
-        "wind_speed": 8,
-        "wind_direction": 240,
-        "gust": 27,
-        "atmospheric_pressure": 1008.5,
-        "sea_temperature": 11.2,
-        "qc_flag": 0,
-        "gust_factor": 3.375
       },
       {
         "station_id": "M6",
@@ -156,51 +141,6 @@
         "sea_temperature": 11.212,
         "qc_flag": 0,
         "gust_factor": 3.2082
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-11-27T03:00:00",
-        "wave_height": 3.9,
-        "hmax": null,
-        "wave_period": 8,
-        "tp": null,
-        "wind_speed": 5,
-        "wind_direction": 260,
-        "gust": 16,
-        "atmospheric_pressure": 991.3,
-        "sea_temperature": 12,
-        "qc_flag": 0,
-        "gust_factor": 3.2
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-01T20:00:00",
-        "wave_height": 3.8,
-        "hmax": null,
-        "wave_period": 9,
-        "tp": null,
-        "wind_speed": 5,
-        "wind_direction": 150,
-        "gust": 16,
-        "atmospheric_pressure": 988.1,
-        "sea_temperature": 11.8,
-        "qc_flag": 0,
-        "gust_factor": 3.2
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-09T20:00:00",
-        "wave_height": 4.9,
-        "hmax": null,
-        "wave_period": 9,
-        "tp": null,
-        "wind_speed": 5,
-        "wind_direction": 150,
-        "gust": 16,
-        "atmospheric_pressure": 1024.9,
-        "sea_temperature": 11.2,
-        "qc_flag": 0,
-        "gust_factor": 3.2
       },
       {
         "station_id": "M6",
@@ -443,21 +383,6 @@
         "gust_factor": 2.8411
       },
       {
-        "station_id": "M6",
-        "time": "2018-12-02T06:00:00",
-        "wave_height": 3.5,
-        "hmax": null,
-        "wave_period": 9,
-        "tp": null,
-        "wind_speed": 5,
-        "wind_direction": 160,
-        "gust": 14,
-        "atmospheric_pressure": 987.1,
-        "sea_temperature": 12,
-        "qc_flag": 0,
-        "gust_factor": 2.8
-      },
-      {
         "station_id": "M4",
         "time": "2020-08-03T13:00:00",
         "wave_height": 2.109,
@@ -549,21 +474,6 @@
       },
       {
         "station_id": "M6",
-        "time": "2018-12-25T13:00:00",
-        "wave_height": 3.6,
-        "hmax": null,
-        "wave_period": 8,
-        "tp": null,
-        "wind_speed": 9,
-        "wind_direction": 230,
-        "gust": 25,
-        "atmospheric_pressure": 1018.3,
-        "sea_temperature": 10.9,
-        "qc_flag": 0,
-        "gust_factor": 2.7778
-      },
-      {
-        "station_id": "M6",
         "time": "2020-08-20T02:00:00",
         "wave_height": 1.641,
         "hmax": 2.344,
@@ -606,6 +516,21 @@
         "sea_temperature": 14.546,
         "qc_flag": 0,
         "gust_factor": 2.7453
+      },
+      {
+        "station_id": "M6",
+        "time": "2026-04-01T12:00:00",
+        "wave_height": 3.164,
+        "hmax": 5.625,
+        "wave_period": 6.914,
+        "tp": 10.547,
+        "wind_speed": 8.88,
+        "wind_direction": 312,
+        "gust": 24.363,
+        "atmospheric_pressure": 1031.067,
+        "sea_temperature": 11.136,
+        "qc_flag": 0,
+        "gust_factor": 2.7436
       },
       {
         "station_id": "M2",
@@ -681,6 +606,21 @@
         "sea_temperature": 11.719,
         "qc_flag": 0,
         "gust_factor": 2.7036
+      },
+      {
+        "station_id": "M6",
+        "time": "2026-04-02T11:00:00",
+        "wave_height": 3.281,
+        "hmax": 5.156,
+        "wave_period": 6.445,
+        "tp": 10.547,
+        "wind_speed": 8.766,
+        "wind_direction": 339,
+        "gust": 23.68,
+        "atmospheric_pressure": 1010.303,
+        "sea_temperature": 11.149,
+        "qc_flag": 0,
+        "gust_factor": 2.7013
       },
       {
         "station_id": "M6",
@@ -1043,21 +983,6 @@
         "gust_factor": 2.5603
       },
       {
-        "station_id": "M3",
-        "time": "2018-10-31T00:00:00",
-        "wave_height": 3.594,
-        "hmax": 4.453,
-        "wave_period": 9.141,
-        "tp": 13.477,
-        "wind_speed": 6.119,
-        "wind_direction": 220,
-        "gust": 15.654,
-        "atmospheric_pressure": 999.878,
-        "sea_temperature": 13.125,
-        "qc_flag": 1,
-        "gust_factor": 2.5583
-      },
-      {
         "station_id": "M4",
         "time": "2024-01-29T09:00:00",
         "wave_height": 4.805,
@@ -1239,21 +1164,6 @@
       },
       {
         "station_id": "M6",
-        "time": "2018-11-27T01:00:00",
-        "wave_height": 3.7,
-        "hmax": null,
-        "wave_period": 8,
-        "tp": null,
-        "wind_speed": 8,
-        "wind_direction": 180,
-        "gust": 20,
-        "atmospheric_pressure": 992.5,
-        "sea_temperature": 12,
-        "qc_flag": 0,
-        "gust_factor": 2.5
-      },
-      {
-        "station_id": "M6",
         "time": "2019-03-23T06:00:00",
         "wave_height": 4.6,
         "hmax": null,
@@ -1296,6 +1206,21 @@
         "sea_temperature": 11.492,
         "qc_flag": 0,
         "gust_factor": 2.4875
+      },
+      {
+        "station_id": "M3",
+        "time": "2026-04-07T03:00:00",
+        "wave_height": 5.977,
+        "hmax": 8.75,
+        "wave_period": 9.609,
+        "tp": 16.641,
+        "wind_speed": 8.425,
+        "wind_direction": 112,
+        "gust": 20.948,
+        "atmospheric_pressure": 1009.326,
+        "sea_temperature": 10.849,
+        "qc_flag": 0,
+        "gust_factor": 2.4864
       },
       {
         "station_id": "M5",
@@ -1793,36 +1718,6 @@
         "gust_factor": 2.4042
       },
       {
-        "station_id": "M5",
-        "time": "2018-12-04T13:00:00",
-        "wave_height": 2.188,
-        "hmax": 3.516,
-        "wave_period": 8.32,
-        "tp": 14.063,
-        "wind_speed": 5.692,
-        "wind_direction": 131,
-        "gust": 13.662,
-        "atmospheric_pressure": 1020.923,
-        "sea_temperature": 12.158,
-        "qc_flag": 0,
-        "gust_factor": 2.4002
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-11-24T03:00:00",
-        "wave_height": 1.1,
-        "hmax": null,
-        "wave_period": 9,
-        "tp": null,
-        "wind_speed": 5,
-        "wind_direction": 40,
-        "gust": 12,
-        "atmospheric_pressure": 1011.1,
-        "sea_temperature": 10,
-        "qc_flag": 0,
-        "gust_factor": 2.4
-      },
-      {
         "station_id": "M6",
         "time": "2019-01-17T04:00:00",
         "wave_height": 4.1,
@@ -2031,21 +1926,6 @@
         "sea_temperature": 12.149,
         "qc_flag": 0,
         "gust_factor": 2.3802
-      },
-      {
-        "station_id": "M3",
-        "time": "2018-11-22T06:00:00",
-        "wave_height": 2.188,
-        "hmax": 3.281,
-        "wave_period": 7.852,
-        "tp": 14.414,
-        "wind_speed": 5.265,
-        "wind_direction": 163,
-        "gust": 12.523,
-        "atmospheric_pressure": 1008.044,
-        "sea_temperature": 12.134,
-        "qc_flag": 0,
-        "gust_factor": 2.3785
       },
       {
         "station_id": "M4",
@@ -2454,36 +2334,6 @@
       },
       {
         "station_id": "M6",
-        "time": "2018-12-04T03:00:00",
-        "wave_height": 3.2,
-        "hmax": null,
-        "wave_period": 8,
-        "tp": null,
-        "wind_speed": 6,
-        "wind_direction": 40,
-        "gust": 14,
-        "atmospheric_pressure": 1017.3,
-        "sea_temperature": 11.8,
-        "qc_flag": 0,
-        "gust_factor": 2.3333
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-11T02:00:00",
-        "wave_height": 5,
-        "hmax": null,
-        "wave_period": 7,
-        "tp": null,
-        "wind_speed": 21,
-        "wind_direction": 210,
-        "gust": 49,
-        "atmospheric_pressure": 1005.9,
-        "sea_temperature": 11.2,
-        "qc_flag": 0,
-        "gust_factor": 2.3333
-      },
-      {
-        "station_id": "M6",
         "time": "2019-01-01T01:00:00",
         "wave_height": 2.5,
         "hmax": null,
@@ -2739,21 +2589,6 @@
       },
       {
         "station_id": "M6",
-        "time": "2018-12-12T19:00:00",
-        "wave_height": 7.5,
-        "hmax": null,
-        "wave_period": 10,
-        "tp": null,
-        "wind_speed": 16,
-        "wind_direction": 260,
-        "gust": 37,
-        "atmospheric_pressure": 984.9,
-        "sea_temperature": 11.2,
-        "qc_flag": 0,
-        "gust_factor": 2.3125
-      },
-      {
-        "station_id": "M6",
         "time": "2019-04-05T05:00:00",
         "wave_height": 5.3,
         "hmax": null,
@@ -2978,21 +2813,6 @@
         "gust_factor": 2.2957
       },
       {
-        "station_id": "M6",
-        "time": "2018-11-26T20:00:00",
-        "wave_height": 4,
-        "hmax": null,
-        "wave_period": 6,
-        "tp": null,
-        "wind_speed": 17,
-        "wind_direction": 210,
-        "gust": 39,
-        "atmospheric_pressure": 992.7,
-        "sea_temperature": 11.9,
-        "qc_flag": 0,
-        "gust_factor": 2.2941
-      },
-      {
         "station_id": "M3",
         "time": "2024-11-21T05:00:00",
         "wave_height": 2.578,
@@ -3039,6 +2859,21 @@
       },
       {
         "station_id": "M6",
+        "time": "2026-04-04T03:00:00",
+        "wave_height": 4.336,
+        "hmax": 6.719,
+        "wave_period": 9.844,
+        "tp": 13.359,
+        "wind_speed": 5.92,
+        "wind_direction": 127,
+        "gust": 13.548,
+        "atmospheric_pressure": 1006.482,
+        "sea_temperature": 11.089,
+        "qc_flag": 0,
+        "gust_factor": 2.2885
+      },
+      {
+        "station_id": "M6",
         "time": "2019-12-14T22:00:00",
         "wave_height": 6.484,
         "hmax": 10.938,
@@ -3051,21 +2886,6 @@
         "sea_temperature": 11.504,
         "qc_flag": 0,
         "gust_factor": 2.2858
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-02T05:00:00",
-        "wave_height": 3.8,
-        "hmax": null,
-        "wave_period": 9,
-        "tp": null,
-        "wind_speed": 7,
-        "wind_direction": 190,
-        "gust": 16,
-        "atmospheric_pressure": 988.1,
-        "sea_temperature": 11.8,
-        "qc_flag": 0,
-        "gust_factor": 2.2857
       },
       {
         "station_id": "M6",
@@ -3231,36 +3051,6 @@
         "sea_temperature": 11.008,
         "qc_flag": 0,
         "gust_factor": 2.2729
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-12T20:00:00",
-        "wave_height": 8.3,
-        "hmax": null,
-        "wave_period": 12,
-        "tp": null,
-        "wind_speed": 11,
-        "wind_direction": 260,
-        "gust": 25,
-        "atmospheric_pressure": 985.1,
-        "sea_temperature": 11.1,
-        "qc_flag": 0,
-        "gust_factor": 2.2727
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-21T14:00:00",
-        "wave_height": 3.3,
-        "hmax": null,
-        "wave_period": 7,
-        "tp": null,
-        "wind_speed": 11,
-        "wind_direction": 260,
-        "gust": 25,
-        "atmospheric_pressure": 998.3,
-        "sea_temperature": 11,
-        "qc_flag": 0,
-        "gust_factor": 2.2727
       },
       {
         "station_id": "M6",
@@ -3894,21 +3684,6 @@
       },
       {
         "station_id": "M6",
-        "time": "2018-12-20T15:00:00",
-        "wave_height": 4.1,
-        "hmax": null,
-        "wave_period": 7,
-        "tp": null,
-        "wind_speed": 13,
-        "wind_direction": 230,
-        "gust": 29,
-        "atmospheric_pressure": 998.3,
-        "sea_temperature": 11,
-        "qc_flag": 0,
-        "gust_factor": 2.2308
-      },
-      {
-        "station_id": "M6",
         "time": "2019-04-05T17:00:00",
         "wave_height": 4.7,
         "hmax": null,
@@ -4056,21 +3831,6 @@
         "sea_temperature": 10.078,
         "qc_flag": 0,
         "gust_factor": 2.2223
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-31T21:00:00",
-        "wave_height": 2.6,
-        "hmax": null,
-        "wave_period": 7,
-        "tp": null,
-        "wind_speed": 9,
-        "wind_direction": 190,
-        "gust": 20,
-        "atmospheric_pressure": 1033.7,
-        "sea_temperature": 11,
-        "qc_flag": 0,
-        "gust_factor": 2.2222
       },
       {
         "station_id": "M6",
@@ -4311,21 +4071,6 @@
         "sea_temperature": 12.416,
         "qc_flag": 0,
         "gust_factor": 2.2154
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-02T21:00:00",
-        "wave_height": 4.1,
-        "hmax": null,
-        "wave_period": 9,
-        "tp": null,
-        "wind_speed": 14,
-        "wind_direction": 30,
-        "gust": 31,
-        "atmospheric_pressure": 993.7,
-        "sea_temperature": 11.5,
-        "qc_flag": 0,
-        "gust_factor": 2.2143
       },
       {
         "station_id": "M6",
@@ -5558,6 +5303,21 @@
         "gust_factor": 2.1616
       },
       {
+        "station_id": "M3",
+        "time": "2026-04-02T01:00:00",
+        "wave_height": 2.695,
+        "hmax": 4.063,
+        "wave_period": 6.914,
+        "tp": 9.961,
+        "wind_speed": 6.375,
+        "wind_direction": 307,
+        "gust": 13.776,
+        "atmospheric_pressure": 1027.673,
+        "sea_temperature": 10.699,
+        "qc_flag": 0,
+        "gust_factor": 2.1609
+      },
+      {
         "station_id": "M4",
         "time": "2021-01-05T04:00:00",
         "wave_height": 1.484,
@@ -5796,21 +5556,6 @@
         "sea_temperature": 11.257,
         "qc_flag": 0,
         "gust_factor": 2.151
-      },
-      {
-        "station_id": "M6",
-        "time": "2018-12-13T12:00:00",
-        "wave_height": 8.7,
-        "hmax": null,
-        "wave_period": 11,
-        "tp": null,
-        "wind_speed": 20,
-        "wind_direction": 260,
-        "gust": 43,
-        "atmospheric_pressure": 1002.9,
-        "sea_temperature": 11.1,
-        "qc_flag": 0,
-        "gust_factor": 2.15
       },
       {
         "station_id": "M3",
@@ -6066,21 +5811,6 @@
         "sea_temperature": 10.6,
         "qc_flag": 0,
         "gust_factor": 2.1364
-      },
-      {
-        "station_id": "M3",
-        "time": "2018-12-15T06:00:00",
-        "wave_height": 7.344,
-        "hmax": 10.781,
-        "wave_period": 12.773,
-        "tp": 18.984,
-        "wind_speed": 6.262,
-        "wind_direction": 59,
-        "gust": 13.377,
-        "atmospheric_pressure": 993.616,
-        "sea_temperature": 11.655,
-        "qc_flag": 0,
-        "gust_factor": 2.1362
       },
       {
         "station_id": "M6",
@@ -7164,21 +6894,6 @@
       },
       {
         "station_id": "M6",
-        "time": "2018-12-02T13:00:00",
-        "wave_height": 4.3,
-        "hmax": null,
-        "wave_period": 8,
-        "tp": null,
-        "wind_speed": 10,
-        "wind_direction": 340,
-        "gust": 21,
-        "atmospheric_pressure": 988.5,
-        "sea_temperature": 11.6,
-        "qc_flag": 0,
-        "gust_factor": 2.1
-      },
-      {
-        "station_id": "M6",
         "time": "2019-04-08T01:00:00",
         "wave_height": 2.2,
         "hmax": null,
@@ -7536,72 +7251,357 @@
         "sea_temperature": 10.3,
         "qc_flag": 0,
         "gust_factor": 2.0909
+      },
+      {
+        "station_id": "M3",
+        "time": "2026-02-25T12:00:00",
+        "wave_height": 4.102,
+        "hmax": 6.406,
+        "wave_period": 9.375,
+        "tp": 16.641,
+        "wind_speed": 6.262,
+        "wind_direction": 214,
+        "gust": 13.092,
+        "atmospheric_pressure": 1009.705,
+        "sea_temperature": 10.289,
+        "qc_flag": 0,
+        "gust_factor": 2.0907
+      },
+      {
+        "station_id": "M6",
+        "time": "2020-11-28T05:00:00",
+        "wave_height": 4.766,
+        "hmax": 7.852,
+        "wave_period": 9.844,
+        "tp": 16.055,
+        "wind_speed": 8.88,
+        "wind_direction": 139,
+        "gust": 18.557,
+        "atmospheric_pressure": 1009.957,
+        "sea_temperature": 10.898,
+        "qc_flag": 0,
+        "gust_factor": 2.0898
+      },
+      {
+        "station_id": "M2",
+        "time": "2023-07-10T13:00:00",
+        "wave_height": 1.172,
+        "hmax": 2.031,
+        "wave_period": 3.75,
+        "tp": 4.219,
+        "wind_speed": 7.628,
+        "wind_direction": 112,
+        "gust": 15.939,
+        "atmospheric_pressure": 1010.266,
+        "sea_temperature": 13.934,
+        "qc_flag": 0,
+        "gust_factor": 2.0895
+      },
+      {
+        "station_id": "M4",
+        "time": "2024-09-28T20:00:00",
+        "wave_height": 1.641,
+        "hmax": 2.656,
+        "wave_period": 4.922,
+        "tp": 9.141,
+        "wind_speed": 6.375,
+        "wind_direction": 194,
+        "gust": 13.32,
+        "atmospheric_pressure": 1020.007,
+        "sea_temperature": 13.881,
+        "qc_flag": 0,
+        "gust_factor": 2.0894
+      },
+      {
+        "station_id": "M4",
+        "time": "2024-12-12T05:00:00",
+        "wave_height": 1.758,
+        "hmax": 2.813,
+        "wave_period": 7.5,
+        "tp": 11.719,
+        "wind_speed": 6.375,
+        "wind_direction": 171,
+        "gust": 13.32,
+        "atmospheric_pressure": 1033.179,
+        "sea_temperature": 11.678,
+        "qc_flag": 0,
+        "gust_factor": 2.0894
+      },
+      {
+        "station_id": "M6",
+        "time": "2019-10-24T21:00:00",
+        "wave_height": 4.375,
+        "hmax": 6.563,
+        "wave_period": 9.727,
+        "tp": 14.648,
+        "wind_speed": 5.123,
+        "wind_direction": 29,
+        "gust": 10.702,
+        "atmospheric_pressure": 1009.273,
+        "sea_temperature": 12.969,
+        "qc_flag": 0,
+        "gust_factor": 2.089
+      },
+      {
+        "station_id": "M6",
+        "time": "2019-11-17T13:00:00",
+        "wave_height": 2.969,
+        "hmax": 4.531,
+        "wave_period": 7.852,
+        "tp": 11.953,
+        "wind_speed": 5.123,
+        "wind_direction": 40,
+        "gust": 10.702,
+        "atmospheric_pressure": 1023.726,
+        "sea_temperature": 12.422,
+        "qc_flag": 0,
+        "gust_factor": 2.089
+      },
+      {
+        "station_id": "M2",
+        "time": "2022-12-10T21:00:00",
+        "wave_height": 0.938,
+        "hmax": 1.406,
+        "wave_period": 3.867,
+        "tp": 4.805,
+        "wind_speed": 6.489,
+        "wind_direction": 181,
+        "gust": 13.548,
+        "atmospheric_pressure": 1008.105,
+        "sea_temperature": 12.898,
+        "qc_flag": 0,
+        "gust_factor": 2.0878
+      },
+      {
+        "station_id": "M4",
+        "time": "2024-01-12T11:00:00",
+        "wave_height": 1.758,
+        "hmax": 3.125,
+        "wave_period": 9.961,
+        "tp": 14.297,
+        "wind_speed": 6.489,
+        "wind_direction": 236,
+        "gust": 13.548,
+        "atmospheric_pressure": 1040.527,
+        "sea_temperature": 10.518,
+        "qc_flag": 0,
+        "gust_factor": 2.0878
+      },
+      {
+        "station_id": "M6",
+        "time": "2019-09-21T10:00:00",
+        "wave_height": 3.75,
+        "hmax": 6.25,
+        "wave_period": 7.383,
+        "tp": 9.492,
+        "wind_speed": 6.489,
+        "wind_direction": 252,
+        "gust": 13.548,
+        "atmospheric_pressure": 990.82,
+        "sea_temperature": 15.605,
+        "qc_flag": 0,
+        "gust_factor": 2.0878
+      },
+      {
+        "station_id": "M4",
+        "time": "2022-02-13T05:00:00",
+        "wave_height": 4.844,
+        "hmax": 6.719,
+        "wave_period": 8.789,
+        "tp": 13.008,
+        "wind_speed": 5.237,
+        "wind_direction": 216,
+        "gust": 10.929,
+        "atmospheric_pressure": 992.566,
+        "sea_temperature": 10.527,
+        "qc_flag": 0,
+        "gust_factor": 2.0869
+      },
+      {
+        "station_id": "M6",
+        "time": "2019-11-08T06:00:00",
+        "wave_height": 3.516,
+        "hmax": 4.844,
+        "wave_period": 8.32,
+        "tp": 12.539,
+        "wind_speed": 5.237,
+        "wind_direction": 249,
+        "gust": 10.929,
+        "atmospheric_pressure": 1013.57,
+        "sea_temperature": 12.695,
+        "qc_flag": 0,
+        "gust_factor": 2.0869
+      },
+      {
+        "station_id": "M3",
+        "time": "2026-02-01T15:00:00",
+        "wave_height": 6.211,
+        "hmax": 10.781,
+        "wave_period": 10.547,
+        "tp": 18.164,
+        "wind_speed": 5.351,
+        "wind_direction": 195,
+        "gust": 11.157,
+        "atmospheric_pressure": 1001.831,
+        "sea_temperature": 10.311,
+        "qc_flag": 0,
+        "gust_factor": 2.085
+      },
+      {
+        "station_id": "M4",
+        "time": "2024-12-26T04:00:00",
+        "wave_height": 5.039,
+        "hmax": 8.281,
+        "wave_period": 9.609,
+        "tp": 13.359,
+        "wind_speed": 5.351,
+        "wind_direction": 347,
+        "gust": 11.157,
+        "atmospheric_pressure": 1029.675,
+        "sea_temperature": 11.274,
+        "qc_flag": 0,
+        "gust_factor": 2.085
+      },
+      {
+        "station_id": "M6",
+        "time": "2019-02-09T12:00:00",
+        "wave_height": 6.1,
+        "hmax": null,
+        "wave_period": 10,
+        "tp": null,
+        "wind_speed": 12,
+        "wind_direction": 270,
+        "gust": 25,
+        "atmospheric_pressure": 997.3,
+        "sea_temperature": 10.5,
+        "qc_flag": 0,
+        "gust_factor": 2.0833
+      },
+      {
+        "station_id": "M3",
+        "time": "2025-11-04T03:00:00",
+        "wave_height": 4.453,
+        "hmax": 7.188,
+        "wave_period": 8.32,
+        "tp": 12.539,
+        "wind_speed": 5.465,
+        "wind_direction": 308,
+        "gust": 11.385,
+        "atmospheric_pressure": 998.474,
+        "sea_temperature": 13.381,
+        "qc_flag": 0,
+        "gust_factor": 2.0833
+      },
+      {
+        "station_id": "M6",
+        "time": "2025-01-03T17:00:00",
+        "wave_height": 2.344,
+        "hmax": 3.125,
+        "wave_period": 7.852,
+        "tp": 11.719,
+        "wind_speed": 5.465,
+        "wind_direction": 41,
+        "gust": 11.385,
+        "atmospheric_pressure": 1023.56,
+        "sea_temperature": 11.891,
+        "qc_flag": 0,
+        "gust_factor": 2.0833
+      },
+      {
+        "station_id": "M6",
+        "time": "2026-01-30T00:00:00",
+        "wave_height": 6.797,
+        "hmax": 13.438,
+        "wave_period": 11.719,
+        "tp": 18.164,
+        "wind_speed": 5.465,
+        "wind_direction": 130,
+        "gust": 11.385,
+        "atmospheric_pressure": 973.413,
+        "sea_temperature": 11.656,
+        "qc_flag": 0,
+        "gust_factor": 2.0833
+      },
+      {
+        "station_id": "M5",
+        "time": "2026-01-25T13:00:00",
+        "wave_height": 2.5,
+        "hmax": 3.594,
+        "wave_period": 6.914,
+        "tp": 14.414,
+        "wind_speed": 6.945,
+        "wind_direction": 125,
+        "gust": 14.459,
+        "atmospheric_pressure": 989.099,
+        "sea_temperature": 10.6,
+        "qc_flag": 0,
+        "gust_factor": 2.0819
       }
     ],
     "by_station": [
       {
         "station_id": "M2",
-        "n": 43261,
-        "mean_gf": 1.288,
-        "median_gf": 1.2698,
+        "n": 43606,
+        "mean_gf": 1.2879,
+        "median_gf": 1.2697,
         "sd_gf": 0.1008,
-        "p95_gf": 1.4592,
-        "p99_gf": 1.6326,
+        "p95_gf": 1.4593,
+        "p99_gf": 1.6333,
         "max_gf": 2.8902,
         "n_rogue": 4,
         "pct_rogue": 0.0092
       },
       {
         "station_id": "M3",
-        "n": 48872,
-        "mean_gf": 1.3304,
-        "median_gf": 1.304,
-        "sd_gf": 0.1261,
-        "p95_gf": 1.5583,
-        "p99_gf": 1.7542,
+        "n": 47629,
+        "mean_gf": 1.3297,
+        "median_gf": 1.3028,
+        "sd_gf": 0.1266,
+        "p95_gf": 1.5591,
+        "p99_gf": 1.7556,
         "max_gf": 3.2127,
         "n_rogue": 6,
-        "pct_rogue": 0.0123
+        "pct_rogue": 0.0126
       },
       {
         "station_id": "M4",
-        "n": 49699,
-        "mean_gf": 1.3598,
-        "median_gf": 1.3376,
+        "n": 49817,
+        "mean_gf": 1.3599,
+        "median_gf": 1.3377,
         "sd_gf": 0.1274,
         "p95_gf": 1.5823,
         "p99_gf": 1.8,
         "max_gf": 3.7178,
         "n_rogue": 14,
-        "pct_rogue": 0.0282
+        "pct_rogue": 0.0281
       },
       {
         "station_id": "M5",
-        "n": 59959,
-        "mean_gf": 1.3462,
-        "median_gf": 1.3115,
-        "sd_gf": 0.1282,
-        "p95_gf": 1.5913,
-        "p99_gf": 1.7273,
+        "n": 58692,
+        "mean_gf": 1.3467,
+        "median_gf": 1.3117,
+        "sd_gf": 0.1289,
+        "p95_gf": 1.5923,
+        "p99_gf": 1.7278,
         "max_gf": 2.8889,
         "n_rogue": 3,
-        "pct_rogue": 0.005
+        "pct_rogue": 0.0051
       },
       {
         "station_id": "M6",
-        "n": 55326,
-        "mean_gf": 1.4148,
-        "median_gf": 1.3854,
-        "sd_gf": 0.1553,
-        "p95_gf": 1.6891,
-        "p99_gf": 1.9401,
+        "n": 54991,
+        "mean_gf": 1.4138,
+        "median_gf": 1.3851,
+        "sd_gf": 0.1533,
+        "p95_gf": 1.6863,
+        "p99_gf": 1.9324,
         "max_gf": 3.8846,
-        "n_rogue": 30,
-        "pct_rogue": 0.0542
+        "n_rogue": 26,
+        "pct_rogue": 0.0473
       }
     ],
     "rogue_gust_threshold": 2.6,
-    "n_rogue_gusts": 57,
-    "pct_rogue_gusts": 0.0222
+    "n_rogue_gusts": 53,
+    "pct_rogue_gusts": 0.0208
   }
 }
