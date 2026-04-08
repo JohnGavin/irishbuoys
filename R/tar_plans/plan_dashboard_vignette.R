@@ -28,6 +28,32 @@ plan_dashboard_vignette <- list(
       max_hmax_row <- data[which.max(data$hmax), ]
       max_signif_row <- data[which.max(data$wave_height), ]
 
+      # Observation freshness (Option E from rogue-wave forecasting plan).
+      # Per-station latest obs and per-station age, plus a global "worst" age
+      # (most stale station drives the dashboard confidence badge).
+      data_end_time <- max(data$time)
+      now <- Sys.time()
+      per_station_age <- data |>
+        dplyr::group_by(.data$station_id) |>
+        dplyr::summarise(
+          latest = max(.data$time, na.rm = TRUE),
+          .groups = "drop"
+        ) |>
+        dplyr::mutate(
+          age_hours = as.numeric(difftime(now, .data$latest, units = "hours")),
+          confidence = compute_obs_confidence(.data$age_hours)
+        )
+
+      obs_age_hours <- as.numeric(difftime(now, data_end_time, units = "hours"))
+      median_age_hours <- stats::median(per_station_age$age_hours, na.rm = TRUE)
+      worst_age_hours <- max(per_station_age$age_hours, na.rm = TRUE)
+      # Global confidence is based on the median station age — the "typical"
+      # freshness — so a single offline buoy doesn't permanently red-flag the
+      # whole dashboard. Per-station confidence in `per_station_obs_age` lets
+      # consumers compute station-specific risk decay.
+      obs_confidence <- compute_obs_confidence(median_age_hours)
+      status <- obs_status_label(obs_confidence)
+
       list(
         cor_wind_wave = round(cor(data$wind_speed[valid_ww], data$wave_height[valid_ww]), 3),
         cor_wave_hmax = round(cor(data$wave_height[valid_wh], data$hmax[valid_wh]), 3),
@@ -45,9 +71,17 @@ plan_dashboard_vignette <- list(
         max_signif = round(max_signif_row$wave_height, 1),
         max_signif_date = format(max_signif_row$time, "%Y-%m-%d %H:%M"),
         max_signif_station = max_signif_row$station_id,
-        data_end_time = max(data$time)
+        data_end_time = data_end_time,
+        obs_age_hours = round(obs_age_hours, 1),
+        median_obs_age_hours = round(median_age_hours, 1),
+        worst_obs_age_hours = round(worst_age_hours, 1),
+        obs_confidence = round(obs_confidence, 3),
+        obs_status_label = status$label,
+        obs_status_color = status$color,
+        per_station_obs_age = per_station_age
       )
-    }
+    },
+    cue = targets::tar_cue(mode = "always")
   ),
 
   # Sampled hourly data for dygraphs (sample if >200k rows)
