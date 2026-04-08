@@ -4,14 +4,15 @@
 \alias{detect_storm_events}
 \title{Detect Storm Events from Forecast Data}
 \usage{
-detect_storm_events(forecasts, threshold_knots = NULL, use_gusts = TRUE)
+detect_storm_events(forecasts, threshold_knots = NULL, use_gusts = FALSE)
 }
 \arguments{
 \item{forecasts}{Tibble from \code{\link[=fetch_all_forecasts]{fetch_all_forecasts()}} or \code{\link[=fetch_open_meteo_forecast]{fetch_open_meteo_forecast()}}.}
 
 \item{threshold_knots}{Numeric threshold in knots (default NULL, uses env var or 41).}
 
-\item{use_gusts}{Logical; if TRUE (default), also flag rows where gusts exceed threshold.}
+\item{use_gusts}{Logical; if TRUE, also flag rows where gusts exceed threshold.
+Default FALSE — only sustained wind speed triggers alerts.}
 }
 \value{
 Tibble with columns: station_id, time, wind_speed_kn, wind_gust_kn,
@@ -36,9 +37,13 @@ Other storm-alert:
 \code{\link{beaufort_to_description}()},
 \code{\link{create_storm_alert_email}()},
 \code{\link{fetch_all_forecasts}()},
+\code{\link{fetch_all_marine_forecasts}()},
 \code{\link{fetch_met_eireann_warnings}()},
 \code{\link{fetch_open_meteo_forecast}()},
+\code{\link{fetch_open_meteo_marine}()},
 \code{\link{knots_to_beaufort}()},
-\code{\link{send_storm_alert}()}
+\code{\link{p_hmax_exceedance}()},
+\code{\link{send_storm_alert}()},
+\code{\link{summarise_forecast_rogue_risk}()}
 }
 \concept{storm-alert}

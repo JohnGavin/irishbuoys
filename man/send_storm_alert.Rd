@@ -44,8 +44,12 @@ Other storm-alert:
 \code{\link{create_storm_alert_email}()},
 \code{\link{detect_storm_events}()},
 \code{\link{fetch_all_forecasts}()},
+\code{\link{fetch_all_marine_forecasts}()},
 \code{\link{fetch_met_eireann_warnings}()},
 \code{\link{fetch_open_meteo_forecast}()},
-\code{\link{knots_to_beaufort}()}
+\code{\link{fetch_open_meteo_marine}()},
+\code{\link{knots_to_beaufort}()},
+\code{\link{p_hmax_exceedance}()},
+\code{\link{summarise_forecast_rogue_risk}()}
 }
 \concept{storm-alert}

@@ -22,6 +22,22 @@ plan_storm_alert <- list(
     detect_storm_events(storm_forecasts)
   ),
 
+  # Fetch marine wave forecasts (Open-Meteo Marine API).
+  # SOFT dependency: function returns empty tibble on any failure, so this
+  # target always succeeds. Downstream email gracefully omits the wave section
+  # when this is empty.
+  targets::tar_target(
+    storm_marine_forecasts,
+    fetch_all_marine_forecasts(station_info = storm_station_info, forecast_days = 7)
+  ),
+
+  # Per-station forecast rogue-wave risk summary
+  # (peak Hs, P(Hmax>20m), P(Hmax>25m) via Forristall short-term distribution).
+  targets::tar_target(
+    forecast_rogue_summary,
+    summarise_forecast_rogue_risk(storm_marine_forecasts)
+  ),
+
   # Fetch Met Eireann marine warnings (best-effort)
   targets::tar_target(
     met_warnings,
@@ -40,7 +56,9 @@ plan_storm_alert <- list(
       email <- create_storm_alert_email(
         storm_events,
         station_info = storm_station_info,
-        met_warnings = met_warnings
+        all_forecasts = storm_forecasts,
+        met_warnings = met_warnings,
+        forecast_rogue_summary = forecast_rogue_summary
       )
 
       gmail_user <- Sys.getenv("GMAIL_USERNAME")

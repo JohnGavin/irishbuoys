@@ -7,13 +7,21 @@
 create_storm_alert_email(
   storm_events,
   station_info = get_station_info(),
-  met_warnings = NULL
+  all_forecasts = NULL,
+  threshold_knots = 41,
+  met_warnings = NULL,
+  forecast_rogue_summary = NULL
 )
 }
 \arguments{
-\item{storm_events}{Tibble from \code{\link[=detect_storm_events]{detect_storm_events()}}.}
+\item{storm_events}{Tibble from \code{\link[=detect_storm_events]{detect_storm_events()}} (above-threshold events).}
 
 \item{station_info}{Data frame from \code{\link[=get_station_info]{get_station_info()}} (default).}
+
+\item{all_forecasts}{Full forecast tibble from \code{\link[=fetch_all_forecasts]{fetch_all_forecasts()}} for all
+stations (used to show context for calm stations). If NULL, only storm stations shown.}
+
+\item{threshold_knots}{Numeric threshold used for triggering (default 41).}
 
 \item{met_warnings}{Character vector from \code{\link[=fetch_met_eireann_warnings]{fetch_met_eireann_warnings()}}, or NULL.}
 }
@@ -21,7 +29,8 @@ create_storm_alert_email(
 A blastula email object.
 }
 \description{
-Composes an HTML email with storm event details for all affected stations.
+Composes an HTML email showing forecasts for ALL stations, with
+storm stations highlighted. Stations sorted by max Beaufort descending.
 }
 \examples{
 \dontrun{
@@ -38,9 +47,13 @@ Other storm-alert:
 \code{\link{beaufort_to_description}()},
 \code{\link{detect_storm_events}()},
 \code{\link{fetch_all_forecasts}()},
+\code{\link{fetch_all_marine_forecasts}()},
 \code{\link{fetch_met_eireann_warnings}()},
 \code{\link{fetch_open_meteo_forecast}()},
+\code{\link{fetch_open_meteo_marine}()},
 \code{\link{knots_to_beaufort}()},
-\code{\link{send_storm_alert}()}
+\code{\link{p_hmax_exceedance}()},
+\code{\link{send_storm_alert}()},
+\code{\link{summarise_forecast_rogue_risk}()}
 }
 \concept{storm-alert}

@@ -163,6 +163,223 @@ fetch_all_forecasts <- function(station_info = get_station_info(),
   dplyr::bind_rows(results)
 }
 
+#' Fetch Marine Wave Forecast from Open-Meteo for a Single Station
+#'
+#' @description
+#' Queries the Open-Meteo Marine Weather API for hourly significant wave height,
+#' wave period, wind-wave and swell components at a given lat/lon. Returns an
+#' empty tibble on error (soft dependency — never aborts the pipeline).
+#'
+#' Source: <https://open-meteo.com/en/docs/marine-weather-api>. Underlying models
+#' are DWD EWAM (European) and GWAM (global), ~25 km grid.
+#'
+#' @param lat Latitude in decimal degrees.
+#' @param lon Longitude in decimal degrees.
+#' @param station_id Character station identifier (e.g. "M2").
+#' @param forecast_days Integer number of forecast days (1-8 for marine, default 7).
+#' @param timeout Numeric request timeout in seconds (default 30).
+#'
+#' @return Tibble with columns: station_id, time, wave_height_m, wave_period_s,
+#'   wind_wave_height_m, swell_wave_height_m, forecast_fetched_at.
+#'   Empty tibble on error.
+#' @export
+#' @family storm-alert
+#' @examples
+#' \dontrun{
+#' fetch_open_meteo_marine(51.22, -9.99, "M2", forecast_days = 1)
+#' }
+fetch_open_meteo_marine <- function(lat, lon, station_id,
+                                    forecast_days = 7, timeout = 30) {
+  empty_result <- tibble::tibble(
+    station_id = character(),
+    time = as.POSIXct(character()),
+    wave_height_m = numeric(),
+    wave_period_s = numeric(),
+    wind_wave_height_m = numeric(),
+    swell_wave_height_m = numeric(),
+    forecast_fetched_at = as.POSIXct(character())
+  )
+
+  tryCatch({
+    resp <- httr2::request("https://marine-api.open-meteo.com/v1/marine") |>
+      httr2::req_url_query(
+        latitude = lat,
+        longitude = lon,
+        hourly = "wave_height,wave_period,wind_wave_height,swell_wave_height",
+        forecast_days = forecast_days,
+        timezone = "UTC"
+      ) |>
+      httr2::req_timeout(timeout) |>
+      httr2::req_retry(max_tries = 3, backoff = ~ 5) |>
+      httr2::req_perform()
+
+    body <- httr2::resp_body_json(resp)
+
+    if (is.null(body$hourly) || is.null(body$hourly$time)) {
+      cli::cli_warn("No hourly marine data returned for station {station_id}")
+      return(empty_result)
+    }
+
+    times <- as.POSIXct(unlist(body$hourly$time), format = "%Y-%m-%dT%H:%M", tz = "UTC")
+    # Open-Meteo returns NULLs for missing values; convert to NA via list-handling
+    pull_num <- function(x) {
+      if (is.null(x)) return(rep(NA_real_, length(times)))
+      vapply(x, function(v) if (is.null(v)) NA_real_ else as.numeric(v), numeric(1))
+    }
+
+    tibble::tibble(
+      station_id = station_id,
+      time = times,
+      wave_height_m = pull_num(body$hourly$wave_height),
+      wave_period_s = pull_num(body$hourly$wave_period),
+      wind_wave_height_m = pull_num(body$hourly$wind_wave_height),
+      swell_wave_height_m = pull_num(body$hourly$swell_wave_height),
+      forecast_fetched_at = Sys.time()
+    )
+  }, error = function(e) {
+    cli::cli_warn("Failed to fetch marine forecast for station {station_id}: {e$message}")
+    empty_result
+  })
+}
+
+#' Fetch Marine Wave Forecasts for All Buoy Stations
+#'
+#' @description
+#' Loops over all stations from [get_station_info()] and fetches Open-Meteo
+#' Marine API forecasts. Soft dependency: any per-station failure is logged
+#' and skipped, never aborts.
+#'
+#' @param station_info Data frame with station_id, lat, lon columns.
+#' @param forecast_days Integer number of forecast days (default 7).
+#' @param timeout Numeric request timeout in seconds (default 30).
+#'
+#' @return Combined tibble of all station marine forecasts. Empty tibble if
+#'   every station failed.
+#' @export
+#' @family storm-alert
+#' @examples
+#' \dontrun{
+#' fetch_all_marine_forecasts()
+#' }
+fetch_all_marine_forecasts <- function(station_info = get_station_info(),
+                                       forecast_days = 7, timeout = 30) {
+  results <- lapply(seq_len(nrow(station_info)), function(i) {
+    row <- station_info[i, ]
+    cli::cli_alert_info("Fetching marine forecast for {row$station_id} ({row$lat}, {row$lon})")
+    fetch_open_meteo_marine(
+      lat = row$lat,
+      lon = row$lon,
+      station_id = row$station_id,
+      forecast_days = forecast_days,
+      timeout = timeout
+    )
+  })
+  dplyr::bind_rows(results)
+}
+
+#' Short-Term Probability of Maximum Wave Height Exceedance (Forristall)
+#'
+#' @description
+#' Computes P(H_max > h | H_s, T_z, D) for a stationary sea state of significant
+#' wave height H_s, mean zero-crossing period T_z, lasting duration D, using the
+#' Forristall (1978) Weibull short-term distribution for individual wave heights.
+#'
+#' Forristall (1978) gives P(H > h | H_s) = exp(-(h / (alpha * H_s))^beta) with
+#' alpha = 0.681 and beta = 2.126 (calibrated on Gulf of Mexico storm data).
+#' For N independent waves in the window, P(H_max <= h) = (1 - P(H > h))^N, so
+#' P(H_max > h) = 1 - (1 - exp(-(h/(alpha*H_s))^beta))^N, with N = D / T_z.
+#'
+#' Reference: Forristall, G. Z. (1978). On the statistical distribution of wave
+#' heights in a storm. *Journal of Geophysical Research*, 83(C5), 2353-2358.
+#'
+#' @param h Numeric vector of wave heights to evaluate (m).
+#' @param hs Numeric significant wave height (m), length 1 or length(h).
+#' @param tz Numeric mean zero-crossing period (s), length 1 or length(h).
+#' @param duration_s Numeric window duration in seconds (default 3600 = 1 hour).
+#' @param alpha Forristall scale parameter (default 0.681).
+#' @param beta Forristall shape parameter (default 2.126).
+#'
+#' @return Numeric vector of P(H_max > h) values in `[0, 1]`. Returns NA where
+#'   `hs <= 0`, `tz <= 0`, or any input is NA.
+#' @export
+#' @family storm-alert
+#' @examples
+#' # Probability of a 20 m wave during a 1-hour window with Hs = 10 m, Tz = 9 s
+#' p_hmax_exceedance(20, hs = 10, tz = 9, duration_s = 3600)
+p_hmax_exceedance <- function(h, hs, tz, duration_s = 3600,
+                              alpha = 0.681, beta = 2.126) {
+  n <- max(length(h), length(hs), length(tz))
+  if (n == 0L) return(numeric(0))
+  h_v <- rep_len(h, n)
+  hs_v <- rep_len(hs, n)
+  tz_v <- rep_len(tz, n)
+  out <- rep(NA_real_, n)
+  ok <- !is.na(h_v) & !is.na(hs_v) & !is.na(tz_v) & hs_v > 0 & tz_v > 0
+  if (!any(ok)) return(out)
+  n_waves <- duration_s / tz_v[ok]
+  p_single <- exp(-(h_v[ok] / (alpha * hs_v[ok]))^beta)
+  out[ok] <- 1 - (1 - p_single)^n_waves
+  out
+}
+
+#' Summarise Forecast Rogue-Wave Risk per Station
+#'
+#' @description
+#' Given an Open-Meteo marine forecast tibble, computes per-station summaries:
+#' the peak forecast hour, peak H_s, peak P(H_max > 20 m), peak P(H_max > 25 m).
+#' Uses [p_hmax_exceedance()] applied independently per forecast hour, then
+#' takes the maximum across the forecast horizon.
+#'
+#' This is a *forecast-derived* risk surrogate — it should always be presented
+#' alongside the deterministic-NWP caveat (lead-time skill drops sharply after
+#' day 2-3, no ensemble spread).
+#'
+#' @param marine_forecasts Tibble from [fetch_all_marine_forecasts()].
+#' @param thresholds Numeric vector of H_max thresholds in metres
+#'   (default `c(20, 25)`).
+#' @param duration_s Window duration in seconds for each forecast hour
+#'   (default 3600).
+#'
+#' @return Tibble with one row per station: station_id, peak_time, peak_hs_m,
+#'   peak_period_s, p_hmax_gt_20, p_hmax_gt_25, n_forecast_hours.
+#'   Empty tibble if `marine_forecasts` is empty.
+#' @export
+#' @family storm-alert
+summarise_forecast_rogue_risk <- function(marine_forecasts,
+                                          thresholds = c(20, 25),
+                                          duration_s = 3600) {
+  empty <- tibble::tibble(
+    station_id = character(),
+    peak_time = as.POSIXct(character()),
+    peak_hs_m = numeric(),
+    peak_period_s = numeric(),
+    p_hmax_gt_20 = numeric(),
+    p_hmax_gt_25 = numeric(),
+    n_forecast_hours = integer()
+  )
+  if (is.null(marine_forecasts) || nrow(marine_forecasts) == 0) return(empty)
+
+  marine_forecasts |>
+    dplyr::filter(!is.na(.data$wave_height_m), !is.na(.data$wave_period_s)) |>
+    dplyr::mutate(
+      p20 = p_hmax_exceedance(20, .data$wave_height_m, .data$wave_period_s, duration_s),
+      p25 = p_hmax_exceedance(25, .data$wave_height_m, .data$wave_period_s, duration_s)
+    ) |>
+    dplyr::group_by(.data$station_id) |>
+    dplyr::summarise(
+      peak_idx = which.max(.data$wave_height_m),
+      peak_time = .data$time[peak_idx],
+      peak_hs_m = .data$wave_height_m[peak_idx],
+      peak_period_s = .data$wave_period_s[peak_idx],
+      p_hmax_gt_20 = max(.data$p20, na.rm = TRUE),
+      p_hmax_gt_25 = max(.data$p25, na.rm = TRUE),
+      n_forecast_hours = dplyr::n(),
+      .groups = "drop"
+    ) |>
+    dplyr::select(-"peak_idx") |>
+    dplyr::arrange(dplyr::desc(.data$peak_hs_m))
+}
+
 #' Detect Storm Events from Forecast Data
 #'
 #' @description
@@ -305,7 +522,8 @@ create_storm_alert_email <- function(storm_events,
                                      station_info = get_station_info(),
                                      all_forecasts = NULL,
                                      threshold_knots = 41,
-                                     met_warnings = NULL) {
+                                     met_warnings = NULL,
+                                     forecast_rogue_summary = NULL) {
   rlang::check_installed("blastula", reason = "to compose storm alert emails")
 
   threshold_beaufort <- knots_to_beaufort(threshold_knots)
@@ -389,6 +607,85 @@ create_storm_alert_email <- function(storm_events,
     )
   }, character(1)), collapse = "")
 
+  # Forecast Wave Conditions section (Option C — Open-Meteo Marine API)
+  # Soft dependency: only rendered if a non-empty summary was passed AND at
+  # least one storm-flagged station has a forecast row.
+  storm_station_ids_for_waves <- unique(storm_events$station_id)
+  wave_section <- if (!is.null(forecast_rogue_summary) &&
+                       nrow(forecast_rogue_summary) > 0) {
+    wave_rows_df <- forecast_rogue_summary |>
+      dplyr::filter(.data$station_id %in% storm_station_ids_for_waves) |>
+      dplyr::arrange(dplyr::desc(.data$peak_hs_m))
+
+    if (nrow(wave_rows_df) == 0) {
+      ""
+    } else {
+      wave_rows <- paste(vapply(seq_len(nrow(wave_rows_df)), function(i) {
+        r <- wave_rows_df[i, ]
+        peak_time_text <- if (!is.na(r$peak_time)) {
+          format(r$peak_time, "%a %d %b %H:%M UTC")
+        } else "<span style='color:#999;'>—</span>"
+        fmt_pct <- function(p) {
+          if (is.na(p) || !is.finite(p)) return("<span style='color:#999;'>—</span>")
+          if (p >= 0.01) sprintf("%.1f%%", 100 * p)
+          else if (p >= 1e-4) sprintf("%.2f%%", 100 * p)
+          else sprintf("%.1e", p)
+        }
+        p20_color <- if (!is.na(r$p_hmax_gt_20) && r$p_hmax_gt_20 >= 0.05) {
+          "color:darkred;font-weight:bold;"
+        } else if (!is.na(r$p_hmax_gt_20) && r$p_hmax_gt_20 >= 0.005) {
+          "color:darkorange;font-weight:bold;"
+        } else "color:#666;"
+        paste0(
+          "<tr>",
+          "<td style='padding:6px;border:1px solid #ddd;font-weight:bold;'>",
+          r$station_id, "</td>",
+          "<td style='padding:6px;border:1px solid #ddd;text-align:center;'>",
+          sprintf("%.1f", r$peak_hs_m), "</td>",
+          "<td style='padding:6px;border:1px solid #ddd;text-align:center;'>",
+          sprintf("%.1f", r$peak_period_s), "</td>",
+          "<td style='padding:6px;border:1px solid #ddd;'>", peak_time_text, "</td>",
+          "<td style='padding:6px;border:1px solid #ddd;text-align:center;",
+          p20_color, "'>", fmt_pct(r$p_hmax_gt_20), "</td>",
+          "<td style='padding:6px;border:1px solid #ddd;text-align:center;",
+          p20_color, "'>", fmt_pct(r$p_hmax_gt_25), "</td>",
+          "</tr>"
+        )
+      }, character(1)), collapse = "")
+
+      paste0(
+        "<details open style='margin-top:20px;'>",
+        "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;color:#333;'>",
+        "Forecast Wave Conditions (storm stations)</summary>",
+        "<p style='color:#555;font-size:0.9em;margin-bottom:8px;'>",
+        "Forecast significant wave height (Hs) and probability of an individual ",
+        "rogue wave exceeding 20 m or 25 m during the peak forecast hour.<br>\n",
+        "Source: <a href='https://open-meteo.com/en/docs/marine-weather-api'>",
+        "Open-Meteo Marine API</a> (DWD EWAM/GWAM, ~25 km grid). ",
+        "P(Hmax &gt; h) computed via the ",
+        "<a href='https://doi.org/10.1029/JC083iC05p02353'>Forristall (1978)</a> ",
+        "Weibull short-term distribution applied to each forecast hour ",
+        "(alpha=0.681, beta=2.126, window=3600 s).<br>\n",
+        "<strong>Forecast-derived</strong> — see lead-time caveat in footer.",
+        "</p>",
+        "<table style='border-collapse:collapse;width:100%;'>",
+        "<tr style='background:#f5f5f5;'>",
+        "<th style='padding:8px;border:1px solid #ddd;'>Station</th>",
+        "<th style='padding:8px;border:1px solid #ddd;'>Peak Hs (m)</th>",
+        "<th style='padding:8px;border:1px solid #ddd;'>Peak T (s)</th>",
+        "<th style='padding:8px;border:1px solid #ddd;'>Peak time</th>",
+        "<th style='padding:8px;border:1px solid #ddd;'>P(Hmax &gt; 20 m)</th>",
+        "<th style='padding:8px;border:1px solid #ddd;'>P(Hmax &gt; 25 m)</th>",
+        "</tr>",
+        wave_rows,
+        "</table>",
+        "</details>"
+      )
+    }
+  } else {
+    ""
+  }
+
   # Met Eireann section
   met_section <- if (!is.null(met_warnings) && length(met_warnings) > 0) {
     paste0(
@@ -408,7 +705,7 @@ create_storm_alert_email <- function(storm_events,
   max_beaufort <- max(station_summary$max_beaufort)
 
   email_body <- paste0(
-    "<div style='font-family:Arial,sans-serif;max-width:700px;margin:auto;'>",
+    "<div style='font-family:Arial,sans-serif;max-width:780px;margin:auto;font-size:18px;line-height:1.5;'>",
     "<div style='background:#d32f2f;color:white;padding:16px;text-align:center;'>",
     "<h1 style='margin:0;'>Storm Alert: Strong Gale Force Winds Forecast</h1>",
     "<p style='margin:4px 0 0;font-size:1.2em;'>",
@@ -456,6 +753,8 @@ create_storm_alert_email <- function(storm_events,
     "</table>",
     "</details>",
 
+    wave_section,
+
     met_section,
 
     "<hr style='margin-top:20px;'>",
@@ -474,6 +773,19 @@ create_storm_alert_email <- function(storm_events,
     "Forecast data is provided by Open-Meteo and should not be used as a substitute ",
     "for official marine weather warnings from ",
     "<a href='https://www.met.ie/warnings'>Met Eireann</a>.",
+    "</p>",
+    "<p style='color:#999;font-size:0.85em;font-style:italic;margin-top:8px;'>",
+    "<sup>1</sup> Forecast source: <a href='https://open-meteo.com/'>Open-Meteo</a> ",
+    "<code>/v1/forecast</code> endpoint, queried per buoy lat/lon for hourly ",
+    "<code>wind_speed_10m</code> and <code>wind_gusts_10m</code> ",
+    "(deterministic run, no ensemble spread). ",
+    "Open-Meteo blends global NWP models — primarily ",
+    "<a href='https://www.ecmwf.int/en/forecasts/datasets/set-i'>ECMWF IFS</a>, ",
+    "with DWD ICON, NOAA GFS and Meteo-France ARPEGE/AROME. ",
+    "<strong>Lead-time skill:</strong> day 1-2 timing typically within +/- 3-6 h and peak ",
+    "wind speed within ~10-15%; by day 5+, timing errors of 12-24 h are normal and ",
+    "Beaufort class can shift by +/- 1. Treat near-term entries as actionable signals ",
+    "and longer-lead entries as provisional — re-check daily.",
     "</p>",
     "</div>"
   )
