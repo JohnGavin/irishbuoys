@@ -6,7 +6,7 @@
 \usage{
 summarise_forecast_rogue_risk(
   marine_forecasts,
-  thresholds = c(20, 25),
+  thresholds = c(10, 15, 20, 25),
   duration_s = 3600
 )
 }
@@ -21,8 +21,8 @@ summarise_forecast_rogue_risk(
 }
 \value{
 Tibble with one row per station: station_id, peak_time, peak_hs_m,
-peak_period_s, p_hmax_gt_20, p_hmax_gt_25, n_forecast_hours.
-Empty tibble if \code{marine_forecasts} is empty.
+peak_period_s, p_hmax_gt_10, p_hmax_gt_15, p_hmax_gt_20, p_hmax_gt_25,
+n_forecast_hours. Empty tibble if \code{marine_forecasts} is empty.
 }
 \description{
 Given an Open-Meteo marine forecast tibble, computes per-station summaries:

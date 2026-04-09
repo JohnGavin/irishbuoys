@@ -318,7 +318,10 @@ test_that("summarise_forecast_rogue_risk returns empty tibble for empty input", 
   result <- summarise_forecast_rogue_risk(empty)
   expect_s3_class(result, "tbl_df")
   expect_equal(nrow(result), 0)
-  expect_true(all(c("station_id", "peak_hs_m", "p_hmax_gt_20", "p_hmax_gt_25") %in% names(result)))
+  expect_true(all(c(
+    "station_id", "peak_hs_m",
+    "p_hmax_gt_10", "p_hmax_gt_15", "p_hmax_gt_20", "p_hmax_gt_25"
+  ) %in% names(result)))
 })
 
 test_that("summarise_forecast_rogue_risk computes per-station peaks", {
@@ -345,10 +348,13 @@ test_that("summarise_forecast_rogue_risk computes per-station peaks", {
   m2 <- result[result$station_id == "M2", ]
   expect_gt(m6$p_hmax_gt_20, m2$p_hmax_gt_20)
   # All probabilities in [0, 1]
-  expect_true(all(result$p_hmax_gt_20 >= 0 & result$p_hmax_gt_20 <= 1))
-  expect_true(all(result$p_hmax_gt_25 >= 0 & result$p_hmax_gt_25 <= 1))
-  # P(Hmax>25) <= P(Hmax>20) always
-  expect_true(all(result$p_hmax_gt_25 <= result$p_hmax_gt_20))
+  for (col in c("p_hmax_gt_10", "p_hmax_gt_15", "p_hmax_gt_20", "p_hmax_gt_25")) {
+    expect_true(all(result[[col]] >= 0 & result[[col]] <= 1))
+  }
+  # Monotonicity: P(>10) >= P(>15) >= P(>20) >= P(>25) for every station
+  expect_true(all(result$p_hmax_gt_10 >= result$p_hmax_gt_15))
+  expect_true(all(result$p_hmax_gt_15 >= result$p_hmax_gt_20))
+  expect_true(all(result$p_hmax_gt_20 >= result$p_hmax_gt_25))
 })
 
 # ── fetch_open_meteo_marine (network) ────────────────────────────
@@ -390,6 +396,8 @@ test_that("create_storm_alert_email renders the wave section when summary provid
     peak_time = as.POSIXct("2026-04-10 18:00", tz = "UTC"),
     peak_hs_m = 12,
     peak_period_s = 11,
+    p_hmax_gt_10 = 0.99,
+    p_hmax_gt_15 = 0.45,
     p_hmax_gt_20 = 0.08,
     p_hmax_gt_25 = 0.005,
     n_forecast_hours = 168L
@@ -398,7 +406,11 @@ test_that("create_storm_alert_email renders the wave section when summary provid
   html <- paste(as.character(email), collapse = "\n")
   expect_true(grepl("Forecast Wave Conditions", html, fixed = TRUE))
   expect_true(grepl("Forristall", html, fixed = TRUE))
+  # All four threshold columns rendered
+  expect_true(grepl("P(Hmax &gt; 10 m)", html, fixed = TRUE))
+  expect_true(grepl("P(Hmax &gt; 15 m)", html, fixed = TRUE))
   expect_true(grepl("P(Hmax &gt; 20 m)", html, fixed = TRUE))
+  expect_true(grepl("P(Hmax &gt; 25 m)", html, fixed = TRUE))
   # M6 row with peak Hs 12.0 must appear
   expect_true(grepl(">12.0<", html, fixed = TRUE))
 })

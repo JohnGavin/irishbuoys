@@ -341,18 +341,20 @@ p_hmax_exceedance <- function(h, hs, tz, duration_s = 3600,
 #'   (default 3600).
 #'
 #' @return Tibble with one row per station: station_id, peak_time, peak_hs_m,
-#'   peak_period_s, p_hmax_gt_20, p_hmax_gt_25, n_forecast_hours.
-#'   Empty tibble if `marine_forecasts` is empty.
+#'   peak_period_s, p_hmax_gt_10, p_hmax_gt_15, p_hmax_gt_20, p_hmax_gt_25,
+#'   n_forecast_hours. Empty tibble if `marine_forecasts` is empty.
 #' @export
 #' @family storm-alert
 summarise_forecast_rogue_risk <- function(marine_forecasts,
-                                          thresholds = c(20, 25),
+                                          thresholds = c(10, 15, 20, 25),
                                           duration_s = 3600) {
   empty <- tibble::tibble(
     station_id = character(),
     peak_time = as.POSIXct(character()),
     peak_hs_m = numeric(),
     peak_period_s = numeric(),
+    p_hmax_gt_10 = numeric(),
+    p_hmax_gt_15 = numeric(),
     p_hmax_gt_20 = numeric(),
     p_hmax_gt_25 = numeric(),
     n_forecast_hours = integer()
@@ -362,6 +364,8 @@ summarise_forecast_rogue_risk <- function(marine_forecasts,
   marine_forecasts |>
     dplyr::filter(!is.na(.data$wave_height_m), !is.na(.data$wave_period_s)) |>
     dplyr::mutate(
+      p10 = p_hmax_exceedance(10, .data$wave_height_m, .data$wave_period_s, duration_s),
+      p15 = p_hmax_exceedance(15, .data$wave_height_m, .data$wave_period_s, duration_s),
       p20 = p_hmax_exceedance(20, .data$wave_height_m, .data$wave_period_s, duration_s),
       p25 = p_hmax_exceedance(25, .data$wave_height_m, .data$wave_period_s, duration_s)
     ) |>
@@ -371,6 +375,8 @@ summarise_forecast_rogue_risk <- function(marine_forecasts,
       peak_time = .data$time[peak_idx],
       peak_hs_m = .data$wave_height_m[peak_idx],
       peak_period_s = .data$wave_period_s[peak_idx],
+      p_hmax_gt_10 = max(.data$p10, na.rm = TRUE),
+      p_hmax_gt_15 = max(.data$p15, na.rm = TRUE),
       p_hmax_gt_20 = max(.data$p20, na.rm = TRUE),
       p_hmax_gt_25 = max(.data$p25, na.rm = TRUE),
       n_forecast_hours = dplyr::n(),
@@ -631,11 +637,12 @@ create_storm_alert_email <- function(storm_events,
           else if (p >= 1e-4) sprintf("%.2f%%", 100 * p)
           else sprintf("%.1e", p)
         }
-        p20_color <- if (!is.na(r$p_hmax_gt_20) && r$p_hmax_gt_20 >= 0.05) {
-          "color:darkred;font-weight:bold;"
-        } else if (!is.na(r$p_hmax_gt_20) && r$p_hmax_gt_20 >= 0.005) {
-          "color:darkorange;font-weight:bold;"
-        } else "color:#666;"
+        p_color <- function(p) {
+          if (is.na(p)) return("color:#666;")
+          if (p >= 0.05) "color:darkred;font-weight:bold;"
+          else if (p >= 0.005) "color:darkorange;font-weight:bold;"
+          else "color:#666;"
+        }
         paste0(
           "<tr>",
           "<td style='padding:6px;border:1px solid #ddd;font-weight:bold;'>",
@@ -646,9 +653,13 @@ create_storm_alert_email <- function(storm_events,
           sprintf("%.1f", r$peak_period_s), "</td>",
           "<td style='padding:6px;border:1px solid #ddd;'>", peak_time_text, "</td>",
           "<td style='padding:6px;border:1px solid #ddd;text-align:center;",
-          p20_color, "'>", fmt_pct(r$p_hmax_gt_20), "</td>",
+          p_color(r$p_hmax_gt_10), "'>", fmt_pct(r$p_hmax_gt_10), "</td>",
           "<td style='padding:6px;border:1px solid #ddd;text-align:center;",
-          p20_color, "'>", fmt_pct(r$p_hmax_gt_25), "</td>",
+          p_color(r$p_hmax_gt_15), "'>", fmt_pct(r$p_hmax_gt_15), "</td>",
+          "<td style='padding:6px;border:1px solid #ddd;text-align:center;",
+          p_color(r$p_hmax_gt_20), "'>", fmt_pct(r$p_hmax_gt_20), "</td>",
+          "<td style='padding:6px;border:1px solid #ddd;text-align:center;",
+          p_color(r$p_hmax_gt_25), "'>", fmt_pct(r$p_hmax_gt_25), "</td>",
           "</tr>"
         )
       }, character(1)), collapse = "")
@@ -659,7 +670,7 @@ create_storm_alert_email <- function(storm_events,
         "Forecast Wave Conditions (storm stations)</summary>",
         "<p style='color:#555;font-size:0.9em;margin-bottom:8px;'>",
         "Forecast significant wave height (Hs) and probability of an individual ",
-        "rogue wave exceeding 20 m or 25 m during the peak forecast hour.<br>\n",
+        "wave exceeding 10 m, 15 m, 20 m or 25 m during the peak forecast hour.<br>\n",
         "Source: <a href='https://open-meteo.com/en/docs/marine-weather-api'>",
         "Open-Meteo Marine API</a> (DWD EWAM/GWAM, ~25 km grid). ",
         "P(Hmax &gt; h) computed via the ",
@@ -674,6 +685,8 @@ create_storm_alert_email <- function(storm_events,
         "<th style='padding:8px;border:1px solid #ddd;'>Peak Hs (m)</th>",
         "<th style='padding:8px;border:1px solid #ddd;'>Peak T (s)</th>",
         "<th style='padding:8px;border:1px solid #ddd;'>Peak time</th>",
+        "<th style='padding:8px;border:1px solid #ddd;'>P(Hmax &gt; 10 m)</th>",
+        "<th style='padding:8px;border:1px solid #ddd;'>P(Hmax &gt; 15 m)</th>",
         "<th style='padding:8px;border:1px solid #ddd;'>P(Hmax &gt; 20 m)</th>",
         "<th style='padding:8px;border:1px solid #ddd;'>P(Hmax &gt; 25 m)</th>",
         "</tr>",
