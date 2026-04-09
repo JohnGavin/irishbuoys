@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-04-08T09:41:50Z",
+    "generated": "2026-04-09T12:33:31Z",
     "package_version": "0.2.0",
     "endpoint": "seasonal",
     "description": "Monthly and seasonal statistics with annual trends"
@@ -34,10 +34,10 @@
         },
         {
           "month": 4,
-          "mean": 2.095,
-          "sd": 1.2744,
+          "mean": 2.0967,
+          "sd": 1.277,
           "median": 1.875,
-          "n": 21009,
+          "n": 21117,
           "month_name": "Apr"
         },
         {
@@ -115,10 +115,10 @@
         },
         {
           "season": "Spring (MAM)",
-          "mean": 2.2682,
-          "sd": 1.4647,
+          "mean": 2.2685,
+          "sd": 1.465,
           "max": 12.422,
-          "n": 66884
+          "n": 66992
         },
         {
           "season": "Summer (JJA)",
@@ -164,10 +164,10 @@
         },
         {
           "month": 4,
-          "mean": 14.0134,
-          "sd": 6.2428,
+          "mean": 14.0193,
+          "sd": 6.252,
           "median": 13.776,
-          "n": 20972,
+          "n": 21080,
           "month_name": "Apr"
         },
         {
@@ -245,10 +245,10 @@
         },
         {
           "season": "Spring (MAM)",
-          "mean": 14.3683,
-          "sd": 6.5748,
+          "mean": 14.3696,
+          "sd": 6.577,
           "max": 47.019,
-          "n": 66442
+          "n": 66550
         },
         {
           "season": "Summer (JJA)",
@@ -341,18 +341,18 @@
           },
           {
             "year": 2026,
-            "mean": 3.3416,
+            "mean": 3.333,
             "median": 3.281,
-            "sd": 1.687,
+            "sd": 1.6892,
             "max": 12.422,
             "p90": 5.508,
             "p99": 7.852,
-            "n": 11261
+            "n": 11369
           }
         ],
-        "trend_per_decade": 0.561,
-        "p_value": 0.2786,
-        "r_squared": 0.1912
+        "trend_per_decade": 0.5538,
+        "p_value": 0.2807,
+        "r_squared": 0.1897
       },
       "wind": {
         "annual_stats": [
@@ -428,18 +428,18 @@
           },
           {
             "year": 2026,
-            "mean": 17.9872,
+            "mean": 17.9605,
             "median": 17.988,
-            "sd": 7.016,
+            "sd": 7.0286,
             "max": 40.644,
-            "p90": 27.323,
+            "p90": 27.2326,
             "p99": 33.927,
-            "n": 11261
+            "n": 11369
           }
         ],
-        "trend_per_decade": 2.3966,
-        "p_value": 0.133,
-        "r_squared": 0.3347
+        "trend_per_decade": 2.3743,
+        "p_value": 0.1333,
+        "r_squared": 0.3343
       }
     }
   }
