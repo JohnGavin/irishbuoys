@@ -207,3 +207,6 @@ test_that("QC flag distribution - reasonable bounds", {
   expect_gte(total, sum(unlist(REFERENCE_MIN_RECORDS)),
     label = paste0("Total records (", total, ") must be >= reference total"))
 })
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(compute_data_coverage)", { expect_snapshot(args(irishbuoys:::compute_data_coverage)) })

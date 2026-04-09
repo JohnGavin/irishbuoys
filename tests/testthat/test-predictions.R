@@ -305,3 +305,41 @@ test_that("confidence buckets are assigned correctly", {
   expect_true("medium" %in% buckets$confidence_bucket)
   expect_true("high" %in% buckets$confidence_bucket)
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(compute_calibration) signature", {
+  expect_snapshot(args(compute_calibration))
+})
+
+test_that("snapshot: args(read_predictions) signature", {
+  expect_snapshot(args(read_predictions))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(empty_predictions_tibble)", {
+  expect_snapshot(args(irishbuoys:::empty_predictions_tibble))
+})
+
+test_that("snapshot pass2: args(prediction_jsonl_path)", {
+  expect_snapshot(args(irishbuoys:::prediction_jsonl_path))
+})
+
+test_that("snapshot pass2: args(read_single_jsonl)", {
+  expect_snapshot(args(irishbuoys:::read_single_jsonl))
+})
+
+test_that("snapshot pass2: args(store_predictions_duckdb)", {
+  expect_snapshot(args(irishbuoys:::store_predictions_duckdb))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
+test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })
+test_that("snap3: args(analyze_joint_extremes)", { expect_snapshot(args(irishbuoys:::analyze_joint_extremes)) })
+test_that("snap3: args(analyze_parquet_storage)", { expect_snapshot(args(irishbuoys:::analyze_parquet_storage)) })

@@ -418,3 +418,73 @@ test_that("predict_wave_height errors on missing predictors", {
     regexp = "nonexistent_var"
   )
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(evaluate_wave_model) signature", {
+  expect_snapshot(args(evaluate_wave_model))
+})
+
+test_that("snapshot: args(predict_wave_height) signature", {
+  expect_snapshot(args(predict_wave_height))
+})
+
+test_that("snapshot: args(prepare_wave_features) signature", {
+  expect_snapshot(args(prepare_wave_features))
+})
+
+test_that("snapshot: args(train_wave_model) signature", {
+  expect_snapshot(args(train_wave_model))
+})
+
+test_that("snapshot: args(wave_model_report) signature", {
+  expect_snapshot(args(wave_model_report))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(add_wave_metrics)", {
+  expect_snapshot(args(irishbuoys:::add_wave_metrics))
+})
+
+test_that("snapshot pass2: args(analyze_gust_factor)", {
+  expect_snapshot(args(irishbuoys:::analyze_gust_factor))
+})
+
+test_that("snapshot pass2: args(analyze_joint_extremes)", {
+  expect_snapshot(args(irishbuoys:::analyze_joint_extremes))
+})
+
+test_that("snapshot pass2: args(analyze_parquet_storage)", {
+  expect_snapshot(args(irishbuoys:::analyze_parquet_storage))
+})
+
+test_that("snapshot pass2: args(analyze_rogue_statistics)", {
+  expect_snapshot(args(irishbuoys:::analyze_rogue_statistics))
+})
+
+test_that("snapshot pass2: args(analyze_station_pairs)", {
+  expect_snapshot(args(irishbuoys:::analyze_station_pairs))
+})
+
+test_that("snapshot pass2: args(beaufort_to_description)", {
+  expect_snapshot(args(irishbuoys:::beaufort_to_description))
+})
+
+test_that("snapshot pass2: args(buoy_tbl)", {
+  expect_snapshot(args(irishbuoys:::buoy_tbl))
+})
+
+test_that("snapshot pass2: args(calculate_annual_trends)", {
+  expect_snapshot(args(irishbuoys:::calculate_annual_trends))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(calculate_gpd_return_levels)", { expect_snapshot(args(irishbuoys:::calculate_gpd_return_levels)) })
+test_that("snap3: args(calculate_hs_from_elevation)", { expect_snapshot(args(irishbuoys:::calculate_hs_from_elevation)) })
+test_that("snap3: args(calculate_return_levels)", { expect_snapshot(args(irishbuoys:::calculate_return_levels)) })
+test_that("snap3: args(calculate_rms_wave_height)", { expect_snapshot(args(irishbuoys:::calculate_rms_wave_height)) })

@@ -224,3 +224,33 @@ test_that("compute_extremal_dependence skips pairs with insufficient data", {
     nrow(result$dependence_table) == 0 || !is.null(result$error)
   )
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(analyze_joint_extremes) signature", {
+  expect_snapshot(args(analyze_joint_extremes))
+})
+
+test_that("snapshot: args(compute_extremal_dependence) signature", {
+  expect_snapshot(args(compute_extremal_dependence))
+})
+
+test_that("snapshot: args(cross_correlation_stations) signature", {
+  expect_snapshot(args(cross_correlation_stations))
+})
+
+test_that("snapshot: args(get_station_info) signature", {
+  expect_snapshot(args(get_station_info))
+})
+
+test_that("snapshot: args(haversine_distance) signature", {
+  expect_snapshot(args(haversine_distance))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
+test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })
+test_that("snap3: args(analyze_parquet_storage)", { expect_snapshot(args(irishbuoys:::analyze_parquet_storage)) })

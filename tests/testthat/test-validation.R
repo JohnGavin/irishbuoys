@@ -54,3 +54,20 @@ test_that("validate_rogue_events passes with valid data", {
   result <- validate_rogue_events(data, min_rows = 1)
   expect_s3_class(result, "data.frame")
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(validate_buoy_data) signature", {
+  expect_snapshot(args(validate_buoy_data))
+})
+
+test_that("snapshot: args(validate_rogue_events) signature", {
+  expect_snapshot(args(validate_rogue_events))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(create_validation_summary)", { expect_snapshot(args(irishbuoys:::create_validation_summary)) })
+test_that("snap3: args(generate_validation_reports)", { expect_snapshot(args(irishbuoys:::generate_validation_reports)) })

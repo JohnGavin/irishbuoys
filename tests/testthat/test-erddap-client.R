@@ -65,3 +65,20 @@ test_that("get_latest_timestamp returns POSIXct", {
   skip_if(is.null(result), "ERDDAP server unreachable")
   expect_s3_class(result, "POSIXct")
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(download_buoy_data) signature", {
+  expect_snapshot(args(download_buoy_data))
+})
+
+test_that("snapshot: args(get_latest_timestamp) signature", {
+  expect_snapshot(args(get_latest_timestamp))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
+test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })

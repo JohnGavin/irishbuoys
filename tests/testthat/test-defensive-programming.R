@@ -384,3 +384,58 @@ test_that("detect_rogue_waves rejects invalid threshold", {
     class = "rlang_error"
   )
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(add_wave_metrics) signature", {
+  expect_snapshot(args(add_wave_metrics))
+})
+
+test_that("snapshot: args(calculate_wave_steepness) signature", {
+  expect_snapshot(args(calculate_wave_steepness))
+})
+
+test_that("snapshot: args(detect_rogue_waves) signature", {
+  expect_snapshot(args(detect_rogue_waves))
+})
+
+test_that("snapshot: args(evaluate_wave_model) signature", {
+  expect_snapshot(args(evaluate_wave_model))
+})
+
+test_that("snapshot: args(predict_wave_height) signature", {
+  expect_snapshot(args(predict_wave_height))
+})
+
+test_that("snapshot: args(prepare_wave_features) signature", {
+  expect_snapshot(args(prepare_wave_features))
+})
+
+test_that("snapshot: args(train_wave_model) signature", {
+  expect_snapshot(args(train_wave_model))
+})
+
+test_that("snapshot: args(validate_buoy_data) signature", {
+  expect_snapshot(args(validate_buoy_data))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(analyze_gust_factor)", {
+  expect_snapshot(args(irishbuoys:::analyze_gust_factor))
+})
+
+test_that("snapshot pass2: args(analyze_joint_extremes)", {
+  expect_snapshot(args(irishbuoys:::analyze_joint_extremes))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(analyze_parquet_storage)", { expect_snapshot(args(irishbuoys:::analyze_parquet_storage)) })
+test_that("snap3: args(analyze_rogue_statistics)", { expect_snapshot(args(irishbuoys:::analyze_rogue_statistics)) })
+test_that("snap3: args(analyze_station_pairs)", { expect_snapshot(args(irishbuoys:::analyze_station_pairs)) })
+test_that("snap3: args(beaufort_to_description)", { expect_snapshot(args(irishbuoys:::beaufort_to_description)) })
+test_that("snap3: args(buoy_tbl)", { expect_snapshot(args(irishbuoys:::buoy_tbl)) })

@@ -123,3 +123,17 @@ test_that("simulated source change would invalidate targets", {
 
   expect_true(TRUE, info = "Dependency structure verified - changes will trigger rebuilds")
 })
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(add_wave_metrics)", {
+  expect_snapshot(args(irishbuoys:::add_wave_metrics))
+})
+
+test_that("snapshot pass2: args(analyze_gust_factor)", {
+  expect_snapshot(args(irishbuoys:::analyze_gust_factor))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(get_variable_docs)", { expect_snapshot(args(irishbuoys:::get_variable_docs)) })

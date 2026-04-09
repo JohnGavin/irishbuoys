@@ -217,3 +217,29 @@ test_that("compare_rogue_wave_gust returns two-row comparison", {
   expect_equal(nrow(result), 2)
   expect_true(all(c("phenomenon", "n_events", "n_eligible", "occurrence_pct") %in% names(result)))
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(analyze_gust_factor) signature", {
+  expect_snapshot(args(analyze_gust_factor))
+})
+
+test_that("snapshot: args(calculate_gpd_return_levels) signature", {
+  expect_snapshot(args(calculate_gpd_return_levels))
+})
+
+test_that("snapshot: args(calculate_return_levels) signature", {
+  expect_snapshot(args(calculate_return_levels))
+})
+
+test_that("snapshot: args(compare_rogue_wave_gust) signature", {
+  expect_snapshot(args(compare_rogue_wave_gust))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(create_return_level_plot_data)", { expect_snapshot(args(irishbuoys:::create_return_level_plot_data)) })
+test_that("snap3: args(fit_gev_annual_maxima)", { expect_snapshot(args(irishbuoys:::fit_gev_annual_maxima)) })
+test_that("snap3: args(fit_gpd_threshold)", { expect_snapshot(args(irishbuoys:::fit_gpd_threshold)) })

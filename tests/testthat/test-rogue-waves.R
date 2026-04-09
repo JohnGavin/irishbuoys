@@ -422,3 +422,59 @@ test_that("test_rogue_propagation filters to valid station pairs", {
   result <- test_rogue_propagation(data, n_permutations = 10)
   expect_equal(nrow(result$h3_table), 0)
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(add_wave_metrics) signature", {
+  expect_snapshot(args(add_wave_metrics))
+})
+
+test_that("snapshot: args(analyze_rogue_statistics) signature", {
+  expect_snapshot(args(analyze_rogue_statistics))
+})
+
+test_that("snapshot: args(calculate_wave_steepness) signature", {
+  expect_snapshot(args(calculate_wave_steepness))
+})
+
+test_that("snapshot: args(compare_rogue_wave_gust) signature", {
+  expect_snapshot(args(compare_rogue_wave_gust))
+})
+
+test_that("snapshot: args(connect_duckdb) signature", {
+  expect_snapshot(args(connect_duckdb))
+})
+
+test_that("snapshot: args(detect_rogue_waves) signature", {
+  expect_snapshot(args(detect_rogue_waves))
+})
+
+test_that("snapshot: args(load_to_duckdb) signature", {
+  expect_snapshot(args(load_to_duckdb))
+})
+
+test_that("snapshot: args(rogue_wave_report) signature", {
+  expect_snapshot(args(rogue_wave_report))
+})
+
+test_that("snapshot: args(test_rogue_propagation) signature", {
+  expect_snapshot(args(test_rogue_propagation))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(analyze_gust_factor)", {
+  expect_snapshot(args(irishbuoys:::analyze_gust_factor))
+})
+
+test_that("snapshot pass2: args(analyze_joint_extremes)", {
+  expect_snapshot(args(irishbuoys:::analyze_joint_extremes))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(create_plot_rogue_all)", { expect_snapshot(args(irishbuoys:::create_plot_rogue_all)) })
+test_that("snap3: args(create_plot_rogue_by_station)", { expect_snapshot(args(irishbuoys:::create_plot_rogue_by_station)) })

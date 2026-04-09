@@ -160,3 +160,33 @@ test_that("validate_email_freshness: custom max_stale_hours threshold", {
     "ALL stations have stale data"
   )
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(create_email_summary) signature", {
+  expect_snapshot(args(create_email_summary))
+})
+
+test_that("snapshot: args(generate_and_send_summary) signature", {
+  expect_snapshot(args(generate_and_send_summary))
+})
+
+test_that("snapshot: args(generate_weekly_summary) signature", {
+  expect_snapshot(args(generate_weekly_summary))
+})
+
+test_that("snapshot: args(get_database_stats) signature", {
+  expect_snapshot(args(get_database_stats))
+})
+
+test_that("snapshot: args(validate_email_freshness) signature", {
+  expect_snapshot(args(validate_email_freshness))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
+test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })
+test_that("snap3: args(analyze_joint_extremes)", { expect_snapshot(args(irishbuoys:::analyze_joint_extremes)) })

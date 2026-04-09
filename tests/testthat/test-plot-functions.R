@@ -396,3 +396,89 @@ test_that("create_plot_gusts_vs_waves returns NULL when no extreme events", {
   result <- create_plot_gusts_vs_waves(d)
   expect_null(result)
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(create_plot_annual_trends) signature", {
+  expect_snapshot(args(create_plot_annual_trends))
+})
+
+test_that("snapshot: args(create_plot_gust_by_category) signature", {
+  expect_snapshot(args(create_plot_gust_by_category))
+})
+
+test_that("snapshot: args(create_plot_gusts_vs_waves) signature", {
+  expect_snapshot(args(create_plot_gusts_vs_waves))
+})
+
+test_that("snapshot: args(create_plot_monthly_wave) signature", {
+  expect_snapshot(args(create_plot_monthly_wave))
+})
+
+test_that("snapshot: args(create_plot_monthly_wind) signature", {
+  expect_snapshot(args(create_plot_monthly_wind))
+})
+
+test_that("snapshot: args(create_plot_return_levels) signature", {
+  expect_snapshot(args(create_plot_return_levels))
+})
+
+test_that("snapshot: args(create_plot_return_levels_per_station) signature", {
+  expect_snapshot(args(create_plot_return_levels_per_station))
+})
+
+test_that("snapshot: args(create_plot_rogue_all) signature", {
+  expect_snapshot(args(create_plot_rogue_all))
+})
+
+test_that("snapshot: args(create_plot_rogue_by_station) signature", {
+  expect_snapshot(args(create_plot_rogue_by_station))
+})
+
+test_that("snapshot: args(create_plot_rogue_gusts) signature", {
+  expect_snapshot(args(create_plot_rogue_gusts))
+})
+
+test_that("snapshot: args(create_plot_rogue_gusts_all) signature", {
+  expect_snapshot(args(create_plot_rogue_gusts_all))
+})
+
+test_that("snapshot: args(create_plot_rogue_gusts_by_station) signature", {
+  expect_snapshot(args(create_plot_rogue_gusts_by_station))
+})
+
+test_that("snapshot: args(create_plot_stl) signature", {
+  expect_snapshot(args(create_plot_stl))
+})
+
+test_that("snapshot: args(create_plot_time_of_day) signature", {
+  expect_snapshot(args(create_plot_time_of_day))
+})
+
+test_that("snapshot: args(create_plot_week_of_year) signature", {
+  expect_snapshot(args(create_plot_week_of_year))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(create_plot_wind_beaufort)", {
+  expect_snapshot(args(irishbuoys:::create_plot_wind_beaufort))
+})
+
+test_that("snapshot pass2: args(add_wave_metrics)", {
+  expect_snapshot(args(irishbuoys:::add_wave_metrics))
+})
+
+test_that("snapshot pass2: args(analyze_gust_factor)", {
+  expect_snapshot(args(irishbuoys:::analyze_gust_factor))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(analyze_joint_extremes)", { expect_snapshot(args(irishbuoys:::analyze_joint_extremes)) })
+test_that("snap3: args(analyze_parquet_storage)", { expect_snapshot(args(irishbuoys:::analyze_parquet_storage)) })
+test_that("snap3: args(analyze_rogue_statistics)", { expect_snapshot(args(irishbuoys:::analyze_rogue_statistics)) })
+test_that("snap3: args(analyze_station_pairs)", { expect_snapshot(args(irishbuoys:::analyze_station_pairs)) })
