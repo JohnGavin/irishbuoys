@@ -221,11 +221,22 @@ reference:
       - send_storm_alert
       - fetch_open_meteo_forecast
       - fetch_all_forecasts
+      - fetch_open_meteo_marine
+      - fetch_all_marine_forecasts
+      - p_hmax_exceedance
+      - summarise_forecast_rogue_risk
       - detect_storm_events
       - create_storm_alert_email
       - fetch_met_eireann_warnings
       - knots_to_beaufort
       - beaufort_to_description
+
+  - title: "Observation Freshness"
+    desc: "Observation-age confidence decay for dashboard risk metrics"
+    contents:
+      - compute_obs_confidence
+      - obs_status_label
+      - widen_ci
 
   - title: "Prediction Calibration"
     desc: "Track and calibrate prediction accuracy"
