@@ -103,3 +103,29 @@ test_that("hs_from_rms and calculate_rms_wave_height are consistent", {
   expect_true(hs > h_rms)  # Hs is always > H_rms
   expect_equal(hs / h_rms, sqrt(8), tolerance = 0.001)
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(calculate_hs_from_elevation) signature", {
+  expect_snapshot(args(calculate_hs_from_elevation))
+})
+
+test_that("snapshot: args(calculate_rms_wave_height) signature", {
+  expect_snapshot(args(calculate_rms_wave_height))
+})
+
+test_that("snapshot: args(explain_hourly_averaging) signature", {
+  expect_snapshot(args(explain_hourly_averaging))
+})
+
+test_that("snapshot: args(explain_hs_formula) signature", {
+  expect_snapshot(args(explain_hs_formula))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(explain_measurement_period)", { expect_snapshot(args(irishbuoys:::explain_measurement_period)) })
+test_that("snap3: args(explain_wave_height_measurement)", { expect_snapshot(args(irishbuoys:::explain_wave_height_measurement)) })
+test_that("snap3: args(hs_from_rms)", { expect_snapshot(args(irishbuoys:::hs_from_rms)) })

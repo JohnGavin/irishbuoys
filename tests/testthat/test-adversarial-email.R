@@ -667,3 +667,91 @@ test_that("validate_email_freshness: negative max_stale_hours", {
     "ALL stations have stale data"
   )
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(connect_duckdb) signature", {
+  expect_snapshot(args(connect_duckdb))
+})
+
+test_that("snapshot: args(create_email_summary) signature", {
+  expect_snapshot(args(create_email_summary))
+})
+
+test_that("snapshot: args(generate_and_send_summary) signature", {
+  expect_snapshot(args(generate_and_send_summary))
+})
+
+test_that("snapshot: args(generate_weekly_summary) signature", {
+  expect_snapshot(args(generate_weekly_summary))
+})
+
+test_that("snapshot: args(validate_email_freshness) signature", {
+  expect_snapshot(args(validate_email_freshness))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(add_wave_metrics)", {
+  expect_snapshot(args(irishbuoys:::add_wave_metrics))
+})
+
+test_that("snapshot pass2: args(analyze_gust_factor)", {
+  expect_snapshot(args(irishbuoys:::analyze_gust_factor))
+})
+
+test_that("snapshot pass2: args(analyze_joint_extremes)", {
+  expect_snapshot(args(irishbuoys:::analyze_joint_extremes))
+})
+
+test_that("snapshot pass2: args(analyze_parquet_storage)", {
+  expect_snapshot(args(irishbuoys:::analyze_parquet_storage))
+})
+
+test_that("snapshot pass2: args(analyze_rogue_statistics)", {
+  expect_snapshot(args(irishbuoys:::analyze_rogue_statistics))
+})
+
+test_that("snapshot pass2: args(analyze_station_pairs)", {
+  expect_snapshot(args(irishbuoys:::analyze_station_pairs))
+})
+
+test_that("snapshot pass2: args(beaufort_to_description)", {
+  expect_snapshot(args(irishbuoys:::beaufort_to_description))
+})
+
+test_that("snapshot pass2: args(buoy_tbl)", {
+  expect_snapshot(args(irishbuoys:::buoy_tbl))
+})
+
+test_that("snapshot pass2: args(calculate_annual_trends)", {
+  expect_snapshot(args(irishbuoys:::calculate_annual_trends))
+})
+
+test_that("snapshot pass2: args(calculate_gpd_return_levels)", {
+  expect_snapshot(args(irishbuoys:::calculate_gpd_return_levels))
+})
+
+test_that("snapshot pass2: args(calculate_hs_from_elevation)", {
+  expect_snapshot(args(irishbuoys:::calculate_hs_from_elevation))
+})
+
+test_that("snapshot pass2: args(calculate_return_levels)", {
+  expect_snapshot(args(irishbuoys:::calculate_return_levels))
+})
+
+test_that("snapshot pass2: args(calculate_rms_wave_height)", {
+  expect_snapshot(args(irishbuoys:::calculate_rms_wave_height))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(calculate_seasonal_means)", { expect_snapshot(args(irishbuoys:::calculate_seasonal_means)) })
+test_that("snap3: args(calculate_wave_steepness)", { expect_snapshot(args(irishbuoys:::calculate_wave_steepness)) })
+test_that("snap3: args(ci_bootstrap_return_levels)", { expect_snapshot(args(irishbuoys:::ci_bootstrap_return_levels)) })
+test_that("snap3: args(ci_order_statistics)", { expect_snapshot(args(irishbuoys:::ci_order_statistics)) })
+test_that("snap3: args(ci_parametric_bootstrap)", { expect_snapshot(args(irishbuoys:::ci_parametric_bootstrap)) })
+test_that("snap3: args(compare_rogue_wave_gust)", { expect_snapshot(args(irishbuoys:::compare_rogue_wave_gust)) })

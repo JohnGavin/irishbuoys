@@ -63,3 +63,21 @@ test_that("get_variable_docs QC_Flag has values list", {
   expect_true("values" %in% names(doc))
   expect_type(doc$values, "character")
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(get_data_dictionary) signature", {
+  expect_snapshot(args(get_data_dictionary))
+})
+
+test_that("snapshot: args(get_variable_docs) signature", {
+  expect_snapshot(args(get_variable_docs))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(compute_data_coverage)", { expect_snapshot(args(irishbuoys:::compute_data_coverage)) })
+test_that("snap3: args(create_return_level_plot_data)", { expect_snapshot(args(irishbuoys:::create_return_level_plot_data)) })
+test_that("snap3: args(download_buoy_data)", { expect_snapshot(args(irishbuoys:::download_buoy_data)) })

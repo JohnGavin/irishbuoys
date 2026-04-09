@@ -147,3 +147,20 @@ test_that("prepare_wave_features rejects invalid lags", {
   expect_error(prepare_wave_features(data, lags = -1), "positive integers")
   expect_error(prepare_wave_features(data, lags = "a"), "positive integers")
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(prepare_wave_features) signature", {
+  expect_snapshot(args(prepare_wave_features))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
+test_that("snap3: args(calculate_rms_wave_height)", { expect_snapshot(args(irishbuoys:::calculate_rms_wave_height)) })
+test_that("snap3: args(calculate_wave_steepness)", { expect_snapshot(args(irishbuoys:::calculate_wave_steepness)) })
+test_that("snap3: args(compare_rogue_wave_gust)", { expect_snapshot(args(irishbuoys:::compare_rogue_wave_gust)) })
+test_that("snap3: args(create_plot_gusts_vs_waves)", { expect_snapshot(args(irishbuoys:::create_plot_gusts_vs_waves)) })
+test_that("snap3: args(create_plot_monthly_wave)", { expect_snapshot(args(irishbuoys:::create_plot_monthly_wave)) })

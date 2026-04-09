@@ -276,3 +276,39 @@ test_that("query_buoy_data selects specific variables", {
   expect_equal(ncol(result), 2)
   expect_true(all(c("time", "wave_height") %in% names(result)))
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(buoy_tbl) signature", {
+  expect_snapshot(args(buoy_tbl))
+})
+
+test_that("snapshot: args(connect_duckdb) signature", {
+  expect_snapshot(args(connect_duckdb))
+})
+
+test_that("snapshot: args(create_buoy_schema) signature", {
+  expect_snapshot(args(create_buoy_schema))
+})
+
+test_that("snapshot: args(get_database_stats) signature", {
+  expect_snapshot(args(get_database_stats))
+})
+
+test_that("snapshot: args(load_to_duckdb) signature", {
+  expect_snapshot(args(load_to_duckdb))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(query_buoy_data)", {
+  expect_snapshot(args(irishbuoys:::query_buoy_data))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
+test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })

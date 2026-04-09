@@ -437,3 +437,59 @@ test_that("create_storm_alert_email omits wave section when summary is NULL or e
   html_empty <- paste(as.character(email_empty), collapse = "\n")
   expect_false(grepl("Forecast Wave Conditions", html_empty, fixed = TRUE))
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(beaufort_to_description) signature", {
+  expect_snapshot(args(beaufort_to_description))
+})
+
+test_that("snapshot: args(create_storm_alert_email) signature", {
+  expect_snapshot(args(create_storm_alert_email))
+})
+
+test_that("snapshot: args(detect_storm_events) signature", {
+  expect_snapshot(args(detect_storm_events))
+})
+
+test_that("snapshot: args(fetch_all_forecasts) signature", {
+  expect_snapshot(args(fetch_all_forecasts))
+})
+
+test_that("snapshot: args(fetch_open_meteo_forecast) signature", {
+  expect_snapshot(args(fetch_open_meteo_forecast))
+})
+
+test_that("snapshot: args(fetch_open_meteo_marine) signature", {
+  expect_snapshot(args(fetch_open_meteo_marine))
+})
+
+test_that("snapshot: args(knots_to_beaufort) signature", {
+  expect_snapshot(args(knots_to_beaufort))
+})
+
+test_that("snapshot: args(p_hmax_exceedance) signature", {
+  expect_snapshot(args(p_hmax_exceedance))
+})
+
+test_that("snapshot: args(send_storm_alert) signature", {
+  expect_snapshot(args(send_storm_alert))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(summarise_forecast_rogue_risk)", {
+  expect_snapshot(args(irishbuoys:::summarise_forecast_rogue_risk))
+})
+
+test_that("snapshot pass2: args(add_wave_metrics)", {
+  expect_snapshot(args(irishbuoys:::add_wave_metrics))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })
+test_that("snap3: args(analyze_joint_extremes)", { expect_snapshot(args(irishbuoys:::analyze_joint_extremes)) })

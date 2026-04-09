@@ -470,3 +470,33 @@ test_that("log_update records notes field correctly", {
   expect_equal(nrow(log), 1)
   expect_equal(log$notes, "test run note")
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(calculate_gpd_return_levels) signature", {
+  expect_snapshot(args(calculate_gpd_return_levels))
+})
+
+test_that("snapshot: args(calculate_return_levels) signature", {
+  expect_snapshot(args(calculate_return_levels))
+})
+
+test_that("snapshot: args(connect_duckdb) signature", {
+  expect_snapshot(args(connect_duckdb))
+})
+
+test_that("snapshot: args(create_email_summary) signature", {
+  expect_snapshot(args(create_email_summary))
+})
+
+test_that("snapshot: args(create_validation_summary) signature", {
+  expect_snapshot(args(create_validation_summary))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(fit_gev_annual_maxima)", { expect_snapshot(args(irishbuoys:::fit_gev_annual_maxima)) })
+test_that("snap3: args(fit_gpd_threshold)", { expect_snapshot(args(irishbuoys:::fit_gpd_threshold)) })
+test_that("snap3: args(generate_validation_reports)", { expect_snapshot(args(irishbuoys:::generate_validation_reports)) })

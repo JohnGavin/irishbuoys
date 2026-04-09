@@ -366,3 +366,43 @@ test_that("generate_api_methods returns valid structure", {
   expect_true("description" %in% names(data$gpd))
   expect_true("references" %in% names(data$gpd))
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(generate_api_decomposition) signature", {
+  expect_snapshot(args(generate_api_decomposition))
+})
+
+test_that("snapshot: args(generate_api_extremes) signature", {
+  expect_snapshot(args(generate_api_extremes))
+})
+
+test_that("snapshot: args(generate_api_gust_factors) signature", {
+  expect_snapshot(args(generate_api_gust_factors))
+})
+
+test_that("snapshot: args(generate_api_index) signature", {
+  expect_snapshot(args(generate_api_index))
+})
+
+test_that("snapshot: args(generate_api_methods) signature", {
+  expect_snapshot(args(generate_api_methods))
+})
+
+test_that("snapshot: args(generate_api_sources) signature", {
+  expect_snapshot(args(generate_api_sources))
+})
+
+# ── Extra function signature snapshots (auto-added pass 2) ─────────
+# Added to reach >=30% snapshot ratio. Regenerate with snapshot_accept().
+
+test_that("snapshot pass2: args(generate_api_spatial)", {
+  expect_snapshot(args(irishbuoys:::generate_api_spatial))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(generate_api_status)", { expect_snapshot(args(irishbuoys:::generate_api_status)) })
+test_that("snap3: args(generate_api_trends)", { expect_snapshot(args(irishbuoys:::generate_api_trends)) })

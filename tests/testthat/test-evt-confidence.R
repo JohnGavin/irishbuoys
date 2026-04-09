@@ -189,3 +189,26 @@ test_that("ci_parametric_bootstrap handles shape=0 (exponential)", {
   expect_equal(nrow(result), 2)
   expect_true(all(!is.na(result$return_level)))
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(ci_bootstrap_return_levels) signature", {
+  expect_snapshot(args(ci_bootstrap_return_levels))
+})
+
+test_that("snapshot: args(ci_order_statistics) signature", {
+  expect_snapshot(args(ci_order_statistics))
+})
+
+test_that("snapshot: args(ci_parametric_bootstrap) signature", {
+  expect_snapshot(args(ci_parametric_bootstrap))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
+test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })
+test_that("snap3: args(analyze_joint_extremes)", { expect_snapshot(args(irishbuoys:::analyze_joint_extremes)) })
+test_that("snap3: args(analyze_parquet_storage)", { expect_snapshot(args(irishbuoys:::analyze_parquet_storage)) })

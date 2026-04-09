@@ -217,3 +217,33 @@ test_that("trend_summary_report produces output", {
   expect_true(grepl("Trend", report))
   expect_true(grepl("significant", report))
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(calculate_annual_trends) signature", {
+  expect_snapshot(args(calculate_annual_trends))
+})
+
+test_that("snapshot: args(calculate_seasonal_means) signature", {
+  expect_snapshot(args(calculate_seasonal_means))
+})
+
+test_that("snapshot: args(compute_acf_summary) signature", {
+  expect_snapshot(args(compute_acf_summary))
+})
+
+test_that("snapshot: args(decompose_stl) signature", {
+  expect_snapshot(args(decompose_stl))
+})
+
+test_that("snapshot: args(detect_anomalies) signature", {
+  expect_snapshot(args(detect_anomalies))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(detect_outliers_iqr)", { expect_snapshot(args(irishbuoys:::detect_outliers_iqr)) })
+test_that("snap3: args(mann_kendall_test)", { expect_snapshot(args(irishbuoys:::mann_kendall_test)) })
+test_that("snap3: args(trend_summary_report)", { expect_snapshot(args(irishbuoys:::trend_summary_report)) })

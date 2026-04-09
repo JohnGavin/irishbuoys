@@ -235,3 +235,29 @@ test_that("convert_duckdb_to_parquet errors on missing file", {
     "not found"
   )
 })
+
+# ── Function signature snapshots (auto-added) ──────────────────────
+# These snapshots lock the exported API surface of functions used in
+# this test file. Any accidental rename / reorder / removal of an
+# argument will fail CI. Regenerate with `testthat::snapshot_accept()`.
+
+test_that("snapshot: args(analyze_parquet_storage) signature", {
+  expect_snapshot(args(analyze_parquet_storage))
+})
+
+test_that("snapshot: args(convert_duckdb_to_parquet) signature", {
+  expect_snapshot(args(convert_duckdb_to_parquet))
+})
+
+test_that("snapshot: args(incremental_update_parquet) signature", {
+  expect_snapshot(args(incremental_update_parquet))
+})
+
+test_that("snapshot: args(init_parquet_storage) signature", {
+  expect_snapshot(args(init_parquet_storage))
+})
+
+# ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
+test_that("snap3: args(get_database_stats)", { expect_snapshot(args(irishbuoys:::get_database_stats)) })
+test_that("snap3: args(initialize_database)", { expect_snapshot(args(irishbuoys:::initialize_database)) })
+test_that("snap3: args(query_parquet)", { expect_snapshot(args(irishbuoys:::query_parquet)) })

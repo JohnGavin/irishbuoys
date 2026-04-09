@@ -32,3 +32,11 @@
       4         M5          2025-11-01
       5         M6          2025-11-01
 
+# snap3: args(compute_data_coverage)
+
+    Code
+      args(irishbuoys:::compute_data_coverage)
+    Output
+      function (con, start_date, end_date) 
+      NULL
+
