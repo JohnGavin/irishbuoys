@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-04-10
+
+### Completed
+- `dv_station_completeness` downgraded from `cli_abort` to `cli_warn` — offline buoys no longer crash the pipeline. This was the root cause of both local run failures and likely `data-update.yml` CI failures
+- First successful end-to-end run of `R/dev/local_pipeline_run.R` (permanent reproducible script from 2026-04-09)
+- Fresh data through 2026-04-10 14:00 UTC deployed to GH Pages
+- P(Hmax>10m) and P(Hmax>15m) thresholds added to storm-alert email forecast wave table (commit `7e8bd13`)
+- Issue #68 opened: higher-value snapshot tests (phases 2-5)
+
+### Failed Approaches
+- None this session
+
+### Accuracy / Metrics
+- M6 storm forecast (2026-04-11 18:00): peak Hs 11.0 m, P(>10m) ≈ 100%, P(>15m) 97%, P(>20m) 8.6%, P(>25m) 0.07%
+- `local_pipeline_run.R` total runtime: ~22 min (fetch + tar_make + 4 vignettes + copy)
+- Pages deploy: 40s
+
+### Known Limitations
+- M4 buoy still offline (12 days, since 2026-03-29)
+- `data-update.yml` CI untested after the `dv_station_completeness` fix — should now succeed but needs verification on next scheduled run
+- `pkgdown_build` target still fails inside tar_make (quarto/pkgdown `--output-dir` integration quirk) — excluded from local runs, does not affect data refresh or Pages deploy
+
 ## 2026-04-08 / 2026-04-09
 
 ### Completed
