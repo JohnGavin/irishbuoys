@@ -304,7 +304,9 @@ ui &lt;- navbarPage(
           h2("About This Dashboard"),
           p("This interactive dashboard displays data from the ",
             tags$b("Irish Weather Buoy Network"),
-            ", operated by the Marine Institute of Ireland."),
+            ", operated by the ",
+            tags$a(href = "https://www.marine.ie/", "Marine Institute of Ireland", target = "_blank"),
+            "."),
           h4("Features"),
           tags$ul(
             tags$li(tags$b("Time Series Tab:"), " View any variable over time for one or more stations"),
@@ -316,7 +318,9 @@ ui &lt;- navbarPage(
           p("Data sourced from the ",
             tags$a(href = "https://erddap.marine.ie/erddap/index.html",
                    "Marine Institute ERDDAP Server", target = "_blank")),
-          p("The Irish Weather Buoy Network is operated by the Marine Institute of Ireland."),
+          p("The Irish Weather Buoy Network is operated by the ",
+            tags$a(href = "https://www.marine.ie/", "Marine Institute of Ireland", target = "_blank"),
+            "."),
           p("Historical data available from 2001 to present.")
         ),
         column(6,
@@ -350,7 +354,9 @@ ui &lt;- navbarPage(
 
       hr(),
       h2("Variable Definitions"),
-      p("Variables from the Marine Institute ERDDAP server. ",
+      p("Variables from the ",
+        tags$a(href = "https://erddap.marine.ie/erddap/index.html",
+               "Marine Institute ERDDAP server", target = "_blank"), ". ",
         tags$a(href = "https://erddap.marine.ie/erddap/info/IWBNetwork/index.html",
                "Full metadata", target = "_blank")),
 
@@ -460,7 +466,7 @@ ui &lt;- navbarPage(
       h2("Technical Notes"),
       p("This dashboard runs entirely in your browser using WebR (R compiled to WebAssembly)."),
       p("Built with: Shiny, Plotly, Shinylive, Quarto"),
-      p("Data updates: Weekly via GitHub Actions")
+      p("Data updates: Every 6 hours via GitHub Actions")
     )
   )
 )
@@ -629,16 +635,25 @@ server &lt;- function(input, output, session) {
         type = "scatter", mode = "lines+markers",
         name = stn,
         marker = list(size = 3),
-        hovertemplate = paste0("&lt;b&gt;", stn, "&lt;/b&gt;&lt;br&gt;%{x}&lt;br&gt;", var_label, ": %{y:.2f}&lt;extra&gt;&lt;/extra&gt;")
+        hoverinfo = "text",
+        text = ~paste0("&lt;b&gt;", stn, "&lt;/b&gt;&lt;br&gt;", format(time, "%Y-%m-%d %H:%M"), "&lt;br&gt;", var_label, ": ", round(get(var), 2))
       )
     }
 
     p |&gt; layout(
-      title = paste(var_label, "- Last", input$days, "Days"),
-      xaxis = list(title = "Time (UTC)"),
-      yaxis = list(title = var_label),
+      title = list(text = paste(var_label, "- Last", input$days, "Days"),
+                   font = list(size = 14, color = "#e0e0e0")),
+      plot_bgcolor = "#1a1a1a", paper_bgcolor = "#1a1a1a",
+      xaxis = list(title = "Time (UTC)", gridcolor = "rgba(255,255,255,0.2)",
+                   tickfont = list(color = "#cccccc"), titlefont = list(color = "#e0e0e0")),
+      yaxis = list(title = var_label, gridcolor = "rgba(255,255,255,0.2)",
+                   tickfont = list(color = "#cccccc"), titlefont = list(color = "#e0e0e0")),
       hovermode = "x unified",
-      legend = list(orientation = "h", y = -0.2)
+      legend = list(orientation = "h", y = -0.15, x = 0.5, xanchor = "center",
+                    font = list(color = "#e0e0e0", size = 12),
+                    bgcolor = "rgba(40,40,40,0.8)", bordercolor = "#555555", borderwidth = 1),
+      hoverlabel = list(bgcolor = "rgba(0,0,0,0.9)", font = list(color = "white", size = 12)),
+      margin = list(b = 80)
     )
   })
 
@@ -702,16 +717,25 @@ server &lt;- function(input, output, session) {
             color = ~station_id,
             type = "scatter", mode = "markers",
             marker = list(size = 6, opacity = 0.6),
-            hovertemplate = paste0(
-              "&lt;b&gt;%{data.name}&lt;/b&gt;&lt;br&gt;",
-              x_label, ": %{x:.2f}&lt;br&gt;",
-              y_label, ": %{y:.2f}&lt;extra&gt;&lt;/extra&gt;"
+            hoverinfo = "text",
+            text = ~paste0(
+              "&lt;b&gt;", station_id, "&lt;/b&gt;&lt;br&gt;",
+              x_label, ": ", round(get(var_x), 2), "&lt;br&gt;",
+              y_label, ": ", round(get(var_y), 2)
             )) |&gt;
       layout(
-        title = paste(y_label, "vs", x_label, "- Last", input$scatter_days, "Days"),
-        xaxis = list(title = x_label),
-        yaxis = list(title = y_label),
-        legend = list(orientation = "h", y = -0.15)
+        title = list(text = paste(y_label, "vs", x_label, "- Last", input$scatter_days, "Days"),
+                     font = list(size = 14, color = "#e0e0e0")),
+        plot_bgcolor = "#1a1a1a", paper_bgcolor = "#1a1a1a",
+        xaxis = list(title = x_label, gridcolor = "rgba(255,255,255,0.2)",
+                     tickfont = list(color = "#cccccc"), titlefont = list(color = "#e0e0e0")),
+        yaxis = list(title = y_label, gridcolor = "rgba(255,255,255,0.2)",
+                     tickfont = list(color = "#cccccc"), titlefont = list(color = "#e0e0e0")),
+        legend = list(orientation = "h", y = -0.15, x = 0.5, xanchor = "center",
+                      font = list(color = "#e0e0e0", size = 12),
+                      bgcolor = "rgba(40,40,40,0.8)", bordercolor = "#555555", borderwidth = 1),
+        hoverlabel = list(bgcolor = "rgba(0,0,0,0.9)", font = list(color = "white", size = 12)),
+        margin = list(b = 80)
       )
   })
 
@@ -832,6 +856,17 @@ server &lt;- function(input, output, session) {
 }
 
 shinyApp(ui, server)</code></pre>
+<hr>
+<div class="callout callout-style-simple callout-note no-icon">
+<div class="callout-body d-flex">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-body-container">
+<p><strong>Disclaimer:</strong> <code>irishbuoys</code> is an independent open-source project (<a href="https://johngavin.github.io/irishbuoys/">website</a>, <a href="https://github.com/JohnGavin/irishbuoys">GitHub</a>). It is not affiliated with, endorsed by, or part of the <a href="https://www.marine.ie/">Marine Institute</a> or the Irish Weather Buoy Network. For official marine weather warnings, consult <a href="https://www.met.ie/warnings">Met Eireann</a>.</p>
+</div>
+</div>
+</div>
 
 </main>
 <!-- /main column -->
