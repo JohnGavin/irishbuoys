@@ -1,11 +1,14 @@
 # local_pipeline_run.R — Reproducible local equivalent of data-update.yml CI.
 #
-# Usage (from irishbuoys/ project root, inside nix-shell):
+# Usage (from anywhere — script auto-detects package root):
+#
+#   # From inside nix-shell, inside irishbuoys/:
 #   Rscript R/dev/local_pipeline_run.R
 #
-# Or from outside nix-shell (handles R_LIBS_SITE contamination):
+#   # From outside nix-shell, from ANY directory:
 #   env -u R_LIBS_SITE -u R_LIBS_USER -u R_LIBS \
-#     nix-shell default.nix -A shell --run 'Rscript R/dev/local_pipeline_run.R'
+#     nix-shell ~/docs_gh/proj/data/weather/irish_buoy_network/irishbuoys/default.nix \
+#     -A shell --run 'Rscript ~/docs_gh/proj/data/weather/irish_buoy_network/irishbuoys/R/dev/local_pipeline_run.R'
 #
 # What it does (mirrors data-update.yml steps):
 #   1. Fetch fresh ERDDAP data via incremental_update()
@@ -23,6 +26,19 @@
 # is offline, temporarily bump LOOKBACK_DAYS_VALIDATION in
 # R/tar_plans/plan_data_validation.R (e.g. 7 -> 14) before running.
 # Revert before committing. See CHANGELOG.md 2026-04-09 entry.
+
+# Ensure we're in the package root regardless of where Rscript was invoked.
+# Locate DESCRIPTION by walking up from this script's location.
+pkg_root <- tryCatch(
+  rprojroot::find_package_root_file(),
+  error = function(e) {
+    # Fallback: derive from this script's path
+    script_dir <- if (interactive()) getwd() else dirname(sys.frame(1)$ofile)
+    normalizePath(file.path(script_dir, "..", ".."), mustWork = TRUE)
+  }
+)
+setwd(pkg_root)
+cli::cli_alert_info("Working directory: {getwd()}")
 
 cli::cli_h1("Step 1: Fetch fresh ERDDAP data")
 pkgload::load_all(quiet = TRUE)
