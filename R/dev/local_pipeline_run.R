@@ -32,9 +32,16 @@
 pkg_root <- tryCatch(
   rprojroot::find_package_root_file(),
   error = function(e) {
-    # Fallback: derive from this script's path
-    script_dir <- if (interactive()) getwd() else dirname(sys.frame(1)$ofile)
-    normalizePath(file.path(script_dir, "..", ".."), mustWork = TRUE)
+    # Fallback: derive from this script's path via --file= arg
+    args <- commandArgs(trailingOnly = FALSE)
+    file_arg <- grep("^--file=", args, value = TRUE)
+    if (length(file_arg) > 0) {
+      script_path <- normalizePath(sub("^--file=", "", file_arg[1]), mustWork = TRUE)
+      # Script is at R/dev/local_pipeline_run.R → package root is ../..
+      normalizePath(file.path(dirname(script_path), "..", ".."), mustWork = TRUE)
+    } else {
+      stop("Cannot determine package root. Run from irishbuoys/ or use Rscript with full path.")
+    }
   }
 )
 setwd(pkg_root)
@@ -50,8 +57,9 @@ result <- incremental_update(
 )
 cat("Status:", result$status, "\n")
 cat("Records added:", result$records_added, "\n")
-if (!is.null(result$summary)) {
-  print(result$summary[, c("station_id", "latest")])
+if (!is.null(result$summary) && nrow(result$summary) > 0) {
+  cols <- intersect(c("station_id", "latest", "n_records"), names(result$summary))
+  if (length(cols) > 0) print(result$summary[, cols, drop = FALSE])
 }
 if (result$status == "error") {
   stop("Data fetch failed: ", result$error)
@@ -59,11 +67,16 @@ if (result$status == "error") {
 
 cli::cli_h1("Step 2: Run targets pipeline")
 targets::tar_config_set(store = "_targets")
+# callr_function = NULL runs tar_make() in-process rather than forking a
+# subprocess. The callr fork gets killed by the system during long-running
+# C computations (spatial_extremal_dependence: ~7 min of SpatialExtremes
+# bootstrap). In-process avoids this and also gives real-time log output.
 targets::tar_make(
   names = !tidyselect::starts_with("vignette_") &
           !tidyselect::starts_with("qa_") &
           !tidyselect::starts_with("pkgctx_") &
-          !tidyselect::starts_with("pkgdown_")
+          !tidyselect::starts_with("pkgdown_"),
+  callr_function = NULL
 )
 
 cli::cli_h1("Step 3: Render vignettes")
