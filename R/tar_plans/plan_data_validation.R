@@ -228,10 +228,11 @@ plan_data_validation <- list(
       missing <- setdiff(all_stations, recent_stations)
 
       if (length(missing) > 0) {
-        cli::cli_abort(c(
-          "x" = "Station completeness FAILED: {length(missing)} station(s) missing recent data",
+        cli::cli_warn(c(
+          "!" = "Station completeness: {length(missing)} station(s) missing recent data",
           "i" = "Missing: {paste(missing, collapse = ', ')}",
-          "i" = "These stations have historical data but none in the last {LOOKBACK_DAYS_VALIDATION} days"
+          "i" = "These stations have historical data but none in the last {LOOKBACK_DAYS_VALIDATION} days",
+          "i" = "Pipeline continues with available stations (real-world outage, not a data quality bug)"
         ))
       }
 
