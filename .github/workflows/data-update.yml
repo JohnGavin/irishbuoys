@@ -146,14 +146,18 @@ jobs:
           echo "::notice::Update trigger: ${{ github.event_name }}"
           nix-shell default.nix -A shell --run "Rscript -e '
             targets::tar_config_set(store = \"_targets\")
-            # Exclude slow dev-only targets from weekly pipeline:
+            # Exclude slow/dev-only targets from data pipeline:
             # - vignette_*: rendered separately below
             # - qa_*: covr takes 50+ min; QA runs in R-CMD-check
             # - pkgctx_*: builds Rust tool from source (~20 min); dev-only
+            # - pkgdown_*: pkgdown::build_site() calls quarto render on all
+            #   vignettes internally, which fails in CI. Vignettes are rendered
+            #   explicitly in the next step instead.
             targets::tar_make(
               names = !tidyselect::starts_with(\"vignette_\") &
                       !tidyselect::starts_with(\"qa_\") &
-                      !tidyselect::starts_with(\"pkgctx_\")
+                      !tidyselect::starts_with(\"pkgctx_\") &
+                      !tidyselect::starts_with(\"pkgdown_\")
             )
           '"
 
