@@ -416,9 +416,23 @@ create_email_summary <- function(summary) {
     "<p>No station data available this week.</p>"
   } else {
     paste(apply(stats_df, 1, function(row) {
+    n_obs <- as.integer(row["n_observations"])
+    is_offline <- is.na(n_obs) || n_obs == 0L
+
+    # Offline stations get a prominent red banner, not NA metrics
+    if (is_offline) {
+      return(paste0(
+        "<h3 style='color:#dc3545;'>Station ", row["station_id"],
+        " — OFFLINE</h3>",
+        "<p style='color:#dc3545;font-weight:bold;'>",
+        "No observations received this week. ",
+        "Station may be offline or ERDDAP data unavailable.</p>"
+      ))
+    }
+
     missing_li <- if (!is.na(row["missing_hours"])) {
       mh <- as.numeric(row["missing_hours"])
-      mh_style <- if (mh > 150) {
+      mh_style <- if (is.na(mh) || mh > 150) {
         "color:#dc3545;font-size:1.4em;font-weight:bold;"
       } else if (mh > 100) {
         "color:#dc3545;font-size:1.2em;font-weight:bold;"
@@ -433,16 +447,23 @@ create_email_summary <- function(summary) {
     } else {
       ""
     }
+
+    fmt <- function(x, digits = 2) {
+      v <- suppressWarnings(as.numeric(x))
+      if (is.na(v)) return("N/A")
+      round(v, digits)
+    }
+
     paste0(
       "<h3>Station ", row["station_id"], "</h3>",
       "<ul>",
       missing_li,
-      "<li>Observations: ", row["n_observations"], "</li>",
-      "<li>Maximum Wave Height: ", round(as.numeric(row["max_wave_height"]), 2), " m</li>",
-      "<li>Average Wave Height: ", round(as.numeric(row["avg_wave_height"]), 2), " m</li>",
-      "<li>Average Wind Speed: ", round(as.numeric(row["avg_wind_speed"]), 1), " knots</li>",
-      "<li>Air Temperature: ", round(as.numeric(row["avg_air_temp"]), 1), " C</li>",
-      "<li>Sea Temperature: ", round(as.numeric(row["avg_sea_temp"]), 1), " C</li>",
+      "<li>Observations: ", n_obs, "</li>",
+      "<li>Maximum Wave Height: ", fmt(row["max_wave_height"]), " m</li>",
+      "<li>Average Wave Height: ", fmt(row["avg_wave_height"]), " m</li>",
+      "<li>Average Wind Speed: ", fmt(row["avg_wind_speed"], 1), " knots</li>",
+      "<li>Air Temperature: ", fmt(row["avg_air_temp"], 1), " C</li>",
+      "<li>Sea Temperature: ", fmt(row["avg_sea_temp"], 1), " C</li>",
       "</ul>"
     )
   }), collapse = "")
@@ -574,14 +595,23 @@ create_email_summary <- function(summary) {
 
     "<details>",
     "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Week-over-Week Changes</summary>",
-    if (!is.null(summary$week_over_week)) {
+    if (!is.null(summary$week_over_week) && nrow(summary$week_over_week) > 0) {
       paste0(
         "<table border='1' style='border-collapse: collapse;'>",
         "<tr><th>Station</th><th>Wave Height Change</th><th>Wind Speed Change</th></tr>",
         paste(apply(summary$week_over_week[, c("station_id", "wave_change_pct", "wind_change_pct")], 1,
           function(row) {
-            wave_color <- if(as.numeric(row[2]) > 0) "red" else "green"
-            wind_color <- if(as.numeric(row[3]) > 0) "red" else "green"
+            wv <- suppressWarnings(as.numeric(row[2]))
+            wn <- suppressWarnings(as.numeric(row[3]))
+            if (is.na(wv) || is.na(wn)) {
+              return(paste0(
+                "<tr><td>", row[1], "</td>",
+                "<td style='color:#999;'>N/A</td>",
+                "<td style='color:#999;'>N/A</td></tr>"
+              ))
+            }
+            wave_color <- if (wv > 0) "red" else "green"
+            wind_color <- if (wn > 0) "red" else "green"
             paste0(
               "<tr><td>", row[1], "</td>",
               "<td style='color:", wave_color, "'>", row[2], "%</td>",
