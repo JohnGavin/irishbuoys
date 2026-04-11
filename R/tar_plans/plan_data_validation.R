@@ -34,7 +34,13 @@ plan_data_validation <- list(
       end_dt <- as.POSIXct(end_date, tz = "UTC")
       expected_hours <- as.integer(difftime(end_dt, start_dt, units = "hours"))
 
-      coverage <- buoy_tbl(con) |>
+      # MANDATORY: start from canonical station list, left-join data.
+      # Never group_by(station_id) on filtered data alone — stations with
+      # zero recent records must appear as 0% coverage, not be omitted.
+      # See rule: never-drop-missing-stations.
+      all_stations <- get_station_info()
+
+      data_coverage <- buoy_tbl(con) |>
         dplyr::filter(
           time >= .env$start_dt,
           time < .env$end_dt
@@ -48,11 +54,18 @@ plan_data_validation <- list(
           actual_hours = dplyr::n_distinct(hour),
           n_records = dplyr::n(),
           .groups = "drop"
-        ) |>
+        )
+
+      coverage <- all_stations |>
+        dplyr::select("station_id") |>
+        dplyr::left_join(data_coverage, by = "station_id") |>
         dplyr::mutate(
+          actual_hours = tidyr::replace_na(actual_hours, 0L),
+          n_records = tidyr::replace_na(n_records, 0L),
           expected_hours = expected_hours,
           coverage_pct = round(100 * actual_hours / expected_hours, 1),
-          missing_hours = expected_hours - actual_hours
+          missing_hours = expected_hours - actual_hours,
+          status = dplyr::if_else(actual_hours == 0L, "offline", "reporting")
         )
 
       # Warn (not abort) if any station below critical threshold.

@@ -45,8 +45,11 @@ plan_dashboard <- list(
     {
       data <- dashboard_buoy_data
 
-      # Station-level statistics
-      station_stats <- data |>
+      # Station-level statistics.
+      # MANDATORY: canonical station list first, left-join data.
+      # Offline stations appear with 0 records + NA metrics.
+      all_stations <- get_station_info()
+      data_stats <- data |>
         dplyr::group_by(station_id) |>
         dplyr::summarise(
           n_records = dplyr::n(),
@@ -59,6 +62,13 @@ plan_dashboard <- list(
           max_wind_speed = max(wind_speed, na.rm = TRUE),
           max_gust = max(gust, na.rm = TRUE),
           .groups = "drop"
+        )
+      station_stats <- all_stations |>
+        dplyr::select("station_id") |>
+        dplyr::left_join(data_stats, by = "station_id") |>
+        dplyr::mutate(
+          n_records = tidyr::replace_na(n_records, 0L),
+          status = dplyr::if_else(n_records == 0L, "offline", "reporting")
         )
 
       # Overall statistics
