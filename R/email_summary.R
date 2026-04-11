@@ -165,8 +165,13 @@ generate_weekly_summary <- function(
     ) |>
     apply_qc()
 
-  # Current week statistics
-  current_week <- base_current |>
+  # Current week statistics.
+  # MANDATORY: start from canonical station list, left-join data.
+  # Stations with zero recent observations must appear as NA / "offline".
+  # See rule: never-drop-missing-stations.
+  all_stations <- get_station_info()
+
+  current_week_data <- base_current |>
     dplyr::group_by(.data$station_id) |>
     dplyr::summarise(
       avg_wave_height = mean(.data$wave_height, na.rm = TRUE),
@@ -179,6 +184,14 @@ generate_weekly_summary <- function(
       .groups = "drop"
     ) |>
     dplyr::collect()
+
+  current_week <- all_stations |>
+    dplyr::select("station_id") |>
+    dplyr::left_join(current_week_data, by = "station_id") |>
+    dplyr::mutate(
+      n_observations = tidyr::replace_na(n_observations, 0L),
+      status = dplyr::if_else(n_observations == 0L, "offline", "reporting")
+    )
 
   # Previous week comparison
   prev_week <- buoy_tbl(con) |>
@@ -255,9 +268,10 @@ generate_weekly_summary <- function(
   extremes <- dplyr::bind_rows(high_waves, storm_winds, rogue_waves) |>
     dplyr::arrange(dplyr::desc(.data$time))
 
-  # Ingestion stats: new records per station this week
+  # Ingestion stats: new records per station this week.
+  # MANDATORY: canonical station list first, left-join data.
   report_composed <- Sys.time()
-  ingestion_stats <- buoy_tbl(con) |>
+  ingestion_data <- buoy_tbl(con) |>
     dplyr::filter(
       .data$time >= !!as.POSIXct(start_date, tz = "UTC"),
       .data$time < !!as.POSIXct(current_date, tz = "UTC")
@@ -269,15 +283,23 @@ generate_weekly_summary <- function(
       latest = max(.data$time, na.rm = TRUE),
       .groups = "drop"
     ) |>
-    dplyr::arrange(.data$station_id) |>
-    dplyr::collect() |>
+    dplyr::collect()
+
+  ingestion_stats <- all_stations |>
+    dplyr::select("station_id") |>
+    dplyr::left_join(ingestion_data, by = "station_id") |>
     dplyr::mutate(
+      new_records = tidyr::replace_na(new_records, 0L),
       report_composed = report_composed,
-      staleness_hours = round(
-        as.numeric(difftime(report_composed, .data$latest, units = "hours")), 1
+      staleness_hours = dplyr::if_else(
+        is.na(.data$latest),
+        Inf,  # no data = infinitely stale
+        round(as.numeric(difftime(report_composed, .data$latest, units = "hours")), 1)
       ),
-      staleness_alert = .data$staleness_hours > 18
-    )
+      staleness_alert = .data$staleness_hours > 18,
+      status = dplyr::if_else(new_records == 0L, "offline", "reporting")
+    ) |>
+    dplyr::arrange(.data$station_id)
 
   # Validate freshness when data exists (abort if ALL stations stale, warn if some)
   if (nrow(ingestion_stats) > 0) {
