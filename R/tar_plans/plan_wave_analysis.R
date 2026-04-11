@@ -60,7 +60,8 @@ plan_wave_analysis <- list(
           dplyr::arrange(.data$time) |>
           dplyr::collect()
         data$time <- as.POSIXct(data$time, tz = "UTC")
-        cli::cli_alert_success("Station {station}: {nrow(data)} observations")
+        sid <- unique(data$station_id)[1]
+        cli::cli_alert_success("Station {sid}: {nrow(data)} observations")
         data
       }
     )
