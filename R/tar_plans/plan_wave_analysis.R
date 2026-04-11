@@ -32,36 +32,53 @@ plan_wave_analysis <- list(
   # Data Loading
   # ========================================
 
-  # Load all historical data from DuckDB (filtered for analysis)
-  # Depends on data_update: rebuilds when fresh data is fetched into DuckDB
-  # Pre-pipeline fetch (LOOKBACK_HOURS=65000) ensures DuckDB has full history
+  # Per-station data from DuckDB. Each station is its own target with a
+
+  # content-based hash, so new records for M2 don't invalidate M6's copulas.
+  # The combined `analysis_data` target (below) recombines them for targets
+  # that need the full dataset (trends, seasonal means, etc.).
+  tarchetypes::tar_map(
+    values = list(station = c("M2", "M3", "M4", "M5", "M6")),
+    names = "station",
+    targets::tar_target(
+      analysis_per_station,
+      {
+        data_update
+        con <- connect_duckdb()
+        on.exit(DBI::dbDisconnect(con))
+        data <- buoy_tbl(con) |>
+          dplyr::filter(
+            .data$station_id == station,
+            !is.na(.data$wave_height),
+            !is.na(.data$qc_flag)
+          ) |>
+          dplyr::select(
+            "station_id", "time", "wave_height", "hmax", "wave_period", "tp",
+            "wind_speed", "wind_direction", "gust", "atmospheric_pressure",
+            "sea_temperature", "qc_flag"
+          ) |>
+          dplyr::arrange(.data$time) |>
+          dplyr::collect()
+        data$time <- as.POSIXct(data$time, tz = "UTC")
+        cli::cli_alert_success("Station {station}: {nrow(data)} observations")
+        data
+      }
+    )
+  ),
+
+  # Combined analysis_data: bind per-station targets.
+  # Content-hash means this only rebuilds if any station's data actually changed.
   targets::tar_target(
     analysis_data,
     {
-      # Reference data_update to create targets DAG dependency
-      data_update
-
-      con <- connect_duckdb()
-      on.exit(DBI::dbDisconnect(con))
-
-      data <- buoy_tbl(con) |>
-        dplyr::filter(
-          !is.na(.data$wave_height),
-          !is.na(.data$qc_flag)
-        ) |>
-        dplyr::select(
-          "station_id", "time", "wave_height", "hmax", "wave_period", "tp",
-          "wind_speed", "wind_direction", "gust", "atmospheric_pressure",
-          "sea_temperature", "qc_flag"
-        ) |>
-        dplyr::arrange(.data$station_id, .data$time) |>
-        dplyr::collect()
-
-      # Convert time
-      data$time <- as.POSIXct(data$time, tz = "UTC")
-
+      data <- dplyr::bind_rows(
+        analysis_per_station_M2,
+        analysis_per_station_M3,
+        analysis_per_station_M4,
+        analysis_per_station_M5,
+        analysis_per_station_M6
+      )
       cli::cli_alert_success("Loaded {nrow(data)} QC-passed observations")
-      # Validate with pointblank (falls back to basic validation if not installed)
       validate_buoy_data(data, "analysis_data", min_rows = 100)
     }
   ),
@@ -512,6 +529,7 @@ plan_wave_analysis <- list(
   ),
 
   # Bootstrap CIs for GPD return levels per station (block_size=48 for hourly)
+  # In-memory computation — safe for crew worker
   targets::tar_target(
     bootstrap_ci_per_station,
     {
@@ -553,7 +571,8 @@ plan_wave_analysis <- list(
         "Computed {nrow(result)} bootstrap CIs ({length(unique(result$station))} stations x {length(unique(result$variable))} variables)"
       )
       result
-    }
+    },
+    deployment = "worker"
   ),
 
   # Combined CI comparison: delta-method vs order-stats vs bootstrap
@@ -920,7 +939,8 @@ plan_wave_analysis <- list(
 
   targets::tar_target(
     wave_rf_model,
-    train_wave_model(wave_features, seed = 42)
+    train_wave_model(wave_features, seed = 42),
+    deployment = "worker"
   ),
 
   targets::tar_target(

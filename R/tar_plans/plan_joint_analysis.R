@@ -107,82 +107,54 @@ plan_joint_analysis <- list(
     analyze_joint_extremes(analysis_data, "hmax", threshold_quantile = 0.95)
   ),
 
-  # Copula analysis for key station pairs
+  # Copula analysis for adjacent station pairs (in-memory, safe for crew workers)
   # M6-M2: offshore to southwest coast
   targets::tar_target(
     copula_m6_m2_wave,
-    fit_bivariate_copula(analysis_data, "M6", "M2", "wave_height", "gumbel")
+    fit_bivariate_copula(analysis_data, "M6", "M2", "wave_height", "gumbel"),
+    deployment = "worker"
   ),
 
   # M6-M5: offshore to west coast (closest to M6)
   targets::tar_target(
     copula_m6_m5_wave,
-    fit_bivariate_copula(analysis_data, "M6", "M5", "wave_height", "gumbel")
+    fit_bivariate_copula(analysis_data, "M6", "M5", "wave_height", "gumbel"),
+    deployment = "worker"
   ),
 
   # M2-M3: two southwest stations (should be highly correlated)
   targets::tar_target(
     copula_m2_m3_wave,
-    fit_bivariate_copula(analysis_data, "M2", "M3", "wave_height", "gumbel")
+    fit_bivariate_copula(analysis_data, "M2", "M3", "wave_height", "gumbel"),
+    deployment = "worker"
   ),
 
-  # All remaining C(5,2)=10 unique pairs
-  # M6-M3: offshore to southwest coast (alternative path)
-  targets::tar_target(
-    copula_m6_m3_wave,
-    fit_bivariate_copula(analysis_data, "M6", "M3", "wave_height", "gumbel")
-  ),
-
-  # M6-M4: offshore to southeast coast (longest path)
-  targets::tar_target(
-    copula_m6_m4_wave,
-    fit_bivariate_copula(analysis_data, "M6", "M4", "wave_height", "gumbel")
-  ),
-
-  # M2-M4: southwest to southeast
-  targets::tar_target(
-    copula_m2_m4_wave,
-    fit_bivariate_copula(analysis_data, "M2", "M4", "wave_height", "gumbel")
-  ),
-
-  # M2-M5: southwest to west
-  targets::tar_target(
-    copula_m2_m5_wave,
-    fit_bivariate_copula(analysis_data, "M2", "M5", "wave_height", "gumbel")
-  ),
-
-  # M3-M4: southwest to southeast (coastal pair)
+  # Adjacent ring: 5 geographically adjacent pairs (was C(5,2)=10).
+  # Ring order: M6(offshore) → M5(west) → M4(southeast) → M3(southwest) → M2(southwest) → M6.
+  # Non-adjacent pairs (M6-M3, M6-M4, M2-M4, M2-M5, M3-M5) removed to halve
+  # copula runtime (~2.5 min saved per tar_make). Restored if needed for
+  # cross-network dependence analysis.
   targets::tar_target(
     copula_m3_m4_wave,
-    fit_bivariate_copula(analysis_data, "M3", "M4", "wave_height", "gumbel")
+    fit_bivariate_copula(analysis_data, "M3", "M4", "wave_height", "gumbel"),
+    deployment = "worker"
   ),
 
-  # M3-M5: southwest to west
-  targets::tar_target(
-    copula_m3_m5_wave,
-    fit_bivariate_copula(analysis_data, "M3", "M5", "wave_height", "gumbel")
-  ),
-
-  # M4-M5: southeast to west (most geographically distant coastal pair)
   targets::tar_target(
     copula_m4_m5_wave,
-    fit_bivariate_copula(analysis_data, "M4", "M5", "wave_height", "gumbel")
+    fit_bivariate_copula(analysis_data, "M4", "M5", "wave_height", "gumbel"),
+    deployment = "worker"
   ),
 
-  # Copula summary — all 10 unique pairs
+  # Copula summary — 5 adjacent pairs
   targets::tar_target(
     copula_summary,
     {
       copulas <- list(
         `M6-M2` = copula_m6_m2_wave,
-        `M6-M3` = copula_m6_m3_wave,
-        `M6-M4` = copula_m6_m4_wave,
         `M6-M5` = copula_m6_m5_wave,
         `M2-M3` = copula_m2_m3_wave,
-        `M2-M4` = copula_m2_m4_wave,
-        `M2-M5` = copula_m2_m5_wave,
         `M3-M4` = copula_m3_m4_wave,
-        `M3-M5` = copula_m3_m5_wave,
         `M4-M5` = copula_m4_m5_wave
       )
 

@@ -79,13 +79,40 @@ targets::tar_make(
   callr_function = NULL
 )
 
-cli::cli_h1("Step 3: Render vignettes")
+cli::cli_h1("Step 3: Render vignettes (fingerprint-cached)")
+
+# Fingerprint-based skip: hash QMD source + targets store metadata timestamp.
+# If neither changed since last render, skip re-rendering.
+fp_dir <- file.path(pkg_root, ".vignette_fingerprints")
+if (!dir.exists(fp_dir)) dir.create(fp_dir)
+
+vignette_fingerprint <- function(qmd_name) {
+  qmd_path <- file.path("vignettes", paste0(qmd_name, ".qmd"))
+  store_meta <- file.path("_targets", "meta", "meta")
+  digest::digest(c(
+    digest::digest(file = qmd_path),
+    if (file.exists(store_meta)) as.character(file.mtime(store_meta)) else ""
+  ))
+}
+
 vignettes <- c("dashboard_static", "wave_analysis", "telemetry", "api-usage")
 for (qmd in vignettes) {
+  html_path <- file.path("docs", "vignettes", paste0(qmd, ".html"))
+  fp_path <- file.path(fp_dir, paste0(qmd, ".fingerprint"))
+  current_fp <- vignette_fingerprint(qmd)
+  stored_fp <- if (file.exists(fp_path)) readLines(fp_path, n = 1) else ""
+
+  if (file.exists(html_path) && identical(current_fp, stored_fp)) {
+    cli::cli_alert_success("Skipping {qmd} (unchanged)")
+    next
+  }
+
   cli::cli_alert_info("Rendering {qmd}")
-  tryCatch(
-    quarto::quarto_render(file.path("vignettes", paste0(qmd, ".qmd"))),
-    error = function(e) cli::cli_alert_warning("{qmd} render failed: {e$message}")
+  tryCatch({
+    quarto::quarto_render(file.path("vignettes", paste0(qmd, ".qmd")))
+    writeLines(current_fp, fp_path)
+  },
+  error = function(e) cli::cli_alert_warning("{qmd} render failed: {e$message}")
   )
 }
 

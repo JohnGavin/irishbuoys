@@ -19,7 +19,8 @@ plan_spatial_extreme_values <- list(
       variable = "wave_height",
       n_bootstrap = 100,
       boot_subsample = 5000
-    )
+    ),
+    deployment = "worker"
   ),
 
   # Extract the dependence summary table for dashboards/vignettes
@@ -37,7 +38,8 @@ plan_spatial_extreme_values <- list(
       rogue_threshold = 2.0,
       min_wave_height = 2.0,
       n_permutations = 500
-    )
+    ),
+    deployment = "worker"
   ),
 
   # Extract H3 results table for dashboards
