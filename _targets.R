@@ -23,11 +23,11 @@ tar_option_set(
   format = "rds",
   memory = "transient",
   garbage_collection = TRUE,
-  # Crew parallel workers for expensive in-memory computations.
-  # Default deployment = "main" keeps DuckDB-accessing targets sequential.
-  # Only targets explicitly tagged deployment = "worker" run in parallel.
-  controller = crew::crew_controller_local(workers = 3),
-  deployment = "main"
+  # Crew parallel workers disabled: copula/SpatialExtremes C code crashes
+  # when forked to crew workers (not fork-safe). The per-station target split
+  # and adjacent-copula reduction provide the main speedup instead.
+  # See issue #69 for re-enabling after investigating fork safety.
+  controller = NULL
 )
 
 # Source all R functions (excluding R/dev/ and R/tar_plans/)
