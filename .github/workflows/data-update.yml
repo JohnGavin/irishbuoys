@@ -175,8 +175,19 @@ jobs:
             if (is.null(stats) || nrow(stats) == 0) {
               stop(\"No ingestion stats in email_summary_data\")
             }
-            max_age <- max(as.numeric(difftime(Sys.time(), stats\$latest, units = \"hours\")))
-            cat(\"Max data age:\", round(max_age, 1), \"hours\\n\")
+            # Filter to reporting stations only (offline stations have latest=NA)
+            reporting <- stats[!is.na(stats\$latest), ]
+            if (nrow(reporting) == 0) {
+              stop(\"All stations offline — no recent data at all\")
+            }
+            n_offline <- nrow(stats) - nrow(reporting)
+            if (n_offline > 0) {
+              offline_ids <- stats\$station_id[is.na(stats\$latest)]
+              cat(\"Offline stations:\", paste(offline_ids, collapse = \", \"), \"\\n\")
+            }
+            max_age <- max(as.numeric(difftime(Sys.time(), reporting\$latest, units = \"hours\")))
+            cat(\"Max data age (reporting stations):\", round(max_age, 1), \"hours\\n\")
+            cat(\"Stations reporting:\", nrow(reporting), \"/\", nrow(stats), \"\\n\")
             # ERDDAP delayed mode has ~10h lag; with 6-hourly runs max expected ~16h.
             # Warn at 36h, but do NOT abort — allow pipeline to recover from outages.
             if (max_age > 36) {
