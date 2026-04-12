@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-04-11T12:33:57Z",
+    "generated": "2026-04-12T08:03:10Z",
     "package_version": "0.2.0",
     "endpoint": "sources",
     "description": "Data provenance: ERDDAP source, update frequency, license, citation"
