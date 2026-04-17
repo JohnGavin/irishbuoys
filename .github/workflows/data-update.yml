@@ -105,17 +105,69 @@ jobs:
       # email_summary_data from targets-runs, sending emails with weeks-old data.
       # This fetch ensures the DB has fresh data BEFORE the pipeline runs.
 
-      - name: Fetch fresh data (before pipeline)
+      - name: Bootstrap DuckDB from Parquet (skip full ERDDAP fetch)
+        run: |
+          PARQUET="docs/vignettes/data/buoy_data.parquet"
+          DB="inst/extdata/irish_buoys.duckdb"
+
+          if [ ! -f "$DB" ] && [ -f "$PARQUET" ]; then
+            echo "DuckDB missing — bootstrapping from committed Parquet..."
+            nix-shell default.nix -A shell --run "Rscript -e '
+              pkgload::load_all(quiet = TRUE)
+              con <- connect_duckdb(db_path = \"$DB\", create_new = TRUE)
+              on.exit(DBI::dbDisconnect(con))
+
+              pq <- arrow::read_parquet(\"$PARQUET\")
+              cat(\"Parquet rows:\", nrow(pq), \"\\n\")
+
+              # Insert via staging table (same as load_to_duckdb but skip column renaming
+              # since Parquet already has standardized names from prior export)
+              DBI::dbWriteTable(con, \"staging_bootstrap\", pq, temporary = TRUE)
+
+              cols <- intersect(DBI::dbListFields(con, \"staging_bootstrap\"),
+                                DBI::dbListFields(con, \"buoy_data\"))
+              cols_sql <- paste(cols, collapse = \", \")
+              n <- DBI::dbExecute(con, paste0(
+                \"INSERT INTO buoy_data (\", cols_sql, \") \",
+                \"SELECT \", cols_sql, \" FROM staging_bootstrap \",
+                \"ON CONFLICT DO NOTHING\"
+              ))
+              DBI::dbExecute(con, \"DROP TABLE IF EXISTS staging_bootstrap\")
+
+              final_n <- DBI::dbGetQuery(con, \"SELECT COUNT(*) AS n FROM buoy_data\")\$n
+              cat(\"Bootstrapped DuckDB with\", final_n, \"rows from Parquet\\n\")
+            '"
+          elif [ -f "$DB" ]; then
+            echo "DuckDB exists — skipping bootstrap"
+          else
+            echo "::warning::No Parquet file at $PARQUET — will do full ERDDAP fetch"
+          fi
+
+      - name: Fetch fresh data (incremental update)
         env:
-          # Full history: DuckDB is ephemeral in CI, so fetch all data since 2019
-          # (~65000 hours = 7.4 years). incremental_update() uses this when DB is empty.
-          LOOKBACK_HOURS: '65000'
+          # With Parquet bootstrap, only need recent data (168h = 1 week).
+          # Falls back to full fetch (65000h) only if DB is still empty.
+          LOOKBACK_HOURS: '168'
         run: |
           nix-shell default.nix -A shell --run "Rscript -e '
             pkgload::load_all(quiet = TRUE)
-            lookback <- as.integer(Sys.getenv(\"LOOKBACK_HOURS\", unset = \"168\"))
+
+            db_path <- \"inst/extdata/irish_buoys.duckdb\"
+            con <- connect_duckdb(db_path = db_path)
+            n_existing <- DBI::dbGetQuery(con, \"SELECT COUNT(*) AS n FROM buoy_data\")\$n
+            DBI::dbDisconnect(con)
+
+            # If DB is empty (no Parquet bootstrap), fall back to full fetch
+            lookback <- if (n_existing == 0) {
+              cat(\"DB empty — using full 65000h lookback\\n\")
+              65000L
+            } else {
+              cat(\"DB has\", n_existing, \"rows — using 168h incremental fetch\\n\")
+              as.integer(Sys.getenv(\"LOOKBACK_HOURS\", unset = \"168\"))
+            }
+
             result <- incremental_update(
-              db_path = \"inst/extdata/irish_buoys.duckdb\",
+              db_path = db_path,
               lookback_hours = lookback
             )
             cat(\"Status:\", result\$status, \"\\n\")
