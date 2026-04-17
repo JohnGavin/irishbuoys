@@ -48,6 +48,7 @@ Suggests:
     mgcv,
     mirai,
     nanoparquet,
+    perspectiveR,
     plumber,
     plotly,
     quantreg,
