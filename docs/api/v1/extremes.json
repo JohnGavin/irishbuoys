@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-04-16T08:10:18Z",
+    "generated": "2026-04-17T08:10:41Z",
     "package_version": "0.2.0",
     "endpoint": "extremes",
     "description": "GPD fits, return levels, and CI method comparison (delta, bootstrap)"
@@ -55,18 +55,18 @@
           {
             "return_period": 1,
             "return_level": 42.24,
-            "lower": 40.73,
+            "lower": 40.72,
             "upper": 43.75
           },
           {
             "return_period": 5,
-            "return_level": 44.7,
+            "return_level": 44.71,
             "lower": 42.69,
-            "upper": 46.72
+            "upper": 46.73
           },
           {
             "return_period": 10,
-            "return_level": 45.61,
+            "return_level": 45.62,
             "lower": 43.38,
             "upper": 47.85
           }
@@ -348,9 +348,9 @@
           },
           {
             "return_period": 5,
-            "return_level": 15.65,
+            "return_level": 15.66,
             "lower": 14.4,
-            "upper": 16.9
+            "upper": 16.91
           },
           {
             "return_period": 10,
@@ -363,7 +363,7 @@
           {
             "return_period": 1,
             "return_level": 22.39,
-            "lower": 21.13,
+            "lower": 21.12,
             "upper": 23.66
           },
           {
@@ -384,19 +384,19 @@
             "return_period": 1,
             "return_level": 45.3,
             "lower": 43.92,
-            "upper": 46.69
+            "upper": 46.68
           },
           {
             "return_period": 5,
             "return_level": 48.53,
             "lower": 46.61,
-            "upper": 50.46
+            "upper": 50.44
           },
           {
             "return_period": 10,
-            "return_level": 49.79,
+            "return_level": 49.78,
             "lower": 47.62,
-            "upper": 51.96
+            "upper": 51.94
           }
         ],
         "wind_gust": [
@@ -404,19 +404,19 @@
             "return_period": 1,
             "return_level": 64.87,
             "lower": 63.21,
-            "upper": 66.54
+            "upper": 66.53
           },
           {
             "return_period": 5,
-            "return_level": 69.38,
-            "lower": 67.11,
-            "upper": 71.65
+            "return_level": 69.37,
+            "lower": 67.1,
+            "upper": 71.64
           },
           {
             "return_period": 10,
             "return_level": 71.12,
             "lower": 68.58,
-            "upper": 73.67
+            "upper": 73.66
           }
         ]
       }
@@ -535,27 +535,27 @@
         },
         {
           "return_period": 1,
-          "return_level": 14.1728,
-          "lower": 13.2972,
-          "upper": 15.0485,
+          "return_level": 14.174,
+          "lower": 13.2979,
+          "upper": 15.0501,
           "station": "M6",
           "variable": "avg_wave",
           "method": "delta"
         },
         {
           "return_period": 5,
-          "return_level": 15.6524,
-          "lower": 14.4017,
-          "upper": 16.9031,
+          "return_level": 15.6551,
+          "lower": 14.4034,
+          "upper": 16.9069,
           "station": "M6",
           "variable": "avg_wave",
           "method": "delta"
         },
         {
           "return_period": 10,
-          "return_level": 16.2364,
-          "lower": 14.8126,
-          "upper": 17.6601,
+          "return_level": 16.2399,
+          "lower": 14.8149,
+          "upper": 17.6649,
           "station": "M6",
           "variable": "avg_wave",
           "method": "delta"
@@ -643,54 +643,54 @@
         },
         {
           "return_period": 1,
-          "return_level": 14.1007,
-          "lower": 13.3229,
-          "upper": 14.8785,
+          "return_level": 14.1013,
+          "lower": 13.3233,
+          "upper": 14.8792,
           "station": "M5",
           "variable": "rogue_wave",
           "method": "delta"
         },
         {
           "return_period": 5,
-          "return_level": 15.6011,
-          "lower": 14.4962,
-          "upper": 16.706,
+          "return_level": 15.601,
+          "lower": 14.496,
+          "upper": 16.7059,
           "station": "M5",
           "variable": "rogue_wave",
           "method": "delta"
         },
         {
           "return_period": 10,
-          "return_level": 16.192,
-          "lower": 14.9367,
-          "upper": 17.4474,
+          "return_level": 16.1915,
+          "lower": 14.9362,
+          "upper": 17.4469,
           "station": "M5",
           "variable": "rogue_wave",
           "method": "delta"
         },
         {
           "return_period": 1,
-          "return_level": 22.3943,
-          "lower": 21.1266,
-          "upper": 23.6619,
+          "return_level": 22.3909,
+          "lower": 21.124,
+          "upper": 23.6577,
           "station": "M6",
           "variable": "rogue_wave",
           "method": "delta"
         },
         {
           "return_period": 5,
-          "return_level": 24.7915,
-          "lower": 22.9918,
-          "upper": 26.5913,
+          "return_level": 24.7889,
+          "lower": 22.99,
+          "upper": 26.5878,
           "station": "M6",
           "variable": "rogue_wave",
           "method": "delta"
         },
         {
           "return_period": 10,
-          "return_level": 25.7378,
-          "lower": 23.6929,
-          "upper": 27.7828,
+          "return_level": 25.7356,
+          "lower": 23.6915,
+          "upper": 27.7797,
           "station": "M6",
           "variable": "rogue_wave",
           "method": "delta"
@@ -698,26 +698,26 @@
         {
           "return_period": 1,
           "return_level": 42.2369,
-          "lower": 40.7258,
-          "upper": 43.748,
+          "lower": 40.7249,
+          "upper": 43.7488,
           "station": "M2",
           "variable": "avg_wind",
           "method": "delta"
         },
         {
           "return_period": 5,
-          "return_level": 44.7049,
-          "lower": 42.6871,
-          "upper": 46.7228,
+          "return_level": 44.7066,
+          "lower": 42.6872,
+          "upper": 46.726,
           "station": "M2",
           "variable": "avg_wind",
           "method": "delta"
         },
         {
           "return_period": 10,
-          "return_level": 45.614,
-          "lower": 43.378,
-          "upper": 47.8499,
+          "return_level": 45.6164,
+          "lower": 43.3786,
+          "upper": 47.8542,
           "station": "M2",
           "variable": "avg_wind",
           "method": "delta"
@@ -805,27 +805,27 @@
         },
         {
           "return_period": 1,
-          "return_level": 45.3028,
-          "lower": 43.9171,
-          "upper": 46.6886,
+          "return_level": 45.2998,
+          "lower": 43.9173,
+          "upper": 46.6822,
           "station": "M6",
           "variable": "avg_wind",
           "method": "delta"
         },
         {
           "return_period": 5,
-          "return_level": 48.5315,
-          "lower": 46.6077,
-          "upper": 50.4552,
+          "return_level": 48.525,
+          "lower": 46.6064,
+          "upper": 50.4436,
           "station": "M6",
           "variable": "avg_wind",
           "method": "delta"
         },
         {
           "return_period": 10,
-          "return_level": 49.7897,
-          "lower": 47.6215,
-          "upper": 51.958,
+          "return_level": 49.7816,
+          "lower": 47.6194,
+          "upper": 51.9437,
           "station": "M6",
           "variable": "avg_wind",
           "method": "delta"
@@ -940,27 +940,27 @@
         },
         {
           "return_period": 1,
-          "return_level": 64.8733,
-          "lower": 63.2111,
-          "upper": 66.5354,
+          "return_level": 64.869,
+          "lower": 63.2087,
+          "upper": 66.5293,
           "station": "M6",
           "variable": "wind_gust",
           "method": "delta"
         },
         {
           "return_period": 5,
-          "return_level": 69.3765,
-          "lower": 67.1072,
-          "upper": 71.6459,
+          "return_level": 69.3711,
+          "lower": 67.1044,
+          "upper": 71.6378,
           "station": "M6",
           "variable": "wind_gust",
           "method": "delta"
         },
         {
           "return_period": 10,
-          "return_level": 71.1237,
-          "lower": 68.5802,
-          "upper": 73.6672,
+          "return_level": 71.1178,
+          "lower": 68.5774,
+          "upper": 73.6581,
           "station": "M6",
           "variable": "wind_gust",
           "method": "delta"
@@ -968,8 +968,8 @@
         {
           "return_period": 1,
           "return_level": 5.6518,
-          "lower": 5.1915,
-          "upper": 6.0566,
+          "lower": 5.1767,
+          "upper": 6.0393,
           "station": "M2",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -977,8 +977,8 @@
         {
           "return_period": 5,
           "return_level": 6.1197,
-          "lower": 5.5167,
-          "upper": 6.8268,
+          "lower": 5.4834,
+          "upper": 6.7884,
           "station": "M2",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -986,8 +986,8 @@
         {
           "return_period": 10,
           "return_level": 6.2934,
-          "lower": 5.6228,
-          "upper": 7.1392,
+          "lower": 5.5921,
+          "upper": 7.0915,
           "station": "M2",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -995,8 +995,8 @@
         {
           "return_period": 1,
           "return_level": 12.6702,
-          "lower": 11.76,
-          "upper": 13.4865,
+          "lower": 11.818,
+          "upper": 13.4271,
           "station": "M3",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1004,8 +1004,8 @@
         {
           "return_period": 5,
           "return_level": 13.709,
-          "lower": 12.5207,
-          "upper": 14.8284,
+          "lower": 12.4325,
+          "upper": 14.807,
           "station": "M3",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1013,8 +1013,8 @@
         {
           "return_period": 10,
           "return_level": 14.0998,
-          "lower": 12.7608,
-          "upper": 15.4408,
+          "lower": 12.6714,
+          "upper": 15.403,
           "station": "M3",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1022,8 +1022,8 @@
         {
           "return_period": 1,
           "return_level": 13.3078,
-          "lower": 11.6823,
-          "upper": 14.9336,
+          "lower": 11.5538,
+          "upper": 15.0247,
           "station": "M4",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1031,8 +1031,8 @@
         {
           "return_period": 5,
           "return_level": 14.7524,
-          "lower": 12.3916,
-          "upper": 17.3255,
+          "lower": 12.3468,
+          "upper": 17.2778,
           "station": "M4",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1040,8 +1040,8 @@
         {
           "return_period": 10,
           "return_level": 15.3284,
-          "lower": 12.6513,
-          "upper": 18.4245,
+          "lower": 12.571,
+          "upper": 18.3063,
           "station": "M4",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1049,8 +1049,8 @@
         {
           "return_period": 1,
           "return_level": 8.9249,
-          "lower": 8.2246,
-          "upper": 9.7339,
+          "lower": 8.1853,
+          "upper": 9.8488,
           "station": "M5",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1058,8 +1058,8 @@
         {
           "return_period": 5,
           "return_level": 9.744,
-          "lower": 8.8203,
-          "upper": 11.1728,
+          "lower": 8.7898,
+          "upper": 11.2616,
           "station": "M5",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1067,35 +1067,35 @@
         {
           "return_period": 10,
           "return_level": 10.0564,
-          "lower": 9.0349,
-          "upper": 11.7869,
+          "lower": 8.9877,
+          "upper": 11.9148,
           "station": "M5",
           "variable": "avg_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 1,
-          "return_level": 14.1728,
-          "lower": 12.979,
-          "upper": 15.2965,
+          "return_level": 14.174,
+          "lower": 13.0119,
+          "upper": 15.2294,
           "station": "M6",
           "variable": "avg_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 5,
-          "return_level": 15.6524,
-          "lower": 13.9972,
-          "upper": 17.4847,
+          "return_level": 15.6551,
+          "lower": 14.0092,
+          "upper": 17.359,
           "station": "M6",
           "variable": "avg_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 10,
-          "return_level": 16.2364,
-          "lower": 14.3688,
-          "upper": 18.4106,
+          "return_level": 16.2399,
+          "lower": 14.42,
+          "upper": 18.301,
           "station": "M6",
           "variable": "avg_wave",
           "method": "bootstrap"
@@ -1103,8 +1103,8 @@
         {
           "return_period": 1,
           "return_level": 9.2782,
-          "lower": 8.6427,
-          "upper": 9.9975,
+          "lower": 8.6396,
+          "upper": 9.9381,
           "station": "M2",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1112,8 +1112,8 @@
         {
           "return_period": 5,
           "return_level": 10.1119,
-          "lower": 9.2675,
-          "upper": 11.1682,
+          "lower": 9.283,
+          "upper": 11.1072,
           "station": "M2",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1121,8 +1121,8 @@
         {
           "return_period": 10,
           "return_level": 10.4249,
-          "lower": 9.4856,
-          "upper": 11.6975,
+          "lower": 9.5185,
+          "upper": 11.6023,
           "station": "M2",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1130,8 +1130,8 @@
         {
           "return_period": 1,
           "return_level": 19.5777,
-          "lower": 18.3606,
-          "upper": 20.7766,
+          "lower": 18.3522,
+          "upper": 20.8356,
           "station": "M3",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1139,8 +1139,8 @@
         {
           "return_period": 5,
           "return_level": 21.0636,
-          "lower": 19.4824,
-          "upper": 22.8435,
+          "lower": 19.4181,
+          "upper": 23.0229,
           "station": "M3",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1148,8 +1148,8 @@
         {
           "return_period": 10,
           "return_level": 21.6123,
-          "lower": 19.8654,
-          "upper": 23.6307,
+          "lower": 19.7798,
+          "upper": 23.927,
           "station": "M3",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1157,8 +1157,8 @@
         {
           "return_period": 1,
           "return_level": 20.6499,
-          "lower": 18.8926,
-          "upper": 22.5522,
+          "lower": 18.7633,
+          "upper": 22.6707,
           "station": "M4",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1166,8 +1166,8 @@
         {
           "return_period": 5,
           "return_level": 23.0516,
-          "lower": 20.399,
-          "upper": 26.2206,
+          "lower": 20.3797,
+          "upper": 26.1577,
           "station": "M4",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1175,62 +1175,62 @@
         {
           "return_period": 10,
           "return_level": 24.0299,
-          "lower": 20.9632,
-          "upper": 27.8661,
+          "lower": 21.0196,
+          "upper": 27.7325,
           "station": "M4",
           "variable": "rogue_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 1,
-          "return_level": 14.1007,
-          "lower": 13.2345,
-          "upper": 14.8836,
+          "return_level": 14.1013,
+          "lower": 13.2814,
+          "upper": 14.9244,
           "station": "M5",
           "variable": "rogue_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 5,
-          "return_level": 15.6011,
-          "lower": 14.3439,
-          "upper": 16.8237,
+          "return_level": 15.601,
+          "lower": 14.4552,
+          "upper": 16.9276,
           "station": "M5",
           "variable": "rogue_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 10,
-          "return_level": 16.192,
-          "lower": 14.7589,
-          "upper": 17.6741,
+          "return_level": 16.1915,
+          "lower": 14.8583,
+          "upper": 17.7643,
           "station": "M5",
           "variable": "rogue_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 1,
-          "return_level": 22.3943,
-          "lower": 20.3909,
-          "upper": 24.3618,
+          "return_level": 22.3909,
+          "lower": 20.4038,
+          "upper": 24.419,
           "station": "M6",
           "variable": "rogue_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 5,
-          "return_level": 24.7915,
-          "lower": 21.9741,
-          "upper": 27.8399,
+          "return_level": 24.7889,
+          "lower": 22.0545,
+          "upper": 27.9962,
           "station": "M6",
           "variable": "rogue_wave",
           "method": "bootstrap"
         },
         {
           "return_period": 10,
-          "return_level": 25.7378,
-          "lower": 22.5393,
-          "upper": 29.2335,
+          "return_level": 25.7356,
+          "lower": 22.6067,
+          "upper": 29.6317,
           "station": "M6",
           "variable": "rogue_wave",
           "method": "bootstrap"
@@ -1238,26 +1238,26 @@
         {
           "return_period": 1,
           "return_level": 42.2369,
-          "lower": 39.6115,
-          "upper": 44.4844,
+          "lower": 39.5823,
+          "upper": 44.3924,
           "station": "M2",
           "variable": "avg_wind",
           "method": "bootstrap"
         },
         {
           "return_period": 5,
-          "return_level": 44.7049,
-          "lower": 41.1377,
-          "upper": 48.0521,
+          "return_level": 44.7066,
+          "lower": 41.251,
+          "upper": 48.0391,
           "station": "M2",
           "variable": "avg_wind",
           "method": "bootstrap"
         },
         {
           "return_period": 10,
-          "return_level": 45.614,
-          "lower": 41.6092,
-          "upper": 49.4506,
+          "return_level": 45.6164,
+          "lower": 41.7245,
+          "upper": 49.4444,
           "station": "M2",
           "variable": "avg_wind",
           "method": "bootstrap"
@@ -1265,8 +1265,8 @@
         {
           "return_period": 1,
           "return_level": 45.1591,
-          "lower": 41.994,
-          "upper": 47.8048,
+          "lower": 42.0256,
+          "upper": 47.9929,
           "station": "M3",
           "variable": "avg_wind",
           "method": "bootstrap"
@@ -1274,8 +1274,8 @@
         {
           "return_period": 5,
           "return_level": 48.3867,
-          "lower": 44.0533,
-          "upper": 52.2481,
+          "lower": 43.9815,
+          "upper": 52.4318,
           "station": "M3",
           "variable": "avg_wind",
           "method": "bootstrap"
@@ -1283,8 +1283,8 @@
         {
           "return_period": 10,
           "return_level": 49.6289,
-          "lower": 44.7534,
-          "upper": 54.0871,
+          "lower": 44.6818,
+          "upper": 54.4409,
           "station": "M3",
           "variable": "avg_wind",
           "method": "bootstrap"
@@ -1319,8 +1319,8 @@
         {
           "return_period": 1,
           "return_level": 38.3435,
-          "lower": 36.4617,
-          "upper": 39.74,
+          "lower": 36.6283,
+          "upper": 39.664,
           "station": "M5",
           "variable": "avg_wind",
           "method": "bootstrap"
@@ -1328,8 +1328,8 @@
         {
           "return_period": 5,
           "return_level": 40.4673,
-          "lower": 37.8897,
-          "upper": 42.437,
+          "lower": 38.0449,
+          "upper": 42.3039,
           "station": "M5",
           "variable": "avg_wind",
           "method": "bootstrap"
@@ -1337,35 +1337,35 @@
         {
           "return_period": 10,
           "return_level": 41.256,
-          "lower": 38.4104,
-          "upper": 43.435,
+          "lower": 38.5395,
+          "upper": 43.3581,
           "station": "M5",
           "variable": "avg_wind",
           "method": "bootstrap"
         },
         {
           "return_period": 1,
-          "return_level": 45.3028,
-          "lower": 42.4519,
-          "upper": 47.7564,
+          "return_level": 45.2998,
+          "lower": 42.3982,
+          "upper": 47.6309,
           "station": "M6",
           "variable": "avg_wind",
           "method": "bootstrap"
         },
         {
           "return_period": 5,
-          "return_level": 48.5315,
-          "lower": 44.5429,
-          "upper": 52.6554,
+          "return_level": 48.525,
+          "lower": 44.4208,
+          "upper": 52.4394,
           "station": "M6",
           "variable": "avg_wind",
           "method": "bootstrap"
         },
         {
           "return_period": 10,
-          "return_level": 49.7897,
-          "lower": 45.1849,
-          "upper": 54.743,
+          "return_level": 49.7816,
+          "lower": 45.1249,
+          "upper": 54.6193,
           "station": "M6",
           "variable": "avg_wind",
           "method": "bootstrap"
@@ -1373,8 +1373,8 @@
         {
           "return_period": 1,
           "return_level": 56.7543,
-          "lower": 53.9269,
-          "upper": 59.5008,
+          "lower": 53.6448,
+          "upper": 59.5294,
           "station": "M2",
           "variable": "wind_gust",
           "method": "bootstrap"
@@ -1382,8 +1382,8 @@
         {
           "return_period": 5,
           "return_level": 60.1547,
-          "lower": 56.4817,
-          "upper": 63.9885,
+          "lower": 56.1374,
+          "upper": 63.9688,
           "station": "M2",
           "variable": "wind_gust",
           "method": "bootstrap"
@@ -1391,8 +1391,8 @@
         {
           "return_period": 10,
           "return_level": 61.4019,
-          "lower": 57.2849,
-          "upper": 65.7708,
+          "lower": 56.925,
+          "upper": 65.7385,
           "station": "M2",
           "variable": "wind_gust",
           "method": "bootstrap"
@@ -1400,8 +1400,8 @@
         {
           "return_period": 1,
           "return_level": 60.4027,
-          "lower": 56.9995,
-          "upper": 63.7174,
+          "lower": 56.6084,
+          "upper": 64.1589,
           "station": "M3",
           "variable": "wind_gust",
           "method": "bootstrap"
@@ -1409,8 +1409,8 @@
         {
           "return_period": 5,
           "return_level": 64.5127,
-          "lower": 59.7275,
-          "upper": 69.5316,
+          "lower": 59.3446,
+          "upper": 70.001,
           "station": "M3",
           "variable": "wind_gust",
           "method": "bootstrap"
@@ -1418,8 +1418,8 @@
         {
           "return_period": 10,
           "return_level": 66.0798,
-          "lower": 60.6972,
-          "upper": 71.8677,
+          "lower": 60.2843,
+          "upper": 72.4824,
           "station": "M3",
           "variable": "wind_gust",
           "method": "bootstrap"
@@ -1454,8 +1454,8 @@
         {
           "return_period": 1,
           "return_level": 55.1265,
-          "lower": 53.1109,
-          "upper": 56.9775,
+          "lower": 53.1766,
+          "upper": 56.715,
           "station": "M5",
           "variable": "wind_gust",
           "method": "bootstrap"
@@ -1463,8 +1463,8 @@
         {
           "return_period": 5,
           "return_level": 58.2059,
-          "lower": 55.553,
-          "upper": 60.7449,
+          "lower": 55.6413,
+          "upper": 60.2839,
           "station": "M5",
           "variable": "wind_gust",
           "method": "bootstrap"
@@ -1472,35 +1472,35 @@
         {
           "return_period": 10,
           "return_level": 59.3308,
-          "lower": 56.4205,
-          "upper": 62.2309,
+          "lower": 56.5968,
+          "upper": 61.6321,
           "station": "M5",
           "variable": "wind_gust",
           "method": "bootstrap"
         },
         {
           "return_period": 1,
-          "return_level": 64.8733,
-          "lower": 60.3988,
-          "upper": 68.0467,
+          "return_level": 64.869,
+          "lower": 60.3234,
+          "upper": 67.9439,
           "station": "M6",
           "variable": "wind_gust",
           "method": "bootstrap"
         },
         {
           "return_period": 5,
-          "return_level": 69.3765,
-          "lower": 62.9388,
-          "upper": 73.9074,
+          "return_level": 69.3711,
+          "lower": 62.8494,
+          "upper": 73.6655,
           "station": "M6",
           "variable": "wind_gust",
           "method": "bootstrap"
         },
         {
           "return_period": 10,
-          "return_level": 71.1237,
-          "lower": 63.846,
-          "upper": 76.2484,
+          "return_level": 71.1178,
+          "lower": 63.708,
+          "upper": 75.8805,
           "station": "M6",
           "variable": "wind_gust",
           "method": "bootstrap"
