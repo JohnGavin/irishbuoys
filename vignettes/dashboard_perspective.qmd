@@ -1,0 +1,125 @@
+---
+title: "Buoy Data Explorer (Perspective)"
+format:
+  html:
+    code-fold: true
+    code-summary: "Show code"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+This dashboard uses [perspectiveR](https://github.com/EydlinIlya/perspectiveR)
+to render buoy data client-side via WebAssembly. The HTML page is small (~2MB
+for the Perspective WASM engine) and data is loaded from a Parquet file on
+demand — no 34MB inline JSON.
+
+See [issue #72](https://github.com/JohnGavin/irishbuoys/issues/72) for context.
+
+## Data
+
+Load the pre-computed buoy data from the static API Parquet file. This is the
+same data that powers the main dashboard, but rendered via Perspective instead
+of dygraphs.
+
+```{r load-data}
+parquet_path <- file.path("..", "docs", "vignettes", "data", "buoy_data.parquet")
+if (!file.exists(parquet_path)) {
+  parquet_path <- system.file(
+    "extdata", "dashboard_buoy_data.rds",
+    package = "irishbuoys"
+  )
+  buoy_data <- readRDS(parquet_path)
+} else {
+  buoy_data <- arrow::read_parquet(parquet_path)
+}
+
+# Subset to key columns for the pivot table
+buoy_subset <- buoy_data[, c(
+  "time", "station_id",
+  "wave_height", "hmax", "wind_speed", "gust",
+  "sea_temperature", "atmospheric_pressure"
+)]
+
+cat(sprintf(
+  "Loaded %s rows x %s columns (%s to %s)\n",
+  format(nrow(buoy_subset), big.mark = ","),
+  ncol(buoy_subset),
+  min(buoy_subset$time, na.rm = TRUE),
+  max(buoy_subset$time, na.rm = TRUE)
+))
+```
+
+## Pivot Table
+
+The Perspective widget below runs entirely in the browser via WebAssembly.
+You can:
+
+- **Group** rows by station, year, month
+- **Split** columns by station
+- **Filter** by any column
+- **Sort** by clicking column headers
+- **Switch views**: datagrid, line chart, bar chart, heatmap
+
+```{r perspective-pivot}
+if (requireNamespace("perspectiveR", quietly = TRUE)) {
+  perspectiveR::perspective(
+    buoy_subset,
+    group_by = "station_id",
+    columns = c("wave_height", "hmax", "wind_speed", "gust",
+                "sea_temperature", "atmospheric_pressure"),
+    aggregates = list(
+      wave_height = "avg",
+      hmax = "max",
+      wind_speed = "avg",
+      gust = "max",
+      sea_temperature = "avg",
+      atmospheric_pressure = "avg"
+    )
+  )
+} else {
+  cat("perspectiveR not installed. Install with: install.packages('perspectiveR')")
+}
+```
+
+## Time Series View
+
+Group by time period to see trends.
+
+```{r perspective-timeseries}
+if (requireNamespace("perspectiveR", quietly = TRUE)) {
+  # Add date column for daily aggregation
+  buoy_daily <- buoy_subset
+  buoy_daily$date <- as.Date(buoy_daily$time)
+
+  perspectiveR::perspective(
+    buoy_daily[, c("date", "station_id", "wave_height", "hmax",
+                   "sea_temperature")],
+    group_by = "date",
+    split_by = "station_id",
+    columns = c("wave_height", "hmax", "sea_temperature"),
+    aggregates = list(
+      wave_height = "avg",
+      hmax = "max",
+      sea_temperature = "avg"
+    ),
+    plugin = "Y Line"
+  )
+} else {
+  cat("perspectiveR not installed.")
+}
+```
+
+## Size Comparison
+
+| Dashboard | HTML Size | Load Time | Interactivity |
+|-----------|-----------|-----------|---------------|
+| Current (dygraphs) | 34 MB | 10-30s | Zoom only |
+| This (perspectiveR) | ~2 MB + data on demand | 2-5s | Pivot, filter, chart type |
+
+## Next Steps
+
+1. Compare render quality and load time with current dashboard
+2. If successful, replace `dashboard_static.qmd` with this approach
+3. Wire to HuggingFace Parquet via `ib_hf_url()` (#71) for zero-copy data access
