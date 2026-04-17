@@ -1,0 +1,124 @@
+name: Website Freshness Monitor
+
+# Checks that the PUBLISHED dashboard at johngavin.github.io contains
+# recent data. If gh-pages content is fresh, all upstream steps worked
+# (ERDDAP fetch, DuckDB, targets, vignette render, deploy).
+#
+# This is the single end-to-end freshness check — it subsumes
+# intermediate data staleness checks for user-facing alerting.
+#
+# See: https://github.com/JohnGavin/irishbuoys/issues/73
+
+on:
+  schedule:
+    - cron: '0 6,18 * * *'  # 06:00 and 18:00 UTC
+  workflow_dispatch:
+
+jobs:
+  website-freshness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check dashboard data freshness
+        id: check
+        run: |
+          DASHBOARD_URL="https://johngavin.github.io/irishbuoys/articles/dashboard_static.html"
+
+          # Fetch just enough of the HTML to find the date range in widget titles
+          # The dygraphs title contains: "... (2018-11-16 to 2026-04-17)"
+          # Limit download to 500KB — the date is in the first few KB of JSON config
+          CONTENT=$(curl -sf --max-time 30 -r 0-512000 "$DASHBOARD_URL" 2>/dev/null) || {
+            echo "website_down=true" >> $GITHUB_OUTPUT
+            echo "::error::Could not fetch dashboard HTML"
+            exit 0
+          }
+
+          # Extract the latest date from dygraphs title pattern "to YYYY-MM-DD)"
+          LATEST_DATE=$(echo "$CONTENT" | grep -oP '(?<=to )\d{4}-\d{2}-\d{2}' | sort -r | head -1)
+
+          if [ -z "$LATEST_DATE" ]; then
+            # Fallback: look for dateWindow end date in JSON
+            LATEST_DATE=$(echo "$CONTENT" | grep -oP '\d{4}-\d{2}-\d{2}T' | sort -r | head -1 | tr -d 'T')
+          fi
+
+          if [ -z "$LATEST_DATE" ]; then
+            echo "parse_failed=true" >> $GITHUB_OUTPUT
+            echo "::warning::Could not extract date from dashboard HTML"
+            exit 0
+          fi
+
+          # Calculate age in hours
+          NOW=$(date -u +%s)
+          DATA_TS=$(date -u -d "$LATEST_DATE" +%s 2>/dev/null) || {
+            echo "parse_failed=true" >> $GITHUB_OUTPUT
+            echo "::warning::Could not parse date: $LATEST_DATE"
+            exit 0
+          }
+          AGE_HOURS=$(( (NOW - DATA_TS) / 3600 ))
+
+          echo "latest_date=$LATEST_DATE" >> $GITHUB_OUTPUT
+          echo "age_hours=$AGE_HOURS" >> $GITHUB_OUTPUT
+          echo "Dashboard latest data: $LATEST_DATE ($AGE_HOURS hours ago)"
+
+          if [ "$AGE_HOURS" -gt 48 ]; then
+            echo "stale=true" >> $GITHUB_OUTPUT
+          else
+            echo "stale=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create issue if website is down
+        if: steps.check.outputs.website_down == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --repo ${{ github.repository }} \
+            --label "website-stale" --state open --json number --jq '.[0].number' 2>/dev/null)
+          if [ -n "$EXISTING" ]; then
+            echo "Existing issue #$EXISTING — skipping"
+            exit 0
+          fi
+          gh issue create --repo ${{ github.repository }} \
+            --title "Website dashboard unreachable" \
+            --label "website-stale,bug" \
+            --body "The published dashboard at johngavin.github.io/irishbuoys did not respond.
+
+          **Detected:** $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          **URL:** https://johngavin.github.io/irishbuoys/articles/dashboard_static.html
+          **Action:** Check GitHub Pages deployment status and recent data-update.yml runs.
+
+          This issue was created automatically by the website-freshness-check workflow."
+
+      - name: Create issue if website data is stale
+        if: steps.check.outputs.stale == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING=$(gh issue list --repo ${{ github.repository }} \
+            --label "website-stale" --state open --json number --jq '.[0].number' 2>/dev/null)
+          if [ -n "$EXISTING" ]; then
+            echo "Existing issue #$EXISTING — skipping"
+            exit 0
+          fi
+          gh issue create --repo ${{ github.repository }} \
+            --title "Website dashboard data is ${{ steps.check.outputs.age_hours }}h stale" \
+            --label "website-stale,bug" \
+            --body "The published dashboard shows data from **${{ steps.check.outputs.latest_date }}** — **${{ steps.check.outputs.age_hours }} hours old** (threshold: 48h).
+
+          **URL:** https://johngavin.github.io/irishbuoys/articles/dashboard_static.html
+          **Detected:** $(date -u +'%Y-%m-%dT%H:%M:%SZ')
+
+          The website deploys daily via data-update.yml → gh-pages. If this is stale, one of these failed:
+          1. ERDDAP data fetch
+          2. targets pipeline (tar_make)
+          3. Vignette rendering (quarto render)
+          4. GitHub Pages deployment
+
+          Check recent [data-update.yml runs](https://github.com/${{ github.repository }}/actions/workflows/data-update.yml) for failures.
+
+          This issue was created automatically by the website-freshness-check workflow."
+
+      - name: Log freshness result
+        if: always()
+        run: |
+          echo "::notice::Website latest=${{ steps.check.outputs.latest_date }}, age=${{ steps.check.outputs.age_hours }}h, stale=${{ steps.check.outputs.stale }}"
