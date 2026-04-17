@@ -258,6 +258,48 @@ jobs:
           git diff --staged --quiet || git commit -m "Data update (${{ github.event_name }}): $(date +'%Y-%m-%dT%H:%M')Z"
           git push || true
 
+      # ── Push Parquet to HuggingFace ─────────────────────────
+      # Public dataset at hf://datasets/JohnGavin/irish-buoy-network
+      # Uses git clone + git-lfs push (NOT REST API)
+
+      - name: Push Parquet to HuggingFace
+        if: env.HF_TOKEN != ''
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          PARQUET="docs/vignettes/data/buoy_data.parquet"
+          if [ ! -f "$PARQUET" ]; then
+            echo "::warning::No Parquet file at $PARQUET — skipping HF push"
+            exit 0
+          fi
+
+          ROW_COUNT=$(nix-shell default.nix -A shell --run "Rscript -e '
+            cat(nrow(arrow::read_parquet(\"$PARQUET\")))
+          '" 2>/dev/null || echo "unknown")
+
+          TMPDIR=$(mktemp -d)
+          git clone --depth 1 \
+            "https://hf-user:${HF_TOKEN}@huggingface.co/datasets/JohnGavin/irish-buoy-network" \
+            "$TMPDIR/repo" || {
+            echo "::warning::HF clone failed — skipping push"
+            rm -rf "$TMPDIR"
+            exit 0
+          }
+
+          cp "$PARQUET" "$TMPDIR/repo/buoy_data.parquet"
+
+          git -C "$TMPDIR/repo" add buoy_data.parquet
+          git -C "$TMPDIR/repo" diff --staged --quiet || {
+            git -C "$TMPDIR/repo" \
+              -c user.email="action@github.com" \
+              -c user.name="GitHub Action" \
+              commit -m "Update buoy_data: ${ROW_COUNT} rows $(date +'%Y-%m-%dT%H:%M')Z"
+            git -C "$TMPDIR/repo" push
+            echo "✔ Pushed Parquet to HuggingFace (${ROW_COUNT} rows)"
+          }
+
+          rm -rf "$TMPDIR"
+
       # ── Save Pipeline State to targets-runs ─────────────────
 
       - name: Identify pipeline output files
