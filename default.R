@@ -52,6 +52,7 @@ viz_pkgs <- c(
   "scales",         # Scale functions
   "DT",             # Interactive tables
   "dygraphs",       # Time series plots
+  "perspectiveR",   # WASM pivot tables (FINOS Perspective)
   "shiny",          # Shiny web apps
   "shinylive"       # Shinylive deployment
 )
