@@ -17,8 +17,8 @@ plan_spatial_extreme_values <- list(
     compute_extremal_dependence(
       data = analysis_data,
       variable = "wave_height",
-      n_bootstrap = 100,
-      boot_subsample = 5000
+      n_bootstrap = 250,
+      boot_subsample = 10000
     ),
     deployment = "worker"
   ),
@@ -37,7 +37,7 @@ plan_spatial_extreme_values <- list(
       data = analysis_data,
       rogue_threshold = 2.0,
       min_wave_height = 2.0,
-      n_permutations = 500
+      n_permutations = 1000
     ),
     deployment = "worker"
   ),
