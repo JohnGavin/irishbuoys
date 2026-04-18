@@ -190,3 +190,19 @@ test_that("snapshot: args(validate_email_freshness) signature", {
 test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
 test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })
 test_that("snap3: args(analyze_joint_extremes)", { expect_snapshot(args(irishbuoys:::analyze_joint_extremes)) })
+
+# ── Phase 2: Output structure snapshots (#68) ────────────────────────
+
+test_that("generate_weekly_summary field names are stable", {
+  result <- generate_weekly_summary(
+    db_path = "inst/extdata/irish_buoys.duckdb"
+  )
+  expect_snapshot(sort(names(result)))
+  expect_snapshot(sort(names(result$current_week)))
+  expect_snapshot(sort(names(result$ingestion_stats)))
+})
+
+test_that("get_station_info output is stable", {
+  info <- get_station_info()
+  expect_snapshot(sort(names(info)))
+})

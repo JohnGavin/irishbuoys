@@ -54,3 +54,25 @@
       function (seasonal_means_wave, date_caption = NULL) 
       NULL
 
+# prepare_wave_features output columns are stable
+
+    Code
+      sort(names(result))
+    Output
+       [1] "atmospheric_pressure" "gust"                 "gust_factor"         
+       [4] "hour"                 "month"                "pressure_change"     
+       [7] "station_id"           "time"                 "wave_height"         
+      [10] "wave_height_lag1"     "wave_height_lag2"     "wave_height_lag3"    
+      [13] "wave_period"          "wave_steepness"       "wind_dir_cos"        
+      [16] "wind_dir_sin"         "wind_direction"       "wind_speed"          
+      [19] "wind_speed_lag1"     
+
+# prepare_wave_features error on missing columns
+
+    Code
+      prepare_wave_features(bad_data)
+    Condition
+      Error in `prepare_wave_features()`:
+      x Missing required columns: "wave_height"
+      i Data must contain: "station_id", "time", and "wave_height"
+
