@@ -11,17 +11,15 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 ```
 
 This dashboard uses [perspectiveR](https://github.com/EydlinIlya/perspectiveR)
-to render buoy data client-side via WebAssembly. The HTML page is small (~2MB
-for the Perspective WASM engine) and data is loaded from a Parquet file on
-demand — no 34MB inline JSON.
+to render buoy data client-side via WebAssembly. Data is pre-aggregated to daily
+resolution (~12K rows vs 300K hourly), keeping the HTML under 3MB.
 
 See [issue #72](https://github.com/JohnGavin/irishbuoys/issues/72) for context.
 
 ## Data
 
-Load the pre-computed buoy data from the static API Parquet file. This is the
-same data that powers the main dashboard, but rendered via Perspective instead
-of dygraphs.
+Pre-aggregate hourly data to daily summaries. This reduces 300K rows to ~12K
+while preserving the key metrics users care about.
 
 ```{r load-data}
 parquet_path <- file.path("..", "docs", "vignettes", "data", "buoy_data.parquet")
@@ -35,25 +33,35 @@ if (!file.exists(parquet_path)) {
   buoy_data <- arrow::read_parquet(parquet_path)
 }
 
-# Subset to key columns for the pivot table
-buoy_subset <- buoy_data[, c(
-  "time", "station_id",
-  "wave_height", "hmax", "wind_speed", "gust",
-  "sea_temperature", "atmospheric_pressure"
-)]
+# Pre-aggregate to daily resolution
+buoy_daily <- buoy_data |>
+  dplyr::mutate(date = as.Date(time)) |>
+  dplyr::summarise(
+    mean_wave_height = round(mean(wave_height, na.rm = TRUE), 2),
+    max_hmax = round(max(hmax, na.rm = TRUE), 2),
+    mean_wind_speed = round(mean(wind_speed, na.rm = TRUE), 1),
+    max_gust = round(max(gust, na.rm = TRUE), 1),
+    mean_sea_temp = round(mean(sea_temperature, na.rm = TRUE), 2),
+    mean_pressure = round(mean(atmospheric_pressure, na.rm = TRUE), 1),
+    n_obs = dplyr::n(),
+    .by = c(station_id, date)
+  )
+
+# Replace Inf/-Inf from empty groups with NA
+buoy_daily[buoy_daily == Inf | buoy_daily == -Inf] <- NA
 
 cat(sprintf(
-  "Loaded %s rows x %s columns (%s to %s)\n",
-  format(nrow(buoy_subset), big.mark = ","),
-  ncol(buoy_subset),
-  min(buoy_subset$time, na.rm = TRUE),
-  max(buoy_subset$time, na.rm = TRUE)
+  "Aggregated: %s daily rows from %s hourly rows (%s to %s)\n",
+  format(nrow(buoy_daily), big.mark = ","),
+  format(nrow(buoy_data), big.mark = ","),
+  min(buoy_daily$date, na.rm = TRUE),
+  max(buoy_daily$date, na.rm = TRUE)
 ))
 ```
 
 ## Pivot Table
 
-The Perspective widget below runs entirely in the browser via WebAssembly.
+The Perspective widget runs entirely in the browser via WebAssembly.
 You can:
 
 - **Group** rows by station, year, month
@@ -65,44 +73,40 @@ You can:
 ```{r perspective-pivot}
 if (requireNamespace("perspectiveR", quietly = TRUE)) {
   perspectiveR::perspective(
-    buoy_subset,
+    buoy_daily,
     group_by = "station_id",
-    columns = c("wave_height", "hmax", "wind_speed", "gust",
-                "sea_temperature", "atmospheric_pressure"),
+    columns = c("mean_wave_height", "max_hmax", "mean_wind_speed",
+                "max_gust", "mean_sea_temp", "n_obs"),
     aggregates = list(
-      wave_height = "avg",
-      hmax = "max",
-      wind_speed = "avg",
-      gust = "max",
-      sea_temperature = "avg",
-      atmospheric_pressure = "avg"
+      mean_wave_height = "avg",
+      max_hmax = "max",
+      mean_wind_speed = "avg",
+      max_gust = "max",
+      mean_sea_temp = "avg",
+      n_obs = "sum"
     )
   )
 } else {
-  cat("perspectiveR not installed. Install with: install.packages('perspectiveR')")
+  cat("perspectiveR not installed.")
 }
 ```
 
 ## Time Series View
 
-Group by time period to see trends.
+Daily mean wave height by station — drag and group to explore patterns.
 
 ```{r perspective-timeseries}
 if (requireNamespace("perspectiveR", quietly = TRUE)) {
-  # Add date column for daily aggregation
-  buoy_daily <- buoy_subset
-  buoy_daily$date <- as.Date(buoy_daily$time)
-
   perspectiveR::perspective(
-    buoy_daily[, c("date", "station_id", "wave_height", "hmax",
-                   "sea_temperature")],
+    buoy_daily[, c("date", "station_id", "mean_wave_height",
+                   "max_hmax", "mean_sea_temp")],
     group_by = "date",
     split_by = "station_id",
-    columns = c("wave_height", "hmax", "sea_temperature"),
+    columns = c("mean_wave_height", "max_hmax", "mean_sea_temp"),
     aggregates = list(
-      wave_height = "avg",
-      hmax = "max",
-      sea_temperature = "avg"
+      mean_wave_height = "avg",
+      max_hmax = "max",
+      mean_sea_temp = "avg"
     ),
     plugin = "Y Line"
   )
@@ -113,13 +117,16 @@ if (requireNamespace("perspectiveR", quietly = TRUE)) {
 
 ## Size Comparison
 
-| Dashboard | HTML Size | Load Time | Interactivity |
-|-----------|-----------|-----------|---------------|
-| Current (dygraphs) | 34 MB | 10-30s | Zoom only |
-| This (perspectiveR) | ~2 MB + data on demand | 2-5s | Pivot, filter, chart type |
-
-## Next Steps
-
-1. Compare render quality and load time with current dashboard
-2. If successful, replace `dashboard_static.qmd` with this approach
-3. Wire to HuggingFace Parquet via `ib_hf_url()` (#71) for zero-copy data access
+```{r size-comparison, echo=FALSE}
+current_size <- file.size("../docs/vignettes/dashboard_static.html")
+perspective_size <- file.size("../docs/vignettes/dashboard_perspective.html")
+cat(sprintf(
+  "| Dashboard | HTML Size | Data Rows | Interactivity |\n|---|---|---|---|\n| Current (dygraphs) | %s MB | %s (hourly) | Zoom only |\n| This (perspectiveR) | %s MB | %s (daily) | Pivot, filter, chart type |\n| **Reduction** | **%.0f%%** | **%.0f%%** | — |\n",
+  round(current_size / 1e6, 1),
+  format(nrow(buoy_data), big.mark = ","),
+  round(perspective_size / 1e6, 1),
+  format(nrow(buoy_daily), big.mark = ","),
+  100 * (1 - perspective_size / current_size),
+  100 * (1 - nrow(buoy_daily) / nrow(buoy_data))
+))
+```
