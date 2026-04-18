@@ -32,3 +32,21 @@
       function (analysis_data, rogue_events, output_dir = "docs/articles") 
       NULL
 
+# validate_buoy_data error messages are stable
+
+    Code
+      validate_buoy_data(NULL)
+    Condition
+      Error in `validate_buoy_data()`:
+      x `data` cannot be NULL
+      i Provide a data frame with buoy measurements
+
+---
+
+    Code
+      validate_buoy_data("string")
+    Condition
+      Error in `validate_buoy_data()`:
+      x `data` must be a data frame
+      i You provided <character>
+
