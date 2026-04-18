@@ -39,6 +39,19 @@ compute_data_coverage <- function(con, start_date, end_date) {
       missing_hours = expected_hours - .data$actual_hours
     )
 
+  # Include ALL canonical stations (offline stations show 0% coverage)
+  all_stations <- get_station_info()
+  coverage <- all_stations |>
+    dplyr::select("station_id") |>
+    dplyr::left_join(coverage, by = "station_id") |>
+    dplyr::mutate(
+      actual_hours = tidyr::replace_na(.data$actual_hours, 0L),
+      n_records = tidyr::replace_na(.data$n_records, 0L),
+      expected_hours = expected_hours,
+      coverage_pct = round(100 * .data$actual_hours / expected_hours, 1),
+      missing_hours = expected_hours - .data$actual_hours
+    )
+
   # Gap detection: gaps >= 6 hours
   # Collect first, then truncate to hour in R
   all_obs <- buoy_tbl(con) |>
@@ -407,7 +420,9 @@ create_email_summary <- function(summary) {
       "coverage" %in% names(summary$data_coverage)) {
     cov_df <- summary$data_coverage$coverage[, c("station_id", "missing_hours")]
     stats_df <- merge(stats_df, cov_df, by = "station_id", all.x = TRUE)
-    stats_df <- stats_df[order(-stats_df$missing_hours, -stats_df$max_wave_height), ]
+    # Offline stations first, then by missing_hours descending
+    is_offline <- is.na(stats_df$n_observations) | stats_df$n_observations == 0L
+    stats_df <- stats_df[order(!is_offline, -stats_df$missing_hours, -stats_df$max_wave_height), ]
   } else if (nrow(stats_df) > 0) {
     stats_df$missing_hours <- NA_real_
   }
