@@ -52,7 +52,8 @@ viz_pkgs <- c(
   "scales",         # Scale functions
   "DT",             # Interactive tables
   "dygraphs",       # Time series plots
-  "perspectiveR",   # WASM pivot tables (FINOS Perspective)
+  # perspectiveR: not in nixpkgs 2026-01-19 snapshot; install separately
+  # install.packages("perspectiveR") outside nix-shell
   "shiny",          # Shiny web apps
   "shinylive"       # Shinylive deployment
 )

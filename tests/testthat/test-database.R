@@ -312,3 +312,33 @@ test_that("snapshot pass2: args(query_buoy_data)", {
 # ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
 test_that("snap3: args(add_wave_metrics)", { expect_snapshot(args(irishbuoys:::add_wave_metrics)) })
 test_that("snap3: args(analyze_gust_factor)", { expect_snapshot(args(irishbuoys:::analyze_gust_factor)) })
+
+# ── Phase 2: Schema & structure snapshots (#68) ─────────────────────
+
+test_that("buoy_data table schema is stable", {
+  tmp_db <- file.path(tempdir(), "test_schema_snap.duckdb")
+  on.exit(unlink(tmp_db), add = TRUE)
+
+  con <- connect_duckdb(db_path = tmp_db, create_new = TRUE)
+  on.exit(DBI::dbDisconnect(con), add = TRUE, after = FALSE)
+
+  cols <- sort(DBI::dbListFields(con, "buoy_data"))
+  expect_snapshot(cols)
+})
+
+test_that("get_database_stats output structure is stable", {
+  stats <- get_database_stats(db_path = "inst/extdata/irish_buoys.duckdb")
+  expect_snapshot(sort(names(stats)))
+  expect_snapshot(sort(names(stats$overall)))
+  expect_snapshot(sort(names(stats$by_station)))
+})
+
+test_that("query_buoy_data column names are stable", {
+  con <- connect_duckdb(db_path = "inst/extdata/irish_buoys.duckdb")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+
+  result <- query_buoy_data(con,
+    start_date = as.POSIXct("2024-01-01"),
+    end_date = as.POSIXct("2024-01-02"))
+  expect_snapshot(sort(names(result)))
+})

@@ -164,3 +164,20 @@ test_that("snap3: args(calculate_wave_steepness)", { expect_snapshot(args(irishb
 test_that("snap3: args(compare_rogue_wave_gust)", { expect_snapshot(args(irishbuoys:::compare_rogue_wave_gust)) })
 test_that("snap3: args(create_plot_gusts_vs_waves)", { expect_snapshot(args(irishbuoys:::create_plot_gusts_vs_waves)) })
 test_that("snap3: args(create_plot_monthly_wave)", { expect_snapshot(args(irishbuoys:::create_plot_monthly_wave)) })
+
+# ── Phase 2: Output structure snapshots (#68) ────────────────────────
+
+test_that("prepare_wave_features output columns are stable", {
+  set.seed(42)
+  data <- make_buoy_data(20)
+  result <- prepare_wave_features(data)
+  expect_snapshot(sort(names(result)))
+})
+
+test_that("prepare_wave_features error on missing columns", {
+  bad_data <- tibble::tibble(time = Sys.time(), station_id = "M2")
+  expect_snapshot(
+    error = TRUE,
+    prepare_wave_features(bad_data)
+  )
+})

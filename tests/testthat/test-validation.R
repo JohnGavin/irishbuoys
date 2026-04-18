@@ -71,3 +71,23 @@ test_that("snapshot: args(validate_rogue_events) signature", {
 # ── Extra snapshots pass 3 (floor to >=30% ratio) ─────────────────
 test_that("snap3: args(create_validation_summary)", { expect_snapshot(args(irishbuoys:::create_validation_summary)) })
 test_that("snap3: args(generate_validation_reports)", { expect_snapshot(args(irishbuoys:::generate_validation_reports)) })
+
+# ── Phase 2: Error message snapshots (#68) ───────────────────────────
+
+test_that("validate_buoy_data error messages are stable", {
+  expect_snapshot(error = TRUE, validate_buoy_data(NULL))
+  expect_snapshot(error = TRUE, validate_buoy_data("string"))
+})
+
+test_that("validate_buoy_data output structure is stable", {
+  data <- data.frame(
+    station_id = rep("M2", 10),
+    time = seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 10),
+    wave_height = runif(10, 0.5, 5),
+    wind_speed = runif(10, 2, 25),
+    qc_flag = rep(1L, 10),
+    stringsAsFactors = FALSE
+  )
+  result <- validate_buoy_data(data, min_rows = 1)
+  expect_snapshot(sort(names(result)))
+})
