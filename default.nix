@@ -3,7 +3,9 @@
 # >rix::rix(date = "2026-01-19",
 #  > r_pkgs = all_r_pkgs,
 #  > system_pkgs = system_pkgs,
-#  > git_pkgs = NULL,
+#  > git_pkgs = list(list(package_name = "perspectiveR",
+#  > repo_url = "https://github.com/EydlinIlya/perspectiveR",
+#  > commit = "c0cc8c7482ee511fd888885d919aca3a5af9e03c")),
 #  > ide = "none",
 #  > project_path = ".",
 #  > overwrite = TRUE,
@@ -71,6 +73,21 @@ let
       xts
       zoo;
   };
+ 
+    perspectiveR = (pkgs.rPackages.buildRPackage {
+      name = "perspectiveR";
+      src = pkgs.fetchgit {
+        url = "https://github.com/EydlinIlya/perspectiveR";
+        rev = "c0cc8c7482ee511fd888885d919aca3a5af9e03c";
+        sha256 = "sha256-DGdIdQJtLwdtlW4hGn564Xq0kj9NAgA+z2pviN5Wq1I=";
+      };
+      propagatedBuildInputs = builtins.attrValues {
+        inherit (pkgs.rPackages) 
+          htmlwidgets
+          htmltools
+          jsonlite;
+      };
+    });
       
   system_packages = builtins.attrValues {
     inherit (pkgs) 
@@ -92,7 +109,7 @@ let
     LC_PAPER = "en_US.UTF-8";
     LC_MEASUREMENT = "en_US.UTF-8";
     
-    buildInputs = [ rpkgs system_packages ];
+    buildInputs = [ perspectiveR rpkgs system_packages ];
     
   }; 
 in
