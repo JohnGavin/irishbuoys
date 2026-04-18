@@ -1,0 +1,196 @@
+---
+title: "Storm Éowyn — October 27-28, 2020"
+format:
+  closeread-html:
+    code-fold: true
+    code-summary: "Show code"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+library(dplyr)
+library(plotly)
+```
+
+```{r load-data}
+storm_path <- system.file("extdata", "storm_oct2020.rds", package = "irishbuoys")
+if (!nzchar(storm_path)) storm_path <- "../inst/extdata/storm_oct2020.rds"
+storm <- readRDS(storm_path)
+
+pkgload::load_all("../", quiet = TRUE)
+stations <- get_station_info()
+
+# Peak stats per station
+peaks <- storm |>
+  filter(!is.na(hmax)) |>
+  group_by(station_id) |>
+  summarise(
+    peak_hmax = round(max(hmax, na.rm = TRUE), 1),
+    peak_time = time[which.max(hmax)],
+    peak_gust = round(max(gust, na.rm = TRUE), 1),
+    mean_wave = round(mean(wave_height, na.rm = TRUE), 1),
+    n_obs = n(),
+    .groups = "drop"
+  ) |>
+  arrange(desc(peak_hmax))
+```
+
+:::{.cr-section}
+
+## The Calm Before {focus-on="cr-map"}
+
+On October 26, 2020, five weather buoys stood watch off Ireland's Atlantic
+coast. Wave heights were modest — 2-3 metres at the offshore stations M6 and
+M4, barely a metre near the coast.
+
+Within 48 hours, the network would record the highest wave in its
+history.
+
+@cr-map
+
+:::
+
+:::{#cr-map}
+```{r map-buoys}
+plot_ly() |>
+  add_markers(
+    data = stations,
+    x = ~lon, y = ~lat,
+    text = ~station_id,
+    marker = list(size = 14, color = "#377EB8"),
+    hovertemplate = "%{text}<br>%{y:.2f}°N, %{x:.2f}°W<extra></extra>"
+  ) |>
+  layout(
+    title = "Irish Weather Buoy Network",
+    xaxis = list(title = "Longitude"),
+    yaxis = list(title = "Latitude"),
+    paper_bgcolor = "#1a1a1a",
+    plot_bgcolor = "#1a1a1a",
+    font = list(color = "white")
+  )
+```
+:::
+
+:::{.cr-section}
+
+## The Storm Builds {focus-on="cr-wave-plot"}
+
+By October 27, an Atlantic low-pressure system was driving swells across
+the network. M6, the westernmost buoy 320 km offshore, was the first to
+feel it. Wave heights climbed through 5, then 8, then 12 metres.
+
+The pressure at M6 dropped from 1010 to 975 hPa in 18 hours — a rapid
+deepening characteristic of a "weather bomb."
+
+@cr-wave-plot
+
+:::
+
+:::{#cr-wave-plot}
+```{r wave-timeseries}
+p <- storm |>
+  filter(!is.na(hmax)) |>
+  plot_ly(
+    x = ~time, y = ~hmax,
+    color = ~station_id,
+    colors = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
+    type = "scatter", mode = "lines",
+    hovertemplate = "%{x}<br>Hmax: %{y:.1f} m<extra>%{data.name}</extra>"
+  ) |>
+  layout(
+    title = "Maximum Wave Height (Hmax) — Oct 26-29, 2020",
+    xaxis = list(title = "", rangeslider = list(visible = TRUE)),
+    yaxis = list(title = "Hmax (m)"),
+    paper_bgcolor = "#1a1a1a",
+    plot_bgcolor = "#1a1a1a",
+    font = list(color = "white"),
+    legend = list(
+      orientation = "h", y = -0.3,
+      font = list(color = "white"),
+      bgcolor = "rgba(0,0,0,0.5)"
+    )
+  )
+p
+```
+:::
+
+:::{.cr-section}
+
+## Peak: 29.9 Metres {focus-on="cr-peak-table"}
+
+On October 28 at approximately 06:00 UTC, station M6 recorded a maximum
+individual wave height of `r peaks$peak_hmax[peaks$station_id == "M6"]` metres —
+the highest in the network's history.
+
+The wave was roughly the height of a 10-storey building.
+
+Stations M3 and M4 recorded their peaks 6-12 hours later as the storm
+tracked eastward, consistent with the spatial propagation pattern
+identified by the H3 rogue wave analysis.
+
+@cr-peak-table
+
+:::
+
+:::{#cr-peak-table}
+```{r peak-table}
+peaks |>
+  mutate(
+    peak_time = format(peak_time, "%b %d %H:%M UTC")
+  ) |>
+  DT::datatable(
+    colnames = c("Station", "Peak Hmax (m)", "Peak Time", "Peak Gust (kn)",
+                 "Mean Wave (m)", "Observations"),
+    options = list(dom = "t", pageLength = 10),
+    caption = htmltools::tags$caption(
+      style = "caption-side: top; text-align: left; color: white;",
+      "Peak conditions per station during Oct 26-29, 2020 storm."
+    ),
+    rownames = FALSE
+  )
+```
+:::
+
+:::{.cr-section}
+
+## The Aftermath {focus-on="cr-pressure"}
+
+By October 29, the system had passed. Wave heights returned to 3-4 metres,
+pressure climbed back above 1000 hPa. The storm had affected all reporting
+stations across `r length(unique(storm$station_id))` buoys over
+`r as.integer(difftime(max(storm$time), min(storm$time), units = "hours"))` hours.
+
+The event demonstrates why Ireland's offshore buoy network is critical:
+M6's early detection gave `r round(as.numeric(difftime(peaks$peak_time[peaks$station_id == "M3"], peaks$peak_time[peaks$station_id == "M6"], units = "hours")), 0)` hours
+of lead time before the storm reached the coastal stations.
+
+@cr-pressure
+
+:::
+
+:::{#cr-pressure}
+```{r pressure-plot}
+storm |>
+  filter(!is.na(atmospheric_pressure)) |>
+  plot_ly(
+    x = ~time, y = ~atmospheric_pressure,
+    color = ~station_id,
+    colors = c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00"),
+    type = "scatter", mode = "lines",
+    hovertemplate = "%{x}<br>%{y:.0f} hPa<extra>%{data.name}</extra>"
+  ) |>
+  layout(
+    title = "Atmospheric Pressure — Oct 26-29, 2020",
+    xaxis = list(title = ""),
+    yaxis = list(title = "Pressure (hPa)"),
+    paper_bgcolor = "#1a1a1a",
+    plot_bgcolor = "#1a1a1a",
+    font = list(color = "white"),
+    legend = list(
+      orientation = "h", y = -0.2,
+      font = list(color = "white"),
+      bgcolor = "rgba(0,0,0,0.5)"
+    )
+  )
+```
+:::
