@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-04-17T08:10:04Z",
+    "generated": "2026-04-18T08:19:44Z",
     "package_version": "0.2.0",
     "endpoint": "spatial",
     "description": "Cross-station correlation matrices for wave height, wind speed, Hmax"
@@ -12,9 +12,9 @@
         "station2": "M3",
         "distance_km": 39,
         "optimal_lag": 0,
-        "max_correlation": 0.6515,
+        "max_correlation": 0.6516,
         "expected_lag": 1.3,
-        "n_obs": 46267
+        "n_obs": 46290
       },
       {
         "station1": "M2",
@@ -32,7 +32,7 @@
         "optimal_lag": 0,
         "max_correlation": 0.7726,
         "expected_lag": 1.7,
-        "n_obs": 47355
+        "n_obs": 47378
       },
       {
         "station1": "M2",
@@ -41,7 +41,7 @@
         "optimal_lag": 2,
         "max_correlation": 0.558,
         "expected_lag": 15.1,
-        "n_obs": 45068
+        "n_obs": 45091
       },
       {
         "station1": "M3",
@@ -59,7 +59,7 @@
         "optimal_lag": -2,
         "max_correlation": 0.8122,
         "expected_lag": 2.2,
-        "n_obs": 52259
+        "n_obs": 52282
       },
       {
         "station1": "M3",
@@ -68,7 +68,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.8698,
         "expected_lag": 14,
-        "n_obs": 49125
+        "n_obs": 49148
       },
       {
         "station1": "M4",
@@ -95,7 +95,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.6684,
         "expected_lag": 14.4,
-        "n_obs": 58262
+        "n_obs": 58285
       }
     ],
     "wind_speed": [
@@ -104,9 +104,9 @@
         "station2": "M3",
         "distance_km": 39,
         "optimal_lag": 6,
-        "max_correlation": 0.5813,
+        "max_correlation": 0.5814,
         "expected_lag": 1.3,
-        "n_obs": 45345
+        "n_obs": 45368
       },
       {
         "station1": "M2",
@@ -124,16 +124,16 @@
         "optimal_lag": 1,
         "max_correlation": 0.6868,
         "expected_lag": 1.7,
-        "n_obs": 47352
+        "n_obs": 47375
       },
       {
         "station1": "M2",
         "station2": "M6",
         "distance_km": 454.3,
         "optimal_lag": 11,
-        "max_correlation": 0.4486,
+        "max_correlation": 0.4488,
         "expected_lag": 15.1,
-        "n_obs": 44922
+        "n_obs": 44945
       },
       {
         "station1": "M3",
@@ -151,16 +151,16 @@
         "optimal_lag": -4,
         "max_correlation": 0.6736,
         "expected_lag": 2.2,
-        "n_obs": 51337
+        "n_obs": 51360
       },
       {
         "station1": "M3",
         "station2": "M6",
         "distance_km": 420.7,
         "optimal_lag": 5,
-        "max_correlation": 0.5293,
+        "max_correlation": 0.5294,
         "expected_lag": 14,
-        "n_obs": 48143
+        "n_obs": 48166
       },
       {
         "station1": "M4",
@@ -187,7 +187,7 @@
         "optimal_lag": 11,
         "max_correlation": 0.4338,
         "expected_lag": 14.4,
-        "n_obs": 57856
+        "n_obs": 57879
       }
     ],
     "hmax": [
@@ -198,7 +198,7 @@
         "optimal_lag": 0,
         "max_correlation": 0.6373,
         "expected_lag": 1.3,
-        "n_obs": 46267
+        "n_obs": 46290
       },
       {
         "station1": "M2",
@@ -216,7 +216,7 @@
         "optimal_lag": 0,
         "max_correlation": 0.7259,
         "expected_lag": 1.7,
-        "n_obs": 47355
+        "n_obs": 47378
       },
       {
         "station1": "M2",
@@ -225,7 +225,7 @@
         "optimal_lag": 2,
         "max_correlation": 0.5419,
         "expected_lag": 15.1,
-        "n_obs": 44745
+        "n_obs": 44768
       },
       {
         "station1": "M3",
@@ -243,7 +243,7 @@
         "optimal_lag": -2,
         "max_correlation": 0.7665,
         "expected_lag": 2.2,
-        "n_obs": 52259
+        "n_obs": 52282
       },
       {
         "station1": "M3",
@@ -252,7 +252,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.8363,
         "expected_lag": 14,
-        "n_obs": 46669
+        "n_obs": 46692
       },
       {
         "station1": "M4",
@@ -279,7 +279,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.5991,
         "expected_lag": 14.4,
-        "n_obs": 52660
+        "n_obs": 52683
       }
     ]
   }
