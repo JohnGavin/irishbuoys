@@ -52,8 +52,6 @@ viz_pkgs <- c(
   "scales",         # Scale functions
   "DT",             # Interactive tables
   "dygraphs",       # Time series plots
-  # perspectiveR: not in nixpkgs 2026-01-19 snapshot; install separately
-  # install.packages("perspectiveR") outside nix-shell
   "shiny",          # Shiny web apps
   "shinylive"       # Shinylive deployment
 )
@@ -91,7 +89,14 @@ rix::rix(
   date = "2026-01-19",
   r_pkgs = all_r_pkgs,
   system_pkgs = system_pkgs,
-  git_pkgs = NULL,
+  # perspectiveR: pure R+JS htmlwidgets (no compilation), not in nixpkgs 2026-01-19
+  git_pkgs = list(
+    list(
+      package_name = "perspectiveR",
+      repo_url = "https://github.com/EydlinIlya/perspectiveR",
+      commit = "c0cc8c7482ee511fd888885d919aca3a5af9e03c"
+    )
+  ),
   ide = "none",
   project_path = ".",
   overwrite = TRUE,
