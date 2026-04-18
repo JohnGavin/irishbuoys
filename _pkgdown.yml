@@ -46,7 +46,12 @@ articles:
     navbar: Dashboards
     contents:
       - dashboard_static
+      - dashboard_perspective
       - wave_analysis
+  - title: Storm Events
+    navbar: Storms
+    contents:
+      - storm_oct2020
   - title: Data Access
     navbar: API
     contents:
@@ -243,6 +248,13 @@ reference:
     contents:
       - read_predictions
       - compute_calibration
+
+  - title: "HuggingFace"
+    desc: "Public Parquet dataset access via HuggingFace"
+    contents:
+      - ib_hf_url
+      - ib_hf_online
+      - ib_hf_connect
 
   - title: "Documentation"
     desc: "Data dictionary and variable documentation"
