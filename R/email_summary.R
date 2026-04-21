@@ -15,6 +15,12 @@ compute_data_coverage <- function(con, start_date, end_date) {
   expected_hours <- as.integer(
     difftime(as.POSIXct(end_date), as.POSIXct(start_date), units = "hours")
   )
+  if (is.na(expected_hours) || expected_hours < 1L) {
+    cli::cli_abort(c(
+      "x" = "Invalid coverage window: expected_hours = {expected_hours}",
+      "i" = "start_date = {start_date}, end_date = {end_date}"
+    ))
+  }
 
   # Hourly coverage per station
   # Collect first, then truncate to hour in R (clock/lubridate not available on DuckDB)
@@ -539,8 +545,9 @@ create_email_summary <- function(summary) {
     # Coverage table with color coding
     cov_rows <- paste(vapply(seq_len(nrow(cov)), function(i) {
       row <- cov[i, ]
-      color <- if (row$coverage_pct >= 90) "#28a745"
-               else if (row$coverage_pct >= 80) "#ffc107"
+      pct <- row$coverage_pct
+      color <- if (isTRUE(pct >= 90)) "#28a745"
+               else if (isTRUE(pct >= 80)) "#ffc107"
                else "#dc3545"
       paste0(
         "<tr><td>", row$station_id, "</td>",
