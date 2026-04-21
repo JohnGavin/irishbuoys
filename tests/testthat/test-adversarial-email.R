@@ -29,7 +29,9 @@ test_that("generate_weekly_summary: non-existent directory path creates new db",
   on.exit(unlink(dirname(tmp_db), recursive = TRUE), add = TRUE)
   result <- generate_weekly_summary(db_path = tmp_db)
   expect_type(result, "list")
-  expect_equal(nrow(result$current_week), 0)
+  # Canonical station list ensures all 5 stations appear, even with empty db
+  expect_equal(nrow(result$current_week), 5)
+  expect_true(all(result$current_week$n_observations == 0L))
 })
 
 test_that("generate_weekly_summary: directory instead of file", {
@@ -48,8 +50,9 @@ test_that("generate_weekly_summary: special characters in path (creates new db)"
   # This SUCCEEDS because DuckDB creates the file
   result <- generate_weekly_summary(db_path = tmp_db)
   expect_type(result, "list")
-  # But data will be empty since it's a new db
-  expect_equal(nrow(result$current_week), 0)
+  # Canonical station list ensures all 5 stations appear, even with empty db
+  expect_equal(nrow(result$current_week), 5)
+  expect_true(all(result$current_week$n_observations == 0L))
 })
 
 test_that("generate_weekly_summary: very long path (creates new db)", {

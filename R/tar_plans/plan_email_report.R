@@ -17,7 +17,13 @@ plan_email_report <- list(
   # Create HTML email from summary
   targets::tar_target(
     email_html,
-    create_email_summary(email_summary_data)
+    withCallingHandlers(
+      create_email_summary(email_summary_data),
+      error = function(e) {
+        message("email_html traceback:")
+        message(paste(capture.output(traceback()), collapse = "\n"))
+      }
+    )
   ),
 
   # Send email or save preview
