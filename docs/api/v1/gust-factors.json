@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-04-21T11:43:20Z",
+    "generated": "2026-04-22T09:03:05Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 258764
+        "value": 258848
       },
       {
         "statistic": "mean",
@@ -29,7 +29,7 @@
       },
       {
         "statistic": "p99",
-        "value": 1.7983
+        "value": 1.7982
       },
       {
         "statistic": "max",
@@ -7541,11 +7541,11 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 43887,
+        "n": 43908,
         "mean_gf": 1.2878,
-        "median_gf": 1.2695,
-        "sd_gf": 0.1009,
-        "p95_gf": 1.4591,
+        "median_gf": 1.2694,
+        "sd_gf": 0.1008,
+        "p95_gf": 1.459,
         "p99_gf": 1.6338,
         "max_gf": 2.8902,
         "n_rogue": 4,
@@ -7553,12 +7553,12 @@
       },
       {
         "station_id": "M3",
-        "n": 48991,
+        "n": 49012,
         "mean_gf": 1.3308,
         "median_gf": 1.3046,
         "sd_gf": 0.1263,
-        "p95_gf": 1.5592,
-        "p99_gf": 1.7558,
+        "p95_gf": 1.5591,
+        "p99_gf": 1.7556,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.0122
@@ -7577,11 +7577,11 @@
       },
       {
         "station_id": "M5",
-        "n": 60073,
+        "n": 60094,
         "mean_gf": 1.3467,
         "median_gf": 1.3124,
-        "sd_gf": 0.1282,
-        "p95_gf": 1.5914,
+        "sd_gf": 0.1281,
+        "p95_gf": 1.5913,
         "p99_gf": 1.7272,
         "max_gf": 2.8889,
         "n_rogue": 3,
@@ -7589,11 +7589,11 @@
       },
       {
         "station_id": "M6",
-        "n": 55996,
+        "n": 56017,
         "mean_gf": 1.4151,
         "median_gf": 1.3858,
-        "sd_gf": 0.1552,
-        "p95_gf": 1.689,
+        "sd_gf": 0.1551,
+        "p95_gf": 1.6889,
         "p99_gf": 1.9402,
         "max_gf": 3.8846,
         "n_rogue": 32,
