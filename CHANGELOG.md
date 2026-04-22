@@ -1,5 +1,26 @@
 # Changelog
 
+## 2026-04-22
+
+### Completed
+- Fixed CI pipeline broken for 3 consecutive days (April 19-21): `if (row$coverage_pct >= 90)` crashed with "missing value where TRUE/FALSE needed" when `coverage_pct` was NaN
+- Root cause: PR #84 added canonical station left-join but NaN propagated from `0/0` division when `expected_hours` was zero
+- Fix: wrapped all `coverage_pct` comparisons with `isTRUE()` in `create_email_summary()`, added `expected_hours` validation in `compute_data_coverage()`
+- Added `withCallingHandlers` traceback capture to `email_html` target for future debugging
+- Updated 2 adversarial tests expecting 0 rows → 5 rows (canonical station left-join from PR #84)
+- Commit `ac00013` pushed to main
+
+### Failed Approaches
+- None this session
+
+### Accuracy / Metrics
+- Tests: 133 passing, 0 failures, 4 warnings (expected from adversarial edge-case inputs)
+
+### Known Limitations
+- `default.nix` still lacks shellHook fix for nested shell R_LIBS_SITE contamination (local-only, not blocking CI)
+- Next CI run needed to confirm fix works in production (can trigger: `gh -R JohnGavin/irishbuoys workflow run data-update.yml`)
+- Untracked rendered docs in `docs/` (dashboard_perspective, storm_oct2020, _extensions/) — not committed
+
 ## 2026-04-10
 
 ### Completed
