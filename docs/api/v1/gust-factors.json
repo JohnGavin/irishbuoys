@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-04-23T09:04:42Z",
+    "generated": "2026-04-24T09:20:17Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 258944
+        "value": 259035
       },
       {
         "statistic": "mean",
@@ -25,7 +25,7 @@
       },
       {
         "statistic": "p95",
-        "value": 1.5992
+        "value": 1.5991
       },
       {
         "statistic": "p99",
@@ -7541,24 +7541,24 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 43932,
-        "mean_gf": 1.2878,
-        "median_gf": 1.2694,
+        "n": 43951,
+        "mean_gf": 1.2877,
+        "median_gf": 1.2693,
         "sd_gf": 0.1008,
         "p95_gf": 1.4589,
-        "p99_gf": 1.6336,
+        "p99_gf": 1.6335,
         "max_gf": 2.8902,
         "n_rogue": 4,
         "pct_rogue": 0.0091
       },
       {
         "station_id": "M3",
-        "n": 49036,
+        "n": 49060,
         "mean_gf": 1.3308,
         "median_gf": 1.3046,
         "sd_gf": 0.1263,
-        "p95_gf": 1.559,
-        "p99_gf": 1.7556,
+        "p95_gf": 1.5589,
+        "p99_gf": 1.7555,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.0122
@@ -7577,11 +7577,11 @@
       },
       {
         "station_id": "M5",
-        "n": 60118,
+        "n": 60142,
         "mean_gf": 1.3467,
         "median_gf": 1.3125,
         "sd_gf": 0.1281,
-        "p95_gf": 1.5913,
+        "p95_gf": 1.5912,
         "p99_gf": 1.7272,
         "max_gf": 2.8889,
         "n_rogue": 3,
@@ -7589,12 +7589,12 @@
       },
       {
         "station_id": "M6",
-        "n": 56041,
+        "n": 56065,
         "mean_gf": 1.4151,
         "median_gf": 1.3858,
         "sd_gf": 0.1551,
         "p95_gf": 1.6889,
-        "p99_gf": 1.9402,
+        "p99_gf": 1.9401,
         "max_gf": 3.8846,
         "n_rogue": 32,
         "pct_rogue": 0.0571
