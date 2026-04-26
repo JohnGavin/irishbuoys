@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-04-24
+
+### Completed
+- Fixed stale comment in `data-update.yml`: cron is daily at 06:00 UTC, not "every 6 hours"
+- Diagnosed double "LLM Usage Report" emails: caused by `llmtelemetry` `daily-report.yaml` having a `push` trigger — two pushes to main = two emails
+
+### Failed Approaches
+- None
+
+### Known Limitations
+- `llmtelemetry/daily-report.yaml` still has `push: branches: [main]` trigger causing duplicate emails on push days — fix pending in that repo
+- `storm-alert.yml` comment (line 8) still references "next 6-hourly run" — should say "next daily run"
+
 ## 2026-04-22
 
 ### Completed
