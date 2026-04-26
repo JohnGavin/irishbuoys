@@ -5,7 +5,7 @@ name: Daily Storm Alert
 # No email on calm days.
 #
 # When storms are detected, directly triggers the data update workflow
-# for an immediate data refresh (instead of waiting for the next 6-hourly run).
+# for an immediate data refresh (instead of waiting for the next daily run).
 
 on:
   schedule:
