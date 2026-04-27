@@ -1,20 +1,20 @@
 {
   "_meta": {
-    "generated": "2026-04-26T07:44:29Z",
+    "generated": "2026-04-27T08:29:32Z",
     "package_version": "0.2.0",
     "endpoint": "status",
     "description": "Per-station operational status, record counts, and date ranges"
   },
   "data": {
     "n_stations": 5,
-    "total_records": 300906,
-    "date_range": ["2018-11-16", "2026-04-26 07:00:00"],
+    "total_records": 301002,
+    "date_range": ["2018-11-16", "2026-04-27 07:00:00"],
     "stations": [
       {
         "station_id": "M2",
-        "n_records": 59060,
+        "n_records": 59084,
         "first_date": "2018-11-16T00:00:00Z",
-        "last_date": "2026-04-26T07:00:00Z",
+        "last_date": "2026-04-27T07:00:00Z",
         "mean_wave_height": 1.18,
         "max_wave_height": 6.41,
         "mean_wind_speed": 14.47,
@@ -22,9 +22,9 @@
       },
       {
         "station_id": "M3",
-        "n_records": 59059,
+        "n_records": 59083,
         "first_date": "2018-11-16T00:00:00Z",
-        "last_date": "2026-04-26T07:00:00Z",
+        "last_date": "2026-04-27T07:00:00Z",
         "mean_wave_height": 3.07,
         "max_wave_height": 14.06,
         "mean_wind_speed": 15.73,
@@ -42,22 +42,22 @@
       },
       {
         "station_id": "M5",
-        "n_records": 63991,
+        "n_records": 64015,
         "first_date": "2018-11-16T00:00:00Z",
-        "last_date": "2026-04-26T07:00:00Z",
+        "last_date": "2026-04-27T07:00:00Z",
         "mean_wave_height": 1.92,
         "max_wave_height": 9.69,
-        "mean_wind_speed": 14.41,
+        "mean_wind_speed": 14.4,
         "max_wind_speed": 44.17
       },
       {
         "station_id": "M6",
-        "n_records": 58899,
+        "n_records": 58923,
         "first_date": "2018-11-23T10:00:00Z",
-        "last_date": "2026-04-26T07:00:00Z",
+        "last_date": "2026-04-27T07:00:00Z",
         "mean_wave_height": 3.4,
         "max_wave_height": 15.7,
-        "mean_wind_speed": 16.55,
+        "mean_wind_speed": 16.54,
         "max_wind_speed": 56.58
       }
     ]
