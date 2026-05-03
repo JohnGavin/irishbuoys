@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-05-02T08:56:17Z",
+    "generated": "2026-05-03T09:14:00Z",
     "package_version": "0.2.0",
     "endpoint": "return-levels",
     "description": "GPD return levels per station for 1, 5, 10-year periods"
@@ -44,9 +44,9 @@
           "10yr": 21.97
         },
         "avg_wind": {
-          "1yr": 45.12,
-          "5yr": 48.27,
-          "10yr": 49.47
+          "1yr": 45.08,
+          "5yr": 48.26,
+          "10yr": 49.49
         },
         "wind_gust": {
           "1yr": 60.27,
@@ -199,14 +199,14 @@
         },
         "avg_wind": {
           "delta": {
-            "1yr": 45.12,
-            "5yr": 48.27,
-            "10yr": 49.47
+            "1yr": 45.08,
+            "5yr": 48.26,
+            "10yr": 49.49
           },
           "bootstrap": {
-            "1yr": 45.12,
-            "5yr": 48.27,
-            "10yr": 49.47
+            "1yr": 45.08,
+            "5yr": 48.26,
+            "10yr": 49.49
           }
         },
         "wind_gust": {
