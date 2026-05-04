@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-05-04
+
+### Completed
+- Updated CHANGELOG 2026-04-24 entry: moved resolved items from Known Limitations to Completed
+- Documented 5 untracked rendered docs (`docs/vignettes/dashboard_perspective*`, `storm_oct2020*`, `_extensions/`) — local render artifacts, not for commit
+- Tabulated HuggingFace #71 pros/cons; identified `dsfefvx` account ownership fragmentation
+- Created cross-linked issues for HF account migration: irishbuoys#87, historical#83
+
+### Failed Approaches
+- None
+
+### Known Limitations
+- 5 untracked rendered docs (~13MB) in `docs/` — recommend `.gitignore` + delete (see session notes)
+- HF datasets hosted under `dsfefvx` account, not `JohnGavin` — tracked in #87
+- Plan file `noble-humming-charm.md` still exists but #71 is closed — can be deleted
+
 ## 2026-04-24
 
 ### Completed
