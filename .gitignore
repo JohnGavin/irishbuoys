@@ -39,6 +39,13 @@ pkgdown/
 **/*.quarto_ipynb
 _output/
 
+# Local-only rendered vignettes (not built by CI)
+docs/vignettes/dashboard_perspective.html
+docs/vignettes/dashboard_perspective_files/
+docs/vignettes/storm_oct2020.html
+docs/vignettes/storm_oct2020_files/
+docs/_extensions/
+
 # Except allow dashboard data files
 !docs/
 !docs/**
