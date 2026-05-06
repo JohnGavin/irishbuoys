@@ -311,7 +311,7 @@ jobs:
           git push || true
 
       # ── Push Parquet to HuggingFace ─────────────────────────
-      # Public dataset at hf://datasets/dsfefvx/irish-buoy-network
+      # Public dataset at hf://datasets/JohnGavin/irish-buoy-network
       # Uses git clone + git-lfs push (NOT REST API)
 
       - name: Push Parquet to HuggingFace
@@ -331,7 +331,7 @@ jobs:
 
           TMPDIR=$(mktemp -d)
           git clone --depth 1 \
-            "https://hf-user:${HF_TOKEN}@huggingface.co/datasets/dsfefvx/irish-buoy-network" \
+            "https://hf-user:${HF_TOKEN}@huggingface.co/datasets/JohnGavin/irish-buoy-network" \
             "$TMPDIR/repo" || {
             echo "::warning::HF clone failed — skipping push"
             rm -rf "$TMPDIR"

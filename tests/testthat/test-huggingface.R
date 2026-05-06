@@ -4,7 +4,7 @@ test_that("ib_hf_url returns correct hf:// URL", {
   url <- ib_hf_url()
   expect_match(url, "^hf://datasets/")
   expect_match(url, "buoy_data\\.parquet$")
-  expect_equal(url, "hf://datasets/dsfefvx/irish-buoy-network/buoy_data.parquet")
+  expect_equal(url, "hf://datasets/JohnGavin/irish-buoy-network/buoy_data.parquet")
 })
 
 test_that("ib_hf_url accepts custom filename", {

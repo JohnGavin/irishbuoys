@@ -3,14 +3,14 @@
     Code
       ib_hf_url()
     Output
-      [1] "hf://datasets/dsfefvx/irish-buoy-network/buoy_data.parquet"
+      [1] "hf://datasets/JohnGavin/irish-buoy-network/buoy_data.parquet"
 
 ---
 
     Code
       ib_hf_url("stations.json")
     Output
-      [1] "hf://datasets/dsfefvx/irish-buoy-network/stations.json"
+      [1] "hf://datasets/JohnGavin/irish-buoy-network/stations.json"
 
 # local Parquet schema snapshot
 
