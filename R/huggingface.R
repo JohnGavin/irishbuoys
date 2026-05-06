@@ -11,7 +11,7 @@
 #' ib_hf_url()
 #' ib_hf_url("stations.json")
 ib_hf_url <- function(filename = "buoy_data.parquet") {
-  repo <- Sys.getenv("IB_HF_REPO", unset = "dsfefvx/irish-buoy-network")
+  repo <- Sys.getenv("IB_HF_REPO", unset = "JohnGavin/irish-buoy-network")
   sprintf("hf://datasets/%s/%s", repo, filename)
 }
 
@@ -26,7 +26,7 @@ ib_hf_url <- function(filename = "buoy_data.parquet") {
 #' @examples
 #' ib_hf_online()
 ib_hf_online <- function() {
-  repo <- Sys.getenv("IB_HF_REPO", unset = "dsfefvx/irish-buoy-network")
+  repo <- Sys.getenv("IB_HF_REPO", unset = "JohnGavin/irish-buoy-network")
   url <- sprintf("https://huggingface.co/api/datasets/%s", repo)
   tryCatch(
     {
