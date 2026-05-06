@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-05-06
+
+### Completed
+- Migrated HuggingFace dataset from `dsfefvx/irish-buoy-network` to `JohnGavin/irish-buoy-network`
+- Updated 4 code files: `R/huggingface.R`, `tests/testthat/test-huggingface.R`, `tests/testthat/_snaps/huggingface.md`, `.github/workflows/data-update.yml`
+- Verified CI push to new HF repo works (run `25433685681`)
+- Closes #87
+
+### Failed Approaches
+- None
+
+### Known Limitations
+- Old `dsfefvx/irish-buoy-network` dataset still exists (stale mirror) — can be deleted manually
+
 ## 2026-05-04
 
 ### Completed
