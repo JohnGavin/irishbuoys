@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-05-10T09:23:33Z",
+    "generated": "2026-05-11T10:48:42Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 260376
+        "value": 260480
       },
       {
         "statistic": "mean",
@@ -17,7 +17,7 @@
       },
       {
         "statistic": "median",
-        "value": 1.3222
+        "value": 1.3221
       },
       {
         "statistic": "sd",
@@ -25,7 +25,7 @@
       },
       {
         "statistic": "p95",
-        "value": 1.5988
+        "value": 1.5987
       },
       {
         "statistic": "p99",
@@ -7541,24 +7541,24 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 44280,
-        "mean_gf": 1.2874,
+        "n": 44306,
+        "mean_gf": 1.2873,
         "median_gf": 1.269,
         "sd_gf": 0.1007,
         "p95_gf": 1.4583,
-        "p99_gf": 1.6328,
+        "p99_gf": 1.6327,
         "max_gf": 2.8902,
         "n_rogue": 4,
         "pct_rogue": 0.009
       },
       {
         "station_id": "M3",
-        "n": 49400,
+        "n": 49426,
         "mean_gf": 1.3307,
-        "median_gf": 1.3046,
+        "median_gf": 1.3045,
         "sd_gf": 0.1261,
-        "p95_gf": 1.5585,
-        "p99_gf": 1.7555,
+        "p95_gf": 1.5583,
+        "p99_gf": 1.7554,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.0121
@@ -7577,10 +7577,10 @@
       },
       {
         "station_id": "M5",
-        "n": 60465,
+        "n": 60491,
         "mean_gf": 1.3465,
         "median_gf": 1.3125,
-        "sd_gf": 0.128,
+        "sd_gf": 0.1279,
         "p95_gf": 1.5909,
         "p99_gf": 1.7268,
         "max_gf": 2.8889,
@@ -7589,11 +7589,11 @@
       },
       {
         "station_id": "M6",
-        "n": 56414,
+        "n": 56440,
         "mean_gf": 1.4146,
-        "median_gf": 1.3854,
+        "median_gf": 1.3853,
         "sd_gf": 0.155,
-        "p95_gf": 1.6884,
+        "p95_gf": 1.6883,
         "p99_gf": 1.9401,
         "max_gf": 3.8846,
         "n_rogue": 32,
