@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-05-21T10:59:26Z",
+    "generated": "2026-05-22T10:43:08Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,11 +9,11 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 261422
+        "value": 261514
       },
       {
         "statistic": "mean",
-        "value": 1.3507
+        "value": 1.3506
       },
       {
         "statistic": "median",
@@ -1701,6 +1701,21 @@
         "sea_temperature": 10.518,
         "qc_flag": 0,
         "gust_factor": 2.432
+      },
+      {
+        "station_id": "M2",
+        "time": "2026-05-21T20:00:00",
+        "wave_height": 0.938,
+        "hmax": 1.563,
+        "wave_period": 4.688,
+        "tp": 5.273,
+        "wind_speed": 6.717,
+        "wind_direction": 201,
+        "gust": 16.28,
+        "atmospheric_pressure": 1021.936,
+        "sea_temperature": 10.701,
+        "qc_flag": 0,
+        "gust_factor": 2.4237
       },
       {
         "station_id": "M6",
@@ -7521,42 +7536,27 @@
         "sea_temperature": 11.387,
         "qc_flag": 0,
         "gust_factor": 2.091
-      },
-      {
-        "station_id": "M6",
-        "time": "2021-05-15T11:00:00",
-        "wave_height": 3.672,
-        "hmax": 5.508,
-        "wave_period": 8.32,
-        "tp": 12.773,
-        "wind_speed": 5.009,
-        "wind_direction": 65,
-        "gust": 10.474,
-        "atmospheric_pressure": 990.149,
-        "sea_temperature": 11.426,
-        "qc_flag": 0,
-        "gust_factor": 2.091
       }
     ],
     "by_station": [
       {
         "station_id": "M2",
-        "n": 44531,
+        "n": 44554,
         "mean_gf": 1.2874,
         "median_gf": 1.2689,
-        "sd_gf": 0.101,
+        "sd_gf": 0.1011,
         "p95_gf": 1.4588,
-        "p99_gf": 1.6336,
+        "p99_gf": 1.6342,
         "max_gf": 2.8902,
         "n_rogue": 4,
         "pct_rogue": 0.009
       },
       {
         "station_id": "M3",
-        "n": 49666,
+        "n": 49689,
         "mean_gf": 1.3306,
         "median_gf": 1.3046,
-        "sd_gf": 0.1259,
+        "sd_gf": 0.1258,
         "p95_gf": 1.5578,
         "p99_gf": 1.7548,
         "max_gf": 3.2127,
@@ -7577,27 +7577,27 @@
       },
       {
         "station_id": "M5",
-        "n": 60728,
+        "n": 60751,
         "mean_gf": 1.3466,
         "median_gf": 1.3125,
         "sd_gf": 0.1278,
         "p95_gf": 1.5907,
-        "p99_gf": 1.7266,
+        "p99_gf": 1.7265,
         "max_gf": 2.8889,
         "n_rogue": 3,
         "pct_rogue": 0.0049
       },
       {
         "station_id": "M6",
-        "n": 56680,
-        "mean_gf": 1.4142,
+        "n": 56703,
+        "mean_gf": 1.4141,
         "median_gf": 1.3847,
-        "sd_gf": 0.1549,
-        "p95_gf": 1.6878,
-        "p99_gf": 1.9395,
+        "sd_gf": 0.1548,
+        "p95_gf": 1.6876,
+        "p99_gf": 1.9394,
         "max_gf": 3.8846,
         "n_rogue": 32,
-        "pct_rogue": 0.0565
+        "pct_rogue": 0.0564
       }
     ],
     "rogue_gust_threshold": 2.6,
