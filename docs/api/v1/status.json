@@ -1,20 +1,20 @@
 {
   "_meta": {
-    "generated": "2026-05-22T09:27:17Z",
+    "generated": "2026-05-23T08:24:45Z",
     "package_version": "0.2.0",
     "endpoint": "status",
     "description": "Per-station operational status, record counts, and date ranges"
   },
   "data": {
     "n_stations": 5,
-    "total_records": 303406,
-    "date_range": ["2018-11-16", "2026-05-22 08:00:00"],
+    "total_records": 303498,
+    "date_range": ["2018-11-16", "2026-05-23 07:00:00"],
     "stations": [
       {
         "station_id": "M2",
-        "n_records": 59685,
+        "n_records": 59708,
         "first_date": "2018-11-16T00:00:00Z",
-        "last_date": "2026-05-22T08:00:00Z",
+        "last_date": "2026-05-23T07:00:00Z",
         "mean_wave_height": 1.17,
         "max_wave_height": 6.41,
         "mean_wind_speed": 14.46,
@@ -22,12 +22,12 @@
       },
       {
         "station_id": "M3",
-        "n_records": 59684,
+        "n_records": 59707,
         "first_date": "2018-11-16T00:00:00Z",
-        "last_date": "2026-05-22T08:00:00Z",
+        "last_date": "2026-05-23T07:00:00Z",
         "mean_wave_height": 3.06,
         "max_wave_height": 14.06,
-        "mean_wind_speed": 15.74,
+        "mean_wind_speed": 15.73,
         "max_wind_speed": 50.09
       },
       {
@@ -42,22 +42,22 @@
       },
       {
         "station_id": "M5",
-        "n_records": 64616,
+        "n_records": 64639,
         "first_date": "2018-11-16T00:00:00Z",
-        "last_date": "2026-05-22T08:00:00Z",
+        "last_date": "2026-05-23T07:00:00Z",
         "mean_wave_height": 1.91,
         "max_wave_height": 9.69,
-        "mean_wind_speed": 14.4,
+        "mean_wind_speed": 14.39,
         "max_wind_speed": 44.17
       },
       {
         "station_id": "M6",
-        "n_records": 59524,
+        "n_records": 59547,
         "first_date": "2018-11-23T10:00:00Z",
-        "last_date": "2026-05-22T08:00:00Z",
+        "last_date": "2026-05-23T07:00:00Z",
         "mean_wave_height": 3.39,
         "max_wave_height": 15.7,
-        "mean_wind_speed": 16.53,
+        "mean_wind_speed": 16.54,
         "max_wind_speed": 56.58
       }
     ]

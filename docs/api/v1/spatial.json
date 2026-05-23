@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-05-22T10:46:08Z",
+    "generated": "2026-05-23T09:34:50Z",
     "package_version": "0.2.0",
     "endpoint": "spatial",
     "description": "Cross-station correlation matrices for wave height, wind speed, Hmax"
@@ -14,7 +14,7 @@
         "optimal_lag": 0,
         "max_correlation": 0.6523,
         "expected_lag": 1.3,
-        "n_obs": 47108
+        "n_obs": 47131
       },
       {
         "station1": "M2",
@@ -32,7 +32,7 @@
         "optimal_lag": 0,
         "max_correlation": 0.7725,
         "expected_lag": 1.7,
-        "n_obs": 48196
+        "n_obs": 48219
       },
       {
         "station1": "M2",
@@ -41,7 +41,7 @@
         "optimal_lag": 2,
         "max_correlation": 0.5585,
         "expected_lag": 15.1,
-        "n_obs": 45909
+        "n_obs": 45932
       },
       {
         "station1": "M3",
@@ -59,7 +59,7 @@
         "optimal_lag": -2,
         "max_correlation": 0.8124,
         "expected_lag": 2.2,
-        "n_obs": 53100
+        "n_obs": 53123
       },
       {
         "station1": "M3",
@@ -68,7 +68,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.8694,
         "expected_lag": 14,
-        "n_obs": 49966
+        "n_obs": 49989
       },
       {
         "station1": "M4",
@@ -95,7 +95,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.6686,
         "expected_lag": 14.4,
-        "n_obs": 59103
+        "n_obs": 59126
       }
     ],
     "wind_speed": [
@@ -106,7 +106,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.5805,
         "expected_lag": 1.3,
-        "n_obs": 46186
+        "n_obs": 46209
       },
       {
         "station1": "M2",
@@ -122,18 +122,18 @@
         "station2": "M5",
         "distance_km": 52.3,
         "optimal_lag": 1,
-        "max_correlation": 0.6864,
+        "max_correlation": 0.6863,
         "expected_lag": 1.7,
-        "n_obs": 48193
+        "n_obs": 48216
       },
       {
         "station1": "M2",
         "station2": "M6",
         "distance_km": 454.3,
         "optimal_lag": 11,
-        "max_correlation": 0.4473,
+        "max_correlation": 0.4471,
         "expected_lag": 15.1,
-        "n_obs": 45763
+        "n_obs": 45786
       },
       {
         "station1": "M3",
@@ -149,18 +149,18 @@
         "station2": "M5",
         "distance_km": 64.7,
         "optimal_lag": -4,
-        "max_correlation": 0.6727,
+        "max_correlation": 0.6728,
         "expected_lag": 2.2,
-        "n_obs": 52178
+        "n_obs": 52201
       },
       {
         "station1": "M3",
         "station2": "M6",
         "distance_km": 420.7,
         "optimal_lag": 5,
-        "max_correlation": 0.5297,
+        "max_correlation": 0.5296,
         "expected_lag": 14,
-        "n_obs": 48984
+        "n_obs": 49007
       },
       {
         "station1": "M4",
@@ -187,7 +187,7 @@
         "optimal_lag": 11,
         "max_correlation": 0.434,
         "expected_lag": 14.4,
-        "n_obs": 58697
+        "n_obs": 58720
       }
     ],
     "hmax": [
@@ -198,7 +198,7 @@
         "optimal_lag": 0,
         "max_correlation": 0.6376,
         "expected_lag": 1.3,
-        "n_obs": 47108
+        "n_obs": 47131
       },
       {
         "station1": "M2",
@@ -216,16 +216,16 @@
         "optimal_lag": 0,
         "max_correlation": 0.7258,
         "expected_lag": 1.7,
-        "n_obs": 48196
+        "n_obs": 48219
       },
       {
         "station1": "M2",
         "station2": "M6",
         "distance_km": 454.3,
         "optimal_lag": 2,
-        "max_correlation": 0.542,
+        "max_correlation": 0.5419,
         "expected_lag": 15.1,
-        "n_obs": 45586
+        "n_obs": 45609
       },
       {
         "station1": "M3",
@@ -243,7 +243,7 @@
         "optimal_lag": -2,
         "max_correlation": 0.7668,
         "expected_lag": 2.2,
-        "n_obs": 53100
+        "n_obs": 53123
       },
       {
         "station1": "M3",
@@ -252,7 +252,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.8357,
         "expected_lag": 14,
-        "n_obs": 47510
+        "n_obs": 47533
       },
       {
         "station1": "M4",
@@ -279,7 +279,7 @@
         "optimal_lag": 6,
         "max_correlation": 0.5996,
         "expected_lag": 14.4,
-        "n_obs": 53501
+        "n_obs": 53524
       }
     ]
   }
