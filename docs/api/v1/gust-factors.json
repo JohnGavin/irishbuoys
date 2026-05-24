@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-05-23T09:31:56Z",
+    "generated": "2026-05-24T09:39:50Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 261605
+        "value": 261700
       },
       {
         "statistic": "mean",
@@ -25,11 +25,11 @@
       },
       {
         "statistic": "p95",
-        "value": 1.5982
+        "value": 1.5981
       },
       {
         "statistic": "p99",
-        "value": 1.7972
+        "value": 1.7969
       },
       {
         "statistic": "max",
@@ -7541,24 +7541,24 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 44576,
-        "mean_gf": 1.2874,
-        "median_gf": 1.2689,
+        "n": 44599,
+        "mean_gf": 1.2873,
+        "median_gf": 1.2688,
         "sd_gf": 0.1011,
         "p95_gf": 1.4588,
-        "p99_gf": 1.6342,
+        "p99_gf": 1.6341,
         "max_gf": 2.8902,
         "n_rogue": 4,
         "pct_rogue": 0.009
       },
       {
         "station_id": "M3",
-        "n": 49712,
+        "n": 49737,
         "mean_gf": 1.3306,
         "median_gf": 1.3046,
         "sd_gf": 0.1258,
         "p95_gf": 1.5578,
-        "p99_gf": 1.7547,
+        "p99_gf": 1.7546,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.0121
@@ -7577,24 +7577,24 @@
       },
       {
         "station_id": "M5",
-        "n": 60774,
+        "n": 60796,
         "mean_gf": 1.3466,
         "median_gf": 1.3125,
         "sd_gf": 0.1278,
-        "p95_gf": 1.5907,
-        "p99_gf": 1.7264,
+        "p95_gf": 1.5906,
+        "p99_gf": 1.7263,
         "max_gf": 2.8889,
         "n_rogue": 3,
         "pct_rogue": 0.0049
       },
       {
         "station_id": "M6",
-        "n": 56726,
+        "n": 56751,
         "mean_gf": 1.4141,
         "median_gf": 1.3846,
         "sd_gf": 0.1548,
         "p95_gf": 1.6876,
-        "p99_gf": 1.9393,
+        "p99_gf": 1.9391,
         "max_gf": 3.8846,
         "n_rogue": 32,
         "pct_rogue": 0.0564
@@ -7602,6 +7602,6 @@
     ],
     "rogue_gust_threshold": 2.6,
     "n_rogue_gusts": 59,
-    "pct_rogue_gusts": 0.0226
+    "pct_rogue_gusts": 0.0225
   }
 }
