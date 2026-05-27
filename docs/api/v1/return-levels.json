@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-05-25T11:23:07Z",
+    "generated": "2026-05-27T11:11:00Z",
     "package_version": "0.2.0",
     "endpoint": "return-levels",
     "description": "GPD return levels per station for 1, 5, 10-year periods"
@@ -100,9 +100,9 @@
       },
       "M6": {
         "avg_wave": {
-          "1yr": 14.23,
-          "5yr": 15.8,
-          "10yr": 16.42
+          "1yr": 14.15,
+          "5yr": 15.63,
+          "10yr": 16.21
         },
         "rogue_wave": {
           "1yr": 22.35,
@@ -325,14 +325,14 @@
       "M6": {
         "avg_wave": {
           "delta": {
-            "1yr": 14.23,
-            "5yr": 15.8,
-            "10yr": 16.42
+            "1yr": 14.15,
+            "5yr": 15.63,
+            "10yr": 16.21
           },
           "bootstrap": {
-            "1yr": 14.23,
-            "5yr": 15.8,
-            "10yr": 16.42
+            "1yr": 14.15,
+            "5yr": 15.63,
+            "10yr": 16.21
           }
         },
         "rogue_wave": {
