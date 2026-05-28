@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-05-27T09:52:50Z",
+    "generated": "2026-05-28T10:04:25Z",
     "package_version": "0.2.0",
     "endpoint": "stations",
     "description": "All buoy station metadata (ID, call sign, coordinates)"
