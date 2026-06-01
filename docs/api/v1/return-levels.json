@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-05-31T10:09:10Z",
+    "generated": "2026-06-01T12:48:20Z",
     "package_version": "0.2.0",
     "endpoint": "return-levels",
     "description": "GPD return levels per station for 1, 5, 10-year periods"
