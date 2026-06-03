@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-06-02T11:35:08Z",
+    "generated": "2026-06-03T12:17:43Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 262503
+        "value": 262603
       },
       {
         "statistic": "mean",
@@ -25,7 +25,7 @@
       },
       {
         "statistic": "p95",
-        "value": 1.598
+        "value": 1.5979
       },
       {
         "statistic": "p99",
@@ -7541,24 +7541,24 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 44788,
-        "mean_gf": 1.2873,
-        "median_gf": 1.2687,
+        "n": 44813,
+        "mean_gf": 1.2872,
+        "median_gf": 1.2686,
         "sd_gf": 0.1014,
-        "p95_gf": 1.4589,
-        "p99_gf": 1.6348,
+        "p95_gf": 1.4588,
+        "p99_gf": 1.6349,
         "max_gf": 2.8902,
         "n_rogue": 5,
         "pct_rogue": 0.0112
       },
       {
         "station_id": "M3",
-        "n": 49949,
+        "n": 49974,
         "mean_gf": 1.3306,
         "median_gf": 1.3046,
-        "sd_gf": 0.1257,
+        "sd_gf": 0.1256,
         "p95_gf": 1.5577,
-        "p99_gf": 1.7543,
+        "p99_gf": 1.7542,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.012
@@ -7577,7 +7577,7 @@
       },
       {
         "station_id": "M5",
-        "n": 60988,
+        "n": 61013,
         "mean_gf": 1.3465,
         "median_gf": 1.3125,
         "sd_gf": 0.1276,
@@ -7589,12 +7589,12 @@
       },
       {
         "station_id": "M6",
-        "n": 56961,
+        "n": 56986,
         "mean_gf": 1.4138,
         "median_gf": 1.3846,
-        "sd_gf": 0.1548,
+        "sd_gf": 0.1547,
         "p95_gf": 1.6875,
-        "p99_gf": 1.939,
+        "p99_gf": 1.9388,
         "max_gf": 3.8846,
         "n_rogue": 32,
         "pct_rogue": 0.0562
@@ -7602,6 +7602,6 @@
     ],
     "rogue_gust_threshold": 2.6,
     "n_rogue_gusts": 60,
-    "pct_rogue_gusts": 0.0229
+    "pct_rogue_gusts": 0.0228
   }
 }
