@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-06-03T12:17:43Z",
+    "generated": "2026-06-04T11:06:55Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 262603
+        "value": 262695
       },
       {
         "statistic": "mean",
@@ -7541,24 +7541,24 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 44813,
-        "mean_gf": 1.2872,
+        "n": 44836,
+        "mean_gf": 1.2873,
         "median_gf": 1.2686,
-        "sd_gf": 0.1014,
+        "sd_gf": 0.1015,
         "p95_gf": 1.4588,
-        "p99_gf": 1.6349,
+        "p99_gf": 1.635,
         "max_gf": 2.8902,
         "n_rogue": 5,
         "pct_rogue": 0.0112
       },
       {
         "station_id": "M3",
-        "n": 49974,
+        "n": 49997,
         "mean_gf": 1.3306,
         "median_gf": 1.3046,
         "sd_gf": 0.1256,
-        "p95_gf": 1.5577,
-        "p99_gf": 1.7542,
+        "p95_gf": 1.5576,
+        "p99_gf": 1.7541,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.012
@@ -7577,9 +7577,9 @@
       },
       {
         "station_id": "M5",
-        "n": 61013,
-        "mean_gf": 1.3465,
-        "median_gf": 1.3125,
+        "n": 61036,
+        "mean_gf": 1.3466,
+        "median_gf": 1.3126,
         "sd_gf": 0.1276,
         "p95_gf": 1.5902,
         "p99_gf": 1.7262,
@@ -7589,15 +7589,15 @@
       },
       {
         "station_id": "M6",
-        "n": 56986,
-        "mean_gf": 1.4138,
+        "n": 57009,
+        "mean_gf": 1.4137,
         "median_gf": 1.3846,
         "sd_gf": 0.1547,
         "p95_gf": 1.6875,
-        "p99_gf": 1.9388,
+        "p99_gf": 1.9387,
         "max_gf": 3.8846,
         "n_rogue": 32,
-        "pct_rogue": 0.0562
+        "pct_rogue": 0.0561
       }
     ],
     "rogue_gust_threshold": 2.6,
