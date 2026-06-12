@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-06-11T11:44:17Z",
+    "generated": "2026-06-12T11:18:35Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,11 +9,11 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 263360
+        "value": 263456
       },
       {
         "statistic": "mean",
-        "value": 1.3505
+        "value": 1.3504
       },
       {
         "statistic": "median",
@@ -21,7 +21,7 @@
       },
       {
         "statistic": "sd",
-        "value": 0.1359
+        "value": 0.1358
       },
       {
         "statistic": "p95",
@@ -7541,7 +7541,7 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 45000,
+        "n": 45024,
         "mean_gf": 1.2872,
         "median_gf": 1.2685,
         "sd_gf": 0.102,
@@ -7553,12 +7553,12 @@
       },
       {
         "station_id": "M3",
-        "n": 50165,
+        "n": 50189,
         "mean_gf": 1.3306,
         "median_gf": 1.3048,
         "sd_gf": 0.1255,
         "p95_gf": 1.5574,
-        "p99_gf": 1.7542,
+        "p99_gf": 1.7541,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.012
@@ -7577,11 +7577,11 @@
       },
       {
         "station_id": "M5",
-        "n": 61204,
-        "mean_gf": 1.3467,
+        "n": 61228,
+        "mean_gf": 1.3468,
         "median_gf": 1.3131,
         "sd_gf": 0.1275,
-        "p95_gf": 1.5902,
+        "p95_gf": 1.5901,
         "p99_gf": 1.7262,
         "max_gf": 2.8889,
         "n_rogue": 3,
@@ -7589,15 +7589,15 @@
       },
       {
         "station_id": "M6",
-        "n": 57174,
+        "n": 57198,
         "mean_gf": 1.4134,
         "median_gf": 1.3841,
-        "sd_gf": 0.1547,
-        "p95_gf": 1.6875,
+        "sd_gf": 0.1546,
+        "p95_gf": 1.6874,
         "p99_gf": 1.9387,
         "max_gf": 3.8846,
         "n_rogue": 32,
-        "pct_rogue": 0.056
+        "pct_rogue": 0.0559
       }
     ],
     "rogue_gust_threshold": 2.6,
