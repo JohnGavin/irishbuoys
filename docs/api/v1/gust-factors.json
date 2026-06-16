@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-06-15T13:18:35Z",
+    "generated": "2026-06-16T12:22:28Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,7 +9,7 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 263730
+        "value": 263816
       },
       {
         "statistic": "mean",
@@ -25,7 +25,7 @@
       },
       {
         "statistic": "p95",
-        "value": 1.5977
+        "value": 1.5976
       },
       {
         "statistic": "p99",
@@ -7541,24 +7541,24 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 45089,
+        "n": 45106,
         "mean_gf": 1.2872,
         "median_gf": 1.2685,
-        "sd_gf": 0.1019,
+        "sd_gf": 0.102,
         "p95_gf": 1.4589,
-        "p99_gf": 1.6363,
+        "p99_gf": 1.6364,
         "max_gf": 3.3621,
         "n_rogue": 6,
         "pct_rogue": 0.0133
       },
       {
         "station_id": "M3",
-        "n": 50254,
-        "mean_gf": 1.3307,
+        "n": 50277,
+        "mean_gf": 1.3306,
         "median_gf": 1.3048,
-        "sd_gf": 0.1255,
+        "sd_gf": 0.1254,
         "p95_gf": 1.5574,
-        "p99_gf": 1.7543,
+        "p99_gf": 1.7542,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.0119
@@ -7577,11 +7577,11 @@
       },
       {
         "station_id": "M5",
-        "n": 61298,
+        "n": 61321,
         "mean_gf": 1.3467,
-        "median_gf": 1.3132,
+        "median_gf": 1.3131,
         "sd_gf": 0.1275,
-        "p95_gf": 1.59,
+        "p95_gf": 1.5899,
         "p99_gf": 1.7262,
         "max_gf": 2.8889,
         "n_rogue": 3,
@@ -7589,11 +7589,11 @@
       },
       {
         "station_id": "M6",
-        "n": 57272,
+        "n": 57295,
         "mean_gf": 1.4133,
-        "median_gf": 1.3839,
+        "median_gf": 1.3838,
         "sd_gf": 0.1546,
-        "p95_gf": 1.6874,
+        "p95_gf": 1.6873,
         "p99_gf": 1.9387,
         "max_gf": 3.8846,
         "n_rogue": 32,

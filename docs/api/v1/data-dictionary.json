@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-06-15T12:16:29Z",
+    "generated": "2026-06-16T11:13:56Z",
     "package_version": "0.2.0",
     "endpoint": "data-dictionary",
     "description": "Variable metadata: names, units, descriptions, typical ranges"
