@@ -14,6 +14,14 @@ on:
     - cron: '0 6,18 * * *'  # 06:00 and 18:00 UTC
   workflow_dispatch:
 
+# The "create issue" steps need issues:write; the default GITHUB_TOKEN is
+# read-only when the repo/org default is restricted, which made this workflow
+# fail ("Resource not accessible by integration (createIssue)") the moment the
+# dashboard data crossed the 48h staleness threshold (#73).
+permissions:
+  contents: read
+  issues: write
+
 jobs:
   website-freshness:
     runs-on: ubuntu-latest
