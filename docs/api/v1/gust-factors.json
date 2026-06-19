@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generated": "2026-06-17T12:15:19Z",
+    "generated": "2026-06-19T11:36:25Z",
     "package_version": "0.2.0",
     "endpoint": "gust-factors",
     "description": "Gust factor analysis per station with extreme events"
@@ -9,11 +9,11 @@
     "summary": [
       {
         "statistic": "n",
-        "value": 263912
+        "value": 264100
       },
       {
         "statistic": "mean",
-        "value": 1.3504
+        "value": 1.3503
       },
       {
         "statistic": "median",
@@ -25,11 +25,11 @@
       },
       {
         "statistic": "p95",
-        "value": 1.5976
+        "value": 1.5975
       },
       {
         "statistic": "p99",
-        "value": 1.7968
+        "value": 1.7967
       },
       {
         "statistic": "max",
@@ -7541,24 +7541,24 @@
     "by_station": [
       {
         "station_id": "M2",
-        "n": 45130,
-        "mean_gf": 1.2872,
-        "median_gf": 1.2685,
-        "sd_gf": 0.102,
-        "p95_gf": 1.4589,
-        "p99_gf": 1.6364,
+        "n": 45177,
+        "mean_gf": 1.2871,
+        "median_gf": 1.2683,
+        "sd_gf": 0.1019,
+        "p95_gf": 1.4588,
+        "p99_gf": 1.6363,
         "max_gf": 3.3621,
         "n_rogue": 6,
         "pct_rogue": 0.0133
       },
       {
         "station_id": "M3",
-        "n": 50301,
+        "n": 50348,
         "mean_gf": 1.3306,
         "median_gf": 1.3048,
         "sd_gf": 0.1254,
-        "p95_gf": 1.5574,
-        "p99_gf": 1.7541,
+        "p95_gf": 1.5573,
+        "p99_gf": 1.7539,
         "max_gf": 3.2127,
         "n_rogue": 6,
         "pct_rogue": 0.0119
@@ -7577,11 +7577,11 @@
       },
       {
         "station_id": "M5",
-        "n": 61345,
+        "n": 61392,
         "mean_gf": 1.3467,
-        "median_gf": 1.3132,
+        "median_gf": 1.3131,
         "sd_gf": 0.1274,
-        "p95_gf": 1.5899,
+        "p95_gf": 1.5898,
         "p99_gf": 1.7262,
         "max_gf": 2.8889,
         "n_rogue": 3,
@@ -7589,12 +7589,12 @@
       },
       {
         "station_id": "M6",
-        "n": 57319,
-        "mean_gf": 1.4132,
-        "median_gf": 1.3838,
+        "n": 57366,
+        "mean_gf": 1.4131,
+        "median_gf": 1.3837,
         "sd_gf": 0.1546,
-        "p95_gf": 1.6872,
-        "p99_gf": 1.9387,
+        "p95_gf": 1.687,
+        "p99_gf": 1.9385,
         "max_gf": 3.8846,
         "n_rogue": 32,
         "pct_rogue": 0.0558
