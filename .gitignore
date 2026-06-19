@@ -49,6 +49,15 @@ docs/_extensions/
 # Except allow dashboard data files
 !docs/
 !docs/**
+
+# #89: rendered HTML must NOT be committed to main — the full site deploys from
+# the build artifact (data-update.yml deploy-pages job). Only dashboard DATA
+# (parquet/json, re-included above) stays committed for the next-run bootstrap.
+docs/articles/
+docs/api/
+docs/vignettes/*.html
+docs/vignettes/*_files/
+
 .DS_Store
 tests/testthat/_problems/
 tests/testthat/testthat-problems.rds

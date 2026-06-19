@@ -1,10 +1,9 @@
 name: Deploy Dashboard to GitHub Pages
 
+# #89: docs/ is no longer committed to main — the data-update workflow deploys
+# Pages from its build artifact. Kept for manual redeploys only; the push
+# trigger is disabled so this never deploys an HTML-less main.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'docs/**'
   workflow_dispatch:
 
 permissions:

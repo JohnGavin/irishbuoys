@@ -298,6 +298,15 @@ jobs:
             fi
           done
 
+      # ── Upload built site for Pages deploy (#89: don't commit HTML to main) ──
+
+      - name: Upload built site artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: docs
+          retention-days: 1
+
       # ── Commit Rendered Outputs to main ─────────────────────
 
       - name: Commit rendered outputs to main
@@ -305,8 +314,10 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add inst/extdata/*.rds || true
-          git add docs/api/ || true
-          git add docs/articles/ docs/vignettes/ || true
+          # #89: do NOT commit rendered HTML to main (it bloated .git to 3.1 GB).
+          # Only the Parquet (needed by next run's DuckDB bootstrap) is committed;
+          # the full rendered site deploys from the build artifact (deploy-pages job).
+          git add docs/vignettes/data/buoy_data.parquet || true
           git diff --staged --quiet || git commit -m "Data update (${{ github.event_name }}): $(date +'%Y-%m-%dT%H:%M')Z"
           git push || true
 
@@ -418,29 +429,27 @@ jobs:
       group: "pages"
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v6
+      - name: Download built site (from update-data; #89 — not committed to main)
+        uses: actions/download-artifact@v4
         with:
-          ref: main  # Checkout after update-data has pushed
+          name: site
+          path: docs
 
       - name: Verify docs exist
         run: |
           if [ ! -f "docs/index.html" ]; then
-            echo "::warning::No docs/index.html found — skipping deploy"
-            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "::error::No docs/index.html in built site artifact"
+            exit 1
           fi
-        id: check
 
       - name: Setup Pages
-        if: steps.check.outputs.skip != 'true'
         uses: actions/configure-pages@v4
 
       - name: Upload artifact
-        if: steps.check.outputs.skip != 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: docs
 
       - name: Deploy to GitHub Pages
-        if: steps.check.outputs.skip != 'true'
         id: deployment
         uses: actions/deploy-pages@v4
