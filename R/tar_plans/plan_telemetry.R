@@ -930,7 +930,8 @@ plan_telemetry <- list(
           total_cost = numeric(),
           total_tokens = integer(),
           n_requests = integer(),
-          pct_cost = numeric()
+          pct_cost = numeric(),
+          model_clean = character()
         ))
       }
 
