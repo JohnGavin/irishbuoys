@@ -298,6 +298,78 @@ jobs:
             fi
           done
 
+      - name: Generate landing page (docs/index.html)
+        run: |
+          mkdir -p docs
+          cat > docs/index.html <<'LANDING_EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>irishbuoys — Irish Weather Buoy Network</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                     max-width: 800px; margin: 2rem auto; padding: 0 1rem;
+                     color: #333; background: #fafafa; }
+              h1   { color: #1a5276; border-bottom: 2px solid #1a5276; padding-bottom: 0.4rem; }
+              p.lead { font-size: 1.1rem; color: #555; margin-bottom: 1.5rem; }
+              ul   { list-style: none; padding: 0; }
+              li   { margin: 0.8rem 0; }
+              a    { color: #1a5276; font-weight: 600; text-decoration: none; }
+              a:hover { text-decoration: underline; }
+              .desc { color: #666; font-size: 0.9rem; }
+              footer { margin-top: 3rem; font-size: 0.8rem; color: #aaa; }
+            </style>
+          </head>
+          <body>
+            <h1>irishbuoys — Irish Weather Buoy Network</h1>
+            <p class="lead">
+              Real-time and historical data from Ireland's network of offshore weather buoys,
+              updated daily from ERDDAP.
+            </p>
+            <ul>
+          LANDING_EOF
+
+          # Append links only for articles that actually exist (degrade gracefully)
+          add_link() {
+            local file="$1" href="$2" title="$3" desc="$4"
+            if [ -f "docs/articles/${file}" ]; then
+              cat >> docs/index.html <<LINK_EOF
+              <li><a href="${href}">${title}</a><br><span class="desc">${desc}</span></li>
+          LINK_EOF
+            else
+              echo "::warning::docs/articles/${file} not found — omitting from landing page"
+            fi
+          }
+
+          add_link "dashboard_static.html" "articles/dashboard_static.html" \
+            "Irish Buoys Explorer" \
+            "Interactive dashboard: current conditions, wave heights, sea temperature, and wind across all buoys."
+
+          add_link "wave_analysis.html" "articles/wave_analysis.html" \
+            "Irish Buoys Analysis" \
+            "Exploratory wave and meteorological analysis across the buoy network."
+
+          add_link "telemetry.html" "articles/telemetry.html" \
+            "Telemetry" \
+            "Pipeline telemetry: data-fetch metrics, ingestion statistics, and pipeline health."
+
+          add_link "api-usage.html" "articles/api-usage.html" \
+            "Static Data API" \
+            "How to access the pre-built Parquet dataset and static JSON API endpoints."
+
+          cat >> docs/index.html <<'FOOTER_EOF'
+            </ul>
+            <footer>
+              Built daily by <a href="https://github.com/JohnGavin/irishbuoys">irishbuoys</a>
+              &mdash; data from the Irish National Buoy Network via ERDDAP.
+            </footer>
+          </body>
+          </html>
+          FOOTER_EOF
+          echo "docs/index.html generated"
+
       # ── Upload built site for Pages deploy (#89: don't commit HTML to main) ──
 
       - name: Upload built site artifact
