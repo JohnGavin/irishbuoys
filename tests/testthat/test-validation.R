@@ -80,11 +80,37 @@ test_that("validate_buoy_data error messages are stable", {
 })
 
 test_that("validate_buoy_data output structure is stable", {
+  # Incomplete data (missing hmax/gust/atmospheric_pressure) drives the
+  # all_passed(agent) == FALSE branch, which uses
+  # get_agent_x_list(agent)$validation_set$all_passed/$stop — the code
+  # path fixed for pointblank >= 0.12 (get_agent_report() lost its
+  # `all_passed` column). Keep this case to cover that branch.
   data <- data.frame(
     station_id = rep("M2", 10),
     time = seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 10),
     wave_height = runif(10, 0.5, 5),
     wind_speed = runif(10, 2, 25),
+    qc_flag = rep(1L, 10),
+    stringsAsFactors = FALSE
+  )
+  result <- validate_buoy_data(data, min_rows = 1)
+  expect_snapshot(sort(names(result)))
+})
+
+test_that("validate_buoy_data output structure is stable with complete data", {
+  skip_if_not_installed("pointblank")
+  # Complete data (all columns pointblank checks against) drives the
+  # all_passed(agent) == TRUE early-return branch (validation.R L151-155),
+  # complementing the incomplete-data case above which drives the
+  # x_list branch.
+  data <- data.frame(
+    station_id = rep("M2", 10),
+    time = seq(as.POSIXct("2024-01-01"), by = "hour", length.out = 10),
+    wave_height = runif(10, 0.5, 5),
+    hmax = runif(10, 1, 15),
+    wind_speed = runif(10, 2, 25),
+    gust = runif(10, 5, 40),
+    atmospheric_pressure = runif(10, 990, 1030),
     qc_flag = rep(1L, 10),
     stringsAsFactors = FALSE
   )

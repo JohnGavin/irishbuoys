@@ -50,3 +50,19 @@
       x `data` must be a data frame
       i You provided <character>
 
+# validate_buoy_data output structure is stable
+
+    Code
+      sort(names(result))
+    Output
+      [1] "qc_flag"     "station_id"  "time"        "wave_height" "wind_speed" 
+
+# validate_buoy_data output structure is stable with complete data
+
+    Code
+      sort(names(result))
+    Output
+      [1] "atmospheric_pressure" "gust"                 "hmax"                
+      [4] "qc_flag"              "station_id"           "time"                
+      [7] "wave_height"          "wind_speed"          
+

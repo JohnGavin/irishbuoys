@@ -155,12 +155,14 @@ validate_buoy_data <- function(data,
     return(data)
   }
 
-  # Get failure summary
-  report <- pointblank::get_agent_report(agent, display_table = FALSE)
-  n_failed <- sum(!report$all_passed, na.rm = TRUE)
+  # Get failure summary. Use get_agent_x_list() rather than
+  # get_agent_report(): the report tibble has no `all_passed` column in
+  # pointblank >= 0.12, whereas the x_list's validation_set data frame
+  # carries `all_passed` and `stop` per validation step.
+  x_list <- pointblank::get_agent_x_list(agent)
+  n_failed <- sum(!x_list$validation_set$all_passed, na.rm = TRUE)
 
   # Check if we hit the stop threshold
-  x_list <- pointblank::get_agent_x_list(agent)
   any_stop <- any(x_list$validation_set$stop, na.rm = TRUE)
 
   if (any_stop) {
@@ -299,13 +301,15 @@ create_validation_summary <- function(...) {
   # Use lapply + bind_rows instead of purrr::map_dfr to avoid purrr dependency
   results <- lapply(names(agents), function(name) {
     agent <- agents[[name]]
-    report <- pointblank::get_agent_report(agent, display_table = FALSE)
+    # get_agent_report()'s tibble has no `all_passed` column in
+    # pointblank >= 0.12; use get_agent_x_list()'s validation_set instead.
+    x_list <- pointblank::get_agent_x_list(agent)
 
     tibble::tibble(
       target = name,
       status = if (pointblank::all_passed(agent)) "PASSED" else "FAILED",
-      checks_passed = sum(report$all_passed, na.rm = TRUE),
-      checks_total = nrow(report)
+      checks_passed = sum(x_list$validation_set$all_passed, na.rm = TRUE),
+      checks_total = nrow(x_list$validation_set)
     )
   })
   dplyr::bind_rows(results)
