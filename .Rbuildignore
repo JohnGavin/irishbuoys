@@ -40,4 +40,4 @@
 ^\.claude$
 ^_targets\.yaml$
 ^inst/extdata/ctx$
-^AGENTS\.md$
+^AGENTS\.md$^LICENSE\.content\.md$
