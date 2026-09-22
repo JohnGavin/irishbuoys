@@ -184,7 +184,7 @@ plan_predictions <- list(
                             color = "red", alpha = 0.5) +
         ggplot2::annotate("text", x = 1, y = 0.26, label = "Uninformative baseline",
                           hjust = 0, size = 3, color = "red") +
-        ggplot2::scale_y_continuous(limits = c(0, 0.5)) +
+        ggplot2::scale_y_continuous(limits = c(0, NA)) +
         ggplot2::labs(
           title = "Rolling Brier Score",
           subtitle = "Cumulative calibration over time (lower is better)",
