@@ -30,10 +30,46 @@ permissions:
   id-token: write
 
 jobs:
+  # ── Upstream Probe ───────────────────────────────────────
+  # Distinguishes an ERDDAP outage (upstream, not our bug) from a real
+  # pipeline failure. Probes with bounded retry (3 attempts, 30s/60s backoff,
+  # worst case ~4.5 min). If ERDDAP is unreachable, update-data and
+  # deploy-pages are SKIPPED (grey, not red) and this job emits a warning
+  # annotation + summary. The run stays green on purpose: a multi-day outage
+  # is alerted by the Data Freshness Monitor issue, and a genuine fetch/parse
+  # error with ERDDAP reachable still fails update-data red.
+  probe-erddap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      erddap_up: ${{ steps.probe.outputs.erddap_up }}
+    steps:
+      - name: Probe ERDDAP (bounded retry)
+        id: probe
+        run: |
+          URL='https://erddap.marine.ie/erddap/tabledap/IWBNetwork.csv?time&orderByMax(%22time%22)'
+          for attempt in 1 2 3; do
+            if curl -sf --max-time 60 -o /dev/null "$URL"; then
+              echo "ERDDAP reachable (attempt $attempt)"
+              echo "erddap_up=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "ERDDAP probe attempt $attempt/3 failed"
+            if [ "$attempt" -lt 3 ]; then
+              sleep $(( attempt * 30 ))
+            fi
+          done
+          echo "erddap_up=false" >> "$GITHUB_OUTPUT"
+          echo "::warning title=ERDDAP unreachable::ERDDAP unreachable - upstream outage, no update today (not a pipeline bug). See the Data Freshness Monitor issue."
+          echo "### ERDDAP unreachable - upstream outage" >> "$GITHUB_STEP_SUMMARY"
+          echo "Probe failed 3 times. Data update and deploy were skipped; the site keeps its previous content." >> "$GITHUB_STEP_SUMMARY"
+
   # ── Main Pipeline Job ────────────────────────────────────
   # Runs on: 6-hourly schedule, storm-alert dispatch, or manual trigger.
-  # No gate job needed — cron runs are routine, other triggers are intentional.
+  # Skipped (not failed) when probe-erddap reports an upstream outage.
   update-data:
+    needs: probe-erddap
+    if: needs.probe-erddap.outputs.erddap_up == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 120  # runs routinely take 79-89 min; 90 was too tight (#89)
     env:
