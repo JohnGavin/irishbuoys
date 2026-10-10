@@ -610,6 +610,27 @@ joint_analysis_summary <- function(data, variable = "wave_height") {
   )
 }
 
+#' Gumbel Copula Parameter by Inversion of Kendall Tau
+#'
+#' For the bivariate Gumbel copula, Kendall tau = 1 - 1/alpha, hence
+#' alpha = 1 / (1 - tau). This is exactly what
+#' `copula::fitCopula(gumbelCopula(dim = 2), u, method = "itau")` returns
+#' (copula `iTauGumbelCopula()`), but lets the caller supply tau from an
+#' O(n log n) routine such as [kendallknight::kendall_cor()] instead of the
+#' O(n^2) `stats::cor(method = "kendall")` that `fitCopula()` uses internally.
+#'
+#' @param tau Kendall tau (scalar).
+#' @return Gumbel `alpha` (>= 1). Negative tau is mapped to `alpha = 1`
+#'   (independence), as `copula` does (it also warns; not repeated here).
+#'   Errors when tau is `NA` or >= 1 (alpha is infinite), as `fitCopula()`
+#'   does.
+#' @keywords internal
+#' @noRd
+gumbel_alpha_from_tau <- function(tau) {
+  if (is.na(tau) || tau >= 1) cli::cli_abort(c("x" = "Cannot invert Kendall tau = {.val {tau}} for a Gumbel copula."))
+  1 / (1 - max(tau, 0))
+}
+
 #' Compute Pairwise Extremal Dependence Across Stations
 #'
 #' @description
@@ -731,24 +752,23 @@ compute_extremal_dependence <- function(
     # Kendall's tau — O(n log n) via kendallknight, no subsampling needed
     tau <- kendallknight::kendall_cor(joined$v1, joined$v2)
 
-    # Fit Gumbel copula for upper tail dependence
+    # Fit Gumbel copula for upper tail dependence by inversion of Kendall tau
+    # (identical estimator to copula::fitCopula(method = "itau")). The copula
+    # package computes tau with the O(n^2) stats::cor(method = "kendall"),
+    # which dominated the pipeline (n ~ 5e4 per pair, 250 bootstrap resamples
+    # per pair); kendallknight gives the same tau-b in O(n log n).
     cop_result <- tryCatch({
-      u_obs <- copula::pobs(cbind(joined$v1, joined$v2))
-      gumbel_fit <- copula::fitCopula(
-        copula::gumbelCopula(dim = 2), u_obs, method = "itau"
-      )
-      alpha <- copula::coef(gumbel_fit)
+      alpha <- gumbel_alpha_from_tau(tau)
       lambda_U <- 2 - 2^(1 / alpha)
 
-      # Bootstrap CI for lambda_U
-      boot_n <- min(nrow(u_obs), boot_subsample)
+      # Bootstrap CI for lambda_U. tau is rank-based, so it is computed on the
+      # raw values (same ties as the pseudo-observations used by copula).
+      boot_n <- min(nrow(joined), boot_subsample)
       lambda_boot <- replicate(n_bootstrap, {
-        idx <- sample(nrow(u_obs), boot_n, replace = TRUE)
+        idx <- sample(nrow(joined), boot_n, replace = TRUE)
         tryCatch({
-          fit_b <- copula::fitCopula(
-            copula::gumbelCopula(dim = 2), u_obs[idx, ], method = "itau"
-          )
-          2 - 2^(1 / copula::coef(fit_b))
+          tau_b <- kendallknight::kendall_cor(joined$v1[idx], joined$v2[idx])
+          2 - 2^(1 / gumbel_alpha_from_tau(tau_b))
         }, error = function(e) NA_real_)
       })
       lambda_ci <- stats::quantile(lambda_boot, c(0.025, 0.975), na.rm = TRUE)
