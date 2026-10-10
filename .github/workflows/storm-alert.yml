@@ -35,9 +35,10 @@ jobs:
           log-directives: nix_installer=trace
           backtrace: full
 
-      - name: Setup magic Nix cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-
+      # No magic-nix-cache here: its post-job cache upload hung until the
+      # 15-min timeout on 18 of 40 runs (irishbuoys#100; e.g. run
+      # 37798774873, where the storm check finished in 2 min). Cachix below
+      # already provides the binary cache.
       - name: Setup Cachix (rstats-on-nix + johngavin)
         uses: cachix/cachix-action@v15
         with:
