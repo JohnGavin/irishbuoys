@@ -59,6 +59,20 @@ test_that("get_stations returns data frame", {
   expect_true("station_id" %in% names(result))
 })
 
+test_that("erddap_request sets timeout and bounded retry", {
+  req <- erddap_request("https://example.invalid/x.csv", timeout = 45, max_tries = 3L)
+  expect_s3_class(req, "httr2_request")
+  expect_equal(req$options$timeout_ms, 45000)
+  expect_equal(req$policies$retry_max_tries, 3L)
+  expect_true(isTRUE(req$policies$retry_on_failure))
+})
+
+test_that("erddap_perform errors after retries when host is unreachable", {
+  expect_error(
+    erddap_perform("https://erddap-unreachable.invalid/x.csv", timeout = 2, max_tries = 2L)
+  )
+})
+
 test_that("get_latest_timestamp returns POSIXct", {
   skip_on_cran()
   result <- tryCatch(get_latest_timestamp(), error = function(e) NULL)

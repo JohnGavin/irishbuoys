@@ -1,3 +1,32 @@
+#' Build an ERDDAP request with timeout and bounded retry
+#'
+#' Retries transient failures (connection errors, timeouts, HTTP 429/503)
+#' with exponential backoff so a brief ERDDAP blip does not fail a run.
+#' A persistent outage still errors after `max_tries` attempts.
+#'
+#' @param url Character request URL.
+#' @param timeout Numeric per-attempt timeout in seconds.
+#' @param max_tries Integer maximum attempts (default 3).
+#' @return An httr2 request object.
+#' @noRd
+erddap_request <- function(url, timeout = 60, max_tries = 3L) {
+  httr2::request(url) |>
+    httr2::req_timeout(timeout) |>
+    httr2::req_retry(
+      max_tries = max_tries,
+      retry_on_failure = TRUE,
+      backoff = ~ min(2^.x * 5, 60)
+    )
+}
+
+#' Perform an ERDDAP request with retry
+#' @inheritParams erddap_request
+#' @return An httr2 response.
+#' @noRd
+erddap_perform <- function(url, timeout = 60, max_tries = 3L) {
+  httr2::req_perform(erddap_request(url, timeout, max_tries))
+}
+
 #' Download Data from Irish Weather Buoy Network ERDDAP Server
 #'
 #' @description
@@ -76,9 +105,7 @@ download_buoy_data <- function(
   cli::cli_alert_info("URL: {query_url}")
 
   # Download data
-  response <- httr2::request(query_url) |>
-    httr2::req_timeout(60) |>
-    httr2::req_perform()
+  response <- erddap_perform(query_url, timeout = 60)
 
   # Parse response based on format
   if (format == "csv") {
@@ -158,9 +185,7 @@ get_latest_timestamp <- function(station = NULL) {
     query_url <- paste0(query_url, "&station_id=%22", station, "%22")
   }
 
-  response <- httr2::request(query_url) |>
-    httr2::req_timeout(30) |>
-    httr2::req_perform()
+  response <- erddap_perform(query_url, timeout = 30)
 
   data <- response |>
     httr2::resp_body_string() |>
@@ -193,9 +218,7 @@ get_stations <- function() {
     ".csv?station_id,CallSign,longitude,latitude&distinct()"
   )
 
-  response <- httr2::request(query_url) |>
-    httr2::req_timeout(30) |>
-    httr2::req_perform()
+  response <- erddap_perform(query_url, timeout = 30)
 
   stations <- response |>
     httr2::resp_body_string() |>
