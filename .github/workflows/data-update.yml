@@ -11,9 +11,9 @@ name: Data Update (daily)
 #   6. actions/cache auto-saves _targets/ at job end (next run restores it)
 #
 # Schedule:
-#   - Runs daily at 06:00 UTC
+#   - Runs every 2nd day (odd days of the month, 06:00 UTC; was daily until 2026-10-16, to save Actions minutes)
 #   - ERDDAP data is hourly with ~10h lag (data_mode=M / delayed mode)
-#   - Daily runs keep the dashboard within ~30h of real-time
+#   - Runs every 2nd day keep the dashboard within ~54h of real-time (30h when daily); gap is 48h, but 24h (31st -> 1st) or 72h (29th -> 1st in 30-day months) at month end
 #   - Also triggered by storm-alert.yml when storms are detected
 #   - Can always be triggered manually via workflow_dispatch
 #
@@ -21,7 +21,7 @@ name: Data Update (daily)
 
 on:
   schedule:
-    - cron: '0 6 * * *'  # Daily at 06:00 UTC
+    - cron: '0 6 */2 * *'  # Every 2nd day (odd days of month) at 06:00 UTC
   workflow_dispatch:
 
 permissions:
