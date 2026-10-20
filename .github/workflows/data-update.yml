@@ -87,9 +87,6 @@ jobs:
           log-directives: nix_installer=trace
           backtrace: full
 
-      - name: Setup magic Nix cache
-        uses: DeterminateSystems/magic-nix-cache-action@main
-
       - name: Setup Cachix (rstats-on-nix + johngavin)
         uses: cachix/cachix-action@v15
         with:
@@ -469,7 +466,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pipeline-failure
-          path: .
+          path: |
+            .
+            !_targets/objects/**
+            !**/*.duckdb
+            !**/*.duckdb.wal
+            !**/*.parquet
+          retention-days: 3
 
   # ── Deploy to GitHub Pages ──────────────────────────────
   # GITHUB_TOKEN pushes don't trigger other workflows (GitHub limitation),
