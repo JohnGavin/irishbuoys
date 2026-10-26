@@ -121,8 +121,9 @@ test_that("create_email_summary renders extreme events with rounded values", {
     extreme_events = data.frame(
       station_id = "M2",
       time = as.character(Sys.time()),
-      event_type = "wave_height",
+      event_type = "High Waves",
       value = 12.5678,
+      hs = 12.5678,
       stringsAsFactors = FALSE
     ),
     current_week = data.frame(
@@ -141,7 +142,8 @@ test_that("create_email_summary renders extreme events with rounded values", {
   )
   email <- create_email_summary(summary_obj)
   html <- paste(as.character(email), collapse = "\n")
-  expect_match(html, "Rogue and high waves")
+  expect_match(html, "Significant wave height Hs \\(m\\)")
+  expect_no_match(html, "<th>Value</th>")
   # Value rounded to 1 decimal place
   expect_match(html, "12.6")
   expect_no_match(html, "12.5678")

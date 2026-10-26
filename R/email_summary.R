@@ -1,3 +1,213 @@
+# ---- Weekly email: single homes for thresholds, units, caps and links ------
+# Every number or URL used in the email text is derived from these objects;
+# the event queries in generate_weekly_summary() use the same thresholds.
+
+# Event rules. Units: Hs and Hmax in metres ("m"), wind speed in knots ("kn");
+# these agree with get_data_dictionary() (checked in tests).
+.email_rules <- list(
+  high_waves = list(event_type = "High Waves", threshold = 8, unit = "m"),
+  storm_winds = list(event_type = "Storm Winds", threshold = 48, unit = "kn"),
+  rogue_wave = list(
+    event_type = "Rogue Wave", ratio = 2, min_hs = 2, unit = "m"
+  )
+)
+
+# Maximum events shown per event table (the email says when rows are cut).
+.email_max_events_per_table <- 20L
+
+# Dashboard base URL and the page/anchor each email section links to.
+.dashboard_base_url <- "https://johngavin.github.io/irishbuoys/"
+.dashboard_targets <- list(
+  # Page-level anchors of the Irish Buoys Explorer dashboard.
+  high_waves = list(page = "dashboard_static", anchor = "signif-wave-m"),
+  storm_winds = list(page = "dashboard_static", anchor = "wind-speed-kn"),
+  rogue_wave = list(page = "dashboard_static", anchor = "data"),
+  station_stats = list(page = "dashboard_static", anchor = "max-wave-m"),
+  definitions = list(page = "dashboard_static", anchor = "reference"),
+  # Pipeline-metrics page sections (full history, not last week only).
+  ingestion = list(page = "telemetry", anchor = "key-metrics"),
+  coverage = list(page = "telemetry", anchor = "data-coverage")
+)
+
+#' Build a dashboard URL for an email section
+#'
+#' @param key Name in `.dashboard_targets`.
+#' @return A single URL string.
+#' @noRd
+email_dashboard_url <- function(key) {
+  target <- .dashboard_targets[[key]]
+  if (is.null(target)) {
+    cli::cli_abort(c(
+      "x" = "Unknown dashboard target {.val {key}}.",
+      "i" = "Known targets: {.val {names(.dashboard_targets)}}."
+    ))
+  }
+  paste0(
+    .dashboard_base_url, "articles/", target$page, ".html#", target$anchor
+  )
+}
+
+#' HTML anchor to a dashboard target
+#' @noRd
+email_link <- function(text, key) {
+  paste0("<a href='", email_dashboard_url(key), "'>", text, "</a>")
+}
+
+#' Coerce event times to POSIXct (UTC); unparsable values become NA
+#' @noRd
+email_parse_time <- function(x) {
+  if (inherits(x, "POSIXt")) {
+    as.POSIXct(x)
+  } else if (inherits(x, "Date")) {
+    as.POSIXct(x)
+  } else if (is.character(x)) {
+    as.POSIXct(x, tz = "UTC", optional = TRUE)
+  } else {
+    as.POSIXct(rep(NA_real_, length(x)), tz = "UTC")
+  }
+}
+
+#' Full timestamp with timezone, e.g. "2026-10-22 00:00:00 UTC"
+#' @noRd
+email_format_time <- function(t) {
+  out <- paste(format(t, "%Y-%m-%d %H:%M:%S", tz = "UTC"), "UTC")
+  out[is.na(t)] <- "time unknown"
+  out
+}
+
+#' Format a numeric column to fixed decimals; non-finite becomes "n/a"
+#' @noRd
+email_format_num <- function(x, digits = 1L) {
+  if (!is.numeric(x)) {
+    return(rep("n/a", length(x)))
+  }
+  out <- formatC(x, format = "f", digits = digits)
+  out[!is.finite(x)] <- "n/a"
+  out
+}
+
+#' HTML table of one event type (newest first, capped, never silent)
+#'
+#' @param evt Events data frame with station_id, time, event_type, value, hs.
+#' @param type_key Name in `.email_rules`.
+#' @return HTML string: heading, rule text, count line, table.
+#' @noRd
+email_event_table <- function(evt, type_key, max_rows = .email_max_events_per_table) {
+  rule <- .email_rules[[type_key]]
+  defs <- "definitions"
+  th <- function(text) paste0("<th>", email_link(text, defs), "</th>")
+
+  for (col in c("station_id", "time", "event_type", "value", "hs")) {
+    if (!col %in% names(evt)) {
+      evt[[col]] <- if (col %in% c("value", "hs")) NA_real_ else NA_character_
+    }
+  }
+  sub <- evt[!is.na(evt$event_type) & evt$event_type == rule$event_type, ,
+             drop = FALSE]
+  sub$time_utc <- email_parse_time(sub$time)
+  sub <- sub[order(sub$time_utc, decreasing = TRUE, na.last = TRUE), ,
+             drop = FALSE]
+  n_total <- nrow(sub)
+  shown <- utils::head(sub, max_rows)
+  n_shown <- nrow(shown)
+
+  time_txt <- email_format_time(shown$time_utc)
+  val_txt <- email_format_num(shown$value)
+  hs_txt <- email_format_num(shown$hs)
+
+  heading_label <- switch(
+    type_key,
+    high_waves = "High Waves",
+    storm_winds = "Storm Winds",
+    rogue_wave = "Rogue Waves"
+  )
+  rule_text <- switch(
+    type_key,
+    high_waves = paste0(
+      "Rule: significant wave height (Hs, the mean height of the highest ",
+      "third of waves) above ", rule$threshold, " ", rule$unit, "."
+    ),
+    storm_winds = paste0(
+      "Rule: wind speed above ", rule$threshold, " ", rule$unit,
+      " (kn = knots, nautical miles per hour)."
+    ),
+    rogue_wave = paste0(
+      "Rule: maximum wave height (Hmax, the single highest wave in the ",
+      "measurement period) more than ", rule$ratio, " times the Hs, and Hs ",
+      "above ", rule$min_hs, " ", rule$unit, "."
+    )
+  )
+
+  count_txt <- if (n_total == 0L) {
+    "None this week."
+  } else if (n_total > n_shown) {
+    paste0(
+      "Showing the newest ", n_shown, " of ", n_total,
+      " events (each event is one hourly observation); ",
+      email_link("see the dashboard section", type_key),
+      " (it covers the full history, not only last week)."
+    )
+  } else {
+    paste0("Showing all ", n_total, " events (newest first).")
+  }
+
+  header <- switch(
+    type_key,
+    high_waves = paste0(
+      "<tr><th>Station</th><th>Time (UTC)</th>",
+      th(paste0("Significant wave height Hs (", rule$unit, ")")), "</tr>"
+    ),
+    storm_winds = paste0(
+      "<tr><th>Station</th><th>Time (UTC)</th>",
+      th(paste0("Wind speed (", rule$unit, ")")), "</tr>"
+    ),
+    rogue_wave = paste0(
+      "<tr><th>Station</th><th>Time (UTC)</th>",
+      th(paste0("Maximum wave height Hmax (", rule$unit, ")")),
+      th(paste0("Significant wave height Hs (", rule$unit, ")")),
+      th("Ratio Hmax/Hs"), "</tr>"
+    )
+  )
+
+  body <- if (n_shown == 0L) {
+    ""
+  } else {
+    ratio_txt <- if (is.numeric(shown$value) && is.numeric(shown$hs)) {
+      email_format_num(shown$value / shown$hs)
+    } else {
+      rep("n/a", n_shown)
+    }
+    paste(vapply(seq_len(n_shown), function(i) {
+      cells <- switch(
+        type_key,
+        rogue_wave = paste0(
+          "<td>", val_txt[i], "</td><td>", hs_txt[i], "</td><td>",
+          ratio_txt[i], "</td>"
+        ),
+        paste0("<td>", val_txt[i], "</td>")
+      )
+      paste0(
+        "<tr><td>", shown$station_id[i], "</td><td>", time_txt[i], "</td>",
+        cells, "</tr>"
+      )
+    }, character(1)), collapse = "")
+  }
+
+  paste0(
+    "<h4>", email_link(heading_label, type_key), "</h4>",
+    "<p><small>", rule_text, "</small></p>",
+    "<p>", count_txt, "</p>",
+    if (n_shown > 0L) {
+      paste0(
+        "<table border='1' style='border-collapse: collapse;'>",
+        header, body, "</table>"
+      )
+    } else {
+      ""
+    }
+  )
+}
+
 #' Compute Data Coverage and Gaps
 #'
 #' @description
@@ -251,36 +461,48 @@ generate_weekly_summary <- function(
     )
 
   # Check for extreme events — three separate dplyr queries bound together
+  # Thresholds and event labels come from `.email_rules` (one home); the
+  # email text is built from the same constants. `value` is the single
+  # measure of the event type; `hs` is the significant wave height each
+  # event was judged against (rogue waves need it to be interpretable).
+  hw_threshold <- .email_rules$high_waves$threshold
+  sw_threshold <- .email_rules$storm_winds$threshold
+  rogue_ratio <- .email_rules$rogue_wave$ratio
+  rogue_min_hs <- .email_rules$rogue_wave$min_hs
+
   high_waves <- base_current |>
-    dplyr::filter(.data$wave_height > 8) |>
+    dplyr::filter(.data$wave_height > !!hw_threshold) |>
     dplyr::transmute(
       station_id = .data$station_id,
       time = .data$time,
-      event_type = "High Waves",
-      value = .data$wave_height
+      event_type = !!.email_rules$high_waves$event_type,
+      value = .data$wave_height,
+      hs = .data$wave_height
     ) |>
     dplyr::collect()
 
   storm_winds <- base_current |>
-    dplyr::filter(.data$wind_speed > 48) |>
+    dplyr::filter(.data$wind_speed > !!sw_threshold) |>
     dplyr::transmute(
       station_id = .data$station_id,
       time = .data$time,
-      event_type = "Storm Winds",
-      value = .data$wind_speed
+      event_type = !!.email_rules$storm_winds$event_type,
+      value = .data$wind_speed,
+      hs = .data$wave_height
     ) |>
     dplyr::collect()
 
   rogue_waves <- base_current |>
     dplyr::filter(
-      .data$hmax > 2 * .data$wave_height,
-      .data$wave_height > 2
+      .data$hmax > (!!rogue_ratio) * .data$wave_height,
+      .data$wave_height > !!rogue_min_hs
     ) |>
     dplyr::transmute(
       station_id = .data$station_id,
       time = .data$time,
-      event_type = "Rogue Wave",
-      value = .data$hmax
+      event_type = !!.email_rules$rogue_wave$event_type,
+      value = .data$hmax,
+      hs = .data$wave_height
     ) |>
     dplyr::collect()
 
@@ -390,34 +612,41 @@ generate_weekly_summary <- function(
 #' @export
 create_email_summary <- function(summary) {
 
-  # Format extreme events table (top half, reverse time order)
+  # Extreme events: one table per event type, each column a single measure
+  # with its unit in the header. Newest first, capped at
+  # .email_max_events_per_table per table with an explicit "N of M" line.
   extreme_text <- if (nrow(summary$extreme_events) > 0) {
     evt <- summary$extreme_events
-    evt <- evt[order(evt$time, decreasing = TRUE), ]
-    evt <- utils::head(evt, ceiling(nrow(evt) / 2))
-    evt_rows <- paste(vapply(seq_len(nrow(evt)), function(i) {
-      row <- evt[i, ]
-      val <- tryCatch(
-        round(as.numeric(row$value), 1),
-        warning = function(w) row$value
-      )
+    known <- vapply(.email_rules, function(r) r$event_type, character(1))
+    n_other <- sum(is.na(evt$event_type) | !evt$event_type %in% known)
+    other_note <- if (n_other > 0) {
       paste0(
-        "<tr><td>", row$station_id, "</td>",
-        "<td>", row$time, "</td>",
-        "<td>", row$event_type, "</td>",
-        "<td>", val, "</td></tr>"
+        "<p><small>", n_other, " event(s) of an unrecognised type are not ",
+        "shown.</small></p>"
       )
-    }, character(1)), collapse = "")
-
+    } else {
+      ""
+    }
     paste0(
-      "<h3>Rogue and high waves (last week, reverse time order)</h3>",
-      "<table border='1' style='border-collapse: collapse;'>",
-      "<tr><th>Station</th><th>Time</th><th>Event</th><th>Value</th></tr>",
-      evt_rows,
-      "</table>"
+      "<p>Events from the last week, newest first. Times are in UTC ",
+      "(Coordinated Universal Time). Column headings link to their ",
+      "definitions on the dashboard.</p>",
+      email_event_table(evt, "high_waves"),
+      email_event_table(evt, "storm_winds"),
+      email_event_table(evt, "rogue_wave"),
+      other_note
     )
   } else {
-    "<p>No extreme events detected this week.</p>"
+    paste0(
+      "<p>No extreme events detected this week (High Waves: significant ",
+      "wave height, Hs, above ", .email_rules$high_waves$threshold, " ",
+      .email_rules$high_waves$unit, "; Storm Winds: wind speed above ",
+      .email_rules$storm_winds$threshold, " ", .email_rules$storm_winds$unit,
+      " (kn = knots); Rogue Wave: maximum wave height, Hmax, more than ",
+      .email_rules$rogue_wave$ratio, " times Hs and Hs above ",
+      .email_rules$rogue_wave$min_hs, " ", .email_rules$rogue_wave$unit,
+      ").</p>"
+    )
   }
 
   # Format station statistics — join with coverage for missing_hours, sort desc
@@ -605,18 +834,20 @@ create_email_summary <- function(summary) {
     summary$period$start, " to ", summary$period$end, "</p>",
 
     "<details open>",
-    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Data Ingestion This Week</summary>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>", email_link("Data Ingestion This Week", "ingestion"), "</summary>",
     ingestion_text,
     db_totals_text,
     "</details>",
 
     "<details>",
-    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Data Coverage &amp; Gaps</summary>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>", email_link("Data Coverage &amp; Gaps", "coverage"), "</summary>",
     coverage_text,
     "</details>",
 
     "<details>",
     "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Week-over-Week Changes</summary>",
+    "<p><small>No dashboard section shows week-over-week changes, so this ",
+    "heading has no link.</small></p>",
     if (!is.null(summary$week_over_week) && nrow(summary$week_over_week) > 0) {
       paste0(
         "<table border='1' style='border-collapse: collapse;'>",
@@ -649,19 +880,19 @@ create_email_summary <- function(summary) {
     "</details>",
 
     "<details>",
-    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Rogue &amp; High Waves</summary>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>", email_link("Rogue &amp; High Waves", "rogue_wave"), "</summary>",
     extreme_text,
     "</details>",
 
     "<details>",
-    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>Station Statistics</summary>",
+    "<summary style='cursor:pointer;font-size:1.3em;font-weight:bold;'>", email_link("Station Statistics", "station_stats"), "</summary>",
     station_stats,
     "</details>",
 
     "</div>",
     "<hr>",
     "<p><small>Generated on ", format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"), " by the ",
-    "<a href='https://johngavin.github.io/irishbuoys/'>irishbuoys</a> R package ",
+    "<a href='", .dashboard_base_url, "'>irishbuoys</a> R package ",
     "(<a href='https://github.com/JohnGavin/irishbuoys'>source on GitHub</a>).</small></p>",
     "<p><small>Data source: <a href='https://erddap.marine.ie/'>Marine Institute ERDDAP Server</a></small></p>",
     "<p><small><em>Disclaimer: irishbuoys is an independent open-source project. ",
@@ -674,7 +905,7 @@ create_email_summary <- function(summary) {
     body = blastula::md(email_body),
     footer = blastula::md(paste0(
       "Automated report from the ",
-      "[irishbuoys](https://johngavin.github.io/irishbuoys/) R package ",
+      "[irishbuoys](", .dashboard_base_url, ") R package ",
       "([GitHub](https://github.com/JohnGavin/irishbuoys)). ",
       "This is an independent open-source project, not affiliated with the Marine Institute ",
       "or the Irish Weather Buoy Network."
