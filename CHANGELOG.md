@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-26
+
+### Completed
+- Weekly email: replaced the mixed `Value` table by one table per event type (High Waves, Storm Winds, Rogue Waves), unit in every header, header links to the dashboard definitions, rogue rows show Hs and the ratio (irishbuoys#110, #109)
+- Removed the silent halving: every event up to a cap (`.email_max_events_per_table`, 20) with a "showing N of M" line; full UTC timestamps
+- Thresholds, units, cap and dashboard URLs now have one home each (`.email_rules`, `.email_max_events_per_table`, `.dashboard_targets` in `R/email_summary.R`)
+
+### Known Limitations
+- The dashboard has no last-week-only event tables; email links go to the closest page-level sections (full history)
+- Existing `[Variable Definitions](#variable-definitions)` links in `vignettes/dashboard_static.qmd` have no matching anchor on the live page (inner tab); the email links to the page-level `#reference` anchor instead
+- The dashboard definitions do not state the 8 m / 48 kn thresholds yet
+
 ## 2026-05-06
 
 ### Completed
