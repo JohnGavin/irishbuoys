@@ -5,8 +5,14 @@
 ### Completed
 - Added `inst/scripts/preview_weekly_email.R` (helpers in `R/email_preview.R`, tests in `tests/testthat/test-email-preview.R`) to preview the weekly email from fresh data. The local `inst/extdata/irish_buoys.duckdb` is git-ignored and was about 7 months old, so it cannot be used. The committed `dashboard_buoy_data.rds` is fresh (latest 2026-10-26 14:00 UTC) but has no `qc_flag` column, which `generate_weekly_summary()` filters on, so it cannot stand in either. The script therefore fetches the last 21 days from the public ERDDAP (Environmental Research Division's Data Access Program) service into a temporary database via the existing `incremental_update()`.
 - The script prints the latest timestamp and age per station, refuses (exit 1) through the unchanged `validate_email_freshness()`, has no bypass flag and never sends email.
+- Weekly email: replaced the mixed `Value` table by one table per event type (High Waves, Storm Winds, Rogue Waves), unit in every header, header links to the dashboard definitions, rogue rows show Hs and the ratio (irishbuoys#110, #109)
+- Removed the silent halving: every event up to a cap (`.email_max_events_per_table`, 20) with a "showing N of M" line; full UTC timestamps
+- Thresholds, units, cap and dashboard URLs now have one home each (`.email_rules`, `.email_max_events_per_table`, `.dashboard_targets` in `R/email_summary.R`)
 
 ### Known Limitations
+- The dashboard has no last-week-only event tables; email links go to the closest page-level sections (full history)
+- Existing `[Variable Definitions](#variable-definitions)` links in `vignettes/dashboard_static.qmd` have no matching anchor on the live page (inner tab); the email links to the page-level `#reference` anchor instead
+- The dashboard definitions do not state the 8 m / 48 kn thresholds yet
 - `generate_weekly_summary()` computes staleness only from the last 7 days, and `validate_email_freshness()` ignores `NA` ages, so a database with no rows in that window passes the guard (falsified: with the new pre-check removed, a 30-day-old fixture rendered). The preview script adds its own pre-check; the guard itself is untouched.
 - Station M4 returned no rows from ERDDAP in the 21-day window on 2026-10-26 and shows as offline in the preview.
 

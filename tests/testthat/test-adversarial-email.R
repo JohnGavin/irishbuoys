@@ -317,7 +317,8 @@ test_that("create_email_summary: summary with extreme events", {
       station_id = "M1",
       time = Sys.time(),
       event_type = "High Waves",
-      value = 10.5
+      value = 10.5,
+      hs = 10.5
     ),
     ingestion_stats = data.frame(),
     period = list(start = Sys.Date() - 7, end = Sys.Date() - 1),
@@ -328,8 +329,9 @@ test_that("create_email_summary: summary with extreme events", {
   email <- create_email_summary(summary)
   expect_s3_class(email, "email_message")
   email_html <- paste(as.character(email), collapse = "\n")
-  expect_match(email_html, "Rogue and high waves")
+  expect_match(email_html, "Rogue &amp; High Waves|Rogue & High Waves")
   expect_match(email_html, "High Waves")
+  expect_match(email_html, "Significant wave height Hs \\(m\\)")
 })
 
 test_that("create_email_summary: empty current_week (edge case - graceful handling)", {
