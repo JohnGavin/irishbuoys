@@ -341,6 +341,21 @@ result <- incremental_update()
 print(result$summary)
 ```
 
+### Previewing the Weekly Email Locally
+
+The local database `inst/extdata/irish_buoys.duckdb` is git-ignored, so a
+`git pull` never refreshes it and a copy can be months old. To preview the
+weekly email from fresh data instead, run
+`nix-shell default.nix --run "Rscript inst/scripts/preview_weekly_email.R"`
+from the project root. It fetches the last 21 days from the public ERDDAP
+(Environmental Research Division’s Data Access Program) service into a
+temporary database with `incremental_update()`, prints the latest observation
+time and age per station, and writes the email as a local HTML file whose path
+it prints. It exits non-zero and renders nothing when the data is older than
+`validate_email_freshness()` allows (96 hours); there is no bypass option and
+it never sends email. Use `--db PATH` to read an existing database, `--out PATH`
+to choose the output file.
+
 ### Data Dictionary
 
 ``` r
