@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-26
+
+### Completed
+- Added `inst/scripts/preview_weekly_email.R` (helpers in `R/email_preview.R`, tests in `tests/testthat/test-email-preview.R`) to preview the weekly email from fresh data. The local `inst/extdata/irish_buoys.duckdb` is git-ignored and was about 7 months old, so it cannot be used. The committed `dashboard_buoy_data.rds` is fresh (latest 2026-10-26 14:00 UTC) but has no `qc_flag` column, which `generate_weekly_summary()` filters on, so it cannot stand in either. The script therefore fetches the last 21 days from the public ERDDAP (Environmental Research Division's Data Access Program) service into a temporary database via the existing `incremental_update()`.
+- The script prints the latest timestamp and age per station, refuses (exit 1) through the unchanged `validate_email_freshness()`, has no bypass flag and never sends email.
+
+### Known Limitations
+- `generate_weekly_summary()` computes staleness only from the last 7 days, and `validate_email_freshness()` ignores `NA` ages, so a database with no rows in that window passes the guard (falsified: with the new pre-check removed, a 30-day-old fixture rendered). The preview script adds its own pre-check; the guard itself is untouched.
+- Station M4 returned no rows from ERDDAP in the 21-day window on 2026-10-26 and shows as offline in the preview.
+
 ## 2026-05-06
 
 ### Completed
