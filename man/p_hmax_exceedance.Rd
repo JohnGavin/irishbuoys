@@ -13,7 +13,9 @@ p_hmax_exceedance(h, hs, tz, duration_s = 3600, alpha = 0.681, beta = 2.126)
 
 \item{tz}{Numeric mean zero-crossing period (s), length 1 or length(h).}
 
-\item{duration_s}{Numeric window duration in seconds (default 3600 = 1 hour).}
+\item{duration_s}{Numeric window duration in seconds. The default, 3600
+(1 hour), is for forecast hours only. For observed buoy records pass
+\code{\link[=ib_record_duration_s]{ib_record_duration_s()}}, the 17.5-minute record length.}
 
 \item{alpha}{Forristall scale parameter (default 0.681).}
 
@@ -32,6 +34,13 @@ Forristall (1978) gives P(H > h | H_s) = exp(-(h / (alpha * H_s))^beta) with
 alpha = 0.681 and beta = 2.126 (calibrated on Gulf of Mexico storm data).
 For N independent waves in the window, P(H_max <= h) = (1 - P(H > h))^N, so
 P(H_max > h) = 1 - (1 - exp(-(h/(alpha*H_s))^beta))^N, with N = D / T_z.
+It is evaluated as \code{-expm1(N * log1p(-p1))} (p1 = P(H > h)), which stays
+accurate and positive far into the tail: a ratio H_max / H_s of 8.1 gives a
+tiny positive probability, where the naive form \code{1 - (1 - p1)^N} returns
+exactly 0 once p1 drops below machine precision.
+
+The Rayleigh distribution is the special case \code{alpha = 1 / sqrt(2)},
+\code{beta = 2}.
 
 Reference: Forristall, G. Z. (1978). On the statistical distribution of wave
 heights in a storm. \emph{Journal of Geophysical Research}, 83(C5), 2353-2358.
@@ -50,6 +59,7 @@ Other storm-alert:
 \code{\link{fetch_met_eireann_warnings}()},
 \code{\link{fetch_open_meteo_forecast}()},
 \code{\link{fetch_open_meteo_marine}()},
+\code{\link{ib_record_duration_s}()},
 \code{\link{knots_to_beaufort}()},
 \code{\link{send_storm_alert}()},
 \code{\link{summarise_forecast_rogue_risk}()}

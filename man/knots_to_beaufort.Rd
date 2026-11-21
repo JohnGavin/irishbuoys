@@ -28,6 +28,7 @@ Other storm-alert:
 \code{\link{fetch_met_eireann_warnings}()},
 \code{\link{fetch_open_meteo_forecast}()},
 \code{\link{fetch_open_meteo_marine}()},
+\code{\link{ib_record_duration_s}()},
 \code{\link{p_hmax_exceedance}()},
 \code{\link{send_storm_alert}()},
 \code{\link{summarise_forecast_rogue_risk}()}

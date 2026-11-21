@@ -896,6 +896,21 @@ plan_wave_analysis <- list(
     create_plot_gusts_vs_waves(analysis_data)
   ),
 
+  # Wave exceedance Manhattan and Q-Q (issue #116): one p-value per record from
+  # p_hmax_exceedance(), N = ib_record_duration_s() / mean period. The Manhattan
+  # draws only records with -log10(p) >= 2 to keep the published figure small
+  # (the title reports the counts); the Q-Q keeps the whole upper tail. The
+  # pre-plot data checks are in each figure's caption.
+  targets::tar_target(
+    plot_wave_manhattan,
+    create_plot_wave_manhattan(analysis_data, min_nlog10_p = 2)
+  ),
+
+  targets::tar_target(
+    plot_exceedance_qq,
+    create_plot_exceedance_qq(analysis_data)
+  ),
+
   # ========================================
   # Validation Reports (pointblank)
   # ========================================

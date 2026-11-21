@@ -997,6 +997,12 @@ create_plot_stl <- function(wave_stl, date_caption = NULL, palette = ib_default_
 
 #' Create Rogue Gusts All Stations Plot
 #'
+#' @description
+#' Gust / wind ratio per event, with the stations laid out as blocks
+#' (alternating shading; time runs left to right inside a block), the rogue
+#' gust threshold line and a label on the top event of each station. There is
+#' no p-value model for gusts yet.
+#'
 #' @param rogue_gust_events Data frame of rogue gust events
 #' @param palette Name of a palette preset, see [ib_palette_names()].
 #' @return plotly object
@@ -1019,51 +1025,68 @@ create_plot_rogue_gusts_all <- function(rogue_gust_events, palette = ib_default_
   }
 
   stations <- sort(unique(rogue_gust_events$station_id))
+  threshold <- ib_rogue_gust_threshold()
+  lay <- .ib_station_blocks(rogue_gust_events$station_id, rogue_gust_events$time)
+  x <- .ib_block_x(lay, rogue_gust_events$station_id, rogue_gust_events$time)
+  hover <- paste0(
+    "Station: ", rogue_gust_events$station_id, "<br>",
+    "Time: ", format(rogue_gust_events$time, "%Y-%m-%d %H:%M"), "<br>",
+    "Gust Ratio: ", round(rogue_gust_events$gust_ratio, 3), "<br>",
+    "Gust: ", round(rogue_gust_events$gust, 1), " kn<br>",
+    "Wind: ", round(rogue_gust_events$wind_speed, 1), " kn<br>",
+    "Wave Hs: ", round(rogue_gust_events$wave_height, 2), " m"
+  )
+  top_idx <- vapply(stations, function(s) {
+    idx <- which(rogue_gust_events$station_id == s)
+    idx[which.max(rogue_gust_events$gust_ratio[idx])]
+  }, integer(1))
 
   .ib_palette_figure(palette, function(pal) {
     st <- pal$semantic
-    plotly::plot_ly(
-      rogue_gust_events,
-      x = ~time, y = ~gust_ratio, color = ~station_id,
-      colors = ib_group_colors(pal, "station", stations),
-      type = "scatter", mode = "markers",
-      marker = list(size = 8, opacity = 0.7),
-      text = ~paste0(
-        "Station: ", station_id, "<br>",
-        "Time: ", format(time, "%Y-%m-%d %H:%M"), "<br>",
-        "Gust Ratio: ", round(gust_ratio, 3), "<br>",
-        "Gust: ", round(gust, 1), " kn<br>",
-        "Wind: ", round(wind_speed, 1), " kn<br>",
-        "Wave Hs: ", round(wave_height, 2), " m"
-      ),
-      hoverinfo = "text"
-    ) |>
+    station_colors <- ib_group_colors(pal, "station", stations)
+    p <- plotly::plot_ly()
+    for (s in stations) {
+      idx <- rogue_gust_events$station_id == s
+      p <- plotly::add_trace(
+        p, x = x[idx], y = rogue_gust_events$gust_ratio[idx],
+        type = "scatter", mode = "markers", name = s,
+        marker = list(size = 8, opacity = 0.7, color = station_colors[[s]]),
+        text = hover[idx], hoverinfo = "text"
+      )
+    }
+    x_lo <- min(lay$blocks$start) - lay$gap / 2
+    x_hi <- max(lay$blocks$end) + lay$gap / 2
+    top_labels <- .ib_top_event_annotations(
+      x[top_idx], rogue_gust_events$gust_ratio[top_idx],
+      paste0(stations, ": gust ratio ",
+             sprintf("%.2f", rogue_gust_events$gust_ratio[top_idx])),
+      NULL, st
+    )
+    p |>
       irishbuoys_layout(
         title = paste0(
           "All Rogue Gust Events (n=", nrow(rogue_gust_events), ", ",
           format(min(rogue_gust_events$time), "%Y-%m-%d"), " to ",
           format(max(rogue_gust_events$time), "%Y-%m-%d"), ")"
         ),
-        xaxis = list(
-          title = "Time",
-          rangeslider = list(type = "date", thickness = 0.05)
-        ),
+        xaxis = .ib_block_xaxis(lay),
         yaxis = list(title = "Gust / Wind Ratio"),
-        shapes = list(
-          list(
-            type = "line",
-            x0 = min(rogue_gust_events$time), x1 = max(rogue_gust_events$time),
-            y0 = 1.5, y1 = 1.5,
+        shapes = c(
+          .ib_block_shapes(lay, st),
+          list(list(
+            type = "line", xref = "x", yref = "y",
+            x0 = x_lo, x1 = x_hi, y0 = threshold, y1 = threshold,
             line = list(color = st$threshold, dash = "dash", width = 2)
-          )
+          ))
         ),
-        annotations = list(
-          list(
-            x = max(rogue_gust_events$time), y = 1.5,
-            text = "Rogue gust threshold (1.5)",
+        annotations = c(
+          list(list(
+            x = x_hi, y = threshold,
+            text = paste0("Rogue gust threshold (", threshold, ")"),
             showarrow = FALSE, xanchor = "right", yanchor = "bottom",
             font = list(color = st$threshold, size = 10)
-          )
+          )),
+          top_labels
         )
       )
   })
