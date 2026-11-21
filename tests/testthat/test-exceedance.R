@@ -269,17 +269,49 @@ test_that("Q-Q thinning keeps the whole upper tail", {
   expect_equal(qq$observed[1:10], top)
 })
 
-# --- Gust-ratio plot restyle -------------------------------------------------
+# --- Gust-ratio plot: time series with range slider ---------------------------
 
-test_that("gust plot has threshold line, station shading and top-event labels", {
-  g <- make_rogue_gust_events(20)
+make_long_gusts <- function(n = 40, by_days = 10) {
+  g <- make_rogue_gust_events(n)
+  g$time <- as.POSIXct("2024-01-01", tz = "UTC") + (seq_len(n) - 1) * by_days * 86400
+  g
+}
+
+test_that("gust plot is a time series with threshold line and top-event labels", {
+  g <- make_long_gusts()
   b <- built(create_plot_rogue_gusts_all(g))
+  expect_equal(b$layout$xaxis$type, "date")
   types <- vapply(b$layout$shapes, function(s) as.character(s$type), character(1))
   expect_true("line" %in% types)
-  expect_true("rect" %in% types)
   texts <- vapply(b$layout$annotations, function(a) as.character(a$text), character(1))
   expect_true(any(grepl("^M2: ", texts)))
   expect_true(any(grepl("^M3: ", texts)))
   expect_length(b$layout$updatemenus[[1]]$buttons, length(ib_palette_names()))
   expect_null(create_plot_rogue_gusts_all(NULL))
 })
+
+test_that("gust plot has a range slider opening on the last 3 months of the data", {
+  g <- make_long_gusts()
+  b <- built(create_plot_rogue_gusts_all(g))
+  ax <- b$layout$xaxis
+  expect_false(is.null(ax$rangeslider))
+  expect_false(isFALSE(ax$rangeslider$visible))
+  win <- as.POSIXct(unlist(ax$range), tz = "UTC")
+  expect_equal(win[2], max(g$time))
+  span_days <- as.numeric(difftime(win[2], win[1], units = "days"))
+  expect_gte(span_days, 89)
+  expect_lte(span_days, 92)
+  # the slider itself spans the whole record
+  full <- as.POSIXct(unlist(ax$rangeslider$range), tz = "UTC")
+  expect_equal(full[1], min(g$time))
+  expect_equal(full[2], max(g$time))
+})
+
+test_that("a record shorter than 3 months opens on the whole record", {
+  g <- make_long_gusts(n = 10, by_days = 1)
+  ax <- built(create_plot_rogue_gusts_all(g))$layout$xaxis
+  win <- as.POSIXct(unlist(ax$range), tz = "UTC")
+  expect_equal(win[1], min(g$time))
+  expect_equal(win[2], max(g$time))
+})
+

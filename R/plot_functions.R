@@ -998,10 +998,11 @@ create_plot_stl <- function(wave_stl, date_caption = NULL, palette = ib_default_
 #' Create Rogue Gusts All Stations Plot
 #'
 #' @description
-#' Gust / wind ratio per event, with the stations laid out as blocks
-#' (alternating shading; time runs left to right inside a block), the rogue
-#' gust threshold line and a label on the top event of each station. There is
-#' no p-value model for gusts yet.
+#' Gust / wind ratio per event against time, with the rogue gust threshold
+#' line and a label on the top event of each station. The time axis carries a
+#' range slider; it opens on the last 3 months of the data (counted back from
+#' the latest event) and the slider spans the whole record. There is no
+#' p-value model for gusts yet.
 #'
 #' @param rogue_gust_events Data frame of rogue gust events
 #' @param palette Name of a palette preset, see [ib_palette_names()].
@@ -1026,8 +1027,8 @@ create_plot_rogue_gusts_all <- function(rogue_gust_events, palette = ib_default_
 
   stations <- sort(unique(rogue_gust_events$station_id))
   threshold <- ib_rogue_gust_threshold()
-  lay <- .ib_station_blocks(rogue_gust_events$station_id, rogue_gust_events$time)
-  x <- .ib_block_x(lay, rogue_gust_events$station_id, rogue_gust_events$time)
+  t_all <- range(rogue_gust_events$time)
+  win <- .ib_last_months_range(rogue_gust_events$time, months = 3)
   hover <- paste0(
     "Station: ", rogue_gust_events$station_id, "<br>",
     "Time: ", format(rogue_gust_events$time, "%Y-%m-%d %H:%M"), "<br>",
@@ -1048,16 +1049,14 @@ create_plot_rogue_gusts_all <- function(rogue_gust_events, palette = ib_default_
     for (s in stations) {
       idx <- rogue_gust_events$station_id == s
       p <- plotly::add_trace(
-        p, x = x[idx], y = rogue_gust_events$gust_ratio[idx],
+        p, x = rogue_gust_events$time[idx], y = rogue_gust_events$gust_ratio[idx],
         type = "scatter", mode = "markers", name = s,
         marker = list(size = 8, opacity = 0.7, color = station_colors[[s]]),
         text = hover[idx], hoverinfo = "text"
       )
     }
-    x_lo <- min(lay$blocks$start) - lay$gap / 2
-    x_hi <- max(lay$blocks$end) + lay$gap / 2
     top_labels <- .ib_top_event_annotations(
-      x[top_idx], rogue_gust_events$gust_ratio[top_idx],
+      rogue_gust_events$time[top_idx], rogue_gust_events$gust_ratio[top_idx],
       paste0(stations, ": gust ratio ",
              sprintf("%.2f", rogue_gust_events$gust_ratio[top_idx])),
       NULL, st
@@ -1066,22 +1065,27 @@ create_plot_rogue_gusts_all <- function(rogue_gust_events, palette = ib_default_
       irishbuoys_layout(
         title = paste0(
           "All Rogue Gust Events (n=", nrow(rogue_gust_events), ", ",
-          format(min(rogue_gust_events$time), "%Y-%m-%d"), " to ",
-          format(max(rogue_gust_events$time), "%Y-%m-%d"), ")"
+          format(t_all[1], "%Y-%m-%d"), " to ",
+          format(t_all[2], "%Y-%m-%d"), ")"
         ),
-        xaxis = .ib_block_xaxis(lay),
+        xaxis = list(
+          title = "Time",
+          type = "date",
+          range = win,
+          rangeslider = list(
+            type = "date", thickness = 0.05,
+            range = .ib_date_str(t_all)
+          )
+        ),
         yaxis = list(title = "Gust / Wind Ratio"),
-        shapes = c(
-          .ib_block_shapes(lay, st),
-          list(list(
-            type = "line", xref = "x", yref = "y",
-            x0 = x_lo, x1 = x_hi, y0 = threshold, y1 = threshold,
-            line = list(color = st$threshold, dash = "dash", width = 2)
-          ))
-        ),
+        shapes = list(list(
+          type = "line", xref = "x", yref = "y",
+          x0 = t_all[1], x1 = t_all[2], y0 = threshold, y1 = threshold,
+          line = list(color = st$threshold, dash = "dash", width = 2)
+        )),
         annotations = c(
           list(list(
-            x = x_hi, y = threshold,
+            x = t_all[2], y = threshold,
             text = paste0("Rogue gust threshold (", threshold, ")"),
             showarrow = FALSE, xanchor = "right", yanchor = "bottom",
             font = list(color = st$threshold, size = 10)

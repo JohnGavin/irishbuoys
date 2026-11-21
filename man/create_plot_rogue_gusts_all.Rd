@@ -15,10 +15,11 @@ create_plot_rogue_gusts_all(rogue_gust_events, palette = ib_default_palette())
 plotly object
 }
 \description{
-Gust / wind ratio per event, with the stations laid out as blocks
-(alternating shading; time runs left to right inside a block), the rogue
-gust threshold line and a label on the top event of each station. There is
-no p-value model for gusts yet.
+Gust / wind ratio per event against time, with the rogue gust threshold
+line and a label on the top event of each station. The time axis carries a
+range slider; it opens on the last 3 months of the data (counted back from
+the latest event) and the slider spans the whole record. There is no
+p-value model for gusts yet.
 }
 \examples{
 \dontrun{

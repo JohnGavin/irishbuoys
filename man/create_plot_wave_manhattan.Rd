@@ -42,6 +42,12 @@ their true value is in the hover text. The top event of each station is
 labelled. Records the quality-control flag marks as suspect (\code{qc_flag} other
 than 0 or 1) are drawn hollow and grey, never dropped; see issue #114.
 
+The x axis is a station-block layout, not a calendar axis: each station's
+block is its own time span (days since that station's first record), so a
+date range slider with a "last 3 months" window has no single meaning
+across blocks and the figure has none. The dates are in the hover text; for
+a time axis with a range slider see \code{\link[=create_plot_rogue_gusts_all]{create_plot_rogue_gusts_all()}}.
+
 Only records with \code{-log10(p) >= min_nlog10_p} are drawn, which keeps the
 figure small; the title gives the counts. The caption reports the data
 checks: rows dropped for NA, Hmax < Hs and Hmax/Hs > 3.
