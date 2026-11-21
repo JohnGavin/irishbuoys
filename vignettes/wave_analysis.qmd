@@ -354,15 +354,6 @@ classify_beaufort <- function(ws) {
   )
 }
 
-beaufort_colors <- c(
-  "0-5 (Calm-Fresh)" = "#2166ac",
-  "6-7 (Strong-Near Gale)" = "#4393c3",
-  "8-9 (Gale-Severe)" = "#d6604d",
-  "10 (Storm)" = "#f4a582",
-  "11 (Violent Storm)" = "#b2182b",
-  "12 (Hurricane)" = "#67001f"
-)
-
 # Use irishbuoys_layout() for all plotly plots (dark theme, bottom legend)
 # Defined in R/plotly_helpers.R - no local legend_style needed
 
@@ -448,7 +439,7 @@ metrics <- data.frame(
     if (has_data) format(min(rogue_events$time), "%Y-%m-%d") else "N/A",
     if (has_data) format(max(rogue_events$time), "%Y-%m-%d") else "N/A"
   ),
-  units = c("count", "m", "ratio", "m", "m/s", "m/s", "count", "days", "date", "date"),
+  units = c("count", "m", "ratio", "m", "kn", "kn", "count", "days", "date", "date"),
   stringsAsFactors = FALSE
 )
 # Interactive DT table with caption, sortable columns, hover tooltips
@@ -512,121 +503,31 @@ create_plot_rogue_all(rogue_events)
 #### M2
 
 ```{r rogue-waves-m2}
-if (has_data && "M2" %in% rogue_events$station_id) {
-  m2_events <- rogue_events |> filter(station_id == "M2")
-  if (nrow(m2_events) > 0) {
-    plot_ly(m2_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
-            marker = list(size = 8, color = "#d62728"),
-            hoverinfo = "text",
-            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
-                          "<br>Ratio: ", round(rogue_ratio, 2),
-                          "<br>Max Wave: ", round(hmax, 1), "m",
-                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      irishbuoys_layout(title = paste0("M2 Rogue Events (n=", nrow(m2_events), ")"),
-             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
-             hovermode = "closest")
-  } else {
-    plotly_empty() |> layout(title = "M2: No rogue events")
-  }
-} else {
-  plotly_empty() |> layout(title = "M2: No data")
-}
+create_plot_rogue_station(rogue_events, "M2")
 ```
 
 #### M3
 
 ```{r rogue-waves-m3}
-if (has_data && "M3" %in% rogue_events$station_id) {
-  m3_events <- rogue_events |> filter(station_id == "M3")
-  if (nrow(m3_events) > 0) {
-    plot_ly(m3_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
-            marker = list(size = 8, color = "#1f77b4"),
-            hoverinfo = "text",
-            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
-                          "<br>Ratio: ", round(rogue_ratio, 2),
-                          "<br>Max Wave: ", round(hmax, 1), "m",
-                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      irishbuoys_layout(title = paste0("M3 Rogue Events (n=", nrow(m3_events), ")"),
-             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
-             hovermode = "closest")
-  } else {
-    plotly_empty() |> layout(title = "M3: No rogue events")
-  }
-} else {
-  plotly_empty() |> layout(title = "M3: No data")
-}
+create_plot_rogue_station(rogue_events, "M3")
 ```
 
 #### M4
 
 ```{r rogue-waves-m4}
-if (has_data && "M4" %in% rogue_events$station_id) {
-  m4_events <- rogue_events |> filter(station_id == "M4")
-  if (nrow(m4_events) > 0) {
-    plot_ly(m4_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
-            marker = list(size = 8, color = "#2ca02c"),
-            hoverinfo = "text",
-            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
-                          "<br>Ratio: ", round(rogue_ratio, 2),
-                          "<br>Max Wave: ", round(hmax, 1), "m",
-                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      irishbuoys_layout(title = paste0("M4 Rogue Events (n=", nrow(m4_events), ")"),
-             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
-             hovermode = "closest")
-  } else {
-    plotly_empty() |> layout(title = "M4: No rogue events")
-  }
-} else {
-  plotly_empty() |> layout(title = "M4: No data")
-}
+create_plot_rogue_station(rogue_events, "M4")
 ```
 
 #### M5
 
 ```{r rogue-waves-m5}
-if (has_data && "M5" %in% rogue_events$station_id) {
-  m5_events <- rogue_events |> filter(station_id == "M5")
-  if (nrow(m5_events) > 0) {
-    plot_ly(m5_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
-            marker = list(size = 8, color = "#ff7f0e"),
-            hoverinfo = "text",
-            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
-                          "<br>Ratio: ", round(rogue_ratio, 2),
-                          "<br>Max Wave: ", round(hmax, 1), "m",
-                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      irishbuoys_layout(title = paste0("M5 Rogue Events (n=", nrow(m5_events), ")"),
-             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
-             hovermode = "closest")
-  } else {
-    plotly_empty() |> layout(title = "M5: No rogue events")
-  }
-} else {
-  plotly_empty() |> layout(title = "M5: No data")
-}
+create_plot_rogue_station(rogue_events, "M5")
 ```
 
 #### M6
 
 ```{r rogue-waves-m6}
-if (has_data && "M6" %in% rogue_events$station_id) {
-  m6_events <- rogue_events |> filter(station_id == "M6")
-  if (nrow(m6_events) > 0) {
-    plot_ly(m6_events, x = ~time, y = ~rogue_ratio, type = "scatter", mode = "markers",
-            marker = list(size = 8, color = "#9467bd"),
-            hoverinfo = "text",
-            text = ~paste0("Time: ", format(time, "%Y-%m-%d %H:%M"),
-                          "<br>Ratio: ", round(rogue_ratio, 2),
-                          "<br>Max Wave: ", round(hmax, 1), "m",
-                          "<br>Signif Wave: ", round(wave_height, 1), "m")) |>
-      irishbuoys_layout(title = paste0("M6 Rogue Events (n=", nrow(m6_events), ")"),
-             xaxis = list(title = "Time"), yaxis = list(title = "Rogue Ratio"),
-             hovermode = "closest")
-  } else {
-    plotly_empty() |> layout(title = "M6: No rogue events")
-  }
-} else {
-  plotly_empty() |> layout(title = "M6: No data")
-}
+create_plot_rogue_station(rogue_events, "M6")
 ```
 
 #### Faceted View
@@ -1297,52 +1198,7 @@ list(
 ```{r rf-actual-vs-predicted}
 #| echo: false
 if (has_rf) {
-  preds <- wave_rf_eval$predictions
-  # Sample if too many points for plotly
-  if (nrow(preds) > 5000) {
-    set.seed(42)
-    preds_plot <- preds[sample(nrow(preds), 5000), ]
-  } else {
-    preds_plot <- preds
-  }
-
-  # LOESS fit line for actual model performance
-  preds_sorted <- preds_plot[order(preds_plot$actual), ]
-  loess_fit <- loess(predicted ~ actual, data = preds_sorted, span = 0.3)
-  preds_sorted$fitted <- predict(loess_fit)
-
-  plot_ly(preds_plot, x = ~actual, y = ~predicted, type = "scatter", mode = "markers",
-          color = ~category,
-          colors = c(Low = "#2196F3", Moderate = "#4CAF50", High = "#FF9800", Extreme = "#F44336"),
-          marker = list(size = 6, opacity = 0.7),
-          hoverinfo = "text",
-          text = ~paste0("Actual: ", round(actual, 2), " m",
-                         "<br>Predicted: ", round(predicted, 2), " m",
-                         "<br>Residual: ", round(residual, 2), " m",
-                         "<br>Category: ", category)) |>
-    add_trace(x = c(0, max(preds$actual, na.rm = TRUE)),
-              y = c(0, max(preds$actual, na.rm = TRUE)),
-              type = "scatter", mode = "lines",
-              line = list(dash = "dash", color = "#888888", width = 1),
-              name = "y = x (perfect)", showlegend = TRUE,
-              hoverinfo = "skip", inherit = FALSE) |>
-    add_trace(data = preds_sorted, x = ~actual, y = ~fitted,
-              type = "scatter", mode = "lines",
-              line = list(color = "#00ff88", width = 2),
-              name = "LOESS fit", showlegend = TRUE,
-              hoverinfo = "skip", inherit = FALSE) |>
-    irishbuoys_layout(
-      title = paste0(
-        "Actual vs Predicted Signif Wave on test set (n=",
-        fmt_num(nrow(preds)), ", R\u00b2=", round(rf_r2, 3), ")<br>",
-        "<sup>Dashed line = y=x (perfect prediction, not a fit). ",
-        "Points coloured by 2m wave-height bins (Low/Moderate/High/Extreme) to show where the model struggles. ",
-        "Click a legend entry to hide that category; the y=x line remains as reference.</sup>"
-      ),
-      xaxis = list(title = "Actual Signif Wave (m)"),
-      yaxis = list(title = "Predicted Signif Wave (m)"),
-      hovermode = "closest"
-    )
+  create_plot_rf_actual_vs_predicted(wave_rf_eval)
 } else {
   plotly_empty() |> layout(title = "RF model not available. Run targets::tar_make()")
 }
@@ -1353,27 +1209,7 @@ if (has_rf) {
 ```{r rf-residuals-by-category}
 #| echo: false
 if (has_rf) {
-  preds <- wave_rf_eval$predictions
-  plot_ly(preds, y = ~residual, x = ~category, type = "box",
-          color = ~category,
-          boxpoints = "outliers",
-          hoverinfo = "text",
-          text = ~paste0("Category: ", category, "<br>Residual: ", round(residual, 2), " m")) |>
-    irishbuoys_layout(
-      title = paste0(
-        "Residuals by 2m Wave Height Category (test set)<br>",
-        "<sup>Categories: Low (0-2m), Moderate (2-4m), High (4-6m), Extreme (>6m). ",
-        "2m bins separate calm seas from storm conditions. ",
-        "Residual = Actual - Predicted; zero = perfect. Wider boxes = more error.</sup>"
-      ),
-      xaxis = list(title = "Wave Height Category"),
-      yaxis = list(title = "Residual (Actual - Predicted, m)"),
-      showlegend = FALSE,
-      shapes = list(
-        list(type = "line", x0 = -0.5, x1 = 3.5, y0 = 0, y1 = 0,
-             line = list(dash = "dash", color = "grey", width = 1))
-      )
-    )
+  create_plot_rf_residuals(wave_rf_eval)
 } else {
   plotly_empty() |> layout(title = "RF model not available")
 }
@@ -1388,23 +1224,7 @@ if (has_rf) {
 ```{r rf-feature-importance}
 #| echo: false
 if (has_rf) {
-  imp <- head(wave_rf_model$importance, 10)
-  imp <- imp[order(imp$importance), ]  # ascending for horizontal bar
-  imp$variable <- factor(imp$variable, levels = imp$variable)
-
-  plot_ly(imp, y = ~variable, x = ~importance, type = "bar",
-          orientation = "h",
-          marker = list(color = "#1f77b4")) |>
-    irishbuoys_layout(
-      title = paste0(
-        "Top 10 Feature Importance (Impurity-based, <a href='https://imbs-hl.github.io/ranger/'>ranger</a>)<br>",
-        "<sup>Higher = variable contributes more to reducing prediction error. ",
-        "Lagged wave heights dominate because wave conditions persist hour-to-hour.</sup>"
-      ),
-      xaxis = list(title = "Importance"),
-      yaxis = list(title = ""),
-      margin = list(l = 150, b = 80)
-    )
+  create_plot_rf_importance(wave_rf_model)
 } else {
   plotly_empty() |> layout(title = "RF model not available")
 }

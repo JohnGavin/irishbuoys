@@ -4,12 +4,18 @@
 \alias{create_plot_rogue_gusts_by_station}
 \title{Create Rogue Gusts By Station Subplot}
 \usage{
-create_plot_rogue_gusts_by_station(rogue_gust_events, date_caption = NULL)
+create_plot_rogue_gusts_by_station(
+  rogue_gust_events,
+  date_caption = NULL,
+  palette = ib_default_palette()
+)
 }
 \arguments{
 \item{rogue_gust_events}{Data frame of rogue gust events}
 
 \item{date_caption}{Date range caption}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

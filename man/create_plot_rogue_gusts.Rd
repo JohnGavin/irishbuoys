@@ -4,10 +4,12 @@
 \alias{create_plot_rogue_gusts}
 \title{Create Rogue Gusts by Station Plot}
 \usage{
-create_plot_rogue_gusts(gust_analysis)
+create_plot_rogue_gusts(gust_analysis, palette = ib_default_palette())
 }
 \arguments{
 \item{gust_analysis}{Gust factor analysis results}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

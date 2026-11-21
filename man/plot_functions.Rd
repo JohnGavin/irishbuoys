@@ -6,5 +6,10 @@
 \description{
 Functions that create plotly objects for the wave analysis vignette.
 Each function returns a plotly object that can be stored as a target.
+
+Every colour comes from a palette preset (see \code{\link[=ib_palette]{ib_palette()}}); no colour is
+typed in this file. Each plotly figure carries a dropdown
+(\code{\link[=add_palette_menu]{add_palette_menu()}}) that restyles it between the presets in the browser.
+Wind and gust speeds are in knots (ERDDAP metadata, \code{\link[=get_data_dictionary]{get_data_dictionary()}}).
 }
 \keyword{internal}

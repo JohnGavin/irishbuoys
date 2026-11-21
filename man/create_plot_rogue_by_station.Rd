@@ -4,12 +4,18 @@
 \alias{create_plot_rogue_by_station}
 \title{Create Rogue Wave By Station Subplot}
 \usage{
-create_plot_rogue_by_station(rogue_events, date_caption = NULL)
+create_plot_rogue_by_station(
+  rogue_events,
+  date_caption = NULL,
+  palette = ib_default_palette()
+)
 }
 \arguments{
 \item{rogue_events}{Data frame of rogue wave events}
 
 \item{date_caption}{Date range caption}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

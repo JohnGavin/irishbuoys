@@ -4,10 +4,12 @@
 \alias{create_plot_gusts_vs_waves}
 \title{Create Rogue Gusts vs Rogue Waves Scatter Plot}
 \usage{
-create_plot_gusts_vs_waves(analysis_data)
+create_plot_gusts_vs_waves(analysis_data, palette = ib_default_palette())
 }
 \arguments{
 \item{analysis_data}{Full analysis data with both ratios computed}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

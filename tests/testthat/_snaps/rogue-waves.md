@@ -93,7 +93,7 @@
     Code
       args(irishbuoys:::create_plot_rogue_all)
     Output
-      function (rogue_events) 
+      function (rogue_events, palette = ib_default_palette()) 
       NULL
 
 # snap3: args(create_plot_rogue_by_station)
@@ -101,6 +101,6 @@
     Code
       args(irishbuoys:::create_plot_rogue_by_station)
     Output
-      function (rogue_events, date_caption = NULL) 
+      function (rogue_events, date_caption = NULL, palette = ib_default_palette()) 
       NULL
 

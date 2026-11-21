@@ -4,12 +4,18 @@
 \alias{create_plot_gust_by_category}
 \title{Create Gust Factor by Category Plot}
 \usage{
-create_plot_gust_by_category(gust_analysis, date_caption = NULL)
+create_plot_gust_by_category(
+  gust_analysis,
+  date_caption = NULL,
+  palette = ib_default_palette()
+)
 }
 \arguments{
 \item{gust_analysis}{Gust factor analysis results}
 
 \item{date_caption}{Date range caption}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

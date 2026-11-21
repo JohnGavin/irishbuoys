@@ -7,7 +7,8 @@
 create_plot_return_levels(
   return_levels,
   variable = "wave",
-  date_caption = NULL
+  date_caption = NULL,
+  palette = ib_default_palette()
 )
 }
 \arguments{
@@ -16,6 +17,8 @@ create_plot_return_levels(
 \item{variable}{Variable name for title ("wave", "wind", or "hmax")}
 
 \item{date_caption}{Date range caption}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

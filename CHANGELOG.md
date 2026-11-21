@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-11-21
+
+### Completed
+- Palettes ([#116](https://github.com/JohnGavin/irishbuoys/issues/116), PR A): one palette home `R/palettes.R` with presets `okabe_ito` (new default), `viridis` and `classic` (the previous look); `ib_palette()`, `ib_group_colors()`, `ib_alpha()`.
+- Every `create_plot_*()` takes `palette =` and draws only palette colours; every plotly figure carries a per-figure preset dropdown (`add_palette_menu()`). The 5 per-station rogue tabs and 3 random-forest figures of `wave_analysis.qmd` moved into `create_plot_rogue_station()` and `create_plot_rf_*()`.
+- `dashboard_static.qmd` dygraph and ggplot colours come from `R/palettes.R`.
+- Wind and gust labels corrected from "m/s" to "kn" (the data are in knots).
+- `_quarto.yml`: dark-contrast post-render step through `scripts/quarto_post_render_contrast.sh`, which skips with a message when the global script is absent (GitHub Actions).
+- Test that scans `R/plot_functions.R` and the R chunks of the deployed pages for colour literals, with an allow-list that states a reason per entry.
+
+### Known Limitations
+- The `classic` preset uses one station colour set (the by-station plots' Set1 colours); the per-station tabs previously used a second set.
+- `create_plot_stl()` is a ggplot2 figure, so it takes `palette =` but has no in-browser menu.
+- Beaufort class breaks in `create_plot_wind_beaufort()` and the Beaufort table in `wave_analysis.qmd` are m/s values applied to knots; not changed here.
+- Wind-category labels in `R/tar_plans/plan_wave_analysis.R` and bounds labels in `R/validation.R` still say "m/s".
+
 ## 2026-10-26
 
 ### Completed

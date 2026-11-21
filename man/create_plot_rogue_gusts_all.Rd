@@ -4,10 +4,12 @@
 \alias{create_plot_rogue_gusts_all}
 \title{Create Rogue Gusts All Stations Plot}
 \usage{
-create_plot_rogue_gusts_all(rogue_gust_events)
+create_plot_rogue_gusts_all(rogue_gust_events, palette = ib_default_palette())
 }
 \arguments{
 \item{rogue_gust_events}{Data frame of rogue gust events}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

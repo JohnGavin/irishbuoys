@@ -41,3 +41,5 @@
 ^_targets\.yaml$
 ^inst/extdata/ctx$
 ^AGENTS\.md$^LICENSE\.content\.md$
+
+^scripts$

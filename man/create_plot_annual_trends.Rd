@@ -4,12 +4,18 @@
 \alias{create_plot_annual_trends}
 \title{Create Annual Trends Line Plot}
 \usage{
-create_plot_annual_trends(annual_trends, date_caption = NULL)
+create_plot_annual_trends(
+  annual_trends,
+  date_caption = NULL,
+  palette = ib_default_palette()
+)
 }
 \arguments{
 \item{annual_trends}{Annual trends from calculate_annual_trends}
 
 \item{date_caption}{Date range caption}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

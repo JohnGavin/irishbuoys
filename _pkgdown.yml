@@ -168,6 +168,16 @@ reference:
       - create_plot_rogue_gusts_all
       - create_plot_rogue_gusts_by_station
       - create_plot_gusts_vs_waves
+      - create_plot_rogue_station
+      - create_plot_rf_actual_vs_predicted
+      - create_plot_rf_residuals
+      - create_plot_rf_importance
+      - ib_palette
+      - ib_palette_names
+      - ib_default_palette
+      - ib_group_colors
+      - ib_alpha
+      - add_palette_menu
 
   - title: "Email Reporting"
     desc: "Functions for generating and sending email summaries"
