@@ -1,0 +1,2 @@
+file	literal	reason
+R/plot_functions.R	transparent	Sentinel meaning 'draw no line' for the confidence ribbon outline; it is the absence of a colour, not a palette colour.
