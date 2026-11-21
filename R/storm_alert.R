@@ -288,6 +288,13 @@ fetch_all_marine_forecasts <- function(station_info = get_station_info(),
 #' alpha = 0.681 and beta = 2.126 (calibrated on Gulf of Mexico storm data).
 #' For N independent waves in the window, P(H_max <= h) = (1 - P(H > h))^N, so
 #' P(H_max > h) = 1 - (1 - exp(-(h/(alpha*H_s))^beta))^N, with N = D / T_z.
+#' It is evaluated as `-expm1(N * log1p(-p1))` (p1 = P(H > h)), which stays
+#' accurate and positive far into the tail: a ratio H_max / H_s of 8.1 gives a
+#' tiny positive probability, where the naive form `1 - (1 - p1)^N` returns
+#' exactly 0 once p1 drops below machine precision.
+#'
+#' The Rayleigh distribution is the special case `alpha = 1 / sqrt(2)`,
+#' `beta = 2`.
 #'
 #' Reference: Forristall, G. Z. (1978). On the statistical distribution of wave
 #' heights in a storm. *Journal of Geophysical Research*, 83(C5), 2353-2358.
@@ -295,7 +302,9 @@ fetch_all_marine_forecasts <- function(station_info = get_station_info(),
 #' @param h Numeric vector of wave heights to evaluate (m).
 #' @param hs Numeric significant wave height (m), length 1 or length(h).
 #' @param tz Numeric mean zero-crossing period (s), length 1 or length(h).
-#' @param duration_s Numeric window duration in seconds (default 3600 = 1 hour).
+#' @param duration_s Numeric window duration in seconds. The default, 3600
+#'   (1 hour), is for forecast hours only. For observed buoy records pass
+#'   [ib_record_duration_s()], the 17.5-minute record length.
 #' @param alpha Forristall scale parameter (default 0.681).
 #' @param beta Forristall shape parameter (default 2.126).
 #'
@@ -316,9 +325,9 @@ p_hmax_exceedance <- function(h, hs, tz, duration_s = 3600,
   out <- rep(NA_real_, n)
   ok <- !is.na(h_v) & !is.na(hs_v) & !is.na(tz_v) & hs_v > 0 & tz_v > 0
   if (!any(ok)) return(out)
-  n_waves <- duration_s / tz_v[ok]
-  p_single <- exp(-(h_v[ok] / (alpha * hs_v[ok]))^beta)
-  out[ok] <- 1 - (1 - p_single)^n_waves
+  out[ok] <- .ib_hmax_exceed(
+    h_v[ok], hs_v[ok], tz_v[ok], duration_s, alpha, beta
+  )$p
   out
 }
 

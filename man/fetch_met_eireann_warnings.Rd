@@ -30,6 +30,7 @@ Other storm-alert:
 \code{\link{fetch_all_marine_forecasts}()},
 \code{\link{fetch_open_meteo_forecast}()},
 \code{\link{fetch_open_meteo_marine}()},
+\code{\link{ib_record_duration_s}()},
 \code{\link{knots_to_beaufort}()},
 \code{\link{p_hmax_exceedance}()},
 \code{\link{send_storm_alert}()},

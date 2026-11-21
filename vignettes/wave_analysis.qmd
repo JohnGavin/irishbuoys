@@ -540,6 +540,22 @@ Use the **range slider** at the bottom to zoom all panels to a specific time per
 create_plot_rogue_by_station(rogue_events)
 ```
 
+#### Exceedance Manhattan
+
+Every buoy record gets a p-value: the chance that the largest of its waves is at least as high as the observed Max Wave, given the record's Signif Wave height and mean period (Forristall 1978 distribution; N waves = 17.5-minute record / mean period). The plot shows -log10(p) per record, with the stations laid out side by side and time running left to right inside each block. The dashed lines mark the Max Wave / Signif Wave = 2.0 and 2.2 definitions for a typical record. Points above the axis cap are drawn as triangles at the cap, with their true value on hover; hollow grey points carry a quality-control flag. The caption reports the data checks.
+
+```{r exceedance-manhattan}
+targets::tar_read(plot_wave_manhattan)
+```
+
+#### Exceedance Q-Q
+
+Observed against expected -log10(p), per station, with a 95% band. Points on the dashed Forristall diagonal mean the model fits the records. An upward tail means more extreme waves than the model predicts, and a station far off the line points to sensor faults. The dotted curve scores the same records under the Rayleigh distribution for comparison.
+
+```{r exceedance-qq}
+targets::tar_read(plot_exceedance_qq)
+```
+
 #### Data Table
 
 **rogue_ratio** = Max Wave / Signif Wave. Values > 2.0 define a rogue wave event.

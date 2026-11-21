@@ -66,6 +66,21 @@ irishbuoys_layout <- function(p, title = NULL, ...) {
 }
 
 
+# A time as the string plotly reads on a date axis (the time's own time zone).
+.ib_date_str <- function(t) {
+  format(t, "%Y-%m-%d %H:%M:%S")
+}
+
+# The initial x range of a time-series plot: the last `months` months of the
+# data, counted back from its latest time and not before its earliest time.
+# Computed from the data, never typed. Returns c(start, end) as date strings.
+.ib_last_months_range <- function(time, months = 3) {
+  t_max <- max(time, na.rm = TRUE)
+  t_min <- min(time, na.rm = TRUE)
+  t_start <- seq(t_max, by = paste0("-", months, " months"), length.out = 2L)[2L]
+  .ib_date_str(c(max(t_start, t_min), t_max))
+}
+
 #' Apply Irish Buoys theme to ggplotly object
 #'
 #' @description

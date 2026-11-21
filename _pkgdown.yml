@@ -166,6 +166,8 @@ reference:
       - create_plot_rogue_gusts
       - create_plot_stl
       - create_plot_rogue_gusts_all
+      - create_plot_wave_manhattan
+      - create_plot_exceedance_qq
       - create_plot_rogue_gusts_by_station
       - create_plot_gusts_vs_waves
       - create_plot_rogue_station
@@ -239,6 +241,7 @@ reference:
       - fetch_open_meteo_marine
       - fetch_all_marine_forecasts
       - p_hmax_exceedance
+      - ib_record_duration_s
       - summarise_forecast_rogue_risk
       - detect_storm_events
       - create_storm_alert_email

@@ -5,6 +5,7 @@
 
 scanned_files <- c(
   "R/plot_functions.R",
+  "R/plot_exceedance.R",
   "vignettes/dashboard_static.qmd",
   "vignettes/wave_analysis.qmd"
 )

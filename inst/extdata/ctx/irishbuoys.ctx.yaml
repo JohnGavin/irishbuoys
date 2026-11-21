@@ -160,6 +160,29 @@ arguments:
   db_path: Path to existing DuckDB database
 ---
 kind: function
+name: create_plot_wave_manhattan
+exported: true
+signature: create_plot_wave_manhattan(data, palette = ib_default_palette(),y_cap = 20, min_nlog10_p = 1,duration_s = ib_record_duration_s())
+arguments:
+  data: Data frame of buoy records with time, station_id, wave_height (Hs, m), hmax (m) and wave_period (mean period, s); optionally qc_flag.
+  duration_s: Record duration in seconds; default \link[=ib_record_duration_s]{ib_record_duration_s()}.
+  min_nlog10_p: Records below this -log10(p) are not drawn.
+  palette: Name of a palette preset, see \link[=ib_palette_names]{ib_palette_names()}.
+  y_cap: Upper limit of the y axis, in -log10(p) units.
+returns: plotly object, or NULL when there are no usable records.
+---
+kind: function
+name: create_plot_exceedance_qq
+exported: true
+signature: create_plot_exceedance_qq(data, palette = ib_default_palette(),max_points = 500L,duration_s = ib_record_duration_s())
+arguments:
+  data: Data frame of buoy records with time, station_id, wave_height (Hs, m), hmax (m) and wave_period (mean period, s); optionally qc_flag.
+  duration_s: Record duration in seconds; default \link[=ib_record_duration_s]{ib_record_duration_s()}.
+  max_points: Most points drawn per station.
+  palette: Name of a palette preset, see \link[=ib_palette_names]{ib_palette_names()}.
+returns: plotly object, or NULL when there are no usable records.
+---
+kind: function
 name: download_buoy_data
 exported: true
 signature: download_buoy_data(start_date = Sys.Date() - 30,end_date = Sys.Date(),stations = NULL,variables = NULL,format = "csv")
@@ -634,6 +657,12 @@ signature: wave_science_documentation()
 returns: Character string with markdown-formatted documentation
 ---
 kind: function
+name: ib_record_duration_s
+exported: true
+signature: ib_record_duration_s()
+returns: Record duration in seconds (a single number).
+---
+kind: function
 name: compute_obs_confidence
 exported: true
 signature: compute_obs_confidence(age_hours)
@@ -809,7 +838,7 @@ signature: p_hmax_exceedance(h, hs, tz, duration_s = 3600,alpha = 0.681, beta = 
 arguments:
   alpha: Forristall scale parameter (default 0.681).
   beta: Forristall shape parameter (default 2.126).
-  duration_s: Numeric window duration in seconds (default 3600 = 1 hour).
+  duration_s: Numeric window duration in seconds.
   h: Numeric vector of wave heights to evaluate (m).
   hs: Numeric significant wave height (m), length 1 or length(h).
   tz: Numeric mean zero-crossing period (s), length 1 or length(h).
