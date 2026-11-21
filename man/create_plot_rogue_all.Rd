@@ -4,10 +4,13 @@
 \alias{create_plot_rogue_all}
 \title{Create Rogue Wave All Stations Plot}
 \usage{
-create_plot_rogue_all(rogue_events)
+create_plot_rogue_all(rogue_events, palette = ib_default_palette())
 }
 \arguments{
 \item{rogue_events}{Data frame of rogue wave events}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.
+Defaults to \code{\link[=ib_default_palette]{ib_default_palette()}}.}
 }
 \value{
 plotly object

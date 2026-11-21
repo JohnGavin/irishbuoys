@@ -4,18 +4,21 @@
 \alias{create_plot_stl}
 \title{Create STL Decomposition Plot}
 \usage{
-create_plot_stl(wave_stl, date_caption = NULL)
+create_plot_stl(wave_stl, date_caption = NULL, palette = ib_default_palette())
 }
 \arguments{
 \item{wave_stl}{STL decomposition from calculate_wave_seasonality}
 
 \item{date_caption}{Date range caption}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 ggplot2 object
 }
 \description{
-Create STL Decomposition Plot
+A ggplot2 figure, so it has no in-browser palette menu; its colours still
+come from the chosen preset.
 }
 \examples{
 \dontrun{

@@ -4,12 +4,19 @@
 \alias{create_plot_monthly_wind}
 \title{Create Monthly Wind Speed Bar Plot}
 \usage{
-create_plot_monthly_wind(seasonal_means_wind, date_caption = NULL)
+create_plot_monthly_wind(
+  seasonal_means_wind,
+  date_caption = NULL,
+  palette = ib_default_palette()
+)
 }
 \arguments{
-\item{seasonal_means_wind}{Seasonal means from calculate_seasonal_means}
+\item{seasonal_means_wind}{Seasonal means from calculate_seasonal_means
+(wind speed in knots)}
 
 \item{date_caption}{Date range caption}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

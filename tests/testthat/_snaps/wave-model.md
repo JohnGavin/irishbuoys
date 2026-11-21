@@ -43,7 +43,7 @@
     Code
       args(irishbuoys:::create_plot_gusts_vs_waves)
     Output
-      function (analysis_data) 
+      function (analysis_data, palette = ib_default_palette()) 
       NULL
 
 # snap3: args(create_plot_monthly_wave)
@@ -51,7 +51,7 @@
     Code
       args(irishbuoys:::create_plot_monthly_wave)
     Output
-      function (seasonal_means_wave, date_caption = NULL) 
+      function (seasonal_means_wave, date_caption = NULL, palette = ib_default_palette()) 
       NULL
 
 # prepare_wave_features output columns are stable

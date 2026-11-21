@@ -4,12 +4,18 @@
 \alias{create_plot_monthly_wave}
 \title{Create Monthly Wave Height Bar Plot}
 \usage{
-create_plot_monthly_wave(seasonal_means_wave, date_caption = NULL)
+create_plot_monthly_wave(
+  seasonal_means_wave,
+  date_caption = NULL,
+  palette = ib_default_palette()
+)
 }
 \arguments{
 \item{seasonal_means_wave}{Seasonal means from calculate_seasonal_means}
 
 \item{date_caption}{Date range caption}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object

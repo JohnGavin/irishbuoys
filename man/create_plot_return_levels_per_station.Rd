@@ -4,7 +4,11 @@
 \alias{create_plot_return_levels_per_station}
 \title{Create Per-Station Return Levels Plot}
 \usage{
-create_plot_return_levels_per_station(return_levels_df, variable_filter)
+create_plot_return_levels_per_station(
+  return_levels_df,
+  variable_filter,
+  palette = ib_default_palette()
+)
 }
 \arguments{
 \item{return_levels_df}{Data frame from \code{return_levels_per_station} target
@@ -12,6 +16,8 @@ with columns: station, variable, return_period, return_level, lower, upper}
 
 \item{variable_filter}{Character, which variable to plot (one of
 "avg_wave", "rogue_wave", "avg_wind", "wind_gust")}
+
+\item{palette}{Name of a palette preset, see \code{\link[=ib_palette_names]{ib_palette_names()}}.}
 }
 \value{
 plotly object, or NULL if no data for the requested variable
